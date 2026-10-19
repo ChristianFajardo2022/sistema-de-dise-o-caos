@@ -1,0 +1,135 @@
+<script>
+  (function () {
+    const exactWords = {
+      'Controls': 'Controles',
+      'Actions': 'Acciones',
+      'Interactions': 'Interacciones',
+      'Accessibility': 'Accesibilidad',
+      'Tests': 'Pruebas',
+      'Coverage': 'Cobertura',
+      'Canvas': 'Lienzo',
+      'Docs': 'Documentación',
+      'Search': 'Buscar',
+      'Help': 'Ayuda',
+      'Release notes': 'Notas de la versión',
+      'Documentation': 'Documentación',
+      'Sidebar': 'Barra lateral',
+      'Toolbar': 'Barra de herramientas',
+    };
+
+    const phraseReplacements = [
+      [/About your Storybook/gi, 'Acerca de tu Storybook'],
+      [/Onboarding guide/gi, 'Guía de inicio'],
+      [/Keyboard shortcuts/gi, 'Atajos de teclado'],
+      [/Show sidebar/gi, 'Mostrar barra lateral'],
+      [/Hide sidebar/gi, 'Ocultar barra lateral'],
+      [/Show toolbar/gi, 'Mostrar barra de herramientas'],
+      [/Hide toolbar/gi, 'Ocultar barra de herramientas'],
+      [/Show addon panel/gi, 'Mostrar panel de complementos'],
+      [/Hide addon panel/gi, 'Ocultar panel de complementos'],
+      [/Change addon orientation/gi, 'Cambiar orientación del panel'],
+      [/Toggle full screen/gi, 'Pantalla completa'],
+      [/Get started/gi, 'Primeros pasos'],
+      [/Set up with AI/gi, 'Configurar con IA'],
+      [/Share your Storybook for feedback/gi, 'Compartir Storybook para feedback'],
+      [/Test functionality with interactions/gi, 'Probar funcionalidad con interacciones'],
+      [/Publish Storybook to Chromatic/gi, 'Publicar Storybook en Chromatic'],
+      [/Integrate Figma designs/gi, 'Integrar diseños de Figma'],
+      [/Automate visual tests/gi, 'Automatizar pruebas visuales'],
+      [/Test your components/gi, 'Probar tus componentes'],
+      [/Find components/gi, 'Buscar componentes...'],
+      [/Expand all/gi, 'Expandir todo'],
+      [/Collapse all/gi, 'Colapsar todo'],
+      [/Zoom in/gi, 'Acercar'],
+      [/Zoom out/gi, 'Alejar'],
+      [/Reset zoom/gi, 'Restablecer zoom'],
+      [/Reset controls/gi, 'Restablecer controles'],
+      [/Clear actions/gi, 'Limpiar acciones'],
+      [/No interactions found/gi, 'No se encontraron interacciones'],
+      [/Open canvas in new tab/gi, 'Abrir lienzo en nueva pestaña'],
+      [/Copy link to story/gi, 'Copiar enlace a historia'],
+      [/Remount component/gi, 'Recargar componente'],
+    ];
+
+    let isTranslating = false;
+    let pending = false;
+
+    function translateTree(root) {
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          const parent = node.parentElement;
+          if (parent && ['SCRIPT', 'STYLE', 'CODE', 'PRE'].includes(parent.tagName)) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+
+      let currentNode;
+      while ((currentNode = walker.nextNode())) {
+        const val = currentNode.nodeValue;
+        const trimmed = val.trim();
+        if (exactWords[trimmed]) {
+          currentNode.nodeValue = val.replace(trimmed, exactWords[trimmed]);
+          continue;
+        }
+        for (const [pattern, replacement] of phraseReplacements) {
+          if (pattern.test(currentNode.nodeValue)) {
+            currentNode.nodeValue = currentNode.nodeValue.replace(pattern, replacement);
+          }
+        }
+      }
+
+      const elements = root.querySelectorAll ? root.querySelectorAll('[placeholder], [title], [aria-label]') : [];
+      elements.forEach((el) => {
+        ['placeholder', 'title', 'aria-label'].forEach((attr) => {
+          const v = el.getAttribute(attr);
+          if (!v) return;
+          const trimmed = v.trim();
+          if (exactWords[trimmed]) {
+            el.setAttribute(attr, exactWords[trimmed]);
+          } else {
+            for (const [pattern, replacement] of phraseReplacements) {
+              if (pattern.test(v)) {
+                el.setAttribute(attr, v.replace(pattern, replacement));
+              }
+            }
+          }
+        });
+      });
+    }
+
+    function scheduleTranslation() {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(() => {
+        pending = false;
+        if (isTranslating) return;
+        isTranslating = true;
+        try {
+          translateTree(document.body);
+        } catch (e) {
+          // ignore
+        } finally {
+          isTranslating = false;
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      scheduleTranslation();
+
+      const observer = new MutationObserver(() => {
+        scheduleTranslation();
+      });
+
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    });
+  })();
+</script>

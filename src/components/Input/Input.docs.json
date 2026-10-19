@@ -1,0 +1,91 @@
+{
+  "name": "Input",
+  "component": "Input",
+  "description": "Componente de entrada de texto accesible y configurable perteneciente al sistema de diseño CAOS. Soporta estados de validación (Error, Success), variantes de tamaño, tipos (Text, Search, Password) e integración completa con tokens CSS y WAI-ARIA.",
+  "figmaNodeId": "8026-2056",
+  "category": "Form Controls",
+  "props": {
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Etiqueta descriptiva superior del campo de texto."
+    },
+    "secondaryLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Texto secundario opcional alineado a la derecha de la etiqueta."
+    },
+    "helperText": {
+      "type": "string",
+      "required": false,
+      "description": "Texto de ayuda o descripción inferior."
+    },
+    "errorText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de error que conmuta el estado a 'error' y activa aria-invalid."
+    },
+    "successText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de éxito que conmuta el estado visual a 'success'."
+    },
+    "inputType": {
+      "type": "'text' | 'search' | 'password' | 'email' | 'number' | 'tel'",
+      "default": "'text'",
+      "description": "Tipo de entrada HTML o variante especial (search, password con toggle automático)."
+    },
+    "state": {
+      "type": "'default' | 'filled' | 'active' | 'disabled' | 'error' | 'success'",
+      "default": "'default'",
+      "description": "Estado del campo de texto."
+    },
+    "sizeVariant": {
+      "type": "'sm' | 'md' | 'lg'",
+      "default": "'md'",
+      "description": "Tamaño del input (altura y espaciados)."
+    },
+    "leftIcon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Icono o elemento React renderizado a la izquierda."
+    },
+    "rightIcon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Icono o elemento React renderizado a la derecha."
+    },
+    "tooltip": {
+      "type": "string",
+      "required": false,
+      "description": "Texto desplegable informativo al pasar el cursor sobre el icono de ayuda."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "default": true,
+      "description": "Indica si el contenedor ocupa el 100% del espacio del padre."
+    }
+  },
+  "examples": [
+    {
+      "title": "Default Input with Label & Helper Text",
+      "code": "<Input label=\"Nombre de usuario\" placeholder=\"Ingresa tu usuario\" helperText=\"Debe contener al menos 4 caracteres\" />"
+    },
+    {
+      "title": "Password Input with Toggle",
+      "code": "<Input label=\"Contraseña\" inputType=\"password\" placeholder=\"••••••••\" />"
+    },
+    {
+      "title": "Search Input",
+      "code": "<Input inputType=\"search\" placeholder=\"Buscar en el portal...\" />"
+    },
+    {
+      "title": "Error State Input",
+      "code": "<Input label=\"Correo electrónico\" value=\"correo-invalido\" errorText=\"Introduce una dirección de correo válida.\" />"
+    },
+    {
+      "title": "Disabled State Input",
+      "code": "<Input label=\"Código de referencia\" value=\"REF-99201\" state=\"disabled\" disabled />"
+    }
+  ]
+}

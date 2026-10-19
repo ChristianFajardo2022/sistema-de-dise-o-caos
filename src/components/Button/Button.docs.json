@@ -1,0 +1,75 @@
+{
+  "name": "Button",
+  "component": "Button",
+  "description": "Componente de botón interactivo y accesible del sistema de diseño CAOS. Admite múltiples variantes de estilo (Primary, Secondary, Tertiary, Destructive, Link), contrastes (Low, High), tamaños (xs, sm, md, lg), estados de carga (load/spinner) e iconos laterales o en modo solo icono.",
+  "category": "General Controls",
+  "props": {
+    "variant": {
+      "type": "'primary' | 'secondary' | 'tertiary' | 'destructive' | 'link'",
+      "default": "'primary'",
+      "description": "Variante estética del botón según su jerarquía de acción."
+    },
+    "contrast": {
+      "type": "'low' | 'high'",
+      "default": "'low'",
+      "description": "Nivel de contraste del botón."
+    },
+    "size": {
+      "type": "'xs' | 'sm' | 'md' | 'lg'",
+      "default": "'md'",
+      "description": "Tamaño del botón (altura y espaciado interno)."
+    },
+    "state": {
+      "type": "'default' | 'hover' | 'press' | 'focus' | 'disabled' | 'delete' | 'load'",
+      "default": "'default'",
+      "description": "Estado del botón."
+    },
+    "loading": {
+      "type": "boolean",
+      "default": false,
+      "description": "Muestra un spinner interactivo y establece aria-busy='true'."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Deshabilita la interacción con el botón y establece aria-disabled='true'."
+    },
+    "leftIcon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Icono o elemento renderizado antes del texto."
+    },
+    "rightIcon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Icono o elemento renderizado después del texto."
+    },
+    "iconOnly": {
+      "type": "boolean",
+      "default": false,
+      "description": "Modo compacto circular/cuadrado solo para icono."
+    }
+  },
+  "examples": [
+    {
+      "title": "Primary Button",
+      "code": "<Button variant=\"primary\">Guardar cambios</Button>"
+    },
+    {
+      "title": "Secondary Button with Icon",
+      "code": "<Button variant=\"secondary\" leftIcon={<Plus className=\"w-4 h-4\" />}>Agregar ítem</Button>"
+    },
+    {
+      "title": "Loading Button",
+      "code": "<Button variant=\"primary\" loading>Procesando...</Button>"
+    },
+    {
+      "title": "Destructive Button",
+      "code": "<Button variant=\"destructive\" leftIcon={<Trash2 className=\"w-4 h-4\" />}>Eliminar cuenta</Button>"
+    },
+    {
+      "title": "Icon Only Button",
+      "code": "<Button variant=\"tertiary\" iconOnly><Settings className=\"w-4 h-4\" /></Button>"
+    }
+  ]
+}

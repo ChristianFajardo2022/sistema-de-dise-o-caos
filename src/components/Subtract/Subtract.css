@@ -1,0 +1,11 @@
+.subtract {
+  width: min(100%, 369px);
+  aspect-ratio: 369 / 540;
+  border-radius: var(--ds-responsive-radius-general-2xl, 24px);
+  background-color: var(
+    --color-ds-background-container-default-on-canva,
+    #1d1c1c
+  );
+  -webkit-mask: url('./assets/subtract.svg') center / 100% 100% no-repeat;
+  mask: url('./assets/subtract.svg') center / 100% 100% no-repeat;
+}

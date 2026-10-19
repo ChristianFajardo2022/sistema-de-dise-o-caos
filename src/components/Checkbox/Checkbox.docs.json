@@ -1,0 +1,38 @@
+{
+  "name": "Checkbox",
+  "description": "Componente de selección múltiple (Checkbox) que soporta estados marcado, desmarcado e indeterminado, con soporte para descripciones y estados de error.",
+  "props": {
+    "checked": "boolean | 'indeterminate'",
+    "defaultChecked": "boolean",
+    "label": "ReactNode",
+    "description": "ReactNode",
+    "size": "'sm' | 'md' | 'lg' (default: 'md')",
+    "error": "boolean | string",
+    "disabled": "boolean",
+    "align": "'top' | 'center' (default: 'top')",
+    "onCheckedChange": "(checked: boolean | 'indeterminate') => void"
+  },
+  "styling": "TailwindCSS + class-variance-authority",
+  "tokens": [
+    "--background-field-surface",
+    "--background-field-active-purpple",
+    "--background-field-disabled",
+    "--border-field-default",
+    "--border-field-active",
+    "--border-field-disabled",
+    "--border-alert-error",
+    "--text-field-label",
+    "--text-field-label-secondary",
+    "--text-alert-error",
+    "--radius-field-checkbox-radiobutton-sm",
+    "--radius-field-checkbox-radiobutton-md",
+    "--radius-field-checkbox-radiobutton-lg"
+  ],
+  "anatomy": [
+    "Container (Label + Input Wrapper)",
+    "Input (Native, hidden visually, takes focus)",
+    "Control (Custom div styled as checkbox)",
+    "Icon (CheckIcon / DashIcon)",
+    "Text Content (Label + Description + Error Message)"
+  ]
+}

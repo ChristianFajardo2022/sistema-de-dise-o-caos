@@ -1,0 +1,32 @@
+<script>
+  (function () {
+    const docTranslations = {
+      'Name': 'Nombre',
+      'Description': 'Descripción',
+      'Default': 'Por defecto',
+      'Controls': 'Controles',
+      'Required': 'Obligatorio',
+      'Show code': 'Mostrar código',
+      'Hide code': 'Ocultar código',
+      'Copy': 'Copiar',
+      'Copied': 'Copiado',
+    };
+
+    function translateDocs() {
+      document.querySelectorAll('th, button').forEach((el) => {
+        if (el.children.length === 0) {
+          const text = el.textContent?.trim();
+          if (docTranslations[text]) {
+            el.textContent = docTranslations[text];
+          }
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      translateDocs();
+      const obs = new MutationObserver(translateDocs);
+      obs.observe(document.body, { childList: true, subtree: true });
+    });
+  })();
+</script>
