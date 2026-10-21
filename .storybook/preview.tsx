@@ -1,10 +1,9 @@
 import type { Preview, Decorator } from '@storybook/react-vite';
 import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import '../src/index.css';
 
-const withThemeDecorator: Decorator = (Story, context) => {
-  const selectedTheme: string = context.globals?.['theme'] ?? 'light';
-
+function ThemeWrapper({ theme: selectedTheme, children }: { theme: string; children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     if (selectedTheme === 'dark') {
@@ -30,10 +29,16 @@ const withThemeDecorator: Decorator = (Story, context) => {
         transition: 'all 0.2s',
       }}
     >
-      <Story />
+      {children}
     </div>
   );
-};
+}
+
+const withThemeDecorator: Decorator = (Story, context) => (
+  <ThemeWrapper theme={context.globals?.['theme'] ?? 'dark'}>
+    <Story />
+  </ThemeWrapper>
+);
 
 const preview: Preview = {
   parameters: {
@@ -54,7 +59,7 @@ const preview: Preview = {
     theme: {
       name: 'Tema',
       description: 'Selector de tema del sistema CAOS',
-      defaultValue: 'light',
+      defaultValue: 'dark',
       toolbar: {
         icon: 'circlehollow',
         items: [
