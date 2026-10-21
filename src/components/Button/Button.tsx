@@ -22,13 +22,13 @@ function EffectUnion({ className }: { className?: string }) {
   );
 }
 
-/** Slot de ícono: 20×20 y color por token del estado (--btn-icon). */
+/** Slot de ícono: 20×20 y color por token del estado (--btn-icon). En px: no hay token de 20 y la raíz no siempre mide 16px. */
 function IconSlot({ children }: { children: ReactNode }) {
   return (
     <span
       data-slot="icon"
       aria-hidden="true"
-      className="inline-flex size-5 shrink-0 items-center justify-center text-(color:--btn-icon) [&>svg]:size-full"
+      className="inline-flex size-[20px] shrink-0 items-center justify-center text-(color:--btn-icon) [&>svg]:size-full"
     >
       {children}
     </span>
@@ -133,6 +133,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </span>
         )}
 
+        {/* Trazo interior de 0.5px de Primary (stroke/dm), por encima del efecto */}
+        {variant === 'primary' && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] text-(color:--btn-stroke) shadow-[inset_0_0_0_var(--ds-primitives-stroke-dm)_currentColor] transition-colors duration-300 ease-out"
+          />
+        )}
+
         {/* Contenido sobre el efecto; en Load se oculta y queda el spinner centrado */}
         <span
           className={cn(
@@ -152,7 +160,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         </span>
 
         {isLoading && (
-          <Spinner className="absolute left-1/2 top-1/2 z-10 size-5 -translate-x-1/2 -translate-y-1/2 text-(color:--btn-icon)" />
+          <Spinner className="absolute left-1/2 top-1/2 z-10 size-[20px] -translate-x-1/2 -translate-y-1/2 text-(color:--btn-icon)" />
         )}
       </button>
     );

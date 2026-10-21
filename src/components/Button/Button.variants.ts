@@ -16,7 +16,7 @@ import { cva } from 'class-variance-authority';
  * - Sin anillo de foco ni escala al presionar: cada estado usa sus propios tokens.
  *
  * Los colores de ícono se pasan por la variable local --btn-icon, que leen
- * el slot de ícono y el spinner.
+ * el slot de ícono y el spinner; el color del trazo de Primary, por --btn-stroke.
  *
  * Los estados con prefijo (hover:, focus-visible:, active:) solo se aplican en
  * state="default"; el resto de valores de state fuerza el aspecto del estado.
@@ -27,15 +27,16 @@ export const buttonVariants = cva(
     'cursor-pointer select-none whitespace-nowrap outline-none',
     'transition-[background-color,border-color,color,min-width] duration-300 ease-out',
     'disabled:cursor-not-allowed',
-    // Button/Button-md-600: Helvetica Neue, peso 400, interlineado 100 %, tracking 0
+    // Button/Button-md-600: Helvetica Neue, peso 400, tracking 0 (tamaño e interlineado en `unicolor`)
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
     '[font-weight:var(--ds-primitives-typography-weight-regular)]',
-    'leading-none tracking-normal',
+    'tracking-normal',
   ].join(' '),
   {
     variants: {
       variant: {
-        primary: 'rounded-ds-radius-button-full border-solid border-(length:--ds-primitives-stroke-dm)',
+        // El trazo de 0.5px se dibuja en Button.tsx con una sombra interior: Chrome redondea a 1px los bordes de 0.5px
+        primary: 'rounded-ds-radius-button-full border-0 [--btn-stroke:transparent]',
         secondary: 'rounded-ds-radius-button-full border-solid border-(length:--ds-primitives-stroke-lg)',
         tertiary: 'rounded-none border-0',
         /** @deprecated Button link es un componente aparte en Figma; pendiente de migrar. */
@@ -48,14 +49,15 @@ export const buttonVariants = cva(
       },
 
       unicolor: {
-        true: 'text-(length:--ds-responsive-typography-button-size-md-uniform)',
-        false: 'text-(length:--ds-responsive-typography-button-size-md)',
+        // leading-none va después del tamaño: tailwind-merge descarta un leading anterior a un text-size
+        true: 'text-(length:--ds-responsive-typography-button-size-md-uniform) leading-none',
+        false: 'text-(length:--ds-responsive-typography-button-size-md) leading-none',
       },
 
       size: {
-        md: 'h-14',
-        sm: 'h-12',
-        xs: 'h-8',
+        md: 'h-ds-primitives-dimention-5xl',
+        sm: 'h-ds-primitives-dimention-4xl',
+        xs: 'h-ds-primitives-dimention-2xl',
       },
 
       state: {
@@ -130,45 +132,45 @@ export const buttonVariants = cva(
         variant: 'primary',
         state: 'default',
         class: [
-          'border-transparent bg-ds-background-button-primary-default text-ds-text-button-primary-default',
+          'bg-ds-background-button-primary-default text-ds-text-button-primary-default',
           '[--btn-icon:var(--color-ds-icon-button-primary-default)]',
-          'hover:border-ds-border-button-primary-default hover:bg-ds-background-button-primary-hover hover:text-ds-text-button-primary-hover-focus-press',
+          'hover:[--btn-stroke:var(--color-ds-border-button-primary-default)] hover:bg-ds-background-button-primary-hover hover:text-ds-text-button-primary-hover-focus-press',
           'hover:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
-          'focus-visible:border-ds-border-button-primary-focus-press focus-visible:bg-ds-background-button-primary-focus focus-visible:text-ds-text-button-primary-hover-focus-press',
+          'focus-visible:[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] focus-visible:bg-ds-background-button-primary-focus focus-visible:text-ds-text-button-primary-hover-focus-press',
           'focus-visible:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
-          'active:border-ds-border-button-primary-focus-press active:bg-ds-background-button-primary-press active:text-ds-text-button-primary-hover-focus-press',
+          'active:[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] active:bg-ds-background-button-primary-press active:text-ds-text-button-primary-hover-focus-press',
           'active:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
         ],
       },
       {
         variant: 'primary',
         state: 'hover',
-        class: 'border-ds-border-button-primary-default bg-ds-background-button-primary-hover text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+        class: '[--btn-stroke:var(--color-ds-border-button-primary-default)] bg-ds-background-button-primary-hover text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
       },
       {
         variant: 'primary',
         state: 'focus',
-        class: 'border-ds-border-button-primary-focus-press bg-ds-background-button-primary-focus text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+        class: '[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] bg-ds-background-button-primary-focus text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
       },
       {
         variant: 'primary',
         state: 'press',
-        class: 'border-ds-border-button-primary-focus-press bg-ds-background-button-primary-press text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+        class: '[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] bg-ds-background-button-primary-press text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
       },
       {
         variant: 'primary',
         state: 'inactive',
-        class: 'border-transparent bg-ds-background-button-primary-inactive text-ds-text-button-primary-inactive [--btn-icon:var(--color-ds-icon-button-primary-inactive)]',
+        class: 'bg-ds-background-button-primary-inactive text-ds-text-button-primary-inactive [--btn-icon:var(--color-ds-icon-button-primary-inactive)]',
       },
       {
         variant: 'primary',
         state: 'delete',
-        class: 'border-transparent bg-ds-background-button-primary-delete text-ds-text-button-primary-delete [--btn-icon:var(--color-ds-icon-button-primary-delete)]',
+        class: 'bg-ds-background-button-primary-delete text-ds-text-button-primary-delete [--btn-icon:var(--color-ds-icon-button-primary-delete)]',
       },
       {
         variant: 'primary',
         state: 'load',
-        class: 'border-transparent bg-ds-background-button-primary-load [--btn-icon:var(--color-ds-icon-button-primary-load)]',
+        class: 'bg-ds-background-button-primary-load [--btn-icon:var(--color-ds-icon-button-primary-load)]',
       },
 
       /* ── Secondary low (sin fondo, solo borde) ───────────────── */
