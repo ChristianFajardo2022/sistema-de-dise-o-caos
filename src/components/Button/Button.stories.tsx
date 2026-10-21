@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './Button';
-import type { ButtonState } from './Button.types';
+import type { ButtonProps, ButtonState } from './Button.types';
 import { AddIcon } from '../../icons/AddIcon';
 import { ArrowRightIcon } from '../../icons/ArrowRightIcon';
 import { TrashIcon } from '../../icons/TrashIcon';
@@ -123,11 +123,19 @@ export const Inactive: Story = {
 /** Matriz de Type × State, como el component set de Figma. */
 export const StatesMatrix: Story = {
   render: () => {
-    const rows = [
-      { label: 'Primary', props: { variant: 'primary' as const } },
-      { label: 'Secondary low', props: { variant: 'secondary' as const, contrast: 'low' as const } },
-      { label: 'Secondary high', props: { variant: 'secondary' as const, contrast: 'high' as const } },
-      { label: 'Tertiary', props: { variant: 'tertiary' as const } },
+    // Orden de Figma: texto (con Unicolor) y luego Icon-single
+    const rows: { label: string; props: Omit<ButtonProps, 'state'> }[] = [
+      { label: 'Primary', props: { variant: 'primary' } },
+      { label: 'Secondary low', props: { variant: 'secondary', contrast: 'low' } },
+      { label: 'Unicolor', props: { variant: 'secondary', contrast: 'low', unicolor: true } },
+      { label: 'Secondary high', props: { variant: 'secondary', contrast: 'high' } },
+      { label: 'Unicolor', props: { variant: 'secondary', contrast: 'high', unicolor: true } },
+      { label: 'Tertiary', props: { variant: 'tertiary' } },
+      { label: 'Tertiary unicolor', props: { variant: 'tertiary', unicolor: true } },
+      { label: 'Primary · ícono', props: { variant: 'primary', iconOnly: true, 'aria-label': 'Agregar', children: <AddIcon /> } },
+      { label: 'Secondary low · ícono', props: { variant: 'secondary', contrast: 'low', iconOnly: true, 'aria-label': 'Agregar', children: <AddIcon /> } },
+      { label: 'Secondary high · ícono', props: { variant: 'secondary', contrast: 'high', iconOnly: true, 'aria-label': 'Agregar', children: <AddIcon /> } },
+      { label: 'Tertiary · ícono', props: { variant: 'tertiary', iconOnly: true, 'aria-label': 'Agregar', children: <AddIcon /> } },
     ];
     return (
       <div className="grid grid-cols-[auto_repeat(7,auto)] items-center gap-4">
@@ -135,15 +143,15 @@ export const StatesMatrix: Story = {
         {STATES.map((s) => (
           <span key={s} className="text-xs text-neutral-400">{s}</span>
         ))}
-        {rows.map((row) => (
-          <div key={row.label} className="contents">
+        {rows.map((row, i) => (
+          <div key={`${row.label}-${i}`} className="contents">
             <span className="text-xs text-neutral-400">{row.label}</span>
             {STATES.map((s) =>
               row.props.variant === 'tertiary' && s === 'load' ? (
                 <span key={s} />
               ) : (
                 <div key={s}>
-                  <Button {...row.props} state={s}>Button</Button>
+                  <Button {...row.props} state={s}>{row.props.children ?? 'Button'}</Button>
                 </div>
               )
             )}
