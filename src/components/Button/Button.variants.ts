@@ -293,16 +293,7 @@ export const buttonVariants = cva(
         class: 'text-ds-text-button-secondary-high-unicolor [--btn-icon:var(--color-ds-icon-button-secondary-high-unicolor)]',
       },
 
-      /* ── Tertiary (sin borde ni radio; fondo en hover, focus y press) ── */
-      {
-        variant: 'tertiary',
-        state: 'default',
-        class: [
-          'hover:bg-ds-background-button-tertiary-hover',
-          'focus-visible:bg-ds-background-button-tertiary-focus-press',
-          'active:bg-ds-background-button-tertiary-focus-press',
-        ],
-      },
+      /* ── Tertiary (sin borde, radio ni fondo en ningún estado) ── */
       {
         variant: 'tertiary',
         state: 'default',
@@ -314,8 +305,6 @@ export const buttonVariants = cva(
           'active:text-ds-text-button-tertiary-focus-press active:[--btn-icon:var(--color-ds-icon-button-tertiary-focus-press)]',
         ],
       },
-      { variant: 'tertiary', state: 'hover', class: 'bg-ds-background-button-tertiary-hover' },
-      { variant: 'tertiary', state: ['focus', 'press'], class: 'bg-ds-background-button-tertiary-focus-press' },
       {
         variant: 'tertiary',
         state: 'hover',
