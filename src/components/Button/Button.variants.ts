@@ -3,196 +3,365 @@ import { cva } from 'class-variance-authority';
 /**
  * CAOS Design System — Button Variants
  *
- * Especificación exacta de Figma (Hover Primary, Secondary, Tertiary):
+ * Fuente: component set "Button" de Figma (nodo 155:1315). Todos los colores,
+ * espacios, radios y bordes salen de tokens (src/styles/tokens.css).
  *
- * Primary (Light & Dark):
- *   - Default:
- *       Light: bg #000000, text #FEFEFE, border ninguno (0.5px transparente)
- *       Dark:  bg #FEFEFE, text #2E3033, border ninguno (0.5px transparente)
- *   - Hover:
- *       Light & Dark: bg #5E6165, text #FEFEFE, border 0.5px interior #7E8187
- *       Efecto interior: Unión booleana de dos círculos con blur 24 y textura de ruido,
- *       reproduciendo ciclo de 4 estados con disolución (Dissolve) de 1s por paso.
- *   - Transición: Dissolve 300 ms, Ease out al entrar y salir.
+ * - Type: primary · secondary · tertiary (link queda como variante heredada).
+ * - Contrats (contrast): low · high, solo para secondary.
+ * - Unicolor: solo secondary y tertiary sin icon-single.
+ * - Size: md 56 · sm 48 · xs 32. Padding X 24/24/16, padding Y 8, min-width 92 en md y sm.
+ * - State: default · hover · focus · press · inactive · delete · load (tertiary sin load).
+ * - Tipografía: Helvetica Neue (typography/family/Primary), peso 400,
+ *   typography/button/size/md, interlineado 100 %.
+ * - Sin anillo de foco ni escala al presionar: cada estado usa sus propios tokens.
  *
- * Secondary (Light & Dark):
- *   - Fondo transparente en ambos estados.
- *   - Borde 1px:
- *       Light: #CFD1D5 (Default) → #ADB0B4 (Hover)
- *       Dark:  #ADB0B4 (Default) → #FEFEFE (Hover)
- *   - Texto:
- *       Light: #000000 (no cambia en hover)
- *       Dark:  #FEFEFE (no cambia en hover)
- *   - Transición: Dissolve 300 ms, Ease out.
+ * Los colores de ícono se pasan por la variable local --btn-icon, que leen
+ * el slot de ícono y el spinner.
  *
- * Tertiary (Light & Dark):
- *   - Fondo transparente, sin borde, radio 0 (rounded-none), px-0.
- *   - Dimensiones: 41x56 (Default) → 44x56 (Hover).
- *   - Subrayado:
- *       Existe desde Default: solid, 6% (~1px), offset 46% (~6px), skip-ink activo.
- *       Color Default: #CFD1D5 (Light) / #7E8187 (Dark) independiente del texto.
- *       Color Hover: Automático (sigue el color del texto).
- *   - Texto:
- *       Light: #000000 (Default) → #5E6165 (Hover)
- *       Dark:  #FEFEFE (Default) → #ADB0B4 (Hover)
- *   - Transición: Dissolve 300 ms, Ease out.
+ * Los estados con prefijo (hover:, focus-visible:, active:) solo se aplican en
+ * state="default"; el resto de valores de state fuerza el aspecto del estado.
  */
 export const buttonVariants = cva(
   [
-    // Base estructural común
-    'inline-flex items-center justify-center gap-2',
-    'relative overflow-hidden transition-all duration-300 ease-out group',
-    'cursor-pointer select-none',
-    'box-border',
-    'outline-none',
-    'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--border-field-active,#aa3bff)]',
-    'disabled:cursor-not-allowed disabled:pointer-events-none',
-    // Tipografía Helvetica Regular 400, 14px, auto leading, 0% tracking
-    '[font-family:Helvetica,Arial,sans-serif]',
-    'font-normal text-[14px] leading-normal tracking-normal',
+    'group relative box-border inline-flex shrink-0 items-center justify-center overflow-hidden',
+    'cursor-pointer select-none whitespace-nowrap outline-none',
+    'transition-[background-color,border-color,color,min-width] duration-300 ease-out',
+    'disabled:cursor-not-allowed',
+    // Button/Button-md-600: Helvetica Neue, peso 400, interlineado 100 %, tracking 0
+    '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
+    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+    'leading-none tracking-normal',
   ].join(' '),
   {
     variants: {
       variant: {
-        /**
-         * Primary — Fondo base y texto según tokens de modo, borde 0.5px.
-         * En hover cambia a #5E6165 con texto #FEFEFE y borde #7E8187 + efecto 4 fases.
-         */
-        primary: [
-          'bg-ds-background-button-primary-default',
-          'text-ds-text-button-primary-default',
-          'border-[0.5px] border-transparent',
-          'hover:bg-ds-background-button-primary-hover',
-          'hover:text-ds-text-button-primary-hover-focus-press',
-          'hover:border-ds-border-button-primary-default',
-          'active:bg-ds-background-button-primary-press',
-          'active:text-ds-text-button-primary-hover-focus-press',
-          'active:border-ds-border-button-primary-focus-press',
-          'active:scale-[0.98]',
-          'focus-visible:bg-ds-background-button-primary-focus',
-          'focus-visible:text-ds-text-button-primary-hover-focus-press',
-        ],
-
-        /**
-         * Secondary — Fondo transparente, solo cambia el borde de 1px.
-         * El texto no cambia de color en hover.
-         */
-        secondary: [
-          'bg-transparent hover:bg-transparent',
-          'text-ds-text-button-secondary-low-default hover:text-ds-text-button-secondary-low-default',
-          'border border-solid border-ds-border-button-secondary-low-default',
-          'hover:border-ds-border-button-secondary-low-hover',
-          'active:bg-ds-background-button-secondary-low-press',
-          'active:scale-[0.98]',
-        ],
-
-        /**
-         * Tertiary — Fondo transparente, sin borde, radio 0, subrayado presente en Default.
-         * Dimensiones 41px Default → 44px Hover.
-         */
-        tertiary: [
-          'bg-transparent hover:bg-transparent',
-          'text-ds-text-button-tertiary-default hover:text-ds-text-button-tertiary-hover',
-          'border-0 border-transparent',
-          'rounded-none',
-          'px-0',
-          'min-w-[41px] hover:min-w-[44px]',
-          'underline decoration-solid decoration-[1px] underline-offset-[6px] [text-decoration-skip-ink:auto]',
-          'decoration-ds-border-general-gray-fourth hover:decoration-current',
-          'active:bg-transparent active:scale-[0.98]',
-        ],
-
-        /**
-         * Destructive — Acción irreversible con fondo rojo.
-         */
-        destructive: [
-          'bg-ds-background-button-primary-delete',
-          'text-ds-text-button-primary-delete',
-          'border border-solid border-ds-border-button-secondary-low-delete',
-          'hover:brightness-110',
-          'active:brightness-90 active:scale-[0.98]',
-        ],
-
-        /**
-         * Link — Enlace interactivo.
-         */
-        link: [
-          'bg-transparent',
-          'text-ds-text-button-link-default',
-          'border-0 border-transparent',
-          'underline-offset-4 hover:underline',
-          'hover:text-ds-text-button-link-hover',
-          'active:text-ds-text-button-link-focus-press',
-        ],
+        primary: 'rounded-ds-radius-button-full border-solid border-(length:--ds-primitives-stroke-dm)',
+        secondary: 'rounded-ds-radius-button-full border-solid border-(length:--ds-primitives-stroke-lg)',
+        tertiary: 'rounded-none border-0',
+        /** @deprecated Button link es un componente aparte en Figma; pendiente de migrar. */
+        link: 'rounded-ds-radius-button-full border-0',
       },
 
       contrast: {
         low: '',
-        high: 'brightness-110',
+        high: '',
+      },
+
+      unicolor: {
+        true: 'text-(length:--ds-responsive-typography-button-size-md-uniform)',
+        false: 'text-(length:--ds-responsive-typography-button-size-md)',
       },
 
       size: {
-        xs: [
-          'h-[40px] min-w-[80px]',
-          'px-4',
-          'text-[12px]',
-          'rounded-[48px]',
-        ],
-        sm: [
-          'h-[40px] min-w-[96px]',
-          'px-5',
-          'text-[12px]',
-          'rounded-[48px]',
-        ],
-        md: [
-          'min-h-[56px] min-w-[92px]',
-          'py-2 px-6',
-          'text-[14px]',
-          'rounded-[48px]',
-        ],
-        lg: [
-          'h-[64px] min-w-[148px]',
-          'py-2 px-8',
-          'text-[14px]',
-          'rounded-[48px]',
-        ],
+        md: 'h-14',
+        sm: 'h-12',
+        xs: 'h-8',
       },
 
       state: {
         default: '',
         hover: '',
-        press: 'scale-[0.98]',
-        focus: 'ring-2 ring-[var(--border-field-active)] ring-offset-2',
-        disabled: [
-          'opacity-50 cursor-not-allowed pointer-events-none',
-          'bg-ds-background-button-primary-inactive',
-          'text-ds-text-button-primary-inactive',
-          'border-ds-border-button-primary-inactive',
-        ],
-        delete: [
-          'bg-ds-background-button-primary-delete',
-          'text-ds-text-button-primary-delete',
-          'border-ds-border-button-secondary-low-delete',
-        ],
-        load: [
-          'cursor-wait opacity-80 pointer-events-none',
-          'bg-ds-background-button-primary-load',
-          'text-ds-text-button-primary-inactive',
-        ],
+        focus: '',
+        press: '',
+        inactive: '',
+        delete: '',
+        load: 'disabled:cursor-wait',
       },
 
       iconOnly: {
-        true: [
-          'px-0 min-w-0',
-          'aspect-square',
-          'rounded-full',
-        ],
+        true: 'aspect-square p-0',
         false: '',
       },
     },
+
+    compoundVariants: [
+      /* ── Medidas ─────────────────────────────────────────────── */
+      {
+        variant: ['primary', 'secondary', 'link'],
+        size: ['md', 'sm'],
+        iconOnly: false,
+        class: 'min-w-[92px] px-ds-space-button-4xl py-ds-space-button-lg',
+      },
+      {
+        variant: ['primary', 'secondary', 'link'],
+        size: 'xs',
+        iconOnly: false,
+        class: 'px-ds-space-button-2xl py-ds-space-button-lg',
+      },
+      {
+        variant: 'tertiary',
+        iconOnly: false,
+        class: 'px-ds-space-button-xs py-ds-space-button-lg',
+      },
+      // Tertiary: ancho 41 en Default y 44 en el resto de estados
+      {
+        variant: 'tertiary',
+        iconOnly: false,
+        state: 'default',
+        class: 'min-w-[41px] hover:min-w-[44px] focus-visible:min-w-[44px] active:min-w-[44px]',
+      },
+      {
+        variant: 'tertiary',
+        iconOnly: false,
+        state: ['hover', 'focus', 'press', 'inactive', 'delete'],
+        class: 'min-w-[44px]',
+      },
+      // Tertiary: subrayado sólido 6 %; en Default el color es fijo, en el resto sigue al texto
+      {
+        variant: 'tertiary',
+        iconOnly: false,
+        class: 'underline decoration-solid [text-decoration-thickness:6%] [text-underline-offset:46%] [text-decoration-skip-ink:auto]',
+      },
+      {
+        variant: 'tertiary',
+        iconOnly: false,
+        state: 'default',
+        class: 'decoration-ds-border-general-gray-fourth hover:decoration-current focus-visible:decoration-current active:decoration-current',
+      },
+      {
+        variant: 'tertiary',
+        iconOnly: false,
+        state: ['hover', 'focus', 'press', 'inactive', 'delete'],
+        class: 'decoration-current',
+      },
+
+      /* ── Primary ─────────────────────────────────────────────── */
+      {
+        variant: 'primary',
+        state: 'default',
+        class: [
+          'border-transparent bg-ds-background-button-primary-default text-ds-text-button-primary-default',
+          '[--btn-icon:var(--color-ds-icon-button-primary-default)]',
+          'hover:border-ds-border-button-primary-default hover:bg-ds-background-button-primary-hover hover:text-ds-text-button-primary-hover-focus-press',
+          'hover:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+          'focus-visible:border-ds-border-button-primary-focus-press focus-visible:bg-ds-background-button-primary-focus focus-visible:text-ds-text-button-primary-hover-focus-press',
+          'focus-visible:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+          'active:border-ds-border-button-primary-focus-press active:bg-ds-background-button-primary-press active:text-ds-text-button-primary-hover-focus-press',
+          'active:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+        ],
+      },
+      {
+        variant: 'primary',
+        state: 'hover',
+        class: 'border-ds-border-button-primary-default bg-ds-background-button-primary-hover text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+      },
+      {
+        variant: 'primary',
+        state: 'focus',
+        class: 'border-ds-border-button-primary-focus-press bg-ds-background-button-primary-focus text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+      },
+      {
+        variant: 'primary',
+        state: 'press',
+        class: 'border-ds-border-button-primary-focus-press bg-ds-background-button-primary-press text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+      },
+      {
+        variant: 'primary',
+        state: 'inactive',
+        class: 'border-transparent bg-ds-background-button-primary-inactive text-ds-text-button-primary-inactive [--btn-icon:var(--color-ds-icon-button-primary-inactive)]',
+      },
+      {
+        variant: 'primary',
+        state: 'delete',
+        class: 'border-transparent bg-ds-background-button-primary-delete text-ds-text-button-primary-delete [--btn-icon:var(--color-ds-icon-button-primary-delete)]',
+      },
+      {
+        variant: 'primary',
+        state: 'load',
+        class: 'border-transparent bg-ds-background-button-primary-load [--btn-icon:var(--color-ds-icon-button-primary-load)]',
+      },
+
+      /* ── Secondary low (sin fondo, solo borde) ───────────────── */
+      {
+        variant: 'secondary',
+        contrast: 'low',
+        state: 'default',
+        class: [
+          'border-ds-border-button-secondary-low-default',
+          'hover:border-ds-border-button-secondary-low-hover',
+          'focus-visible:border-ds-border-button-secondary-low-focus',
+          'active:border-ds-border-button-secondary-low-press',
+        ],
+      },
+      {
+        variant: 'secondary',
+        contrast: 'low',
+        state: 'default',
+        unicolor: false,
+        class: [
+          'text-ds-text-button-secondary-low-default [--btn-icon:var(--color-ds-icon-button-secondary-low-default)]',
+          'hover:text-ds-text-button-secondary-low-hover-focus-press hover:[--btn-icon:var(--color-ds-icon-button-secondary-low-hover-focus-press)]',
+          'focus-visible:text-ds-text-button-secondary-low-hover-focus-press focus-visible:[--btn-icon:var(--color-ds-icon-button-secondary-low-hover-focus-press)]',
+          'active:text-ds-text-button-secondary-low-hover-focus-press active:[--btn-icon:var(--color-ds-icon-button-secondary-low-hover-focus-press)]',
+        ],
+      },
+      { variant: 'secondary', contrast: 'low', state: 'hover', class: 'border-ds-border-button-secondary-low-hover' },
+      { variant: 'secondary', contrast: 'low', state: 'focus', class: 'border-ds-border-button-secondary-low-focus' },
+      { variant: 'secondary', contrast: 'low', state: 'press', class: 'border-ds-border-button-secondary-low-press' },
+      { variant: 'secondary', contrast: 'low', state: 'inactive', class: 'border-ds-border-button-secondary-low-inactive' },
+      { variant: 'secondary', contrast: 'low', state: 'delete', class: 'border-ds-border-button-secondary-low-delete' },
+      { variant: 'secondary', contrast: 'low', state: 'load', class: 'border-ds-border-button-secondary-low-load [--btn-icon:var(--color-ds-icon-button-secondary-low-load)]' },
+      {
+        variant: 'secondary',
+        contrast: 'low',
+        state: ['hover', 'focus', 'press'],
+        unicolor: false,
+        class: 'text-ds-text-button-secondary-low-hover-focus-press [--btn-icon:var(--color-ds-icon-button-secondary-low-hover-focus-press)]',
+      },
+      {
+        variant: 'secondary',
+        contrast: 'low',
+        state: 'inactive',
+        unicolor: false,
+        class: 'text-ds-text-button-secondary-low-inactive [--btn-icon:var(--color-ds-icon-button-secondary-low-inactive)]',
+      },
+      {
+        variant: 'secondary',
+        contrast: 'low',
+        state: 'delete',
+        unicolor: false,
+        class: 'text-ds-text-button-secondary-low-delete [--btn-icon:var(--color-ds-icon-button-secondary-low-delete)]',
+      },
+      {
+        variant: 'secondary',
+        contrast: 'low',
+        state: ['default', 'hover', 'focus', 'press', 'inactive', 'delete'],
+        unicolor: true,
+        class: 'text-ds-text-button-secondary-low-unicolor [--btn-icon:var(--color-ds-icon-button-secondary-low-unicolor)]',
+      },
+
+      /* ── Secondary high (sin fondo, solo borde) ──────────────── */
+      {
+        variant: 'secondary',
+        contrast: 'high',
+        state: 'default',
+        class: [
+          'border-ds-border-button-secondary-high-default',
+          'hover:border-ds-border-button-secondary-high-hover',
+          'focus-visible:border-ds-border-button-secondary-high-focus',
+          'active:border-ds-border-button-secondary-high-press',
+        ],
+      },
+      {
+        variant: 'secondary',
+        contrast: 'high',
+        state: 'default',
+        unicolor: false,
+        class: [
+          'text-ds-text-button-secondary-high-default [--btn-icon:var(--color-ds-icon-button-secondary-high-default)]',
+          'hover:text-ds-text-button-secondary-high-hover-focus-press hover:[--btn-icon:var(--color-ds-icon-button-secondary-high-hover-focus-press)]',
+          'focus-visible:text-ds-text-button-secondary-high-hover-focus-press focus-visible:[--btn-icon:var(--color-ds-icon-button-secondary-high-hover-focus-press)]',
+          'active:text-ds-text-button-secondary-high-hover-focus-press active:[--btn-icon:var(--color-ds-icon-button-secondary-high-hover-focus-press)]',
+        ],
+      },
+      { variant: 'secondary', contrast: 'high', state: 'hover', class: 'border-ds-border-button-secondary-high-hover' },
+      { variant: 'secondary', contrast: 'high', state: 'focus', class: 'border-ds-border-button-secondary-high-focus' },
+      { variant: 'secondary', contrast: 'high', state: 'press', class: 'border-ds-border-button-secondary-high-press' },
+      { variant: 'secondary', contrast: 'high', state: 'inactive', class: 'border-ds-border-button-secondary-high-inactive' },
+      { variant: 'secondary', contrast: 'high', state: 'delete', class: 'border-ds-border-button-secondary-high-delete' },
+      { variant: 'secondary', contrast: 'high', state: 'load', class: 'border-ds-border-button-secondary-high-load [--btn-icon:var(--color-ds-icon-button-secondary-high-load)]' },
+      {
+        variant: 'secondary',
+        contrast: 'high',
+        state: ['hover', 'focus', 'press'],
+        unicolor: false,
+        class: 'text-ds-text-button-secondary-high-hover-focus-press [--btn-icon:var(--color-ds-icon-button-secondary-high-hover-focus-press)]',
+      },
+      {
+        variant: 'secondary',
+        contrast: 'high',
+        state: 'inactive',
+        unicolor: false,
+        class: 'text-ds-text-button-secondary-high-inactive [--btn-icon:var(--color-ds-icon-button-secondary-high-inactive)]',
+      },
+      {
+        variant: 'secondary',
+        contrast: 'high',
+        state: 'delete',
+        unicolor: false,
+        class: 'text-ds-text-button-secondary-high-delete [--btn-icon:var(--color-ds-icon-button-secondary-high-delete)]',
+      },
+      {
+        variant: 'secondary',
+        contrast: 'high',
+        state: ['default', 'hover', 'focus', 'press', 'inactive', 'delete'],
+        unicolor: true,
+        class: 'text-ds-text-button-secondary-high-unicolor [--btn-icon:var(--color-ds-icon-button-secondary-high-unicolor)]',
+      },
+
+      /* ── Tertiary (sin borde ni radio; fondo en hover, focus y press) ── */
+      {
+        variant: 'tertiary',
+        state: 'default',
+        class: [
+          'hover:bg-ds-background-button-tertiary-hover',
+          'focus-visible:bg-ds-background-button-tertiary-focus-press',
+          'active:bg-ds-background-button-tertiary-focus-press',
+        ],
+      },
+      {
+        variant: 'tertiary',
+        state: 'default',
+        unicolor: false,
+        class: [
+          'text-ds-text-button-tertiary-default [--btn-icon:var(--color-ds-icon-button-tertiary-default)]',
+          'hover:text-ds-text-button-tertiary-hover hover:[--btn-icon:var(--color-ds-icon-button-tertiary-hover)]',
+          'focus-visible:text-ds-text-button-tertiary-focus-press focus-visible:[--btn-icon:var(--color-ds-icon-button-tertiary-focus-press)]',
+          'active:text-ds-text-button-tertiary-focus-press active:[--btn-icon:var(--color-ds-icon-button-tertiary-focus-press)]',
+        ],
+      },
+      { variant: 'tertiary', state: 'hover', class: 'bg-ds-background-button-tertiary-hover' },
+      { variant: 'tertiary', state: ['focus', 'press'], class: 'bg-ds-background-button-tertiary-focus-press' },
+      {
+        variant: 'tertiary',
+        state: 'hover',
+        unicolor: false,
+        class: 'text-ds-text-button-tertiary-hover [--btn-icon:var(--color-ds-icon-button-tertiary-hover)]',
+      },
+      {
+        variant: 'tertiary',
+        state: ['focus', 'press'],
+        unicolor: false,
+        class: 'text-ds-text-button-tertiary-focus-press [--btn-icon:var(--color-ds-icon-button-tertiary-focus-press)]',
+      },
+      {
+        variant: 'tertiary',
+        state: 'inactive',
+        unicolor: false,
+        class: 'text-ds-text-button-tertiary-inactive [--btn-icon:var(--color-ds-icon-button-tertiary-inactive)]',
+      },
+      {
+        variant: 'tertiary',
+        state: 'delete',
+        unicolor: false,
+        class: 'text-ds-text-button-tertiary-delete [--btn-icon:var(--color-ds-icon-button-tertiary-delete)]',
+      },
+      {
+        variant: 'tertiary',
+        unicolor: true,
+        class: 'text-ds-text-button-tertiary-unicolor [--btn-icon:var(--color-ds-icon-button-tertiary-unicolor)]',
+      },
+
+      /* ── Link (heredado; pendiente de pasar a componente propio) ── */
+      {
+        variant: 'link',
+        state: 'default',
+        class: [
+          'text-ds-text-button-link-default [--btn-icon:var(--color-ds-icon-button-link-default)]',
+          'hover:underline hover:text-ds-text-button-link-hover hover:[--btn-icon:var(--color-ds-icon-button-link-hover)]',
+          'focus-visible:text-ds-text-button-link-focus-press focus-visible:[--btn-icon:var(--color-ds-icon-button-link-focus-press)]',
+          'active:text-ds-text-button-link-focus-press active:[--btn-icon:var(--color-ds-icon-button-link-focus-press)]',
+        ],
+      },
+      { variant: 'link', state: 'hover', class: 'underline text-ds-text-button-link-hover [--btn-icon:var(--color-ds-icon-button-link-hover)]' },
+      { variant: 'link', state: ['focus', 'press'], class: 'text-ds-text-button-link-focus-press [--btn-icon:var(--color-ds-icon-button-link-focus-press)]' },
+      { variant: 'link', state: ['inactive', 'load', 'delete'], class: 'text-ds-text-button-link-inactive [--btn-icon:var(--color-ds-icon-button-link-inactive)]' },
+    ],
+
     defaultVariants: {
       variant: 'primary',
       contrast: 'low',
+      unicolor: false,
       size: 'md',
       state: 'default',
       iconOnly: false,

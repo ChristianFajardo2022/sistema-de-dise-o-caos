@@ -1,34 +1,39 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'link';
+/** Type de Figma. `link` se mantiene por compatibilidad: Button link es un componente aparte. */
+export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'link';
 
+/** Contrats de Figma. Solo aplica a secondary. */
 export type ButtonContrast = 'low' | 'high';
 
-export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
+export type ButtonSize = 'md' | 'sm' | 'xs';
 
-export type ButtonState = 'default' | 'hover' | 'press' | 'focus' | 'disabled' | 'delete' | 'load';
+/**
+ * State de Figma. hover, focus y press solo fuerzan el aspecto (para documentación);
+ * en uso normal salen de la interacción. Tertiary no tiene load.
+ */
+export type ButtonState = 'default' | 'hover' | 'focus' | 'press' | 'inactive' | 'delete' | 'load';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Visual variant type of the button */
+  /** Type: jerarquía visual del botón */
   variant?: ButtonVariant;
-  /** Contrast level variant (mainly for secondary/tertiary) */
+  /** Contrats: nivel de contraste de secondary */
   contrast?: ButtonContrast;
-  /** Size variant */
+  /** Unicolor: texto e ícono de un solo color (secondary y tertiary sin icon-single) */
+  unicolor?: boolean;
+  /** Size: md 56 · sm 48 · xs 32 */
   size?: ButtonSize;
-  /** Explicit state override */
+  /** State forzado. `delete` es el estado de acción destructiva de cada tipo. */
   state?: ButtonState;
-  /** Whether the button is in a loading state (renders spinner & sets aria-busy) */
+  /** Estado load: muestra el spinner y establece aria-busy (tertiary no tiene load) */
   loading?: boolean;
-  /** Icon rendered before children text */
+  /** Ícono antes del texto (iconLeft en Figma). Se dibuja a 20px con el color del estado. */
   leftIcon?: ReactNode;
-  /** Icon rendered after children text */
+  /** Ícono después del texto (iconRigth en Figma). Se dibuja a 20px con el color del estado. */
   rightIcon?: ReactNode;
-  /** Single icon button mode (renders circular/square compact layout) */
+  /** Icon-single: botón cuadrado solo con ícono (pasar el ícono como children y un aria-label) */
   iconOnly?: boolean;
-  /** Whether the component delegates rendering to its child */
-  asChild?: boolean;
-  /** Additional CSS class names */
+  /** Clases adicionales */
   className?: string;
-  /** Button children node */
   children?: ReactNode;
 }

@@ -1,21 +1,52 @@
 import { forwardRef } from 'react';
-import type { ButtonProps } from './Button.types';
+import type { ReactNode } from 'react';
+import type { ButtonProps, ButtonState } from './Button.types';
 import { buttonVariants } from './Button.variants';
 import { Spinner } from '../../icons/Spinner';
 import { cn } from '../../utils/cn';
+
+/** Forma "Union" del efecto de Primary: dos círculos con blur 24. */
+function EffectUnion({ className }: { className?: string }) {
+  return (
+    <svg
+      width="104"
+      height="74"
+      viewBox="0 0 104 74"
+      fill="none"
+      aria-hidden="true"
+      className={cn('pointer-events-none absolute h-[74px] w-[104px] blur-[24px]', className)}
+    >
+      <circle cx="30" cy="44" r="30" fill="var(--color-ds-background-effect-button)" />
+      <circle cx="74" cy="30" r="30" fill="var(--color-ds-background-effect-button)" />
+    </svg>
+  );
+}
+
+/** Slot de ícono: 20×20 y color por token del estado (--btn-icon). */
+function IconSlot({ children }: { children: ReactNode }) {
+  return (
+    <span
+      data-slot="icon"
+      aria-hidden="true"
+      className="inline-flex size-5 shrink-0 items-center justify-center text-(color:--btn-icon) [&>svg]:size-full"
+    >
+      {children}
+    </span>
+  );
+}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       variant = 'primary',
       contrast = 'low',
+      unicolor = false,
       size = 'md',
       state = 'default',
       loading = false,
       leftIcon,
       rightIcon,
       iconOnly = false,
-      asChild: _asChild = false,
       className,
       disabled,
       children,
@@ -24,22 +55,31 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const isLoading = loading || state === 'load';
-    const isDisabled = disabled || state === 'disabled' || isLoading;
-    const computedState = isLoading ? 'load' : disabled ? 'disabled' : state;
-    const isForcedHover = state === 'hover';
+    const wantsLoad = loading || state === 'load';
+    // Tertiary no tiene Load en Figma: se muestra como Inactive
+    const isLoading = wantsLoad && variant !== 'tertiary';
+    const isDisabled = disabled || state === 'inactive' || wantsLoad;
+    const computedState: ButtonState = isLoading
+      ? 'load'
+      : isDisabled
+        ? 'inactive'
+        : state;
+    const isUnicolor = unicolor && !iconOnly && (variant === 'secondary' || variant === 'tertiary');
+    const showEffect = variant === 'primary' && (computedState === 'default' || computedState === 'hover' || computedState === 'press');
+
+    const icon = iconOnly ? (leftIcon ?? rightIcon ?? children) : null;
 
     return (
       <button
         ref={ref}
         type={type}
         disabled={isDisabled}
-        aria-disabled={isDisabled}
-        aria-busy={isLoading}
+        aria-busy={wantsLoad || undefined}
         className={cn(
           buttonVariants({
             variant,
             contrast,
+            unicolor: isUnicolor,
             size,
             state: computedState,
             iconOnly,
@@ -48,105 +88,71 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {...restProps}
       >
-        {/* Efecto interior de Primary: Unión booleana de dos círculos con blur 24 y textura de ruido, ciclo de 4 estados por disolución */}
-        {variant === 'primary' && !isDisabled && (
-          <div
-            className={cn(
-              'absolute inset-0 pointer-events-none overflow-hidden rounded-[48px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-out z-0',
-              isForcedHover && 'opacity-100'
-            )}
+        {showEffect && (
+          <span
             aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-ds-radius-button-full"
           >
-            {/* Fase 1 (Hover): Coordenadas x = -12px, y = 20px */}
-            <div
-              className="absolute w-[104px] h-[74px] pointer-events-none animate-[dissolve-phase-1_4s_linear_infinite]"
-              style={{ left: '-12px', top: '20px' }}
-            >
-              <svg
-                width="104"
-                height="74"
-                viewBox="0 0 104 74"
-                fill="none"
-                className="w-[104px] h-[74px]"
-                style={{ filter: 'blur(24px)' }}
+            {/* Hover a Hover4: la forma Union recorre 4 posiciones con disolución */}
+            {computedState !== 'press' && (
+              <span
+                className={cn(
+                  'absolute inset-0 transition-opacity duration-300 ease-out',
+                  '*:[animation-play-state:paused] group-hover:*:[animation-play-state:running] motion-reduce:*:animate-none',
+                  computedState === 'hover'
+                    ? 'opacity-100 *:[animation-play-state:running]'
+                    : 'opacity-0 group-hover:opacity-100 group-active:opacity-0'
+                )}
               >
-                <circle cx="30" cy="44" r="30" fill="var(--color-ds-background-effect-button, #ADB0B4)" />
-                <circle cx="74" cy="30" r="30" fill="var(--color-ds-background-effect-button, #ADB0B4)" />
-              </svg>
-            </div>
+                <EffectUnion className="left-[-12px] top-[20px] animate-[dissolve-phase-1_4s_linear_infinite]" />
+                <EffectUnion className="left-[-6px] top-0 animate-[dissolve-phase-2-4_4s_linear_infinite]" />
+                <EffectUnion className="left-[-33px] top-[-40px] animate-[dissolve-phase-3_4s_linear_infinite]" />
+              </span>
+            )}
 
-            {/* Fases 2 y 4 (Hover2 y Hover4): Coordenadas x = -6px, y = 0px */}
-            <div
-              className="absolute w-[104px] h-[74px] pointer-events-none animate-[dissolve-phase-2-4_4s_linear_infinite]"
-              style={{ left: '-6px', top: '0px' }}
+            {/* Press: la forma Union queda fija abajo a la derecha */}
+            <span
+              className={cn(
+                'absolute inset-0 transition-opacity duration-300 ease-out',
+                computedState === 'press' ? 'opacity-100' : 'opacity-0 group-active:opacity-100'
+              )}
             >
-              <svg
-                width="104"
-                height="74"
-                viewBox="0 0 104 74"
-                fill="none"
-                className="w-[104px] h-[74px]"
-                style={{ filter: 'blur(24px)' }}
-              >
-                <circle cx="30" cy="44" r="30" fill="var(--color-ds-background-effect-button, #ADB0B4)" />
-                <circle cx="74" cy="30" r="30" fill="var(--color-ds-background-effect-button, #ADB0B4)" />
-              </svg>
-            </div>
+              <EffectUnion className="right-[-0.5px] top-[calc(50%+29px)] -translate-y-1/2" />
+            </span>
 
-            {/* Fase 3 (Hover3): Coordenadas x = -33px, y = -40px */}
-            <div
-              className="absolute w-[104px] h-[74px] pointer-events-none animate-[dissolve-phase-3_4s_linear_infinite]"
-              style={{ left: '-33px', top: '-40px' }}
-            >
-              <svg
-                width="104"
-                height="74"
-                viewBox="0 0 104 74"
-                fill="none"
-                className="w-[104px] h-[74px]"
-                style={{ filter: 'blur(24px)' }}
-              >
-                <circle cx="30" cy="44" r="30" fill="var(--color-ds-background-effect-button, #ADB0B4)" />
-                <circle cx="74" cy="30" r="30" fill="var(--color-ds-background-effect-button, #ADB0B4)" />
-              </svg>
-            </div>
-
-            {/* Textura de ruido (noise) sobre la forma difuminada */}
-            <div
-              className="absolute inset-0 pointer-events-none opacity-30 mix-blend-overlay"
+            {/* Textura de ruido sobre la forma difuminada */}
+            <span
+              className={cn(
+                'absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 ease-out',
+                computedState === 'default' ? 'group-hover:opacity-30' : 'opacity-30'
+              )}
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
               }}
             />
-          </div>
+          </span>
         )}
 
-        {/* Contenido (texto e iconos) situado en capa superior z-10 */}
-        {isLoading ? (
-          <span className="relative z-10 inline-flex items-center justify-center gap-2">
-            <Spinner
-              className={cn(
-                'shrink-0',
-                size === 'xs' || size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'
-              )}
-            />
-            {!iconOnly && children && (
-              <span className="whitespace-nowrap">{children}</span>
-            )}
-          </span>
-        ) : (
-          <span className="relative z-10 inline-flex items-center justify-center gap-2">
-            {leftIcon && (
-              <span className="inline-flex shrink-0 items-center">{leftIcon}</span>
-            )}
-            {!iconOnly && children && (
-              <span className="whitespace-nowrap">{children}</span>
-            )}
-            {iconOnly && !leftIcon && !rightIcon && children}
-            {rightIcon && (
-              <span className="inline-flex shrink-0 items-center">{rightIcon}</span>
-            )}
-          </span>
+        {/* Contenido sobre el efecto; en Load se oculta y queda el spinner centrado */}
+        <span
+          className={cn(
+            'relative z-10 inline-flex items-center justify-center gap-ds-space-button-lg',
+            isLoading && 'invisible'
+          )}
+        >
+          {iconOnly ? (
+            icon && <IconSlot>{icon}</IconSlot>
+          ) : (
+            <>
+              {leftIcon && <IconSlot>{leftIcon}</IconSlot>}
+              {children && <span className="pb-ds-space-button-sm">{children}</span>}
+              {rightIcon && <IconSlot>{rightIcon}</IconSlot>}
+            </>
+          )}
+        </span>
+
+        {isLoading && (
+          <Spinner className="absolute left-1/2 top-1/2 z-10 size-5 -translate-x-1/2 -translate-y-1/2 text-(color:--btn-icon)" />
         )}
       </button>
     );
