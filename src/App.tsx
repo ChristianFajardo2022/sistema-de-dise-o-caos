@@ -59,93 +59,98 @@ export function App() {
             <Button
               size="sm"
               variant="tertiary"
-              leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+              leftIcon={<RefreshCw />}
               onClick={handleSimulateLoading}
             >
               Simular Carga
             </Button>
           </div>
 
-          {/* 1. Variants Showcase */}
           <div className="space-y-6">
+            {/* 1. Type */}
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Variantes Principales (Variants)
+                Type y Contrats
               </h3>
               <div className="flex flex-wrap items-center gap-3">
-                <Button variant="primary" leftIcon={<Plus className="w-4 h-4" />}>
-                  Primary Button
+                <Button variant="primary" leftIcon={<Plus />}>
+                  Primary
                 </Button>
-                <Button variant="secondary" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                  Secondary Button
+                <Button variant="secondary" rightIcon={<ArrowRight />}>
+                  Secondary low
                 </Button>
-                <Button variant="tertiary">Tertiary Button</Button>
-                <Button variant="destructive" leftIcon={<Trash2 className="w-4 h-4" />}>
-                  Destructive
+                <Button variant="secondary" contrast="high">
+                  Secondary high
                 </Button>
-                <Button variant="link">Link Button</Button>
+                <Button variant="tertiary">Tertiary</Button>
+                <Button variant="secondary" unicolor>
+                  Unicolor
+                </Button>
               </div>
             </div>
 
-            {/* 2. States Matrix */}
+            {/* 2. State */}
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Estados (States & Loading)
+                Estados (Inactive, Delete, Load)
               </h3>
               <div className="flex flex-wrap items-center gap-3">
                 <Button variant="primary" loading={isBtnLoading}>
-                  {isBtnLoading ? 'Guardando...' : 'Estado Normal / Carga'}
+                  {isBtnLoading ? 'Guardando...' : 'Normal / Carga'}
                 </Button>
                 <Button variant="secondary" loading>
-                  Cargando...
+                  Cargando
                 </Button>
                 <Button variant="primary" disabled>
-                  Deshabilitado
+                  Inactive
                 </Button>
-                <Button variant="destructive" state="delete">
-                  Confirmar Borrado
+                <Button variant="primary" state="delete" leftIcon={<Trash2 />}>
+                  Eliminar
+                </Button>
+                <Button variant="secondary" state="delete">
+                  Eliminar
+                </Button>
+                <Button variant="tertiary" state="delete">
+                  Eliminar
                 </Button>
               </div>
             </div>
 
-            {/* 3. Sizes Matrix */}
+            {/* 3. Size */}
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Tamaños (Sizes: XS, SM, MD, LG)
+                Tamaños (Size: md, sm, xs)
               </h3>
               <div className="flex flex-wrap items-center gap-3">
-                <Button size="xs" variant="primary">
-                  Size XS (32px)
+                <Button size="md" variant="primary">
+                  md (56px)
                 </Button>
                 <Button size="sm" variant="primary">
-                  Size SM (40px)
+                  sm (48px)
                 </Button>
-                <Button size="md" variant="primary">
-                  Size MD (48px)
-                </Button>
-                <Button size="lg" variant="primary">
-                  Size LG (56px)
+                <Button size="xs" variant="primary">
+                  xs (32px)
                 </Button>
               </div>
             </div>
 
-            {/* 4. Icon Only Mode */}
+            {/* 4. Icon-single */}
             <div>
               <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Modo Solo Icono (Icon Only)
+                Solo ícono (Icon-single)
               </h3>
               <div className="flex flex-wrap items-center gap-3">
-                <Button size="xs" iconOnly variant="primary" aria-label="Ajustes">
-                  <Settings className="w-3.5 h-3.5" />
+                <Button size="md" iconOnly variant="primary" aria-label="Agregar">
+                  <Plus />
                 </Button>
                 <Button size="sm" iconOnly variant="secondary" aria-label="Descargar">
-                  <Download className="w-4 h-4" />
+                  <Download />
                 </Button>
-                <Button size="md" iconOnly variant="primary" aria-label="Agregar">
-                  <Plus className="w-4 h-4" />
+                <Button size="xs" iconOnly variant="tertiary" aria-label="Ajustes">
+                  <Settings />
                 </Button>
-                <Button size="lg" iconOnly variant="destructive" aria-label="Eliminar">
-                  <Trash2 className="w-5 h-5" />
+                <Button size="md" iconOnly variant="primary" state="delete" aria-label="Eliminar">
+                  <Trash2 />
                 </Button>
               </div>
             </div>
