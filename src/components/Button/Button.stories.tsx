@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './Button';
-import { Plus, ArrowRight, Trash2, Settings, Download } from 'lucide-react';
+import type { ButtonState } from './Button.types';
+// Pendiente: migrar a Iconsax cuando el paquete esté en el proyecto. El slot de ícono
+// del Button dibuja cualquier SVG a 20px con el color del estado.
+import { Plus, ArrowRight, Trash2, Settings } from 'lucide-react';
 
 const meta: Meta<typeof Button> = {
   title: 'General Controls/Button',
@@ -9,41 +12,46 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'destructive', 'link'],
-      description: 'Jerarquía visual del botón',
+      options: ['primary', 'secondary', 'tertiary'],
+      description: 'Type: jerarquía visual del botón',
     },
     contrast: {
       control: 'radio',
       options: ['low', 'high'],
-      description: 'Nivel de contraste para fondos claros/oscuros',
+      description: 'Contrats: solo aplica a secondary',
+    },
+    unicolor: {
+      control: 'boolean',
+      description: 'Unicolor: secondary y tertiary sin icon-single',
     },
     size: {
       control: 'radio',
-      options: ['xs', 'sm', 'md', 'lg'],
-      description: 'Tamaño del componente',
+      options: ['md', 'sm', 'xs'],
+      description: 'Size: md 56 · sm 48 · xs 32',
     },
     state: {
       control: 'select',
-      options: ['default', 'hover', 'press', 'focus', 'disabled', 'delete', 'load'],
-      description: 'Estado interactivo forzado (para visualización)',
+      options: ['default', 'hover', 'focus', 'press', 'inactive', 'delete', 'load'],
+      description: 'State forzado (hover, focus y press solo para visualización). Tertiary no tiene load.',
     },
     loading: {
       control: 'boolean',
-      description: 'Muestra el spinner de carga y deshabilita la interacción',
+      description: 'Estado load: spinner y aria-busy',
     },
     disabled: {
       control: 'boolean',
-      description: 'Deshabilita el botón visual y funcionalmente',
+      description: 'Estado inactive',
     },
     iconOnly: {
       control: 'boolean',
-      description: 'Establece el padding simétrico para botones que solo contienen un icono',
+      description: 'Icon-single: botón cuadrado solo con ícono',
     },
   },
   args: {
     children: 'Button',
     variant: 'primary',
     contrast: 'low',
+    unicolor: false,
     size: 'md',
     state: 'default',
     loading: false,
@@ -55,25 +63,125 @@ const meta: Meta<typeof Button> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const STATES: ButtonState[] = ['default', 'hover', 'focus', 'press', 'inactive', 'delete', 'load'];
+
 export const Primary: Story = {
-  args: {
-    variant: 'primary',
-    children: 'Button',
-  },
+  args: { variant: 'primary' },
 };
 
-export const Secondary: Story = {
-  args: {
-    variant: 'secondary',
-    children: 'Button',
-  },
+export const SecondaryLow: Story = {
+  args: { variant: 'secondary', contrast: 'low' },
+};
+
+export const SecondaryHigh: Story = {
+  args: { variant: 'secondary', contrast: 'high' },
 };
 
 export const Tertiary: Story = {
+  args: { variant: 'tertiary' },
+};
+
+export const Unicolor: Story = {
+  args: { variant: 'secondary', unicolor: true },
+};
+
+export const WithIcons: Story = {
   args: {
-    variant: 'tertiary',
-    children: 'Button',
+    variant: 'primary',
+    leftIcon: <Plus />,
+    rightIcon: <ArrowRight />,
   },
+};
+
+export const IconSingle: Story = {
+  args: {
+    variant: 'secondary',
+    iconOnly: true,
+    children: <Settings />,
+    'aria-label': 'Configuración',
+  },
+};
+
+export const Delete: Story = {
+  args: {
+    variant: 'primary',
+    state: 'delete',
+    leftIcon: <Trash2 />,
+    children: 'Eliminar',
+  },
+};
+
+export const Load: Story = {
+  args: { variant: 'primary', loading: true },
+};
+
+export const Inactive: Story = {
+  args: { variant: 'primary', disabled: true },
+};
+
+/** Matriz de Type × State, como el component set de Figma. */
+export const StatesMatrix: Story = {
+  render: () => {
+    const rows = [
+      { label: 'Primary', props: { variant: 'primary' as const } },
+      { label: 'Secondary low', props: { variant: 'secondary' as const, contrast: 'low' as const } },
+      { label: 'Secondary high', props: { variant: 'secondary' as const, contrast: 'high' as const } },
+      { label: 'Tertiary', props: { variant: 'tertiary' as const } },
+    ];
+    return (
+      <div className="grid grid-cols-[auto_repeat(7,auto)] items-center gap-4">
+        <span />
+        {STATES.map((s) => (
+          <span key={s} className="text-xs text-neutral-400">{s}</span>
+        ))}
+        {rows.map((row) => (
+          <div key={row.label} className="contents">
+            <span className="text-xs text-neutral-400">{row.label}</span>
+            {STATES.map((s) =>
+              row.props.variant === 'tertiary' && s === 'load' ? (
+                <span key={s} />
+              ) : (
+                <div key={s}>
+                  <Button {...row.props} state={s}>Button</Button>
+                </div>
+              )
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  },
+};
+
+/** Icon-single en los tres tamaños y tipos. */
+export const IconSingleMatrix: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      {(['md', 'sm', 'xs'] as const).map((size) => (
+        <div key={size} className="flex items-center gap-3">
+          <span className="w-8 text-xs text-neutral-400">{size}</span>
+          <Button size={size} iconOnly variant="primary" aria-label="Agregar"><Plus /></Button>
+          <Button size={size} iconOnly variant="secondary" aria-label="Agregar"><Plus /></Button>
+          <Button size={size} iconOnly variant="secondary" contrast="high" aria-label="Agregar"><Plus /></Button>
+          <Button size={size} iconOnly variant="tertiary" aria-label="Agregar"><Plus /></Button>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      {(['primary', 'secondary', 'tertiary'] as const).map((variant) => (
+        <div key={variant} className="flex items-center gap-3">
+          <Button size="md" variant={variant} leftIcon={<Plus />}>md 56</Button>
+          <Button size="sm" variant={variant} leftIcon={<Plus />}>sm 48</Button>
+          <Button size="xs" variant={variant} leftIcon={<Plus />}>xs 32</Button>
+        </div>
+      ))}
+    </div>
+  ),
 };
 
 export const HoverSpecifications: Story = {
@@ -81,115 +189,17 @@ export const HoverSpecifications: Story = {
     <div className="flex flex-col gap-8">
       <div>
         <h3 className="text-sm font-semibold mb-2 text-neutral-400">
-          Interacción en vivo (Hover y salida con Dissolve 300 ms, Ease out)
+          Interacción en vivo (Dissolve 300 ms, Ease out)
         </h3>
         <p className="text-xs text-neutral-500 mb-4">
-          Pasa el cursor por encima para ver el ciclo de 4 estados por disolución en Primary, el cambio de borde en Secondary y el subrayado automático en Tertiary.
+          Pasa el cursor para ver el ciclo de 4 fases en Primary, el cambio de borde en Secondary y el fondo y subrayado en Tertiary. Usa Tab para ver Focus y mantén presionado para ver Press.
         </p>
         <div className="flex items-center gap-6">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-xs text-neutral-400">Primary (md)</span>
-            <Button variant="primary">Button</Button>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-xs text-neutral-400">Secondary (md)</span>
-            <Button variant="secondary">Button</Button>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-xs text-neutral-400">Tertiary (md)</span>
-            <Button variant="tertiary">Button</Button>
-          </div>
+          <Button variant="primary">Button</Button>
+          <Button variant="secondary">Button</Button>
+          <Button variant="secondary" contrast="high">Button</Button>
+          <Button variant="tertiary">Button</Button>
         </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-semibold mb-3 text-neutral-400">
-          Comparativa Default vs Hover forzado
-        </h3>
-        <div className="grid grid-cols-2 gap-4 max-w-md items-center">
-          <div className="text-xs font-medium text-neutral-400">Default</div>
-          <div className="text-xs font-medium text-neutral-400">Hover forzado</div>
-
-          <div><Button variant="primary" state="default">Button</Button></div>
-          <div><Button variant="primary" state="hover">Button</Button></div>
-
-          <div><Button variant="secondary" state="default">Button</Button></div>
-          <div><Button variant="secondary" state="hover">Button</Button></div>
-
-          <div><Button variant="tertiary" state="default">Button</Button></div>
-          <div><Button variant="tertiary" state="hover">Button</Button></div>
-        </div>
-      </div>
-    </div>
-  ),
-};
-
-export const Destructive: Story = {
-  args: {
-    variant: 'destructive',
-    children: 'Eliminar Elemento',
-    leftIcon: <Trash2 className="w-4 h-4" />,
-  },
-};
-
-export const WithIcons: Story = {
-  args: {
-    variant: 'primary',
-    children: 'Continuar',
-    leftIcon: <Plus className="w-4 h-4" />,
-    rightIcon: <ArrowRight className="w-4 h-4" />,
-  },
-};
-
-export const LoadingState: Story = {
-  args: {
-    variant: 'primary',
-    loading: true,
-    children: 'Guardando datos...',
-  },
-};
-
-export const DisabledState: Story = {
-  args: {
-    variant: 'primary',
-    disabled: true,
-    children: 'Botón Deshabilitado',
-  },
-};
-
-export const IconOnly: Story = {
-  args: {
-    variant: 'secondary',
-    iconOnly: true,
-    children: <Settings className="w-4 h-4" />,
-    'aria-label': 'Configuración',
-  },
-};
-
-export const VariantsMatrix: Story = {
-  render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <Button variant="primary">Primario</Button>
-        <Button variant="secondary">Secundario</Button>
-        <Button variant="tertiary">Terciario</Button>
-        <Button variant="destructive">Destructivo</Button>
-        <Button variant="link">Enlace</Button>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Button size="xs" variant="primary">XS (40px)</Button>
-        <Button size="sm" variant="primary">SM (40px)</Button>
-        <Button size="md" variant="primary">MD (56px)</Button>
-        <Button size="lg" variant="primary">LG (64px)</Button>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Button loading variant="primary">Cargando</Button>
-        <Button disabled variant="primary">Deshabilitado</Button>
-        <Button iconOnly variant="secondary" aria-label="Descargar">
-          <Download className="w-4 h-4" />
-        </Button>
       </div>
     </div>
   ),

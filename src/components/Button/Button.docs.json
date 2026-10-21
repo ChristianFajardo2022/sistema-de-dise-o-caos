@@ -1,75 +1,80 @@
 {
   "name": "Button",
   "component": "Button",
-  "description": "Componente de botón interactivo y accesible del sistema de diseño CAOS. Admite múltiples variantes de estilo (Primary, Secondary, Tertiary, Destructive, Link), contrastes (Low, High), tamaños (xs, sm, md, lg), estados de carga (load/spinner) e iconos laterales o en modo solo icono.",
+  "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Type Primary, Secondary (Contrats low/high, sin fondo, solo borde) y Tertiary; Unicolor para Secondary y Tertiary; tamaños md 56, sm 48 y xs 32; estados Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary sin Load); modo Icon-single cuadrado. Tipografía Helvetica Neue 400, 14px (typography/button/size/md), interlineado 100 %. Íconos de 20px con color por token. Sin anillo de foco ni escala al presionar: cada estado usa sus tokens.",
   "category": "General Controls",
   "props": {
     "variant": {
-      "type": "'primary' | 'secondary' | 'tertiary' | 'destructive' | 'link'",
+      "type": "'primary' | 'secondary' | 'tertiary' | 'link'",
       "default": "'primary'",
-      "description": "Variante estética del botón según su jerarquía de acción."
+      "description": "Type de Figma. 'link' queda por compatibilidad y se migrará al componente Button link."
     },
     "contrast": {
       "type": "'low' | 'high'",
       "default": "'low'",
-      "description": "Nivel de contraste del botón."
+      "description": "Contrats de Figma. Solo aplica a secondary; cada nivel tiene sus propios tokens de borde, texto e ícono."
+    },
+    "unicolor": {
+      "type": "boolean",
+      "default": false,
+      "description": "Texto e ícono de un solo color. Solo en secondary y tertiary sin iconOnly; usa typography/button/size/md-uniform."
     },
     "size": {
-      "type": "'xs' | 'sm' | 'md' | 'lg'",
+      "type": "'md' | 'sm' | 'xs'",
       "default": "'md'",
-      "description": "Tamaño del botón (altura y espaciado interno)."
+      "description": "md: alto 56, padding 24/8, min-width 92. sm: alto 48, padding 24/8, min-width 92. xs: alto 32, padding 16/8. Tertiary: padding X 0."
     },
     "state": {
-      "type": "'default' | 'hover' | 'press' | 'focus' | 'disabled' | 'delete' | 'load'",
+      "type": "'default' | 'hover' | 'focus' | 'press' | 'inactive' | 'delete' | 'load'",
       "default": "'default'",
-      "description": "Estado del botón."
+      "description": "State de Figma. hover, focus y press fuerzan el aspecto para documentación; delete es el estado de acción destructiva de cada tipo; tertiary no tiene load (se muestra como inactive)."
     },
     "loading": {
       "type": "boolean",
       "default": false,
-      "description": "Muestra un spinner interactivo y establece aria-busy='true'."
+      "description": "Estado load: deshabilita el botón, muestra el spinner de 20px y establece aria-busy."
     },
     "disabled": {
       "type": "boolean",
       "default": false,
-      "description": "Deshabilita la interacción con el botón y establece aria-disabled='true'."
+      "description": "Estado inactive."
     },
     "leftIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Icono o elemento renderizado antes del texto."
+      "description": "Ícono antes del texto (iconLeft). Se dibuja a 20×20 con el token icon/button del estado."
     },
     "rightIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Icono o elemento renderizado después del texto."
+      "description": "Ícono después del texto (iconRigth). Se dibuja a 20×20 con el token icon/button del estado."
     },
     "iconOnly": {
       "type": "boolean",
       "default": false,
-      "description": "Modo compacto circular/cuadrado solo para icono."
+      "description": "Icon-single: botón cuadrado (56, 48 o 32). Pasar el ícono como children y un aria-label."
     }
   },
   "examples": [
     {
-      "title": "Primary Button",
+      "title": "Primary",
       "code": "<Button variant=\"primary\">Guardar cambios</Button>"
     },
     {
-      "title": "Secondary Button with Icon",
-      "code": "<Button variant=\"secondary\" leftIcon={<Plus className=\"w-4 h-4\" />}>Agregar ítem</Button>"
+      "title": "Secondary high con ícono",
+      "code": "<Button variant=\"secondary\" contrast=\"high\" leftIcon={<Plus />}>Agregar ítem</Button>"
     },
     {
-      "title": "Loading Button",
-      "code": "<Button variant=\"primary\" loading>Procesando...</Button>"
+      "title": "Load",
+      "code": "<Button variant=\"primary\" loading>Procesando</Button>"
     },
     {
-      "title": "Destructive Button",
-      "code": "<Button variant=\"destructive\" leftIcon={<Trash2 className=\"w-4 h-4\" />}>Eliminar cuenta</Button>"
+      "title": "Delete",
+      "code": "<Button variant=\"primary\" state=\"delete\" leftIcon={<Trash2 />}>Eliminar cuenta</Button>"
     },
     {
-      "title": "Icon Only Button",
-      "code": "<Button variant=\"tertiary\" iconOnly><Settings className=\"w-4 h-4\" /></Button>"
+      "title": "Icon-single",
+      "code": "<Button variant=\"tertiary\" iconOnly aria-label=\"Ajustes\"><Settings /></Button>"
     }
   ]
 }
