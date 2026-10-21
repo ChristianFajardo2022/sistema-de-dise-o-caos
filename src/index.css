@@ -115,65 +115,24 @@ code {
   background: var(--code-bg);
 }
 
-/* CAOS Design System — Ciclo de hover por disolución exacta (4 fases, 4s continuo, 1s cada paso) */
-@keyframes dissolve-phase-1 {
-  0%, 100% {
-    opacity: 1;
+/* CAOS — Hover de Primary: la forma difuminada cruza de izquierda a derecha y reinicia (3s, una fase) */
+@keyframes caos-primary-sweep {
+  from {
+    left: -104px;
   }
-  25% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0;
-  }
-  75% {
-    opacity: 0;
+  to {
+    left: 100%;
   }
 }
 
-@keyframes dissolve-phase-2-4 {
-  0% {
-    opacity: 0;
-  }
-  25% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  75% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes dissolve-phase-3 {
-  0% {
-    opacity: 0;
-  }
-  25% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-  75% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-
-/* CAOS — Load del Button: pulso secuencial de los 3 puntos (suposición: 1.2s, 0.4s de desfase, ease-in-out) */
+/* CAOS — Load del Button: cada punto pulsa en su sitio (opacidad 0.3→1 y escala 1→1.3), 1.5s, 0.5s entre picos */
 @keyframes caos-load-dot {
-  0%, 100% {
+  0%, 66%, 100% {
     opacity: 0.3;
+    transform: scale(1);
   }
   33% {
     opacity: 1;
+    transform: scale(1.3);
   }
 }

@@ -24,11 +24,11 @@ function EffectUnion({ className }: { className?: string }) {
 /**
  * Indicador de Load de Figma: 3 puntos de 8px en una caja de 24×24 (dos arriba, uno abajo
  * al centro), color --btn-icon (icon/button/<tipo>/load). Medidas tomadas de la variante
- * estática; la animación (pulso secuencial) es una suposición mientras no se lea el prototipo.
+ * estática; animación según el video del prototipo: pulso de opacidad y escala, 1.5s, 0.5s entre puntos.
  */
 function LoadDots() {
   const dot =
-    'absolute size-[8px] rounded-full bg-(--btn-icon) animate-[caos-load-dot_1.2s_ease-in-out_infinite] motion-reduce:animate-none';
+    'absolute size-[8px] rounded-full bg-(--btn-icon) animate-[caos-load-dot_1.5s_ease-in-out_infinite] motion-reduce:animate-none';
   return (
     <span
       data-slot="load"
@@ -36,8 +36,8 @@ function LoadDots() {
       className="absolute left-1/2 top-1/2 z-10 size-[24px] -translate-x-1/2 -translate-y-1/2"
     >
       <span className={cn(dot, 'left-0 top-0')} />
-      <span className={cn(dot, 'right-0 top-0 [animation-delay:0.4s]')} />
-      <span className={cn(dot, 'bottom-0 left-[8px] [animation-delay:0.8s]')} />
+      <span className={cn(dot, 'right-0 top-0 [animation-delay:0.5s]')} />
+      <span className={cn(dot, 'bottom-0 left-[8px] [animation-delay:1s]')} />
     </span>
   );
 }
@@ -113,7 +113,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-ds-radius-button-full"
           >
-            {/* Hover a Hover4: la forma Union recorre 4 posiciones con disolución */}
+            {/* Hover: la forma Union recorre el botón de izquierda a derecha en una sola fase (3s, sin retroceso) */}
             {computedState !== 'press' && (
               <span
                 className={cn(
@@ -124,9 +124,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     : 'opacity-0 group-hover:opacity-100 group-active:opacity-0'
                 )}
               >
-                <EffectUnion className="left-[-12px] top-[20px] animate-[dissolve-phase-1_4s_linear_infinite]" />
-                <EffectUnion className="left-[-6px] top-0 animate-[dissolve-phase-2-4_4s_linear_infinite]" />
-                <EffectUnion className="left-[-33px] top-[-40px] animate-[dissolve-phase-3_4s_linear_infinite]" />
+                <EffectUnion className="top-1/2 -translate-y-1/2 animate-[caos-primary-sweep_3s_linear_infinite]" />
               </span>
             )}
 
