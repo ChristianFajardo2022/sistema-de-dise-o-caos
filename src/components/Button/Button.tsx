@@ -35,11 +35,11 @@ function LoadDots() {
       aria-hidden="true"
       className="absolute left-1/2 top-1/2 z-10 size-[24px] -translate-x-1/2 -translate-y-1/2"
     >
-      {/* origen en el centroide de los puntos (12px, 9.33px) */}
-      <span className="absolute inset-0 origin-[12px_9.33px] animate-[caos-load-turn_0.667s_ease-in-out_infinite] motion-reduce:animate-none">
-        <span className={cn(dot, 'left-0 top-0 [--dx:8px] [--dy:5.33px]')} />
-        <span className={cn(dot, 'right-0 top-0 [--dx:-8px] [--dy:5.33px]')} />
-        <span className={cn(dot, 'bottom-0 left-[8px] [--dx:0px] [--dy:-10.67px]')} />
+      {/* origen en el centroide de los puntos (12px, 8.62px); triángulo equilátero para que el giro de 120° coincida */}
+      <span className="absolute inset-0 origin-[12px_8.62px] animate-[caos-load-turn_0.667s_ease-in-out_infinite] motion-reduce:animate-none">
+        <span className={cn(dot, 'left-0 top-0 [--dx:8px] [--dy:4.62px]')} />
+        <span className={cn(dot, 'right-0 top-0 [--dx:-8px] [--dy:4.62px]')} />
+        <span className={cn(dot, 'top-[13.86px] left-[8px] [--dx:0px] [--dy:-9.24px]')} />
       </span>
     </span>
   );
