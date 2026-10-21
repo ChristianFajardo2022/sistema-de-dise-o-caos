@@ -12,7 +12,7 @@ import { cva } from 'class-variance-authority';
  * - Size: md 56 · sm 48 · xs 32. Padding X 24/24/16, padding Y 8, min-width 92 en md y sm.
  * - State: default · hover · focus · press · inactive · delete · load (tertiary sin load).
  * - Tipografía: Helvetica Neue (typography/family/Primary), peso 400,
- *   typography/button/size/md, interlineado 100 %.
+ *   typography/button/size/md-uniform (14px fijo en todos los breakpoints), interlineado 100 %.
  * - Sin anillo de foco ni escala al presionar: cada estado usa sus propios tokens.
  *
  * Los colores de ícono se pasan por la variable local --btn-icon, que leen
@@ -27,9 +27,11 @@ export const buttonVariants = cva(
     'cursor-pointer select-none whitespace-nowrap outline-none',
     'transition-[background-color,border-color,color,min-width] duration-300 ease-out',
     'disabled:cursor-not-allowed',
-    // Button/Button-md-600: Helvetica Neue, peso 400, tracking 0 (tamaño e interlineado en `unicolor`)
+    // Button/Button-md-600: Helvetica Neue, peso 400, 14px fijo (md-uniform, no el responsive), tracking 0
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
     '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+    // leading-none va después del tamaño: tailwind-merge descarta un leading anterior a un text-size
+    'text-(length:--ds-responsive-typography-button-size-md-uniform) leading-none',
     'tracking-normal',
   ].join(' '),
   {
@@ -48,10 +50,10 @@ export const buttonVariants = cva(
         high: '',
       },
 
+      // Unicolor solo cambia colores (ver compoundVariants); el tamaño de texto es el mismo
       unicolor: {
-        // leading-none va después del tamaño: tailwind-merge descarta un leading anterior a un text-size
-        true: 'text-(length:--ds-responsive-typography-button-size-md-uniform) leading-none',
-        false: 'text-(length:--ds-responsive-typography-button-size-md) leading-none',
+        true: '',
+        false: '',
       },
 
       size: {

@@ -1,7 +1,7 @@
 {
   "name": "Button",
   "component": "Button",
-  "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Type Primary, Secondary (Contrats low/high, sin fondo, solo borde) y Tertiary; Unicolor para Secondary y Tertiary; tamaños md 56, sm 48 y xs 32; estados Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary sin Load); modo Icon-single cuadrado. Tipografía Helvetica Neue 400, 14px (typography/button/size/md), interlineado 100 %. Íconos de 20px con color por token. Sin anillo de foco ni escala al presionar: cada estado usa sus tokens.",
+  "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Type Primary, Secondary (Contrats low/high, sin fondo, solo borde) y Tertiary; Unicolor para Secondary y Tertiary; tamaños md 56, sm 48 y xs 32; estados Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary sin Load); modo Icon-single cuadrado. Tipografía Helvetica Neue 400, 14px fijo en todos los breakpoints (typography/button/size/md-uniform), interlineado 100 %. Íconos de 20px con color por token. Sin anillo de foco ni escala al presionar: cada estado usa sus tokens.",
   "category": "General Controls",
   "props": {
     "variant": {
@@ -17,7 +17,7 @@
     "unicolor": {
       "type": "boolean",
       "default": false,
-      "description": "Texto e ícono de un solo color. Solo en secondary y tertiary sin iconOnly; usa typography/button/size/md-uniform."
+      "description": "Texto e ícono de un solo color. Solo en secondary y tertiary sin iconOnly; cambia solo los colores (tokens *-unicolor)."
     },
     "size": {
       "type": "'md' | 'sm' | 'xs'",
