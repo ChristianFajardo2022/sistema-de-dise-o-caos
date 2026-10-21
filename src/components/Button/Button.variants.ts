@@ -172,7 +172,7 @@ export const buttonVariants = cva(
       {
         variant: 'primary',
         state: 'load',
-        class: 'bg-ds-background-button-primary-load [--btn-icon:var(--color-ds-icon-button-primary-load)]',
+        class: 'bg-ds-background-button-primary-load text-ds-icon-button-primary-load [--btn-icon:var(--color-ds-icon-button-primary-load)]',
       },
 
       /* ── Secondary low (sin fondo, solo borde) ───────────────── */
@@ -204,7 +204,7 @@ export const buttonVariants = cva(
       { variant: 'secondary', contrast: 'low', state: 'press', class: 'border-ds-border-button-secondary-low-press' },
       { variant: 'secondary', contrast: 'low', state: 'inactive', class: 'border-ds-border-button-secondary-low-inactive' },
       { variant: 'secondary', contrast: 'low', state: 'delete', class: 'border-ds-border-button-secondary-low-delete' },
-      { variant: 'secondary', contrast: 'low', state: 'load', class: 'border-ds-border-button-secondary-low-load [--btn-icon:var(--color-ds-icon-button-secondary-low-load)]' },
+      { variant: 'secondary', contrast: 'low', state: 'load', class: 'border-ds-border-button-secondary-low-load text-ds-icon-button-secondary-low-load [--btn-icon:var(--color-ds-icon-button-secondary-low-load)]' },
       {
         variant: 'secondary',
         contrast: 'low',
@@ -263,7 +263,7 @@ export const buttonVariants = cva(
       { variant: 'secondary', contrast: 'high', state: 'press', class: 'border-ds-border-button-secondary-high-press' },
       { variant: 'secondary', contrast: 'high', state: 'inactive', class: 'border-ds-border-button-secondary-high-inactive' },
       { variant: 'secondary', contrast: 'high', state: 'delete', class: 'border-ds-border-button-secondary-high-delete' },
-      { variant: 'secondary', contrast: 'high', state: 'load', class: 'border-ds-border-button-secondary-high-load [--btn-icon:var(--color-ds-icon-button-secondary-high-load)]' },
+      { variant: 'secondary', contrast: 'high', state: 'load', class: 'border-ds-border-button-secondary-high-load text-ds-icon-button-secondary-high-load [--btn-icon:var(--color-ds-icon-button-secondary-high-load)]' },
       {
         variant: 'secondary',
         contrast: 'high',

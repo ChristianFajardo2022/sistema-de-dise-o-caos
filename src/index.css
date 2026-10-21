@@ -167,3 +167,13 @@ code {
   }
 }
 
+
+/* CAOS — Load del Button: pulso secuencial de los 3 puntos (suposición: 1.2s, 0.4s de desfase, ease-in-out) */
+@keyframes caos-load-dot {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  33% {
+    opacity: 1;
+  }
+}

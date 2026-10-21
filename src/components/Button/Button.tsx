@@ -2,7 +2,6 @@ import { forwardRef } from 'react';
 import type { ReactNode } from 'react';
 import type { ButtonProps, ButtonState } from './Button.types';
 import { buttonVariants } from './Button.variants';
-import { Spinner } from '../../icons/Spinner';
 import { cn } from '../../utils/cn';
 
 /** Forma "Union" del efecto de Primary: dos círculos con blur 24. */
@@ -19,6 +18,27 @@ function EffectUnion({ className }: { className?: string }) {
       <circle cx="30" cy="44" r="30" fill="var(--color-ds-background-effect-button)" />
       <circle cx="74" cy="30" r="30" fill="var(--color-ds-background-effect-button)" />
     </svg>
+  );
+}
+
+/**
+ * Indicador de Load de Figma: 3 puntos de 8px en una caja de 24×24 (dos arriba, uno abajo
+ * al centro), color --btn-icon (icon/button/<tipo>/load). Medidas tomadas de la variante
+ * estática; la animación (pulso secuencial) es una suposición mientras no se lea el prototipo.
+ */
+function LoadDots() {
+  const dot =
+    'absolute size-[8px] rounded-full bg-(--btn-icon) animate-[caos-load-dot_1.2s_ease-in-out_infinite] motion-reduce:animate-none';
+  return (
+    <span
+      data-slot="load"
+      aria-hidden="true"
+      className="absolute left-1/2 top-1/2 z-10 size-[24px] -translate-x-1/2 -translate-y-1/2"
+    >
+      <span className={cn(dot, 'left-0 top-0')} />
+      <span className={cn(dot, 'right-0 top-0 [animation-delay:0.4s]')} />
+      <span className={cn(dot, 'bottom-0 left-[8px] [animation-delay:0.8s]')} />
+    </span>
   );
 }
 
@@ -141,7 +161,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           />
         )}
 
-        {/* Contenido sobre el efecto; en Load se oculta y queda el spinner centrado */}
+        {/* Contenido sobre el efecto; en Load se oculta y quedan los 3 puntos centrados */}
         <span
           className={cn(
             'relative z-10 inline-flex items-center justify-center gap-ds-space-button-lg',
@@ -159,9 +179,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           )}
         </span>
 
-        {isLoading && (
-          <Spinner className="absolute left-1/2 top-1/2 z-10 size-[20px] -translate-x-1/2 -translate-y-1/2 text-(color:--btn-icon)" />
-        )}
+        {isLoading && <LoadDots />}
+        {isLoading && <span className="sr-only">Cargando</span>}
       </button>
     );
   }
