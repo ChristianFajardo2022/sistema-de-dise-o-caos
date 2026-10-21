@@ -10,7 +10,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "check:tokens": "node scripts/check-tokens.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -23,26 +24,26 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "latest",
+    "@storybook/addon-a11y": "^10.6.1",
+    "@storybook/addon-docs": "^10.6.1",
+    "@storybook/addon-mcp": "^10.6.1",
+    "@storybook/addon-vitest": "^10.6.1",
+    "@storybook/react-vite": "^10.6.1",
     "@svgr/cli": "^8.1.0",
     "@svgr/plugin-jsx": "^8.1.0",
     "@types/node": "^24.19.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/browser-playwright": "latest",
+    "@vitest/coverage-v8": "latest",
     "oxlint": "^1.81.0",
+    "playwright": "latest",
+    "storybook": "^10.6.1",
     "svgo": "^4.1.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
-    "storybook": "^10.6.1",
-    "@storybook/react-vite": "^10.6.1",
-    "@chromatic-com/storybook": "latest",
-    "@storybook/addon-vitest": "^10.6.1",
-    "@storybook/addon-a11y": "^10.6.1",
-    "@storybook/addon-docs": "^10.6.1",
-    "@storybook/addon-mcp": "^10.6.1",
-    "vitest": "latest",
-    "@vitest/browser-playwright": "latest",
-    "@vitest/coverage-v8": "latest",
-    "playwright": "latest"
+    "vitest": "latest"
   }
 }
