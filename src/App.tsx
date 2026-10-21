@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { Input } from './components/Input';
 import { Button } from './components/Button';
 import { Subtract } from './components/Subtract';
-import { Mail, Lock, User, ShieldCheck, Plus, ArrowRight, Trash2, Download, Settings, RefreshCw } from 'lucide-react';
+import { Mail, Lock, User, ShieldCheck, Download, RefreshCw } from 'lucide-react';
+import { AddIcon } from './icons/AddIcon';
+import { ArrowRightIcon } from './icons/ArrowRightIcon';
+import { TrashIcon } from './icons/TrashIcon';
+import { SettingIcon } from './icons/SettingIcon';
 
 export function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
@@ -73,10 +77,10 @@ export function App() {
                 Type y Contrats
               </h3>
               <div className="flex flex-wrap items-center gap-3">
-                <Button variant="primary" leftIcon={<Plus />}>
+                <Button variant="primary" leftIcon={<AddIcon />}>
                   Primary
                 </Button>
-                <Button variant="secondary" rightIcon={<ArrowRight />}>
+                <Button variant="secondary" rightIcon={<ArrowRightIcon />}>
                   Secondary low
                 </Button>
                 <Button variant="secondary" contrast="high">
@@ -104,7 +108,7 @@ export function App() {
                 <Button variant="primary" disabled>
                   Inactive
                 </Button>
-                <Button variant="primary" state="delete" leftIcon={<Trash2 />}>
+                <Button variant="primary" state="delete" leftIcon={<TrashIcon />}>
                   Eliminar
                 </Button>
                 <Button variant="secondary" state="delete">
@@ -141,16 +145,16 @@ export function App() {
               </h3>
               <div className="flex flex-wrap items-center gap-3">
                 <Button size="md" iconOnly variant="primary" aria-label="Agregar">
-                  <Plus />
+                  <AddIcon />
                 </Button>
                 <Button size="sm" iconOnly variant="secondary" aria-label="Descargar">
                   <Download />
                 </Button>
                 <Button size="xs" iconOnly variant="tertiary" aria-label="Ajustes">
-                  <Settings />
+                  <SettingIcon />
                 </Button>
                 <Button size="md" iconOnly variant="primary" state="delete" aria-label="Eliminar">
-                  <Trash2 />
+                  <TrashIcon />
                 </Button>
               </div>
             </div>

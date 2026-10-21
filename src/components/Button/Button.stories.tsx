@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from './Button';
 import type { ButtonState } from './Button.types';
-// Pendiente: migrar a Iconsax cuando el paquete esté en el proyecto. El slot de ícono
-// del Button dibuja cualquier SVG a 20px con el color del estado.
-import { Plus, ArrowRight, Trash2, Settings } from 'lucide-react';
+import { AddIcon } from '../../icons/AddIcon';
+import { ArrowRightIcon } from '../../icons/ArrowRightIcon';
+import { TrashIcon } from '../../icons/TrashIcon';
+import { SettingIcon } from '../../icons/SettingIcon';
 
 const meta: Meta<typeof Button> = {
   title: 'General Controls/Button',
@@ -88,8 +89,8 @@ export const Unicolor: Story = {
 export const WithIcons: Story = {
   args: {
     variant: 'primary',
-    leftIcon: <Plus />,
-    rightIcon: <ArrowRight />,
+    leftIcon: <AddIcon />,
+    rightIcon: <ArrowRightIcon />,
   },
 };
 
@@ -97,7 +98,7 @@ export const IconSingle: Story = {
   args: {
     variant: 'secondary',
     iconOnly: true,
-    children: <Settings />,
+    children: <SettingIcon />,
     'aria-label': 'Configuración',
   },
 };
@@ -106,7 +107,7 @@ export const Delete: Story = {
   args: {
     variant: 'primary',
     state: 'delete',
-    leftIcon: <Trash2 />,
+    leftIcon: <TrashIcon />,
     children: 'Eliminar',
   },
 };
@@ -160,10 +161,10 @@ export const IconSingleMatrix: Story = {
       {(['md', 'sm', 'xs'] as const).map((size) => (
         <div key={size} className="flex items-center gap-3">
           <span className="w-8 text-xs text-neutral-400">{size}</span>
-          <Button size={size} iconOnly variant="primary" aria-label="Agregar"><Plus /></Button>
-          <Button size={size} iconOnly variant="secondary" aria-label="Agregar"><Plus /></Button>
-          <Button size={size} iconOnly variant="secondary" contrast="high" aria-label="Agregar"><Plus /></Button>
-          <Button size={size} iconOnly variant="tertiary" aria-label="Agregar"><Plus /></Button>
+          <Button size={size} iconOnly variant="primary" aria-label="Agregar"><AddIcon /></Button>
+          <Button size={size} iconOnly variant="secondary" aria-label="Agregar"><AddIcon /></Button>
+          <Button size={size} iconOnly variant="secondary" contrast="high" aria-label="Agregar"><AddIcon /></Button>
+          <Button size={size} iconOnly variant="tertiary" aria-label="Agregar"><AddIcon /></Button>
         </div>
       ))}
     </div>
@@ -175,9 +176,9 @@ export const Sizes: Story = {
     <div className="flex flex-col gap-4">
       {(['primary', 'secondary', 'tertiary'] as const).map((variant) => (
         <div key={variant} className="flex items-center gap-3">
-          <Button size="md" variant={variant} leftIcon={<Plus />}>md 56</Button>
-          <Button size="sm" variant={variant} leftIcon={<Plus />}>sm 48</Button>
-          <Button size="xs" variant={variant} leftIcon={<Plus />}>xs 32</Button>
+          <Button size="md" variant={variant} leftIcon={<AddIcon />}>md 56</Button>
+          <Button size="sm" variant={variant} leftIcon={<AddIcon />}>sm 48</Button>
+          <Button size="xs" variant={variant} leftIcon={<AddIcon />}>xs 32</Button>
         </div>
       ))}
     </div>
