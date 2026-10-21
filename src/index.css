@@ -2,15 +2,6 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @import './styles/tokens.css';
 
-@theme {
-  --color-btn-primary-bg: var(--background-button-primary-default);
-  --color-btn-primary-text: var(--text-button-primary-default);
-  --color-btn-primary-bg-hover: var(--background-button-primary-hover);
-  --color-btn-primary-text-hover: var(--text-button-primary-hover-focus-press);
-  --color-btn-primary-bg-active: var(--background-button-primary-press);
-  --color-btn-primary-border: var(--border-button-primary-default);
-}
-
 :root {
   --text: #6b6375;
   --text-h: #08060d;
