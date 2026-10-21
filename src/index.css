@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @import './styles/tokens.css';
+@import './styles/fonts.css';
 
 :root {
   --text: #6b6375;

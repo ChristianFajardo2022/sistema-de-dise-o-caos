@@ -1,0 +1,48 @@
+/* Fuentes del sistema. Solo los pesos que usan los tokens (typography/weight: 400, 600, 700). */
+
+/* typography/family/Primary — texto de UI (Button y demás) */
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../assets/fonts/HelveticaNeue-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* Helvetica Neue no tiene SemiBold: Medium cubre 500 y 600 */
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../assets/fonts/HelveticaNeue-Medium.woff2") format("woff2");
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../assets/fonts/HelveticaNeue-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* typography/family/secundary — solo títulos */
+@font-face {
+  font-family: "Prospero";
+  src: url("../assets/fonts/Prospero-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Prospero";
+  src: url("../assets/fonts/Prospero-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Prospero";
+  src: url("../assets/fonts/Prospero-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
