@@ -125,14 +125,23 @@ code {
   }
 }
 
-/* CAOS — Load del Button: cada punto pulsa en su sitio (opacidad 0.3→1 y escala 1→1.3), 1.5s, 0.5s entre picos */
-@keyframes caos-load-dot {
-  0%, 66%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
+/* CAOS — Load del Button (video del prototipo): los 3 puntos (siempre de 8px) giran 120° en sentido antihorario alrededor de
+   su centroide mientras se juntan al 40% de su separación y vuelven a abrirse; ciclo de 0.667s, 60% en movimiento y 40% quieto.
+   120° deja el triángulo igual. --dx/--dy: vector de cada punto hacia el centroide. */
+@keyframes caos-load-turn {
+  0% {
+    transform: rotate(0deg);
   }
-  33% {
-    opacity: 1;
-    transform: scale(1.3);
+  60%, 100% {
+    transform: rotate(-120deg);
+  }
+}
+
+@keyframes caos-load-gather {
+  0%, 60%, 100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(calc(var(--dx) * 0.6), calc(var(--dy) * 0.6));
   }
 }

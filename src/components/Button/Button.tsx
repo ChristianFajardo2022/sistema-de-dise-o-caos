@@ -24,20 +24,23 @@ function EffectUnion({ className }: { className?: string }) {
 /**
  * Indicador de Load de Figma: 3 puntos de 8px en una caja de 24×24 (dos arriba, uno abajo
  * al centro), color --btn-icon (icon/button/<tipo>/load). Medidas tomadas de la variante
- * estática; animación según el video del prototipo: pulso de opacidad y escala, 1.5s, 0.5s entre puntos.
+ * estática; animación según el video del prototipo: el trío gira 120° y se junta/abre alrededor de su centroide, ciclo de 0.667s.
  */
 function LoadDots() {
   const dot =
-    'absolute size-[8px] rounded-full bg-(--btn-icon) animate-[caos-load-dot_1.5s_ease-in-out_infinite] motion-reduce:animate-none';
+    'absolute size-[8px] rounded-full bg-(--btn-icon) animate-[caos-load-gather_0.667s_ease-in-out_infinite] motion-reduce:animate-none';
   return (
     <span
       data-slot="load"
       aria-hidden="true"
       className="absolute left-1/2 top-1/2 z-10 size-[24px] -translate-x-1/2 -translate-y-1/2"
     >
-      <span className={cn(dot, 'left-0 top-0')} />
-      <span className={cn(dot, 'right-0 top-0 [animation-delay:0.5s]')} />
-      <span className={cn(dot, 'bottom-0 left-[8px] [animation-delay:1s]')} />
+      {/* origen en el centroide de los puntos (12px, 9.33px) */}
+      <span className="absolute inset-0 origin-[12px_9.33px] animate-[caos-load-turn_0.667s_ease-in-out_infinite] motion-reduce:animate-none">
+        <span className={cn(dot, 'left-0 top-0 [--dx:8px] [--dy:5.33px]')} />
+        <span className={cn(dot, 'right-0 top-0 [--dx:-8px] [--dy:5.33px]')} />
+        <span className={cn(dot, 'bottom-0 left-[8px] [--dx:0px] [--dy:-10.67px]')} />
+      </span>
     </span>
   );
 }
