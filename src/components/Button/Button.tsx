@@ -154,11 +154,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </span>
         )}
 
-        {/* Trazo interior de 0.5px de Primary (stroke/dm), por encima del efecto */}
+        {/* Trazo interior de Primary por encima del efecto: stroke/dm (0.5px), o --btn-stroke-w en Focus (stroke/lg) */}
         {variant === 'primary' && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] text-(color:--btn-stroke) shadow-[inset_0_0_0_var(--ds-primitives-stroke-dm)_currentColor] transition-colors duration-300 ease-out"
+            className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] text-(color:--btn-stroke) shadow-[inset_0_0_0_var(--btn-stroke-w,var(--ds-primitives-stroke-dm))_currentColor] transition-colors duration-300 ease-out"
           />
         )}
 

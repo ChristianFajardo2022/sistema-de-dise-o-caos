@@ -19,7 +19,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   /** Contrats: nivel de contraste de secondary */
   contrast?: ButtonContrast;
-  /** Unicolor: texto e ícono de un solo color (secondary y tertiary sin icon-single) */
+  /** Unicolor: texto e ícono de un solo color (secondary y tertiary sin icon-single). Inactive y Delete conservan sus colores. */
   unicolor?: boolean;
   /** Size: md 56 · sm 48 · xs 32 */
   size?: ButtonSize;

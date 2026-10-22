@@ -40,7 +40,8 @@ export const buttonVariants = cva(
         // El trazo de 0.5px se dibuja en Button.tsx con una sombra interior: Chrome redondea a 1px los bordes de 0.5px
         primary: 'rounded-ds-radius-button-full border-0 [--btn-stroke:transparent]',
         secondary: 'rounded-ds-radius-button-full border-solid border-(length:--ds-primitives-stroke-lg)',
-        tertiary: 'rounded-none border-0',
+        // Sin radio con texto; Icon-single lleva radio completo (ver compoundVariants)
+        tertiary: 'border-0',
         /** @deprecated Button link es un componente aparte en Figma; pendiente de migrar. */
         link: 'rounded-ds-radius-button-full border-0',
       },
@@ -138,7 +139,7 @@ export const buttonVariants = cva(
           '[--btn-icon:var(--color-ds-icon-button-primary-default)]',
           'hover:[--btn-stroke:var(--color-ds-border-button-primary-default)] hover:bg-ds-background-button-primary-hover hover:text-ds-text-button-primary-hover-focus-press',
           'hover:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
-          'focus-visible:[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] focus-visible:bg-ds-background-button-primary-focus focus-visible:text-ds-text-button-primary-hover-focus-press',
+          'focus-visible:[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] focus-visible:[--btn-stroke-w:var(--ds-primitives-stroke-lg)] focus-visible:bg-ds-background-button-primary-focus focus-visible:text-ds-text-button-primary-hover-focus-press',
           'focus-visible:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
           'active:[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] active:bg-ds-background-button-primary-press active:text-ds-text-button-primary-hover-focus-press',
           'active:[--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
@@ -152,7 +153,8 @@ export const buttonVariants = cva(
       {
         variant: 'primary',
         state: 'focus',
-        class: '[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] bg-ds-background-button-primary-focus text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
+        // Focus es el único estado con trazo de 1px (stroke/lg); el resto usa stroke/dm
+        class: '[--btn-stroke:var(--color-ds-border-button-primary-focus-press)] [--btn-stroke-w:var(--ds-primitives-stroke-lg)] bg-ds-background-button-primary-focus text-ds-text-button-primary-hover-focus-press [--btn-icon:var(--color-ds-icon-button-primary-hover-focus-press)]',
       },
       {
         variant: 'primary',
@@ -212,24 +214,23 @@ export const buttonVariants = cva(
         unicolor: false,
         class: 'text-ds-text-button-secondary-low-hover-focus-press [--btn-icon:var(--color-ds-icon-button-secondary-low-hover-focus-press)]',
       },
+      // Inactive y Delete usan sus colores también con Unicolor
       {
         variant: 'secondary',
         contrast: 'low',
         state: 'inactive',
-        unicolor: false,
         class: 'text-ds-text-button-secondary-low-inactive [--btn-icon:var(--color-ds-icon-button-secondary-low-inactive)]',
       },
       {
         variant: 'secondary',
         contrast: 'low',
         state: 'delete',
-        unicolor: false,
         class: 'text-ds-text-button-secondary-low-delete [--btn-icon:var(--color-ds-icon-button-secondary-low-delete)]',
       },
       {
         variant: 'secondary',
         contrast: 'low',
-        state: ['default', 'hover', 'focus', 'press', 'inactive', 'delete'],
+        state: ['default', 'hover', 'focus', 'press'],
         unicolor: true,
         class: 'text-ds-text-button-secondary-low-unicolor [--btn-icon:var(--color-ds-icon-button-secondary-low-unicolor)]',
       },
@@ -271,33 +272,32 @@ export const buttonVariants = cva(
         unicolor: false,
         class: 'text-ds-text-button-secondary-high-hover-focus-press [--btn-icon:var(--color-ds-icon-button-secondary-high-hover-focus-press)]',
       },
+      // Inactive y Delete usan sus colores también con Unicolor
       {
         variant: 'secondary',
         contrast: 'high',
         state: 'inactive',
-        unicolor: false,
         class: 'text-ds-text-button-secondary-high-inactive [--btn-icon:var(--color-ds-icon-button-secondary-high-inactive)]',
       },
       {
         variant: 'secondary',
         contrast: 'high',
         state: 'delete',
-        unicolor: false,
         class: 'text-ds-text-button-secondary-high-delete [--btn-icon:var(--color-ds-icon-button-secondary-high-delete)]',
       },
       {
         variant: 'secondary',
         contrast: 'high',
-        state: ['default', 'hover', 'focus', 'press', 'inactive', 'delete'],
+        state: ['default', 'hover', 'focus', 'press'],
         unicolor: true,
         class: 'text-ds-text-button-secondary-high-unicolor [--btn-icon:var(--color-ds-icon-button-secondary-high-unicolor)]',
       },
 
-      /* ── Tertiary (sin borde, radio ni fondo en ningún estado) ── */
+      /* ── Tertiary (sin borde; fondo y radio solo en Icon-single) ── */
+      // Unicolor solo cambia el reposo: hover, focus, press, inactive y delete usan los colores de tertiary
       {
         variant: 'tertiary',
         state: 'default',
-        unicolor: false,
         class: [
           'text-ds-text-button-tertiary-default [--btn-icon:var(--color-ds-icon-button-tertiary-default)]',
           'hover:text-ds-text-button-tertiary-hover hover:[--btn-icon:var(--color-ds-icon-button-tertiary-hover)]',
@@ -308,32 +308,40 @@ export const buttonVariants = cva(
       {
         variant: 'tertiary',
         state: 'hover',
-        unicolor: false,
         class: 'text-ds-text-button-tertiary-hover [--btn-icon:var(--color-ds-icon-button-tertiary-hover)]',
       },
       {
         variant: 'tertiary',
         state: ['focus', 'press'],
-        unicolor: false,
         class: 'text-ds-text-button-tertiary-focus-press [--btn-icon:var(--color-ds-icon-button-tertiary-focus-press)]',
       },
       {
         variant: 'tertiary',
         state: 'inactive',
-        unicolor: false,
         class: 'text-ds-text-button-tertiary-inactive [--btn-icon:var(--color-ds-icon-button-tertiary-inactive)]',
       },
       {
         variant: 'tertiary',
         state: 'delete',
-        unicolor: false,
         class: 'text-ds-text-button-tertiary-delete [--btn-icon:var(--color-ds-icon-button-tertiary-delete)]',
       },
+      // Va después del default para ganarle al color base; los hover:/focus-visible:/active: del default siguen aplicando
       {
         variant: 'tertiary',
+        state: 'default',
         unicolor: true,
         class: 'text-ds-text-button-tertiary-unicolor [--btn-icon:var(--color-ds-icon-button-tertiary-unicolor)]',
       },
+      // Icon-single: radio completo y fondo en hover, focus y press
+      { variant: 'tertiary', iconOnly: true, class: 'rounded-ds-radius-button-full' },
+      {
+        variant: 'tertiary',
+        iconOnly: true,
+        state: 'default',
+        class: 'hover:bg-ds-background-button-tertiary-hover focus-visible:bg-ds-background-button-tertiary-focus-press active:bg-ds-background-button-tertiary-focus-press',
+      },
+      { variant: 'tertiary', iconOnly: true, state: 'hover', class: 'bg-ds-background-button-tertiary-hover' },
+      { variant: 'tertiary', iconOnly: true, state: ['focus', 'press'], class: 'bg-ds-background-button-tertiary-focus-press' },
 
       /* ── Link (heredado; pendiente de pasar a componente propio) ── */
       {
