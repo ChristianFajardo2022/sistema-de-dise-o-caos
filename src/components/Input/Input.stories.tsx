@@ -1,5 +1,6 @@
 import { useState, type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Input } from './Input';
 import type { InputState, InputVariant } from './Input.types';
 
@@ -162,4 +163,66 @@ export const StatesMatrix: Story = {
       ))}
     </div>
   ),
+};
+
+/** Test: escribir actualiza el valor y el label sigue asociado */
+export const TypingTest: Story = {
+  tags: ['!autodocs'],
+  args: { label: 'Nombre completo', placeholder: 'Ej. Camilo Hernández' },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByLabelText('Nombre completo');
+    await userEvent.type(input, 'Camilo Pérez');
+    await expect(input).toHaveValue('Camilo Pérez');
+    await expect(within(canvasElement).getByRole('textbox', { name: 'Nombre completo' })).toBe(input);
+  },
+};
+
+/** Test: en error aria-invalid y aria-describedby apuntan al mensaje visible */
+export const ErrorTest: Story = {
+  tags: ['!autodocs'],
+  args: { label: 'Correo', errorText: 'Escribe un correo válido', defaultValue: 'abc' },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByLabelText('Correo');
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    const id = input.getAttribute('aria-describedby');
+    await expect(id).toBeTruthy();
+    const message = canvasElement.querySelector(`[id="${id}"]`);
+    await expect(message).toBeVisible();
+    await expect(message).toHaveTextContent('Escribe un correo válido');
+  },
+};
+
+/** Test: el botón de contraseña alterna tipo y nombre con teclado */
+export const PasswordToggleTest: Story = {
+  tags: ['!autodocs'],
+  args: { variant: 'password', label: 'Contraseña' },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByLabelText('Contraseña');
+    await userEvent.type(input, 'secreto');
+    await expect(input).toHaveAttribute('type', 'password');
+    await userEvent.tab();
+    const show = canvas.getByRole('button', { name: 'Mostrar contraseña' });
+    await expect(show).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(input).toHaveAttribute('type', 'text');
+    const hide = canvas.getByRole('button', { name: 'Ocultar contraseña' });
+    await expect(hide).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.keyboard(' ');
+    await expect(input).toHaveAttribute('type', 'password');
+    await expect(canvas.getByRole('button', { name: 'Mostrar contraseña' })).toBeVisible();
+    await expect(input).toHaveValue('secreto');
+  },
+};
+
+/** Test: disabled no acepta texto */
+export const DisabledTest: Story = {
+  tags: ['!autodocs'],
+  args: { label: 'Campo', disabled: true },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByLabelText('Campo');
+    await expect(input).toBeDisabled();
+    await userEvent.type(input, 'hola');
+    await expect(input).toHaveValue('');
+  },
 };

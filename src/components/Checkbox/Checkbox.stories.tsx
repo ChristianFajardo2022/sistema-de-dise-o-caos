@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { Checkbox } from './Checkbox';
 import type { CheckboxProps, SelectionContrast, SelectionState } from './Checkbox.types';
 
@@ -103,4 +104,39 @@ export const StatesMatrix: Story = {
       ))}
     </div>
   ),
+};
+
+/** Test: clic y Espacio alternan checked y llaman onChange; el label está asociado */
+export const ToggleTest: Story = {
+  tags: ['!autodocs'],
+  args: { children: 'Acepto los términos', onChange: fn() },
+  play: async ({ args, canvasElement }) => {
+    const checkbox = within(canvasElement).getByRole('checkbox', { name: 'Acepto los términos' });
+    await expect(within(canvasElement).getByLabelText('Acepto los términos')).toBe(checkbox);
+    await expect(checkbox).not.toBeChecked();
+    await userEvent.click(checkbox);
+    await expect(checkbox).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await userEvent.click(within(canvasElement).getByText('Acepto los términos'));
+    await expect(checkbox).not.toBeChecked();
+    checkbox.focus();
+    await expect(checkbox).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect(checkbox).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(3);
+  },
+};
+
+/** Test: disabled no cambia ni llama onChange */
+export const DisabledTest: Story = {
+  tags: ['!autodocs'],
+  args: { children: 'No disponible', disabled: true, onChange: fn() },
+  play: async ({ args, canvasElement }) => {
+    const checkbox = within(canvasElement).getByRole('checkbox', { name: 'No disponible' });
+    await expect(checkbox).toBeDisabled();
+    await userEvent.click(checkbox);
+    await userEvent.click(within(canvasElement).getByText('No disponible'));
+    await expect(checkbox).not.toBeChecked();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
 };

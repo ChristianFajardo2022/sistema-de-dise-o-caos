@@ -1,5 +1,6 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react';
 import type { ComponentType } from 'react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { Button } from './Button';
 import type { ButtonBaseProps, ButtonProps, ButtonState } from './Button.types';
 import { AddIcon } from '../../icons/AddIcon';
@@ -237,4 +238,60 @@ export const HoverSpecifications: Story = {
       </div>
     </div>
   ),
+};
+
+/** Test: el clic llama a onClick */
+export const ClickTest: Story = {
+  tags: ['!autodocs'],
+  args: { onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Button' });
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+/** Test: Tab llega al botón y Enter y Espacio lo activan */
+export const KeyboardTest: Story = {
+  tags: ['!autodocs'],
+  args: { onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Button' });
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
+};
+
+/** Test: en Load no se llama a onClick, hay aria-busy, el foco se conserva y el nombre incluye el texto */
+export const LoadingTest: Story = {
+  tags: ['!autodocs'],
+  args: { variant: 'primary', loading: true, onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: /Button/ });
+    await expect(button).toHaveAttribute('aria-busy', 'true');
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.click(button);
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(button).toHaveFocus();
+  },
+};
+
+/** Test: inactive no recibe clic ni foco */
+export const InactiveTest: Story = {
+  tags: ['!autodocs'],
+  args: { disabled: true, onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Button' });
+    await expect(button).toBeDisabled();
+    await userEvent.click(button);
+    await userEvent.tab();
+    await expect(button).not.toHaveFocus();
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
 };

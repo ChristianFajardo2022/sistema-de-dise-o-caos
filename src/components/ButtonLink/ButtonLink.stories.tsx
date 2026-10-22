@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { ButtonLink } from './ButtonLink';
 import type { ButtonLinkState } from './ButtonLink.types';
 
@@ -65,4 +66,42 @@ export const StatesMatrix: Story = {
       ))}
     </div>
   ),
+};
+
+/** Test: rol link con href y nombre accesible */
+export const LinkRoleTest: Story = {
+  tags: ['!autodocs'],
+  args: { href: '#destino', children: 'Ver detalle' },
+  play: async ({ canvasElement }) => {
+    const link = within(canvasElement).getByRole('link', { name: 'Ver detalle' });
+    await expect(link).toHaveAttribute('href', '#destino');
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+  },
+};
+
+/** Test: inactivo tiene aria-disabled, no tiene href, no entra en el orden de tabulación y el clic no navega */
+export const InactiveLinkTest: Story = {
+  tags: ['!autodocs'],
+  args: { disabled: true, href: '#destino', children: 'No disponible', onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const link = within(canvasElement).getByRole('link', { name: 'No disponible' });
+    await expect(link).toHaveAttribute('aria-disabled', 'true');
+    await expect(link).not.toHaveAttribute('href');
+    await userEvent.click(link);
+    await userEvent.tab();
+    await expect(link).not.toHaveFocus();
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(window.location.hash).not.toBe('#destino');
+  },
+};
+
+/** Test: con target="_blank" el nombre accesible avisa de la pestaña nueva */
+export const NewTabNameTest: Story = {
+  tags: ['!autodocs'],
+  args: { href: 'https://example.com', target: '_blank', rel: 'noopener noreferrer', children: 'Documentación' },
+  play: async ({ canvasElement }) => {
+    const link = within(canvasElement).getByRole('link', { name: /Documentación.*pestaña nueva/ });
+    await expect(link).toHaveAttribute('target', '_blank');
+  },
 };

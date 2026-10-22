@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { Radio } from './Radio';
 import type { RadioProps, RadioContrast, RadioState } from './Radio.types';
 
@@ -115,4 +116,64 @@ export const StatesMatrix: Story = {
       ))}
     </div>
   ),
+};
+
+/** Test: las flechas mueven la selección, solo uno queda marcado y disabled se omite */
+export const ArrowKeysTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div role="radiogroup" aria-label="Plan" className="flex flex-col gap-3">
+      <Radio name="plan-test" value="a" defaultChecked>
+        Básico
+      </Radio>
+      <Radio name="plan-test" value="b" disabled>
+        Estándar
+      </Radio>
+      <Radio name="plan-test" value="c">
+        Premium
+      </Radio>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const basic = canvas.getByRole('radio', { name: 'Básico' });
+    const standard = canvas.getByRole('radio', { name: 'Estándar' });
+    const premium = canvas.getByRole('radio', { name: 'Premium' });
+    await userEvent.tab();
+    await expect(basic).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(premium).toBeChecked();
+    await expect(premium).toHaveFocus();
+    await expect(basic).not.toBeChecked();
+    await expect(standard).not.toBeChecked();
+    await userEvent.keyboard('{ArrowUp}');
+    await expect(basic).toBeChecked();
+    await expect(canvas.getAllByRole('radio').filter((r) => (r as HTMLInputElement).checked)).toHaveLength(1);
+  },
+};
+
+/** Test: clic en el label selecciona y desmarca el anterior; disabled no se selecciona */
+export const SelectionTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <GroupDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('radio', { name: 'Estándar' })).toBeChecked();
+    await userEvent.click(canvas.getByText('Premium'));
+    await expect(canvas.getByRole('radio', { name: 'Premium' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: 'Estándar' })).not.toBeChecked();
+  },
+};
+
+/** Test: disabled no se puede seleccionar */
+export const DisabledTest: Story = {
+  tags: ['!autodocs'],
+  args: { children: 'No disponible', disabled: true, onChange: fn() },
+  play: async ({ args, canvasElement }) => {
+    const radio = within(canvasElement).getByRole('radio', { name: 'No disponible' });
+    await userEvent.click(radio);
+    await expect(radio).toBeDisabled();
+    await expect(radio).not.toBeChecked();
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
 };

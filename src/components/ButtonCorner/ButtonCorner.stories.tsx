@@ -1,5 +1,6 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react';
 import type { ComponentType } from 'react';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { ButtonCorner } from './ButtonCorner';
 import type {
   ButtonCornerBaseProps,
@@ -152,4 +153,41 @@ export const StatesMatrix: Story = {
       ))}
     </div>
   ),
+};
+
+/** Test: nombre accesible y activación con clic */
+export const NameAndClickTest: Story = {
+  tags: ['!autodocs'],
+  args: { 'aria-label': 'Abrir detalle', onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Abrir detalle' });
+    await expect(button).not.toHaveAttribute('aria-pressed');
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+/** Test: pressed expone aria-pressed */
+export const PressedTest: Story = {
+  tags: ['!autodocs'],
+  args: { variant: 'favorite', pressed: true, 'aria-label': 'Quitar de favoritos' },
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Quitar de favoritos', pressed: true });
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+  },
+};
+
+/** Test: Enter y Espacio disparan onClick */
+export const KeyboardTest: Story = {
+  tags: ['!autodocs'],
+  args: { variant: 'dots', 'aria-label': 'Más opciones', onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Más opciones' });
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
 };
