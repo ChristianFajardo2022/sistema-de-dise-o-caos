@@ -1,0 +1,17 @@
+{
+  "name": "ScrollArea",
+  "component": "ScrollArea",
+  "description": "Área con desplazamiento nativo cuya barra se ve como el componente suelto Scroll bar de Figma (id 11189:8771, 6×314, slot Scroll). Riel de 6 de ancho con radio radius/button/full y relleno background/general/gray-sixth; pulgar con el mismo radio y relleno background/general/gray-firts. En Chrome y Safari se aplica con ::-webkit-scrollbar* (6 px exactos); en Firefox con scrollbar-width thin y scrollbar-color con los mismos tokens (ancho y radio los decide el navegador). Limitación: el alto del pulgar (71 en Figma) lo calcula el navegador según el contenido, CSS no permite fijarlo; en móviles y macOS con barras superpuestas el sistema puede ocultar la barra hasta que se desplaza. Accesibilidad: no reemplaza el scroll nativo (rueda, táctil, lectores). Solo cuando el contenido desborda (se mide con ResizeObserver según `orientation`) es role=region con tabIndex 0, y el aria-label es obligatorio, para poder desplazarlo con flechas, RePág/AvPág, Inicio y Fin aunque el contenido no sea enfocable; foco visible con outline de 2px. Sin desborde no es tabulable ni región. Un role o tabIndex explícito se respeta.",
+  "category": "Layout",
+  "props": {
+    "orientation": { "type": "'vertical' | 'horizontal' | 'both'", "default": "'vertical'", "description": "Eje de desplazamiento." },
+    "maxHeight": { "type": "string | number", "required": false, "description": "Alto máximo; sin él el área crece con su contenido." },
+    "aria-label": { "type": "string", "required": true, "description": "Nombre accesible de la región." },
+    "children": { "type": "ReactNode", "required": false, "description": "Contenido desplazable." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para el div raíz. El resto de props nativas y el ref van al div." }
+  },
+  "examples": [
+    { "title": "Lista larga", "code": "<ScrollArea maxHeight=\"314px\" aria-label=\"Resultados\">…</ScrollArea>" },
+    { "title": "Horizontal", "code": "<ScrollArea orientation=\"horizontal\" aria-label=\"Galería\">…</ScrollArea>" }
+  ]
+}
