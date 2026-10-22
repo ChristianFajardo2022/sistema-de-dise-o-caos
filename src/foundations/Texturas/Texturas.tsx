@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import {
   DoDont,
@@ -27,22 +28,89 @@ export type TexturasTab = 'definicion' | 'valores-de-token' | 'aplicacion';
 /** Degradado de contenedores principales: lineal a 45°, de N01 (0 %) a A06 (100 %), como indica Figma */
 const GRADIENT = 'bg-linear-45 from-ds-primitives-color-primary-n01 to-ds-primitives-color-secondary-a06 text-ds-primitives-color-primary-b01';
 
-/** Fondo con formas de color para que se note lo que hay detrás del glass y del blur */
-function ColorfulBackdrop({ children, className }: { children: ReactNode; className?: string }) {
+/** Fondo con formas de color que se asoman bajo el panel, para que se note lo que hay detrás del glass y del blur */
+function ColorfulBackdrop({ children, className, fill = false }: { children: ReactNode; className?: string; fill?: boolean }) {
   return (
     <div
       className={cn(
-        'relative isolate flex items-center justify-center overflow-hidden rounded-ds-radius-container-on-card bg-ds-background-container-default-on-canva p-ds-space-general-4xl',
+        'relative isolate flex items-center justify-center overflow-hidden rounded-ds-radius-container-on-card bg-ds-primitives-color-primary-n01 p-ds-space-general-4xl',
         className,
       )}
     >
-      <span aria-hidden="true" className="absolute -top-10 -left-6 -z-10 size-32 rounded-full bg-ds-primitives-color-secondary-a03" />
-      <span aria-hidden="true" className="absolute -right-8 -bottom-12 -z-10 size-40 rounded-full bg-ds-primitives-color-tertiary-m03" />
-      <span aria-hidden="true" className="absolute bottom-4 left-[4%] -z-10 h-8 w-40 -rotate-12 rounded-full bg-ds-primitives-color-information-ai04" />
-      {children}
+      <div className={fill ? 'contents' : 'relative isolate w-full max-w-sm'}>
+        <span aria-hidden="true" className="absolute -top-10 -left-12 -z-10 size-28 rounded-full bg-ds-primitives-color-secondary-a03" />
+        <span aria-hidden="true" className="absolute -right-10 -bottom-12 -z-10 size-32 rounded-full bg-ds-primitives-color-tertiary-m03" />
+        <span aria-hidden="true" className="absolute top-1/2 -left-6 -z-10 h-6 w-48 -rotate-12 rounded-full bg-ds-primitives-color-information-ai04" />
+        <span aria-hidden="true" className="absolute -top-6 right-8 -z-10 h-4 w-40 rotate-6 rounded-full bg-ds-primitives-color-secondary-a03" />
+        {children}
+      </div>
     </div>
   );
 }
+
+/** Código CSS con botón de copiar */
+function CopyCode({ label, code }: { label: string; code: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    void navigator.clipboard?.writeText(code).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <div className="flex flex-col gap-ds-space-general-sm">
+      <div className="flex items-center justify-between gap-ds-space-general-lg text-ds-primitives-typography-size-md text-ds-text-neutral-body">
+        <span>{label}</span>
+        <button type="button" onClick={copy} className="cursor-pointer rounded-ds-radius-general-full border border-ds-border-general-gray-fifth bg-transparent px-ds-space-general-lg py-ds-space-general-xs text-ds-text-neutral-heading">
+          {copied ? 'Copiado' : 'Copiar CSS'}
+        </button>
+      </div>
+      <pre className="m-0 overflow-x-auto rounded-ds-radius-container-on-card bg-ds-background-container-default-on-canva p-ds-space-general-lg text-ds-primitives-typography-size-sm text-ds-text-neutral-heading">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
+/** Parámetros de un efecto (valor de Figma + CSS equivalente) */
+function ParamList({ params }: { params: [string, string][] }) {
+  return (
+    <dl className="m-0 grid grid-cols-2 gap-x-ds-space-general-4xl gap-y-ds-space-general-sm text-ds-primitives-typography-size-md sm:grid-cols-3">
+      {params.map(([k, v]) => (
+        <div key={k} className="flex items-baseline justify-between gap-ds-space-general-lg border-b border-ds-border-general-gray-fifth py-ds-space-general-xs">
+          <dt className="text-ds-text-neutral-body">{k}</dt>
+          <dd className="m-0 font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+const GLASS_PURE_CSS = `/* glass.default: Light -45° 80 % · Refraction 80 · Depth 20 · Dispersion 50 · Frost 4 · Splay 0 */
+backdrop-filter: blur(4px) saturate(180%) brightness(1.15);
+background: linear-gradient(135deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 55%);
+box-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.6), inset -1px -1px 0 rgb(255 255 255 / 0.2);
+border: 1px solid rgb(255 255 255 / 0.25);`;
+
+const GLASS_OPACITY_CSS = `/* glass.opacity: mismos valores + relleno B01 al 60 % */
+backdrop-filter: blur(4px) saturate(180%) brightness(1.15);
+background: color-mix(in srgb, var(--color-ds-primitives-color-primary-b01) 60%, transparent); /* B01 al 60 % */
+box-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.6), inset -1px -1px 0 rgb(255 255 255 / 0.2);
+border: 1px solid rgb(255 255 255 / 0.25);`;
+
+const BLUR_CSS = `/* blur.default: relleno blanco + desenfoque 16 al abrir un modal */
+background: rgb(255 255 255 / 0.3);
+backdrop-filter: blur(16px);`;
+
+const GRADIENT_CSS = `/* degraded.default: lineal 45°, 0 % a 100 %, N01 a A06 */
+background: linear-gradient(45deg, var(--color-ds-primitives-color-primary-n01) 0%, var(--color-ds-primitives-color-secondary-a06) 100%);`;
+
+/** Efecto glass aproximado en CSS: desenfoque, saturación, brillo y bordes de luz a -45° */
+const GLASS_STYLE = {
+  backdropFilter: 'blur(4px) saturate(180%) brightness(1.15)',
+  WebkitBackdropFilter: 'blur(4px) saturate(180%) brightness(1.15)',
+  boxShadow: 'inset 1px 1px 0 rgb(255 255 255 / 0.6), inset -1px -1px 0 rgb(255 255 255 / 0.2)',
+} as const;
 
 /** Texto de ejemplo dentro de los paneles de muestra */
 function PanelText({ title, body }: { title: string; body: string }) {
@@ -59,12 +127,15 @@ function GlassPure({ shadow = false }: { shadow?: boolean }) {
   return (
     <div
       className={cn(
-        'w-full max-w-sm rounded-ds-radius-container-on-card border border-ds-border-general-gray-fifth p-ds-space-general-4xl',
+        'w-full rounded-ds-radius-container-on-card border border-white/25 bg-linear-135 from-white/20 to-transparent to-55% p-ds-space-general-4xl',
         shadow && 'shadow-ds-on-canva',
       )}
-      style={{ backdropFilter: 'blur(4px)' }}
+      style={shadow ? { ...GLASS_STYLE, boxShadow: undefined } : GLASS_STYLE}
     >
-      <PanelText title="Glass puro" body="Interviene directamente en el fondo del contenedor." />
+      <span className="flex flex-col gap-ds-space-general-sm text-ds-primitives-color-primary-b01">
+        <span className="text-ds-primitives-typography-size-xl font-ds-primitives-typography-weight-semibold">Glass puro</span>
+        <span className="text-ds-primitives-typography-size-md">Interviene directamente en el fondo del contenedor.</span>
+      </span>
     </div>
   );
 }
@@ -73,8 +144,8 @@ function GlassPure({ shadow = false }: { shadow?: boolean }) {
 function GlassOpacity() {
   return (
     <div
-      className="w-full max-w-sm rounded-ds-radius-container-on-card border border-ds-border-general-gray-fifth bg-ds-primitives-color-primary-b01/60 p-ds-space-general-4xl"
-      style={{ backdropFilter: 'blur(4px)' }}
+      className="w-full rounded-ds-radius-container-on-card border border-white/25 bg-ds-primitives-color-primary-b01/60 p-ds-space-general-4xl"
+      style={GLASS_STYLE}
     >
       <span className="flex flex-col gap-ds-space-general-sm">
         <span className="text-ds-primitives-typography-size-xl font-ds-primitives-typography-weight-semibold text-ds-primitives-color-primary-n01">Glass con opacidad</span>
@@ -115,6 +186,8 @@ function Definicion(): ReactNode {
         <DocFigure caption="Lineal, inclinación de 45°, de 0 % a 100 %, del color N01 al A06.">
           <div className={cn('mx-auto h-48 w-full max-w-lg rounded-ds-radius-container-on-card', GRADIENT)} role="img" aria-label="Contenedor con degradado lineal de negro a azul oscuro" />
         </DocFigure>
+        <ParamList params={[['Tipo', 'Lineal'], ['Ángulo', '45°'], ['Inicio · 0 %', 'N01'], ['Fin · 100 %', 'A06']]} />
+        <CopyCode label="CSS" code={GRADIENT_CSS} />
       </DocSection>
 
       <DocSection title="Glass">
@@ -132,6 +205,8 @@ function Definicion(): ReactNode {
               <GlassPure />
             </ColorfulBackdrop>
           </DocFigure>
+          <ParamList params={[['Light', '-45° · 80 %'], ['Refraction', '80'], ['Depth', '20'], ['Dispersion', '50'], ['Frost', '4'], ['Splay', '0']]} />
+          <CopyCode label="CSS aproximado" code={GLASS_PURE_CSS} />
         </DocSubsection>
         <DocSubsection title="Glass opacidad">
           <DocText>
@@ -144,6 +219,8 @@ function Definicion(): ReactNode {
               <GlassOpacity />
             </ColorfulBackdrop>
           </DocFigure>
+          <ParamList params={[['Light', '-45° · 80 %'], ['Refraction', '80'], ['Depth', '20'], ['Dispersion', '50'], ['Frost', '4'], ['Splay', '0'], ['Relleno', 'B01 · 60 %']]} />
+          <CopyCode label="CSS aproximado" code={GLASS_OPACITY_CSS} />
         </DocSubsection>
       </DocSection>
 
@@ -153,17 +230,19 @@ function Definicion(): ReactNode {
           filtro al momento de abrir un modal de diálogo.
         </DocText>
         <DocFigure caption="El contenido detrás del diálogo se desenfoca (16) con un relleno blanco semitransparente.">
-          <ColorfulBackdrop className="min-h-72">
+          <ColorfulBackdrop fill className="min-h-72">
             <div className="absolute inset-0 flex flex-col gap-ds-space-general-lg p-ds-space-general-4xl">
               <PanelText title="Contenido de la vista" body="Se desenfoca al abrir el modal." />
               <span className="h-10 w-48 rounded-ds-radius-general-full bg-ds-text-neutral-heading" />
             </div>
-            <div className="absolute inset-0 bg-ds-primitives-color-primary-b01/30" style={{ backdropFilter: 'blur(16px)' }} />
+            <div className="absolute inset-0 bg-white/30" style={{ backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }} />
             <div className="relative w-full max-w-xs rounded-ds-radius-container-on-card bg-ds-background-container-surface p-ds-space-general-4xl">
               <PanelText title="Modal de diálogo" body="Nitidez total sobre el fondo desenfocado." />
             </div>
           </ColorfulBackdrop>
         </DocFigure>
+        <ParamList params={[['Blur', '16'], ['Relleno', 'Blanco · 30 %']]} />
+        <CopyCode label="CSS aproximado" code={BLUR_CSS} />
       </DocSection>
 
       <DocSection title="Recursos de textura">
