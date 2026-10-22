@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Decorator, Meta, StoryObj } from '@storybook/react';
 import { Button } from './Button';
 import type { ButtonProps, ButtonState } from './Button.types';
 import { AddIcon } from '../../icons/AddIcon';
@@ -82,8 +82,16 @@ export const Tertiary: Story = {
   args: { variant: 'tertiary' },
 };
 
+/** Unicolor se usa sobre foto o color: texto e ícono son blancos en ambos modos, así que se muestra sobre N01. */
+const OnDarkSurface: Decorator = (Story) => (
+  <div className="inline-flex bg-ds-primitives-color-primary-n01 p-6">
+    <Story />
+  </div>
+);
+
 export const Unicolor: Story = {
   args: { variant: 'secondary', unicolor: true },
+  decorators: [OnDarkSurface],
 };
 
 export const WithIcons: Story = {
@@ -150,7 +158,8 @@ export const StatesMatrix: Story = {
               row.props.variant === 'tertiary' && s === 'load' ? (
                 <span key={s} />
               ) : (
-                <div key={s}>
+                // Unicolor sobre N01 para que se lea también en modo claro
+                <div key={s} className={row.props.unicolor ? 'bg-ds-primitives-color-primary-n01 p-2' : undefined}>
                   <Button {...row.props} state={s}>{row.props.children ?? 'Button'}</Button>
                 </div>
               )
