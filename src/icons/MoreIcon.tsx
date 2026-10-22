@@ -1,0 +1,4 @@
+import type { SVGProps } from "react";
+export function MoreIcon(props: SVGProps<SVGSVGElement>) {
+  return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" {...props}><path fill="currentColor" fillRule="evenodd" d="M4.6 9c1.431 0 2.6 1.168 2.6 2.6 0 1.431-1.169 2.6-2.6 2.6A2.605 2.605 0 0 1 2 11.6C2 10.168 3.168 9 4.6 9M11.6 9c1.431 0 2.6 1.168 2.6 2.6 0 1.431-1.169 2.6-2.6 2.6A2.605 2.605 0 0 1 9 11.6C9 10.168 10.168 9 11.6 9M18.6 9c1.431 0 2.6 1.168 2.6 2.6 0 1.431-1.169 2.6-2.6 2.6a2.605 2.605 0 0 1-2.6-2.6c0-1.432 1.168-2.6 2.6-2.6" clipRule="evenodd" /></svg>;
+}

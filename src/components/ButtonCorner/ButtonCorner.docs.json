@@ -1,0 +1,54 @@
+{
+  "name": "ButtonCorner",
+  "component": "ButtonCorner",
+  "description": "Botón circular de esquina del sistema de diseño CAOS, fiel al component set Button corner de Figma (60 variantes, solo estado Default). Type Icon, Dots, Radiobutton, Checkbox y Favorite; Status On canva, On card y Unicolor canva (tokens -unicolor, no cambian con el tema); tamaños md 40 y sm 32; Stroke con borde exterior de 1px. Círculo con radio radius/button/full, padding space/general/xl (md) o lg (sm); Dots usa un botón interno de 32. Checkbox y Radiobutton muestran el control de 16px de Selection (Default Positive) como elemento decorativo. La sombra effect/shadow sm es invisible (alfa 0 en oscuro, casi nula en claro) y no se agrega. Figma no define hover, press, seleccionado ni disabled: no se inventan. Se agregan foco visible (outline de 2px, offset 2, border/field/active), disabled nativo con cursor-not-allowed y aria-pressed opcional (sin cambio de aspecto). Siempre exige aria-label o aria-labelledby.",
+  "category": "General Controls",
+  "props": {
+    "variant": {
+      "type": "'icon' | 'dots' | 'radiobutton' | 'checkbox' | 'favorite'",
+      "default": "'icon'",
+      "description": "Type de Figma. Icon usa ArrowDiagonalRightIcon (reemplazable con icon), Dots MoreIcon, Favorite FavoriteIcon (trazo gray-secondary)."
+    },
+    "status": {
+      "type": "'on-canva' | 'on-card' | 'unicolor-canva'",
+      "default": "'on-canva'",
+      "description": "Status de Figma: relleno default-on-canva, default-on-card o hover-unicolor. Unicolor canva se usa sobre foto o color."
+    },
+    "size": {
+      "type": "'md' | 'sm'",
+      "default": "'md'",
+      "description": "md: 40×40, padding 12 (Dots 4). sm: 32×32, padding 8 (Dots 0)."
+    },
+    "stroke": {
+      "type": "boolean",
+      "default": false,
+      "description": "Stroke=Yes: borde exterior de 1px (border/general/gray-fifth, o su versión -unicolor)."
+    },
+    "icon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Ícono de 16px para variant=\"icon\". Hereda currentColor."
+    },
+    "pressed": {
+      "type": "boolean",
+      "required": false,
+      "description": "aria-pressed para checkbox, radiobutton y favorite. Figma no tiene aspecto de seleccionado: solo cambia el atributo."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "disabled nativo con cursor-not-allowed. Figma no define aspecto disabled."
+    },
+    "aria-label": {
+      "type": "string",
+      "required": true,
+      "description": "Nombre accesible. Obligatorio: aria-label o aria-labelledby (el tipo lo exige)."
+    }
+  },
+  "examples": [
+    { "title": "Icon", "code": "<ButtonCorner aria-label=\"Abrir\" />" },
+    { "title": "Dots sobre tarjeta", "code": "<ButtonCorner variant=\"dots\" status=\"on-card\" aria-label=\"Más opciones\" />" },
+    { "title": "Favorite con aria-pressed", "code": "<ButtonCorner variant=\"favorite\" stroke pressed={fav} onClick={() => setFav(!fav)} aria-label=\"Marcar como favorito\" />" },
+    { "title": "Unicolor sobre foto", "code": "<ButtonCorner status=\"unicolor-canva\" size=\"sm\" aria-label=\"Abrir\" />" }
+  ]
+}
