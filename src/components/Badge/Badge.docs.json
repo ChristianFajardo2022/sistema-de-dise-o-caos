@@ -1,0 +1,20 @@
+{
+  "name": "Badge",
+  "component": "Badge",
+  "description": "Indicador de estado o contador del sistema de diseño CAOS, fiel al component set Badge de Figma (36 variantes: Type × State). Type: simple (punto de 12×12), icon (16×16, padding 2, ícono de 12), number (alto 16, padding X 2, texto Helvetica Neue regular 10/14 con padding inferior 2) e icon-number (alto 16, gap 4, ícono de 12 + texto). State es el color semántico (default, success, alert, error, info, neutral, negative, positive, inactive) con tokens background/*, text/* e icon/* propios de cada tipo; Simple + Negative usa background/general/white-unicolor, tal como está en Figma. Esquina radius/container/On canva. Semántica: el badge no es interactivo, es un <span> sin rol. Si lleva número, el número es su contenido y un lector lo dice; con label se añade un texto sr-only después (\"5 notificaciones sin leer\"). Simple e icon solo informan con color o dibujo, que no basta (WCAG 1.4.1): requieren label; sin label ni texto se marcan aria-hidden (decorativos). No es una región viva: si el contador cambia y debe anunciarse, el consumidor lo envuelve en un aria-live. No tiene hover, foco ni estados de interacción.",
+  "category": "Data Display",
+  "props": {
+    "type": { "type": "'simple' | 'icon' | 'number' | 'icon-number'", "default": "'simple'", "description": "Type de Figma: punto, solo ícono, solo número o ícono + número." },
+    "state": { "type": "'default' | 'success' | 'alert' | 'error' | 'info' | 'neutral' | 'negative' | 'positive' | 'inactive'", "default": "'default'", "description": "State de Figma: color semántico. No es un estado de interacción." },
+    "children": { "type": "ReactNode", "required": false, "description": "Prop Text de Figma. Contenido en los tipos number e icon-number." },
+    "icon": { "type": "IconName", "default": "'star'", "description": "Ícono de la biblioteca CAOS en los tipos icon e icon-number (12px, relleno)." },
+    "label": { "type": "string", "required": false, "description": "Texto para lectores de pantalla. Necesario en simple e icon cuando informan algo; en number se lee tras el número." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para el span raíz. El resto de props nativas y el ref van al span." }
+  },
+  "examples": [
+    { "title": "Contador de notificaciones", "code": "<Badge type=\"number\" state=\"error\" label=\"notificaciones sin leer\">5</Badge>" },
+    { "title": "Punto de estado", "code": "<Badge type=\"simple\" state=\"success\" label=\"En línea\" />" },
+    { "title": "Ícono", "code": "<Badge type=\"icon\" state=\"alert\" icon=\"star\" label=\"Destacado\" />" },
+    { "title": "Ícono + número", "code": "<Badge type=\"icon-number\" state=\"info\" label=\"comentarios\">12</Badge>" }
+  ]
+}
