@@ -212,12 +212,13 @@
     varIds.clear();
     const set = await figma.getNodeByIdAsync(setId);
     if (!set) throw new Error(`no existe el nodo ${setId}`);
+    // Un set borrado del lienzo (que aún usan otras instancias) no tiene página
     const pagina = (() => {
       let p = set;
-      while (p.type !== 'PAGE') p = p.parent;
+      while (p && p.type !== 'PAGE') p = p.parent;
       return p;
     })();
-    await pagina.loadAsync();
+    if (pagina) await pagina.loadAsync();
     carpeta = carpeta || slug(set.name);
 
     let props = null;
@@ -254,7 +255,7 @@
     }
     const { tabla, colecciones } = await resolverVariables();
     const spec = {
-      fuente: { setId: set.id, nombre: set.name.trim(), pagina: paginaDe(set), extraido: new Date().toISOString() },
+      fuente: { setId: set.id, nombre: set.name.trim(), pagina: paginaDe(set), ...(pagina ? {} : { fueraDelLienzo: true }), extraido: new Date().toISOString() },
       props,
       total: todas.length,
       offset,
