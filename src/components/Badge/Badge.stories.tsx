@@ -70,6 +70,7 @@ export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (
     <div className="bg-ds-background-general-black p-6">
+     <div role="region" tabIndex={0} aria-label="Matriz de Badge" className="max-w-full overflow-x-auto">
       <div className="grid grid-cols-[auto_repeat(9,auto)] items-center justify-items-start gap-x-8 gap-y-4">
         <span />
         {STATES.map((s) => (
@@ -93,6 +94,7 @@ export const FigmaMatrix: Story = {
           </div>
         ))}
       </div>
+     </div>
     </div>
   ),
 };
