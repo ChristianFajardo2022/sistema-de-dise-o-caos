@@ -1,38 +1,29 @@
 {
   "name": "Checkbox",
-  "description": "Componente de selección múltiple (Checkbox) que soporta estados marcado, desmarcado e indeterminado, con soporte para descripciones y estados de error.",
+  "component": "Checkbox",
+  "description": "Casilla de selección del sistema de diseño CAOS, fiel al component set Selection de Figma (9545:6413 y 9558:6975). Control de 16×16 con esquina de 6 y contorno de 1.5. Default: solo contorno. Select: relleno con check de 8.05×6. Disabled usa tokens background/field/disabled. Contraste positive para superficies oscuras y negative para claras. Con texto: gap 8, 16/20 Helvetica Neue regular. Usa un input nativo oculto pero accesible: funciona controlado y no controlado, con teclado nativo (Espacio) y foco visible con outline de 2px (agregado, no está en Figma). No tiene estado indeterminado (Figma no lo define).",
+  "category": "Form Controls",
   "props": {
-    "checked": "boolean | 'indeterminate'",
-    "defaultChecked": "boolean",
-    "label": "ReactNode",
-    "description": "ReactNode",
-    "size": "'sm' | 'md' | 'lg' (default: 'md')",
-    "error": "boolean | string",
-    "disabled": "boolean",
-    "align": "'top' | 'center' (default: 'top')",
-    "onCheckedChange": "(checked: boolean | 'indeterminate') => void"
+    "contrast": {
+      "type": "'positive' | 'negative'",
+      "default": "'positive'",
+      "description": "Contrast de Figma: positive sobre superficies oscuras, negative sobre claras."
+    },
+    "checked": { "type": "boolean", "required": false, "description": "Marcado (controlado). Usar con onChange." },
+    "defaultChecked": { "type": "boolean", "required": false, "description": "Marcado inicial (no controlado)." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estados Disabled default y Disabled select." },
+    "children": { "type": "ReactNode", "required": false, "description": "Texto junto al control. Sin texto, pasar aria-label." },
+    "state": {
+      "type": "'default' | 'select' | 'disabled-default' | 'disabled-select'",
+      "required": false,
+      "description": "Fuerza el aspecto, solo para documentación."
+    },
+    "onChange": { "type": "ChangeEventHandler<HTMLInputElement>", "required": false, "description": "Va al input nativo, igual que name, value y el resto de props nativas. El ref también apunta al input." }
   },
-  "styling": "TailwindCSS + class-variance-authority",
-  "tokens": [
-    "--background-field-surface",
-    "--background-field-active-purpple",
-    "--background-field-disabled",
-    "--border-field-default",
-    "--border-field-active",
-    "--border-field-disabled",
-    "--border-alert-error",
-    "--text-field-label",
-    "--text-field-label-secondary",
-    "--text-alert-error",
-    "--radius-field-checkbox-radiobutton-sm",
-    "--radius-field-checkbox-radiobutton-md",
-    "--radius-field-checkbox-radiobutton-lg"
-  ],
-  "anatomy": [
-    "Container (Label + Input Wrapper)",
-    "Input (Native, hidden visually, takes focus)",
-    "Control (Custom div styled as checkbox)",
-    "Icon (CheckIcon / DashIcon)",
-    "Text Content (Label + Description + Error Message)"
+  "examples": [
+    { "title": "Con texto", "code": "<Checkbox defaultChecked>Acepto los términos</Checkbox>" },
+    { "title": "Controlado", "code": "<Checkbox checked={ok} onChange={(e) => setOk(e.target.checked)}>Recordarme</Checkbox>" },
+    { "title": "Sobre superficie clara", "code": "<Checkbox contrast=\"negative\">Opción</Checkbox>" },
+    { "title": "Solo control", "code": "<Checkbox aria-label=\"Seleccionar fila\" />" }
   ]
 }

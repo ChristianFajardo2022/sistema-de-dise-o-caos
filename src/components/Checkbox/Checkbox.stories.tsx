@@ -1,120 +1,106 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { Checkbox } from './Checkbox';
+import type { CheckboxProps, SelectionContrast, SelectionState } from './Checkbox.types';
 
 const meta = {
-  title: 'Components/Checkbox',
+  title: 'Form Controls/Checkbox',
   component: Checkbox,
-  parameters: {
-    layout: 'centered',
-  },
+  parameters: { layout: 'centered' },
   tags: ['autodocs'],
   argTypes: {
-    checked: {
+    contrast: {
       control: 'radio',
-      options: [true, false, 'indeterminate'],
-      description: 'Estado de selección',
+      options: ['positive', 'negative'],
+      description: 'Contrast: positive sobre superficies oscuras, negative sobre claras',
     },
-    size: {
-      control: 'radio',
-      options: ['sm', 'md', 'lg'],
-      description: 'Tamaño del checkbox',
+    state: {
+      control: 'select',
+      options: [undefined, 'default', 'select', 'disabled-default', 'disabled-select'],
+      description: 'State forzado, solo para documentación',
     },
-    disabled: {
-      control: 'boolean',
-      description: 'Deshabilita el checkbox visual y funcionalmente',
-    },
-    error: {
-      control: 'text',
-      description: 'Mensaje de error para estado inválido',
-    },
-    align: {
-      control: 'radio',
-      options: ['top', 'center'],
-      description: 'Alineación vertical del checkbox con respecto al texto',
-    },
+    checked: { control: 'boolean', description: 'Marcado (controlado)' },
+    disabled: { control: 'boolean', description: 'Deshabilitado' },
   },
+  args: { contrast: 'positive', disabled: false },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Wrapper for interactive states in Storybook
-const CheckboxInteractive = (args: any) => {
-  const [checked, setChecked] = useState<boolean | 'indeterminate'>(args.checked || false);
+function InteractiveDemo(args: CheckboxProps) {
+  const [checked, setChecked] = useState(false);
   return (
     <Checkbox
       {...args}
       checked={checked}
-      onCheckedChange={(c) => {
-        // Toggle logic for interactive preview
-        if (checked === 'indeterminate') setChecked(true);
-        else setChecked(c);
-      }}
+      onChange={(e) => setChecked(e.target.checked)}
+      aria-label="Aceptar"
     />
   );
+}
+
+export const Interactive: Story = {
+  render: (args) => <InteractiveDemo {...args} />,
 };
 
-export const Default: Story = {
-  args: {
-    label: 'Aceptar términos y condiciones',
-    size: 'md',
-  },
-  render: (args) => <CheckboxInteractive {...args} />,
+export const WithText: Story = {
+  args: { children: 'Acepto los términos y condiciones', defaultChecked: true },
 };
 
-export const WithDescription: Story = {
-  args: {
-    label: 'Suscribirse al newsletter',
-    description: 'Recibe noticias y ofertas especiales cada semana en tu correo.',
-    size: 'md',
-  },
-  render: (args) => <CheckboxInteractive {...args} />,
+export const Disabled: Story = {
+  args: { children: 'Opción no disponible', disabled: true },
 };
 
-export const Indeterminate: Story = {
-  args: {
-    label: 'Seleccionar todos los elementos',
-    checked: 'indeterminate',
-    size: 'md',
-  },
-  render: (args) => <CheckboxInteractive {...args} />,
-};
-
-export const States: Story = {
-  render: () => (
-    <div className="flex flex-col gap-6">
-      <div className="flex gap-8">
-        <div className="flex flex-col gap-4">
-          <h4 className="text-sm font-bold mb-2">Desmarcado</h4>
-          <Checkbox label="Por defecto" />
-          <Checkbox label="Hover/Focus" className="group-hover:border-[var(--border-field-active)]" />
-          <Checkbox label="Deshabilitado" disabled />
-          <Checkbox label="Error" error="Debes aceptar esto" />
-        </div>
-        <div className="flex flex-col gap-4">
-          <h4 className="text-sm font-bold mb-2">Marcado</h4>
-          <Checkbox checked label="Por defecto" />
-          <Checkbox checked label="Hover/Focus" />
-          <Checkbox checked label="Deshabilitado" disabled />
-        </div>
-        <div className="flex flex-col gap-4">
-          <h4 className="text-sm font-bold mb-2">Indeterminado</h4>
-          <Checkbox checked="indeterminate" label="Por defecto" />
-          <Checkbox checked="indeterminate" label="Hover/Focus" />
-          <Checkbox checked="indeterminate" label="Deshabilitado" disabled />
-        </div>
+export const Negative: Story = {
+  args: { contrast: 'negative', children: 'Sobre superficie clara', defaultChecked: true },
+  decorators: [
+    (Story) => (
+      <div className="bg-ds-background-general-white p-6">
+        <Story />
       </div>
-    </div>
-  ),
+    ),
+  ],
 };
 
-export const Sizes: Story = {
+const STATES: SelectionState[] = ['default', 'disabled-default', 'select', 'disabled-select'];
+const CONTRASTS: SelectionContrast[] = ['positive', 'negative'];
+
+/**
+ * Matriz de Contrast × State, con y sin texto.
+ * Positive va sobre la superficie del tema (background/general/black: oscura en modo oscuro
+ * y clara en claro) y negative sobre la inversa (background/general/white), así cada fila
+ * se lee en ambos temas, igual que el texto: text/neutral/white y black cambian con el tema.
+ */
+export const StatesMatrix: Story = {
+  parameters: { layout: 'padded' },
   render: () => (
-    <div className="flex items-center gap-8">
-      <Checkbox size="sm" label="Pequeño (16px)" description="Texto de soporte para checkbox pequeño" />
-      <Checkbox size="md" label="Mediano (20px)" description="Texto de soporte para checkbox mediano" />
-      <Checkbox size="lg" label="Grande (24px)" description="Texto de soporte para checkbox grande" />
+    <div className="flex flex-col gap-4">
+      {CONTRASTS.map((contrast) => (
+        <div
+          key={contrast}
+          className={
+            contrast === 'positive'
+              ? 'bg-ds-background-general-black p-6'
+              : 'bg-ds-background-general-white p-6'
+          }
+        >
+          <div className="grid grid-cols-[auto_repeat(4,auto)] items-center gap-x-8 gap-y-4">
+            <span className="text-xs text-ds-text-neutral-body">{contrast}</span>
+            {STATES.map((s) => (
+              <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
+            ))}
+            <span className="text-xs text-ds-text-neutral-body">Control</span>
+            {STATES.map((s) => (
+              <Checkbox key={s} contrast={contrast} state={s} aria-label={`${contrast} ${s}`} />
+            ))}
+            <span className="text-xs text-ds-text-neutral-body">Con texto</span>
+            {STATES.map((s) => (
+              <Checkbox key={s} contrast={contrast} state={s}>Label</Checkbox>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   ),
 };

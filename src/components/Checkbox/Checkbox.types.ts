@@ -1,43 +1,22 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
 
-export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'size' | 'checked'> {
-  /**
-   * The checked state of the checkbox.
-   * Can be boolean or 'indeterminate'
-   */
-  checked?: boolean | 'indeterminate';
-  /**
-   * Default checked state for uncontrolled usage
-   */
-  defaultChecked?: boolean;
-  /**
-   * Label to display next to the checkbox
-   */
-  label?: ReactNode;
-  /**
-   * Supporting text to display below the label
-   */
-  description?: ReactNode;
-  /**
-   * Size of the checkbox
-   * @default 'md'
-   */
-  size?: 'sm' | 'md' | 'lg';
-  /**
-   * Validation state
-   */
-  error?: boolean | string;
-  /**
-   * Disabled state
-   */
-  disabled?: boolean;
-  /**
-   * Visual alignment of the label and description relative to the checkbox
-   * @default 'top'
-   */
-  align?: 'top' | 'center';
-  /**
-   * Event handler when the value changes
-   */
-  onCheckedChange?: (checked: boolean | 'indeterminate') => void;
+/** Contrast de Figma: positive sobre superficies oscuras, negative sobre claras. */
+export type SelectionContrast = 'positive' | 'negative';
+
+/**
+ * State de Figma. Solo fuerza el aspecto (para documentación);
+ * en uso normal sale de checked y disabled.
+ */
+export type SelectionState = 'default' | 'select' | 'disabled-default' | 'disabled-select';
+
+export interface CheckboxProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'children'> {
+  /** Contrast: positive (superficies oscuras) o negative (superficies claras) */
+  contrast?: SelectionContrast;
+  /** State forzado, solo para documentación */
+  state?: SelectionState;
+  /** Texto junto al control. Si se omite, solo se dibuja el control de 16px. */
+  children?: ReactNode;
+  /** Clases adicionales para la fila */
+  className?: string;
 }
