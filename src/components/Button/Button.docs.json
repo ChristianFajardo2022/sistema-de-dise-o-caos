@@ -5,9 +5,9 @@
   "category": "General Controls",
   "props": {
     "variant": {
-      "type": "'primary' | 'secondary' | 'tertiary' | 'link'",
+      "type": "'primary' | 'secondary' | 'tertiary'",
       "default": "'primary'",
-      "description": "Type de Figma. 'link' queda por compatibilidad y se migrará al componente Button link."
+      "description": "Type de Figma. Para enlaces usar ButtonLink."
     },
     "contrast": {
       "type": "'low' | 'high'",

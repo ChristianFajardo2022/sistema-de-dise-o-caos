@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-/** Type de Figma. `link` se mantiene por compatibilidad: Button link es un componente aparte. */
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'link';
+/** Type de Figma. Button link es un componente aparte (ButtonLink). */
+export type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
 /** Contrats de Figma. Solo aplica a secondary. */
 export type ButtonContrast = 'low' | 'high';

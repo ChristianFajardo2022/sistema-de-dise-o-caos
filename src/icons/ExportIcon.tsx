@@ -1,0 +1,4 @@
+import type { SVGProps } from "react";
+export function ExportIcon(props: SVGProps<SVGSVGElement>) {
+  return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" {...props}><path fill="currentColor" d="M10.6 1a.6.6 0 1 1 0 1.2h-2c-2.441 0-3.994.491-4.952 1.448C2.691 4.606 2.2 6.158 2.2 8.6v6c0 2.44.492 3.993 1.45 4.95.957.958 2.51 1.45 4.95 1.45h6c2.441 0 3.994-.492 4.952-1.45.957-.957 1.449-2.51 1.449-4.95v-2a.6.6 0 1 1 1.2 0v2c0 2.559-.509 4.506-1.802 5.798-1.292 1.293-3.24 1.801-5.798 1.801h-6c-2.56 0-4.507-.508-5.8-1.8-1.292-1.293-1.8-3.24-1.8-5.8v-6c0-2.559.508-4.506 1.8-5.798C4.094 1.508 6.04 1 8.6 1z" /><path fill="currentColor" d="M21.6 1a.6.6 0 0 1 .6.6v4.8a.601.601 0 0 1-1.2 0V3.046l-7.977 7.976a.6.6 0 1 1-.847-.848l7.975-7.976H16.8A.6.6 0 1 1 16.8 1z" /></svg>;
+}

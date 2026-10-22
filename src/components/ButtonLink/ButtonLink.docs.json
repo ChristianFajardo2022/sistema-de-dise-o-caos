@@ -1,0 +1,47 @@
+{
+  "name": "ButtonLink",
+  "component": "ButtonLink",
+  "description": "Enlace con aspecto de botón del sistema de diseño CAOS, fiel al component set Button link de Figma (nodo 13215:4751). Se renderiza como <a>. Alto 32 (padding Y 8, línea de 16), padding X 0, gap 4 entre texto e ícono. Texto Helvetica Neue 400, 14px fijo (typography/button/size/md-uniform), subrayado sólido 6 %. Ícono de enlace externo de 12px con color por token. Estados Default, Hover, Focus, Press e Inactive con tokens text/button/link/* e icon/button/link/*. Sin anillo de foco: cada estado usa sus tokens.",
+  "category": "General Controls",
+  "props": {
+    "href": {
+      "type": "string",
+      "required": false,
+      "description": "Destino del enlace. Se omite en Inactive."
+    },
+    "state": {
+      "type": "'default' | 'hover' | 'focus' | 'press' | 'inactive'",
+      "default": "'default'",
+      "description": "State de Figma. hover, focus y press fuerzan el aspecto para documentación."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Estado inactive: quita el href, marca aria-disabled y cancela el clic."
+    },
+    "iconRight": {
+      "type": "boolean",
+      "default": true,
+      "description": "Icon right de Figma: ícono de enlace externo de 12px después del texto."
+    },
+    "icon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Reemplaza el ícono de enlace externo. Se dibuja a 12×12 con el token icon/button/link del estado."
+    }
+  },
+  "examples": [
+    {
+      "title": "Enlace externo",
+      "code": "<ButtonLink href=\"https://example.com\" target=\"_blank\" rel=\"noreferrer\">Ver guía</ButtonLink>"
+    },
+    {
+      "title": "Sin ícono",
+      "code": "<ButtonLink href=\"/ayuda\" iconRight={false}>Centro de ayuda</ButtonLink>"
+    },
+    {
+      "title": "Inactive",
+      "code": "<ButtonLink href=\"/ayuda\" disabled>Centro de ayuda</ButtonLink>"
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
  * Fuente: component set "Button" de Figma (nodo 155:1315). Todos los colores,
  * espacios, radios y bordes salen de tokens (src/styles/tokens.css).
  *
- * - Type: primary · secondary · tertiary (link queda como variante heredada).
+ * - Type: primary · secondary · tertiary. Button link es un componente aparte (ButtonLink).
  * - Contrats (contrast): low · high, solo para secondary.
  * - Unicolor: solo secondary y tertiary sin icon-single.
  * - Size: md 56 · sm 48 · xs 32. Padding X 24/24/16, padding Y 8, min-width 92 en md y sm.
@@ -42,8 +42,6 @@ export const buttonVariants = cva(
         secondary: 'rounded-ds-radius-button-full border-solid border-(length:--ds-primitives-stroke-lg)',
         // Sin radio con texto; Icon-single lleva radio completo (ver compoundVariants)
         tertiary: 'border-0',
-        /** @deprecated Button link es un componente aparte en Figma; pendiente de migrar. */
-        link: 'rounded-ds-radius-button-full border-0',
       },
 
       contrast: {
@@ -82,13 +80,13 @@ export const buttonVariants = cva(
     compoundVariants: [
       /* ── Medidas ─────────────────────────────────────────────── */
       {
-        variant: ['primary', 'secondary', 'link'],
+        variant: ['primary', 'secondary'],
         size: ['md', 'sm'],
         iconOnly: false,
         class: 'min-w-[92px] px-ds-space-button-4xl py-ds-space-button-lg',
       },
       {
-        variant: ['primary', 'secondary', 'link'],
+        variant: ['primary', 'secondary'],
         size: 'xs',
         iconOnly: false,
         class: 'px-ds-space-button-2xl py-ds-space-button-lg',
@@ -342,21 +340,6 @@ export const buttonVariants = cva(
       },
       { variant: 'tertiary', iconOnly: true, state: 'hover', class: 'bg-ds-background-button-tertiary-hover' },
       { variant: 'tertiary', iconOnly: true, state: ['focus', 'press'], class: 'bg-ds-background-button-tertiary-focus-press' },
-
-      /* ── Link (heredado; pendiente de pasar a componente propio) ── */
-      {
-        variant: 'link',
-        state: 'default',
-        class: [
-          'text-ds-text-button-link-default [--btn-icon:var(--color-ds-icon-button-link-default)]',
-          'hover:underline hover:text-ds-text-button-link-hover hover:[--btn-icon:var(--color-ds-icon-button-link-hover)]',
-          'focus-visible:text-ds-text-button-link-focus-press focus-visible:[--btn-icon:var(--color-ds-icon-button-link-focus-press)]',
-          'active:text-ds-text-button-link-focus-press active:[--btn-icon:var(--color-ds-icon-button-link-focus-press)]',
-        ],
-      },
-      { variant: 'link', state: 'hover', class: 'underline text-ds-text-button-link-hover [--btn-icon:var(--color-ds-icon-button-link-hover)]' },
-      { variant: 'link', state: ['focus', 'press'], class: 'text-ds-text-button-link-focus-press [--btn-icon:var(--color-ds-icon-button-link-focus-press)]' },
-      { variant: 'link', state: ['inactive', 'load', 'delete'], class: 'text-ds-text-button-link-inactive [--btn-icon:var(--color-ds-icon-button-link-inactive)]' },
     ],
 
     defaultVariants: {
