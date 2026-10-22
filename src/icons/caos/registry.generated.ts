@@ -148,6 +148,7 @@ import {
   flashIcon,
   flashSlashIcon,
   forbiddenIcon,
+  forbidden2Icon,
   ghostIcon,
   glassIcon,
   home1Icon,
@@ -407,7 +408,7 @@ import {
   rowVerticalIcon,
 } from './icons.generated';
 
-/** Nombres de todos los íconos de la biblioteca (404) */
+/** Nombres de todos los íconos de la biblioteca (405) */
 export type IconName =
   | "ac"
   | "add"
@@ -556,6 +557,7 @@ export type IconName =
   | "flash"
   | "flash-slash"
   | "forbidden"
+  | "forbidden-2"
   | "ghost"
   | "glass"
   | "home1"
@@ -815,7 +817,7 @@ export type IconName =
   | "row-vertical"
 ;
 
-/** Registro completo: importarlo arrastra los 404 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
+/** Registro completo: importarlo arrastra los 405 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
 export const caosIcons: Record<IconName, CaosIconData> = {
   "ac": acIcon,
   "add": addIcon,
@@ -964,6 +966,7 @@ export const caosIcons: Record<IconName, CaosIconData> = {
   "flash": flashIcon,
   "flash-slash": flashSlashIcon,
   "forbidden": forbiddenIcon,
+  "forbidden-2": forbidden2Icon,
   "ghost": ghostIcon,
   "glass": glassIcon,
   "home1": home1Icon,
@@ -1372,6 +1375,7 @@ export const caosIconCategories: Record<IconName, string> = {
   "flash": "Essential",
   "flash-slash": "Essential",
   "forbidden": "Essential",
+  "forbidden-2": "Essential",
   "ghost": "Essential",
   "glass": "Essential",
   "home1": "Essential",

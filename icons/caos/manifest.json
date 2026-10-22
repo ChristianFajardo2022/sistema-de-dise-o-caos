@@ -735,6 +735,11 @@
   "figmaSetId": "9485:25800"
  },
  {
+  "name": "forbidden-2",
+  "category": "Essential",
+  "figmaSetId": "9485:25811"
+ },
+ {
   "name": "ghost",
   "category": "Essential",
   "figmaSetId": "9487:25925"
