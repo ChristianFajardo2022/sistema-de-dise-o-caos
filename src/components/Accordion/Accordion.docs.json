@@ -1,0 +1,30 @@
+{
+  "name": "Accordion",
+  "component": "Accordion",
+  "description": "Acordeón del sistema de diseño CAOS, fiel al component set Card accordion (Atom) de Figma (State Default/Dropdown × Contrast On canva/On card) y al componente suelto Accordion (lista de tarjetas con gap 8). Cada ítem es un encabezado (h3 configurable) con un botón aria-expanded/aria-controls y un panel role=region con aria-labelledby, según el patrón WAI-ARIA APG. Incluye Avatar icon, Button corner como indicador, y un slot Container para el contenido (Button, ButtonLink, texto). Funciona controlado y no controlado, type single o multiple, y también como AccordionItem suelto. Teclado: Enter y Espacio alternan; flechas arriba/abajo, Inicio y Fin mueven el foco entre encabezados. La apertura anima grid-template-rows y con prefers-reduced-motion la altura salta sin movimiento. El ancho es el de su contenedor.",
+  "category": "Layout",
+  "props": {
+    "type": { "type": "'single' | 'multiple'", "default": "'single'", "description": "Accordion: un ítem abierto a la vez o varios." },
+    "value": { "type": "string | string[]", "required": false, "description": "Accordion, controlado: valor del ítem abierto (single, '' = ninguno) o lista (multiple)." },
+    "defaultValue": { "type": "string | string[]", "required": false, "description": "Accordion, no controlado: ítems abiertos al inicio." },
+    "onValueChange": { "type": "(value) => void", "required": false, "description": "Accordion: se llama al abrir o cerrar un ítem." },
+    "collapsible": { "type": "boolean", "default": "true", "description": "Accordion single: permite cerrar el ítem abierto." },
+    "contrast": { "type": "'on-canva' | 'on-card'", "default": "'on-card'", "description": "Contrast de Figma. En Accordion se aplica a todos los ítems." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6", "default": "3", "description": "Nivel del encabezado (h2 a h6) que envuelve el botón." },
+    "value (AccordionItem)": { "type": "string", "required": false, "description": "Identificador del ítem dentro del grupo. Suelto se genera." },
+    "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma; nombre accesible del botón." },
+    "description": { "type": "ReactNode", "required": false, "description": "Props Description y Description-2 de Figma: estado bajo el título." },
+    "icon": { "type": "boolean", "default": "true", "description": "Prop Icon de Figma: avatar con ícono antes del título." },
+    "iconName": { "type": "IconName", "default": "'folder'", "description": "Ícono de la biblioteca CAOS del avatar." },
+    "open": { "type": "boolean", "required": false, "description": "AccordionItem suelto, controlado (State=Dropdown de Figma)." },
+    "defaultOpen": { "type": "boolean", "default": "false", "description": "AccordionItem suelto, no controlado." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "AccordionItem suelto: se llama al alternar." },
+    "children": { "type": "ReactNode", "required": false, "description": "Prop Container (slot) de Figma: contenido del panel, en columna con gap 16 y alineado al final." }
+  },
+  "examples": [
+    { "title": "Un ítem abierto a la vez", "code": "<Accordion defaultValue=\"a\">\n  <AccordionItem value=\"a\" title=\"Nombre del archivo\" description=\"Estado\">Contenido</AccordionItem>\n  <AccordionItem value=\"b\" title=\"Otro archivo\">Contenido</AccordionItem>\n</Accordion>" },
+    { "title": "Varios abiertos y controlado", "code": "<Accordion type=\"multiple\" value={abiertos} onValueChange={setAbiertos}>…</Accordion>" },
+    { "title": "Ítem suelto", "code": "<AccordionItem title=\"Detalles\" defaultOpen>Contenido</AccordionItem>" },
+    { "title": "Sobre el lienzo", "code": "<Accordion contrast=\"on-canva\" headingLevel={2}>…</Accordion>" }
+  ]
+}
