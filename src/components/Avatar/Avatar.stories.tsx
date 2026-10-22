@@ -1,0 +1,448 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import type { ReactNode } from 'react';
+import { expect, fn, userEvent, within } from 'storybook/test';
+import { Avatar } from './Avatar';
+import { AvatarGroup } from './AvatarGroup';
+import { AvatarPlus } from './AvatarPlus';
+import type { AvatarColor, AvatarContrast, AvatarSize, AvatarVariant } from './Avatar.types';
+import { PortraitSample, SampleLogo } from './Avatar.samples';
+import { PORTRAIT_NAMES, SAMPLE_PHOTO_SRC } from './Avatar.sample-data';
+import type { PortraitName } from './Avatar.sample-data';
+
+const VARIANT_OPTIONS: AvatarVariant[] = ['initials', 'user', 'photo', 'brand', 'icon'];
+const SIZE_OPTIONS: AvatarSize[] = ['xs', 'sm', 'md', 'lg'];
+const COLOR_OPTIONS: AvatarColor[] = ['purple', 'yellow', 'blue', 'green', 'red'];
+const CONTRAST_OPTIONS: AvatarContrast[] = ['on-canva', 'on-card'];
+
+const meta = {
+  title: 'Data Display/Avatar',
+  component: Avatar,
+  subcomponents: { AvatarGroup, AvatarPlus },
+  parameters: { layout: 'centered' },
+  tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      name: 'variant',
+      control: 'radio',
+      options: VARIANT_OPTIONS,
+      type: { name: 'enum', value: VARIANT_OPTIONS },
+      description: 'Type de Figma: iniciales, silueta, foto, logo o ícono',
+    },
+    size: {
+      name: 'size',
+      control: 'radio',
+      options: SIZE_OPTIONS,
+      type: { name: 'enum', value: SIZE_OPTIONS },
+      description: 'Diámetro: xs 24, sm 32, md 48, lg 56',
+    },
+    color: {
+      name: 'color',
+      control: 'select',
+      options: COLOR_OPTIONS,
+      type: { name: 'enum', value: COLOR_OPTIONS },
+      description: 'Color de initials y user',
+    },
+    contrast: {
+      name: 'contrast',
+      control: 'radio',
+      options: CONTRAST_OPTIONS,
+      type: { name: 'enum', value: CONTRAST_OPTIONS },
+      description: 'Contrast de brand e icon',
+    },
+    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Aspecto Disabled (solo visual)' },
+    badge: { control: 'boolean', type: { name: 'boolean' }, description: 'Indicador de estado (lg y md)' },
+    name: { control: 'text', type: { name: 'string' }, description: 'Nombre completo: iniciales y nombre accesible' },
+    alt: { control: 'text', type: { name: 'string' }, description: 'Texto alternativo de photo' },
+    label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible de user, brand e icon' },
+    badgeLabel: { control: 'text', type: { name: 'string' }, description: 'Texto sr-only del indicador' },
+  },
+  args: {
+    variant: 'initials',
+    size: 'lg',
+    color: 'purple',
+    contrast: 'on-canva',
+    disabled: false,
+    badge: true,
+    name: 'Hugo García',
+    badgeLabel: 'En línea',
+  },
+} satisfies Meta<typeof Avatar>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Interactive: Story = {
+  args: { variant: 'photo', alt: 'Hugo García', src: SAMPLE_PHOTO_SRC },
+};
+
+export const Initials: Story = {};
+
+export const User: Story = { args: { variant: 'user', color: 'blue', label: 'Hugo García' } };
+
+export const Photo: Story = {
+  render: (args) => (
+    <Avatar {...args} variant="photo" alt="Hugo García">
+      <PortraitSample name="woman-1" />
+    </Avatar>
+  ),
+};
+
+export const Brand: Story = {
+  args: { variant: 'brand', badge: false, label: 'Marca de ejemplo' },
+  render: (args) => <Avatar {...args} logo={<SampleLogo />} />,
+};
+
+export const IconAvatar: Story = { args: { variant: 'icon', badge: false, label: 'Carpeta', icon: 'folder' } };
+
+export const Group: Story = {
+  render: () => (
+    <AvatarGroup aria-label="Participantes" max={4}>
+      {(['woman-1', 'woman-2', 'man-1', 'man-2', 'woman-3', 'man-3'] as PortraitName[]).map((p) => (
+        <Avatar key={p} variant="photo" alt={p}>
+          <PortraitSample name={p} />
+        </Avatar>
+      ))}
+    </AvatarGroup>
+  ),
+};
+
+/* ---------------------------------- Matrices ---------------------------------- */
+
+const LABEL = 'text-xs text-ds-text-neutral-body';
+const SURFACE = 'bg-ds-background-general-black p-6';
+
+const COLORS: { color: AvatarColor | 'disabled'; figma: string }[] = [
+  { color: 'purple', figma: 'Purple' },
+  { color: 'blue', figma: 'Blue' },
+  { color: 'yellow', figma: 'Yellow' },
+  { color: 'green', figma: 'Green' },
+  { color: 'disabled', figma: 'Disabled' },
+  { color: 'red', figma: 'Red' },
+];
+const SIZES_4: { size: AvatarSize; figma: string }[] = [
+  { size: 'lg', figma: 'lg' },
+  { size: 'md', figma: 'md' },
+  { size: 'sm', figma: 'sm' },
+  { size: 'xs', figma: 'xs' },
+];
+/** Brand e icon: Figma nombra md, sm y xs a lo que aquí es lg, md y sm. */
+const SIZES_PILL: { size: AvatarSize; figma: string }[] = [
+  { size: 'lg', figma: 'md' },
+  { size: 'md', figma: 'sm' },
+  { size: 'sm', figma: 'xs' },
+];
+
+function Frame({ children }: { children: ReactNode }) {
+  return (
+    <div className={SURFACE}>
+      <div role="region" tabIndex={0} aria-label="Matriz de Avatar" className="max-w-full overflow-x-auto">{children}</div>
+    </div>
+  );
+}
+
+/** Set "Avatar" (Type Text, Photo, Brand, Icon; 56): envoltorio de cada átomo, como en Figma. */
+export const FigmaMatrixAvatar: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <Frame>
+      <div className="flex items-center gap-8">
+        <div data-figma="Type=Photo" className="inline-flex gap-2.5">
+          <Avatar variant="photo" size="lg" badge alt="Hugo García" badgeLabel="En línea">
+            <PortraitSample name="woman-1" />
+          </Avatar>
+        </div>
+        <div data-figma="Type=Brand" className="inline-flex gap-2.5">
+          <Avatar variant="brand" size="lg" label="Marca de ejemplo" logo={<SampleLogo />} />
+        </div>
+        <div data-figma="Type=Text" className="inline-flex gap-2.5">
+          <Avatar variant="initials" size="lg" badge name="Hugo García" badgeLabel="En línea" />
+        </div>
+        <div data-figma="Type=Icon" className="inline-flex gap-2.5">
+          <Avatar variant="icon" size="lg" label="Carpeta" />
+        </div>
+      </div>
+    </Frame>
+  ),
+};
+
+/** Set "Avatar colors": Type Names/User × Size × Color (48 variantes). Badge en lg y md, salvo Disabled. */
+export const FigmaMatrixAvatarColors: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <Frame>
+      <div className="grid grid-cols-[auto_repeat(8,auto)] items-center justify-items-start gap-x-8 gap-y-4">
+        <span />
+        {(['Names', 'User'] as const).flatMap((t) => SIZES_4.map((s) => <span key={t + s.size} className={LABEL}>{t} {s.size}</span>))}
+        {COLORS.map((c) => (
+          <div key={c.figma} className="contents">
+            <span className={LABEL}>{c.figma}</span>
+            {(['Names', 'User'] as const).flatMap((t) =>
+              SIZES_4.map((s) => (
+                <Avatar
+                  key={t + s.size}
+                  variant={t === 'Names' ? 'initials' : 'user'}
+                  size={s.size}
+                  color={c.color === 'disabled' ? undefined : c.color}
+                  disabled={c.color === 'disabled'}
+                  badge
+                  badgeLabel="En línea"
+                  name="Hugo García"
+                  data-figma={`Type=${t}, Size=${s.figma}, Color=${c.figma}`}
+                />
+              ))
+            )}
+          </div>
+        ))}
+      </div>
+    </Frame>
+  ),
+};
+
+/** Set "Avatar photo": Size xs-lg con indicador en lg y md. */
+export const FigmaMatrixAvatarPhoto: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <Frame>
+      <div className="flex items-center gap-8">
+        {SIZES_4.map((s) => (
+          <Avatar
+            key={s.size}
+            variant="photo"
+            size={s.size}
+            badge
+            badgeLabel="En línea"
+            alt="Hugo García"
+            data-figma={`Size=${s.figma}`}
+          >
+            <PortraitSample name="woman-1" />
+          </Avatar>
+        ))}
+      </div>
+    </Frame>
+  ),
+};
+
+function PillMatrix({ variant }: { variant: 'brand' | 'icon' }) {
+  const surfaces: { contrast: AvatarContrast; figma: string; bg: string }[] = [
+    { contrast: 'on-canva', figma: 'On Canva', bg: 'bg-ds-background-container-default-on-canva' },
+    { contrast: 'on-card', figma: 'On Card', bg: 'bg-ds-background-container-default-on-card' },
+  ];
+  return (
+    <div className="flex flex-col">
+      {surfaces.map((sf) => (
+        <div key={sf.contrast} className={`${sf.bg} flex flex-col gap-4 p-6`}>
+          <span className={LABEL}>{sf.figma}</span>
+          {[false, true].map((disabled) => (
+            <div key={String(disabled)} className="flex items-center gap-8">
+              <span className={LABEL}>{disabled ? 'Disabled' : 'Default'}</span>
+              {SIZES_PILL.map((s) => (
+                <Avatar
+                  key={s.size}
+                  variant={variant}
+                  size={s.size}
+                  contrast={sf.contrast}
+                  disabled={disabled}
+                  label={variant === 'brand' ? 'Marca de ejemplo' : 'Carpeta'}
+                  logo={variant === 'brand' ? <SampleLogo /> : undefined}
+                  data-figma={`Contrast=${sf.figma}, State=${disabled ? 'Disabled' : 'Default'}, Size=${s.figma}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Set "Avatar brand": Contrast × State × Size (12). Una superficie por Contrast. */
+export const FigmaMatrixAvatarBrand: Story = {
+  parameters: { layout: 'padded' },
+  render: () => <PillMatrix variant="brand" />,
+};
+
+/** Set "Avatar icon": Contrast × State × Size (12). Una superficie por Contrast. */
+export const FigmaMatrixAvatarIcon: Story = {
+  parameters: { layout: 'padded' },
+  render: () => <PillMatrix variant="icon" />,
+};
+
+/** Set "Avatar plus": Default y Hover. El menú de Hover (Dropdown) llega en otro grupo. */
+export const FigmaMatrixAvatarPlus: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <Frame>
+      <div className="flex items-start gap-8">
+        <div data-figma="State=Default, Size=lg" className="inline-flex gap-2.5">
+          <AvatarPlus count={2} />
+        </div>
+        <div data-figma="State=Hover, Size=lg" className="inline-flex gap-2">
+          <AvatarPlus count={2} state="hover" />
+        </div>
+      </div>
+    </Frame>
+  ),
+};
+
+const GROUP_COLORS: AvatarColor[] = ['purple', 'green', 'blue', 'yellow', 'red', 'purple', 'green'];
+const GROUP_NAMES = ['Ana Bernal', 'Carlos Duarte', 'Fabiola Gil', 'Hugo Imbert', 'Julia Kent', 'Laura Mejia', 'Nora Ortiz'];
+const GROUP_PORTRAITS: PortraitName[] = ['woman-1', 'woman-2', 'woman-3', 'woman-4', 'man-1', 'man-2', 'man-3'];
+
+/** Set "Avatar group": Type names, user y Photo (Size lg: avatares de 32 + "+2"). */
+export const FigmaMatrixAvatarGroup: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <Frame>
+      <div className="flex flex-col items-start gap-12">
+        <AvatarGroup data-figma="Type=names, Size=lg">
+          {GROUP_NAMES.map((n, i) => (
+            <Avatar key={n} variant="initials" color={GROUP_COLORS[i]} name={n} />
+          ))}
+        </AvatarGroup>
+        <AvatarGroup data-figma="Type=user, Size=lg">
+          {GROUP_NAMES.map((n, i) => (
+            <Avatar key={n} variant="user" color={GROUP_COLORS[i]} label={n} />
+          ))}
+        </AvatarGroup>
+        <AvatarGroup data-figma="Type=Photo, Size=lg">
+          {GROUP_NAMES.map((n, i) => (
+            <Avatar key={n} variant="photo" alt={n}>
+              <PortraitSample name={GROUP_PORTRAITS[i]} />
+            </Avatar>
+          ))}
+        </AvatarGroup>
+      </div>
+    </Frame>
+  ),
+};
+
+/** Set "photos": las 9 fotos de muestra de Figma, aquí retratos neutros hechos en código (102 × 68.53). */
+export const FigmaMatrixPhotos: Story = {
+  parameters: { layout: 'padded' },
+  render: () => {
+    const items: { figma: string; portrait: PortraitName; disabled?: boolean }[] = [
+      { figma: 'Woman_1', portrait: PORTRAIT_NAMES[0] },
+      { figma: 'Woman_2', portrait: PORTRAIT_NAMES[1] },
+      { figma: 'Woman_3', portrait: PORTRAIT_NAMES[2] },
+      { figma: 'Woman_4', portrait: PORTRAIT_NAMES[3] },
+      { figma: 'Men_1', portrait: PORTRAIT_NAMES[4] },
+      { figma: 'Men_2', portrait: PORTRAIT_NAMES[5] },
+      { figma: 'Men_3', portrait: PORTRAIT_NAMES[6] },
+      { figma: 'Men_4', portrait: PORTRAIT_NAMES[7] },
+      { figma: 'Disabled', portrait: PORTRAIT_NAMES[7], disabled: true },
+    ];
+    return (
+      <Frame>
+        <div className="flex flex-wrap items-center gap-8">
+          {items.map((p) => (
+            <div
+              key={p.figma}
+              data-figma={`Photo=${p.figma}`}
+              className={p.disabled ? 'overflow-hidden grayscale' : 'overflow-hidden'}
+              style={{ width: 102, height: 68.53 }}
+            >
+              <PortraitSample name={p.portrait} />
+            </div>
+          ))}
+        </div>
+      </Frame>
+    );
+  },
+};
+
+/* ------------------------------------ Tests ------------------------------------ */
+
+/** Test: nombre accesible de cada tipo y decorativos con aria-hidden */
+export const AccessibleNameTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div>
+      <Avatar variant="initials" name="Hugo García" badge badgeLabel="En línea" data-testid="initials" />
+      <Avatar variant="user" data-testid="user-decorative" />
+      <Avatar variant="user" label="Angélica Chavez" />
+      <Avatar variant="photo" alt="Retrato de Hugo" src={SAMPLE_PHOTO_SRC} />
+      <Avatar variant="photo" src={SAMPLE_PHOTO_SRC} data-testid="photo-decorative" />
+      <Avatar variant="photo" alt="Retrato con hijos" data-testid="photo-children">
+        <PortraitSample name="woman-1" />
+      </Avatar>
+      <Avatar variant="photo" data-testid="photo-children-decorative">
+        <PortraitSample name="woman-2" />
+      </Avatar>
+      <Avatar variant="icon" label="Carpeta" />
+      <Avatar variant="brand" label="Marca de ejemplo" logo={<SampleLogo />} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('img', { name: 'Hugo García' })).toHaveTextContent('HG');
+    await expect(canvas.getByTestId('initials')).toHaveTextContent('En línea');
+    await expect(canvas.getByTestId('user-decorative').firstElementChild).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas.getByRole('img', { name: 'Angélica Chavez' })).toBeInTheDocument();
+    await expect(canvas.getByRole('img', { name: 'Retrato de Hugo' }).tagName).toBe('IMG');
+    await expect(canvas.getByRole('img', { name: 'Carpeta' })).toBeInTheDocument();
+    await expect(canvas.getByRole('img', { name: 'Marca de ejemplo' })).toBeInTheDocument();
+    await expect(canvas.getByTestId('photo-decorative').firstElementChild).toHaveAttribute('aria-hidden', 'true');
+    const withChildren = canvas.getByRole('img', { name: 'Retrato con hijos' });
+    await expect(withChildren.tagName).toBe('SPAN');
+    await expect(withChildren.firstElementChild).toHaveAttribute('aria-hidden', 'true');
+    await expect(canvas.getByTestId('photo-children-decorative').firstElementChild).toHaveAttribute('aria-hidden', 'true');
+  },
+};
+
+const onOverflowClick = fn();
+
+/** Test: el grupo recorta a max, resume el resto en "+N" y el botón responde a clic y teclado (cuenta las activaciones) */
+export const GroupOverflowTest: Story = {
+  tags: ['!autodocs'],
+  args: { variant: 'initials' },
+  beforeEach: () => {
+    onOverflowClick.mockClear();
+  },
+  render: () => {
+    return (
+      <AvatarGroup aria-label="Participantes" max={3} onOverflowClick={onOverflowClick} data-testid="group">
+        {['Ana Bernal', 'Carlos Duarte', 'Fabiola Gil', 'Hugo Imbert', 'Julia Kent'].map((n) => (
+          <Avatar key={n} name={n} />
+        ))}
+      </AvatarGroup>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('group', { name: 'Participantes' })).toBeInTheDocument();
+    await expect(canvas.getAllByRole('img')).toHaveLength(3);
+    const plus = canvas.getByRole('button', { name: 'Ver +2 más' });
+    await expect(plus).toHaveTextContent('+2');
+    await userEvent.tab();
+    await expect(plus).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(onOverflowClick).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard(' ');
+    await expect(onOverflowClick).toHaveBeenCalledTimes(2);
+    await userEvent.click(plus);
+    await expect(onOverflowClick).toHaveBeenCalledTimes(3);
+  },
+};
+
+/** Test: sin desbordar no hay "+N"; el indicador solo existe en lg y md y no en disabled */
+export const BadgeRulesTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div>
+      <AvatarGroup max={5} data-testid="group-small">
+        <Avatar name="Ana Bernal" />
+        <Avatar name="Carlos Duarte" />
+      </AvatarGroup>
+      <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" size="md" data-testid="md" />
+      <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" size="sm" data-testid="sm" />
+      <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" disabled data-testid="disabled" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.queryByRole('button')).toBeNull();
+    await expect(canvas.getByTestId('md')).toHaveTextContent('Ocupada');
+    await expect(canvas.getByTestId('sm')).not.toHaveTextContent('Ocupada');
+    await expect(canvas.getByTestId('disabled')).not.toHaveTextContent('Ocupada');
+  },
+};

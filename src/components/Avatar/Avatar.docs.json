@@ -1,0 +1,51 @@
+{
+  "name": "Avatar",
+  "component": "Avatar",
+  "description": "Avatar del sistema de diseño CAOS. Reúne en una sola API los component sets de Figma de la carpeta Avatar: Avatar (Type Text, Photo, Brand, Icon, 56) y sus átomos Avatar colors (Type Names/User × Size xs/sm/md/lg × Color Purple/Yellow/Blue/Green/Red/Disabled), Avatar photo (Size xs-lg), Avatar brand y Avatar icon (Contrast On Canva/On Card × State Default/Disabled × Size), Avatar plus (State Default/Hover) y Avatar group (Type names/user/Photo). La variante se elige con `variant` (initials, user, photo, brand, icon); el tamaño con `size` por diámetro (xs 24, sm 32, md 48, lg 56, tokens dimention/avatar/*). Initials reduce `name` a iniciales; user dibuja la silueta; photo recibe `src` y `alt` (con `children` y `alt`/`label`, el círculo es role=img con ese nombre y los hijos quedan aria-hidden) (el sistema no incluye fotos); brand recibe `logo` (ReactNode, SVG con currentColor); icon recibe `icon` (biblioteca CAOS, por defecto folder). `disabled` da el gris de Figma (en photo, la imagen en grises). El indicador es el Badge simple del sistema, abajo a la derecha, solo en initials, user y photo de tamaño lg y md y no en disabled (así lo define Figma). Semántica: no es interactivo, es un <span>; con nombre accesible (`name`, `label` o `alt`) se expone como imagen con ese nombre y sin ninguno es decorativo (aria-hidden). AvatarGroup solapa -8 los avatares con un anillo blanco de 0.5, muestra hasta `max` (5) y resume el resto en AvatarPlus, un botón con aria-label \"Ver +N más\" (contiene el texto visible, WCAG 2.5.3). Figma abre ahí un Dropdown list al pasar el cursor; Dropdown aún no existe, así que el \"+N\" solo tiene su aspecto Hover y `onClick`/`onOverflowClick` para conectar el menú. Figma nombra md, sm y xs a los tamaños de brand e icon que aquí son lg, md y sm (56, 48, 32): el xs de 24 de brand e icon se deriva de la misma regla. Weight Medium de las iniciales sm y xs no existe en tokens.css: usa regular.",
+  "category": "Data Display",
+  "props": {
+    "variant": { "type": "'initials' | 'user' | 'photo' | 'brand' | 'icon'", "default": "'initials'", "description": "Type de Figma: Names, User, Photo, Brand o Icon." },
+    "size": { "type": "'xs' | 'sm' | 'md' | 'lg'", "default": "'lg'", "description": "Diámetro: xs 24, sm 32, md 48, lg 56. En un AvatarGroup manda el tamaño del grupo." },
+    "color": { "type": "'purple' | 'yellow' | 'blue' | 'green' | 'red'", "default": "'purple'", "description": "Color de initials y user. Se ignora con disabled." },
+    "contrast": { "type": "'on-canva' | 'on-card'", "default": "'on-canva'", "description": "Contrast de brand e icon." },
+    "disabled": { "type": "boolean", "default": false, "description": "Aspecto Disabled (solo visual: el avatar no es interactivo)." },
+    "name": { "type": "string", "required": false, "description": "Nombre completo: initials lo reduce a iniciales y es el nombre accesible; en user es el nombre accesible." },
+    "alt": { "type": "string", "required": false, "description": "Texto alternativo de photo. Sin él la foto es decorativa." },
+    "src": { "type": "string", "required": false, "description": "URL de la foto de photo." },
+    "children": { "type": "ReactNode", "required": false, "description": "Imagen propia de photo (p. ej. un componente de imagen del framework); reemplaza al <img> de src." },
+    "logo": { "type": "ReactNode", "required": false, "description": "Logo de brand; ocupa el recuadro del logo y debe usar currentColor." },
+    "icon": { "type": "IconName", "default": "'folder'", "description": "Ícono de la biblioteca CAOS para icon." },
+    "label": { "type": "string", "required": false, "description": "Nombre accesible de user, brand e icon (y sobrescribe el de initials). Sin ningún nombre el avatar es decorativo." },
+    "badge": { "type": "boolean", "default": false, "description": "Indicador de estado (Badge simple). Solo initials, user y photo en lg y md, y no en disabled." },
+    "badgeLabel": { "type": "string", "required": false, "description": "Texto sr-only del indicador. Sin él el indicador es decorativo." },
+    "ringed": { "type": "boolean", "required": false, "description": "Anillo blanco de 0.5 entre avatares solapados; lo activa AvatarGroup." }
+  },
+  "subcomponents": {
+    "AvatarGroup": {
+      "description": "Grupo de avatares solapados con \"+N\".",
+      "props": {
+        "max": { "type": "number", "default": 5, "description": "Máximo de avatares visibles; el resto va al \"+N\"." },
+        "size": { "type": "AvatarSize", "default": "'sm'", "description": "Tamaño de los avatares del grupo (Figma: grupo Size lg, avatares de 32)." },
+        "onOverflowClick": { "type": "() => void", "required": false, "description": "Al activar el \"+N\"." },
+        "overflowLabel": { "type": "(count: number) => string", "required": false, "description": "Nombre accesible del \"+N\"; por defecto \"Ver +N más\" (debe contener \"+N\")." }
+      }
+    },
+    "AvatarPlus": {
+      "description": "El \"+N\" como botón accesible. `ref` y las props nativas de button (aria-haspopup, aria-expanded, aria-controls, disabled) van al <button>.",
+      "props": {
+        "count": { "type": "number", "required": true, "description": "Cantidad que representa." },
+        "size": { "type": "AvatarSize", "default": "'sm'", "description": "Alto del botón." },
+        "state": { "type": "'default' | 'hover'", "default": "'default'", "description": "Fuerza el aspecto Hover, solo para documentación." },
+        "label": { "type": "string", "required": false, "description": "Nombre accesible; por defecto \"Ver +N más\" (debe contener \"+N\")." },
+        "onClick": { "type": "() => void", "required": false, "description": "Al activar el botón (y cualquier otra prop de button va al <button>)." }
+      }
+    }
+  },
+  "examples": [
+    { "title": "Iniciales con indicador", "code": "<Avatar name=\"Hugo García\" color=\"blue\" badge badgeLabel=\"En línea\" />" },
+    { "title": "Foto", "code": "<Avatar variant=\"photo\" src={url} alt=\"Hugo García\" size=\"md\" />" },
+    { "title": "Logo", "code": "<Avatar variant=\"brand\" label=\"Mi marca\" logo={<MyLogo />} contrast=\"on-card\" />" },
+    { "title": "Ícono", "code": "<Avatar variant=\"icon\" icon=\"folder\" label=\"Carpeta\" />" },
+    { "title": "Grupo", "code": "<AvatarGroup max={4} aria-label=\"Participantes\">{people.map((p) => <Avatar key={p.id} name={p.name} />)}</AvatarGroup>" }
+  ]
+}
