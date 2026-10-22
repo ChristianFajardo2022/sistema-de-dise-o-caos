@@ -1,0 +1,19 @@
+{
+  "name": "Icon",
+  "component": "Icon",
+  "description": "Ícono de la biblioteca de iconografía CAOS (404 íconos 24×24 exportados de Figma, variantes line y fill). Dibuja un svg con fill currentColor, así que toma el color del texto. Tamaños permitidos 12, 14, 16, 20, 24, 32, 40, 48 y 56. Por defecto usa relleno por debajo de 24 px y línea desde 24 px; variant fuerza cualquiera. Sin aria-label es decorativo (aria-hidden, focusable=false); con aria-label es role=img. Icon con name importa el registro completo; para tree-shaking importar el ícono suelto (searchIcon) y usar icon con Icon o IconBase.",
+  "category": "Foundations",
+  "props": {
+    "name": { "type": "IconName", "required": false, "description": "Nombre del ícono (unión generada de los 404 nombres). Usa el registro completo." },
+    "icon": { "type": "CaosIconData", "required": false, "description": "Datos de un ícono importado suelto de icons.generated. Tiene prioridad sobre name." },
+    "size": { "type": "12 | 14 | 16 | 20 | 24 | 32 | 40 | 48 | 56", "default": "24", "description": "Alto y ancho en px; solo valores de Figma." },
+    "variant": { "type": "'line' | 'fill'", "default": "según size", "description": "Por defecto fill si size < 24 y line desde 24." },
+    "aria-label": { "type": "string", "required": false, "description": "Nombre accesible. Sin él, aria-hidden=true." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales; el color se define con text-*." }
+  },
+  "examples": [
+    { "title": "Por nombre", "code": "<Icon name=\"search\" />" },
+    { "title": "Con nombre accesible", "code": "<Icon name=\"trash\" size={32} aria-label=\"Eliminar\" />" },
+    { "title": "Tree-shaking", "code": "import { searchIcon } from '.../icons/caos/icons.generated';\n<IconBase icon={searchIcon} size={16} />" }
+  ]
+}

@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "build:icons:caos": "node scripts/build-caos-icons.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check": "npm run lint && tsc -b && npm run check:tokens && vitest run"
   },

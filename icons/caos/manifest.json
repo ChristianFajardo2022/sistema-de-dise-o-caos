@@ -1,0 +1,2022 @@
+[
+ {
+  "name": "ac",
+  "category": "Ai",
+  "figmaSetId": "9248:2053"
+ },
+ {
+  "name": "add",
+  "category": "Ai",
+  "figmaSetId": "9248:5199"
+ },
+ {
+  "name": "commentary",
+  "category": "Ai",
+  "figmaSetId": "9260:7083"
+ },
+ {
+  "name": "heart-square",
+  "category": "Ai",
+  "figmaSetId": "9260:7092"
+ },
+ {
+  "name": "smart-lock",
+  "category": "Ai",
+  "figmaSetId": "9260:7093"
+ },
+ {
+  "name": "smart-cursor",
+  "category": "Ai",
+  "figmaSetId": "9260:7094"
+ },
+ {
+  "name": "smart-bag",
+  "category": "Ai",
+  "figmaSetId": "9260:7095"
+ },
+ {
+  "name": "enhance-user",
+  "category": "Ai",
+  "figmaSetId": "9260:7097"
+ },
+ {
+  "name": "weight",
+  "category": "Ai",
+  "figmaSetId": "9268:362"
+ },
+ {
+  "name": "users",
+  "category": "Ai",
+  "figmaSetId": "9260:7101"
+ },
+ {
+  "name": "tag-price",
+  "category": "Ai",
+  "figmaSetId": "9260:7103"
+ },
+ {
+  "name": "send-message",
+  "category": "Ai",
+  "figmaSetId": "9260:7106"
+ },
+ {
+  "name": "sand-timer",
+  "category": "Ai",
+  "figmaSetId": "9260:7107"
+ },
+ {
+  "name": "record-video",
+  "category": "Ai",
+  "figmaSetId": "9260:7108"
+ },
+ {
+  "name": "loveletter",
+  "category": "Ai",
+  "figmaSetId": "9260:7109"
+ },
+ {
+  "name": "homepage",
+  "category": "Ai",
+  "figmaSetId": "9260:7110"
+ },
+ {
+  "name": "landscape",
+  "category": "Ai",
+  "figmaSetId": "9260:7111"
+ },
+ {
+  "name": "housing",
+  "category": "Ai",
+  "figmaSetId": "9260:7112"
+ },
+ {
+  "name": "star-ia",
+  "category": "Ai",
+  "figmaSetId": "17428:1531"
+ },
+ {
+  "name": "back",
+  "category": "Arrows",
+  "figmaSetId": "9274:17194"
+ },
+ {
+  "name": "forward",
+  "category": "Arrows",
+  "figmaSetId": "9274:17257"
+ },
+ {
+  "name": "circle-down",
+  "category": "Arrows",
+  "figmaSetId": "9274:17201"
+ },
+ {
+  "name": "circle-left",
+  "category": "Arrows",
+  "figmaSetId": "9274:17208"
+ },
+ {
+  "name": "circle-right",
+  "category": "Arrows",
+  "figmaSetId": "9274:17215"
+ },
+ {
+  "name": "circle-up",
+  "category": "Arrows",
+  "figmaSetId": "9274:17222"
+ },
+ {
+  "name": "chevron-left",
+  "category": "Arrows",
+  "figmaSetId": "9274:17278"
+ },
+ {
+  "name": "chevron-down",
+  "category": "Arrows",
+  "figmaSetId": "9274:17250"
+ },
+ {
+  "name": "chevron-right",
+  "category": "Arrows",
+  "figmaSetId": "9274:17306"
+ },
+ {
+  "name": "chevron-up",
+  "category": "Arrows",
+  "figmaSetId": "9314:27634"
+ },
+ {
+  "name": "swap",
+  "category": "Arrows",
+  "figmaSetId": "9274:17341"
+ },
+ {
+  "name": "transfer",
+  "category": "Arrows",
+  "figmaSetId": "9274:17362"
+ },
+ {
+  "name": "transfer2",
+  "category": "Arrows",
+  "figmaSetId": "9274:17369"
+ },
+ {
+  "name": "convert",
+  "category": "Arrows",
+  "figmaSetId": "9318:29084"
+ },
+ {
+  "name": "export",
+  "category": "Arrows",
+  "figmaSetId": "9318:29930"
+ },
+ {
+  "name": "export2",
+  "category": "Arrows",
+  "figmaSetId": "9318:30201"
+ },
+ {
+  "name": "import2",
+  "category": "Arrows",
+  "figmaSetId": "9318:31491"
+ },
+ {
+  "name": "download",
+  "category": "Arrows",
+  "figmaSetId": "9318:31886"
+ },
+ {
+  "name": "login",
+  "category": "Arrows",
+  "figmaSetId": "9318:32317"
+ },
+ {
+  "name": "logout2",
+  "category": "Arrows",
+  "figmaSetId": "9318:32383"
+ },
+ {
+  "name": "receive-square",
+  "category": "Arrows",
+  "figmaSetId": "9318:32439"
+ },
+ {
+  "name": "receive-square2",
+  "category": "Arrows",
+  "figmaSetId": "9318:32492"
+ },
+ {
+  "name": "received",
+  "category": "Arrows",
+  "figmaSetId": "9322:32893"
+ },
+ {
+  "name": "redo",
+  "category": "Arrows",
+  "figmaSetId": "9322:33222"
+ },
+ {
+  "name": "refresh",
+  "category": "Arrows",
+  "figmaSetId": "9322:33233"
+ },
+ {
+  "name": "repeat-arrow",
+  "category": "Arrows",
+  "figmaSetId": "9330:33505"
+ },
+ {
+  "name": "rotate-left",
+  "category": "Arrows",
+  "figmaSetId": "9330:35426"
+ },
+ {
+  "name": "rotate-right",
+  "category": "Arrows",
+  "figmaSetId": "9330:35437"
+ },
+ {
+  "name": "swap-horizontal",
+  "category": "Arrows",
+  "figmaSetId": "9330:37278"
+ },
+ {
+  "name": "undo-arrow",
+  "category": "Arrows",
+  "figmaSetId": "9342:37336"
+ },
+ {
+  "name": "undo-arrow-2",
+  "category": "Arrows",
+  "figmaSetId": "14120:4432"
+ },
+ {
+  "name": "arrow-diagonal-left",
+  "category": "Arrows",
+  "figmaSetId": "14120:4536"
+ },
+ {
+  "name": "arrow-diagonal-right",
+  "category": "Arrows",
+  "figmaSetId": "14126:4944"
+ },
+ {
+  "name": "arrow-right3",
+  "category": "Arrows",
+  "figmaSetId": "18236:11279"
+ },
+ {
+  "name": "search",
+  "category": "Search",
+  "figmaSetId": "9346:42048"
+ },
+ {
+  "name": "search-favorite",
+  "category": "Search",
+  "figmaSetId": "9346:42055"
+ },
+ {
+  "name": "search-status2",
+  "category": "Search",
+  "figmaSetId": "9346:42076"
+ },
+ {
+  "name": "down",
+  "category": "Search",
+  "figmaSetId": "9346:42083"
+ },
+ {
+  "name": "search-zoom-out2",
+  "category": "Search",
+  "figmaSetId": "9346:42097"
+ },
+ {
+  "name": "calendar",
+  "category": "Time",
+  "figmaSetId": "9377:144"
+ },
+ {
+  "name": "calendar-add",
+  "category": "Time",
+  "figmaSetId": "9377:158"
+ },
+ {
+  "name": "calendar-date",
+  "category": "Time",
+  "figmaSetId": "9377:172"
+ },
+ {
+  "name": "calendar-edit",
+  "category": "Time",
+  "figmaSetId": "9377:179"
+ },
+ {
+  "name": "calendar-remove",
+  "category": "Time",
+  "figmaSetId": "9377:186"
+ },
+ {
+  "name": "calendar-search",
+  "category": "Time",
+  "figmaSetId": "9377:193"
+ },
+ {
+  "name": "calendar-tick",
+  "category": "Time",
+  "figmaSetId": "9377:200"
+ },
+ {
+  "name": "clock",
+  "category": "Time",
+  "figmaSetId": "9377:207"
+ },
+ {
+  "name": "hourglass",
+  "category": "Time",
+  "figmaSetId": "9382:2483"
+ },
+ {
+  "name": "security-time",
+  "category": "Time",
+  "figmaSetId": "9384:2496"
+ },
+ {
+  "name": "timer",
+  "category": "Time",
+  "figmaSetId": "9384:7546"
+ },
+ {
+  "name": "timer-pause",
+  "category": "Time",
+  "figmaSetId": "9384:7983"
+ },
+ {
+  "name": "timer-start",
+  "category": "Time",
+  "figmaSetId": "9384:7996"
+ },
+ {
+  "name": "alarm",
+  "category": "Security",
+  "figmaSetId": "9384:8149"
+ },
+ {
+  "name": "eye",
+  "category": "Security",
+  "figmaSetId": "9384:8163"
+ },
+ {
+  "name": "eye-slash",
+  "category": "Security",
+  "figmaSetId": "9384:8170"
+ },
+ {
+  "name": "finger-scan",
+  "category": "Security",
+  "figmaSetId": "9384:8184"
+ },
+ {
+  "name": "key",
+  "category": "Security",
+  "figmaSetId": "9384:8191"
+ },
+ {
+  "name": "lock-slash",
+  "category": "Security",
+  "figmaSetId": "9384:8219"
+ },
+ {
+  "name": "padlock",
+  "category": "Security",
+  "figmaSetId": "9384:8226"
+ },
+ {
+  "name": "unlock",
+  "category": "Security",
+  "figmaSetId": "9446:27"
+ },
+ {
+  "name": "radar",
+  "category": "Security",
+  "figmaSetId": "9384:8240"
+ },
+ {
+  "name": "scan",
+  "category": "Security",
+  "figmaSetId": "9384:8247"
+ },
+ {
+  "name": "scan-barcode",
+  "category": "Security",
+  "figmaSetId": "9418:19221"
+ },
+ {
+  "name": "security-safe",
+  "category": "Security",
+  "figmaSetId": "9422:736"
+ },
+ {
+  "name": "security-user",
+  "category": "Security",
+  "figmaSetId": "9422:798"
+ },
+ {
+  "name": "shield-cross",
+  "category": "Security",
+  "figmaSetId": "9422:1197"
+ },
+ {
+  "name": "shield-search",
+  "category": "Security",
+  "figmaSetId": "9422:1218"
+ },
+ {
+  "name": "shield-slash",
+  "category": "Security",
+  "figmaSetId": "9430:4846"
+ },
+ {
+  "name": "shield-tick",
+  "category": "Security",
+  "figmaSetId": "9446:16"
+ },
+ {
+  "name": "attach-circle",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9446:779"
+ },
+ {
+  "name": "eraser",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9446:793"
+ },
+ {
+  "name": "firstline",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9446:800"
+ },
+ {
+  "name": "language-square",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9446:814"
+ },
+ {
+  "name": "link4",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9464:10852"
+ },
+ {
+  "name": "maximize",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9466:11228"
+ },
+ {
+  "name": "paragraphspacing",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9466:16085"
+ },
+ {
+  "name": "quote-down",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9466:16096"
+ },
+ {
+  "name": "quote-down-square",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9466:16173"
+ },
+ {
+  "name": "smallcaps",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9471:16543"
+ },
+ {
+  "name": "text",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9471:16554"
+ },
+ {
+  "name": "text-bold",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:18469"
+ },
+ {
+  "name": "text-italic",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:18792"
+ },
+ {
+  "name": "text-underline",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:18781"
+ },
+ {
+  "name": "textalign-center",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:19647"
+ },
+ {
+  "name": "textalign-justifycenter",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:20157"
+ },
+ {
+  "name": "textalign-justifyleft",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:20241"
+ },
+ {
+  "name": "textalign-justifyright",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:20333"
+ },
+ {
+  "name": "textalign-left",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:20349"
+ },
+ {
+  "name": "textalign-right",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:20403"
+ },
+ {
+  "name": "translate",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "9474:20414"
+ },
+ {
+  "name": "firm",
+  "category": "Type-Paragraph-Character",
+  "figmaSetId": "17734:3262"
+ },
+ {
+  "name": "3dcube",
+  "category": "Essential",
+  "figmaSetId": "9477:20973"
+ },
+ {
+  "name": "add-2",
+  "category": "Essential",
+  "figmaSetId": "9477:20980"
+ },
+ {
+  "name": "add-circle",
+  "category": "Essential",
+  "figmaSetId": "9477:21092"
+ },
+ {
+  "name": "archive",
+  "category": "Essential",
+  "figmaSetId": "9477:24346"
+ },
+ {
+  "name": "autobrightness",
+  "category": "Essential",
+  "figmaSetId": "9477:24357"
+ },
+ {
+  "name": "battery-2bars",
+  "category": "Essential",
+  "figmaSetId": "9477:24432"
+ },
+ {
+  "name": "battery-charging",
+  "category": "Essential",
+  "figmaSetId": "9477:24526"
+ },
+ {
+  "name": "battery-charging-2",
+  "category": "Essential",
+  "figmaSetId": "9477:24454"
+ },
+ {
+  "name": "battery-charging-3",
+  "category": "Essential",
+  "figmaSetId": "9477:24545"
+ },
+ {
+  "name": "battery-empty",
+  "category": "Essential",
+  "figmaSetId": "9477:24598"
+ },
+ {
+  "name": "battery-full",
+  "category": "Essential",
+  "figmaSetId": "9477:24643"
+ },
+ {
+  "name": "box",
+  "category": "Essential",
+  "figmaSetId": "9477:24674"
+ },
+ {
+  "name": "broom",
+  "category": "Essential",
+  "figmaSetId": "9477:24685"
+ },
+ {
+  "name": "bubble",
+  "category": "Essential",
+  "figmaSetId": "9477:24712"
+ },
+ {
+  "name": "cake",
+  "category": "Essential",
+  "figmaSetId": "9477:24723"
+ },
+ {
+  "name": "cd",
+  "category": "Essential",
+  "figmaSetId": "9477:24766"
+ },
+ {
+  "name": "chart",
+  "category": "Essential",
+  "figmaSetId": "9477:24777"
+ },
+ {
+  "name": "chrome",
+  "category": "Essential",
+  "figmaSetId": "9477:24815"
+ },
+ {
+  "name": "coffee",
+  "category": "Essential",
+  "figmaSetId": "9481:25294"
+ },
+ {
+  "name": "computing",
+  "category": "Essential",
+  "figmaSetId": "9481:25317"
+ },
+ {
+  "name": "crown",
+  "category": "Essential",
+  "figmaSetId": "9481:25329"
+ },
+ {
+  "name": "crown-2",
+  "category": "Essential",
+  "figmaSetId": "9481:25358"
+ },
+ {
+  "name": "diamonds",
+  "category": "Essential",
+  "figmaSetId": "9481:25381"
+ },
+ {
+  "name": "discover",
+  "category": "Essential",
+  "figmaSetId": "9481:25400"
+ },
+ {
+  "name": "emoji-happy",
+  "category": "Essential",
+  "figmaSetId": "9481:25431"
+ },
+ {
+  "name": "emoji-normal",
+  "category": "Essential",
+  "figmaSetId": "9481:25462"
+ },
+ {
+  "name": "emoji-sad",
+  "category": "Essential",
+  "figmaSetId": "9481:25473"
+ },
+ {
+  "name": "filter",
+  "category": "Essential",
+  "figmaSetId": "9562:4914"
+ },
+ {
+  "name": "filter-add",
+  "category": "Essential",
+  "figmaSetId": "9481:25495"
+ },
+ {
+  "name": "filter-edit",
+  "category": "Essential",
+  "figmaSetId": "9481:25596"
+ },
+ {
+  "name": "filter-remove",
+  "category": "Essential",
+  "figmaSetId": "9481:25620"
+ },
+ {
+  "name": "filter-search",
+  "category": "Essential",
+  "figmaSetId": "9481:25673"
+ },
+ {
+  "name": "filter-tick",
+  "category": "Essential",
+  "figmaSetId": "9481:25711"
+ },
+ {
+  "name": "flag",
+  "category": "Essential",
+  "figmaSetId": "9481:25722"
+ },
+ {
+  "name": "flash",
+  "category": "Essential",
+  "figmaSetId": "9485:25750"
+ },
+ {
+  "name": "flash-slash",
+  "category": "Essential",
+  "figmaSetId": "9485:25789"
+ },
+ {
+  "name": "forbidden",
+  "category": "Essential",
+  "figmaSetId": "9485:25800"
+ },
+ {
+  "name": "ghost",
+  "category": "Essential",
+  "figmaSetId": "9487:25925"
+ },
+ {
+  "name": "glass",
+  "category": "Essential",
+  "figmaSetId": "9487:25936"
+ },
+ {
+  "name": "home1",
+  "category": "Essential",
+  "figmaSetId": "9512:34"
+ },
+ {
+  "name": "instagram",
+  "category": "Essential",
+  "figmaSetId": "9514:2304"
+ },
+ {
+  "name": "judge",
+  "category": "Essential",
+  "figmaSetId": "9514:2315"
+ },
+ {
+  "name": "lamp",
+  "category": "Essential",
+  "figmaSetId": "9514:2326"
+ },
+ {
+  "name": "menu",
+  "category": "Essential",
+  "figmaSetId": "9514:2348"
+ },
+ {
+  "name": "milk",
+  "category": "Essential",
+  "figmaSetId": "9514:2359"
+ },
+ {
+  "name": "minus",
+  "category": "Essential",
+  "figmaSetId": "12379:12437"
+ },
+ {
+  "name": "minus-circle",
+  "category": "Essential",
+  "figmaSetId": "9518:2370"
+ },
+ {
+  "name": "more-circle",
+  "category": "Essential",
+  "figmaSetId": "9522:2403"
+ },
+ {
+  "name": "pet",
+  "category": "Essential",
+  "figmaSetId": "9522:2540"
+ },
+ {
+  "name": "ranking",
+  "category": "Essential",
+  "figmaSetId": "9522:2551"
+ },
+ {
+  "name": "reserve",
+  "category": "Essential",
+  "figmaSetId": "9522:2580"
+ },
+ {
+  "name": "safe-home",
+  "category": "Essential",
+  "figmaSetId": "9536:3007"
+ },
+ {
+  "name": "send2",
+  "category": "Essential",
+  "figmaSetId": "9536:3054"
+ },
+ {
+  "name": "share",
+  "category": "Essential",
+  "figmaSetId": "9536:3271"
+ },
+ {
+  "name": "signpost",
+  "category": "Essential",
+  "figmaSetId": "9536:3426"
+ },
+ {
+  "name": "slash",
+  "category": "Essential",
+  "figmaSetId": "9536:3437"
+ },
+ {
+  "name": "slash-2",
+  "category": "Essential",
+  "figmaSetId": "9543:3448"
+ },
+ {
+  "name": "smart-home",
+  "category": "Essential",
+  "figmaSetId": "9543:3904"
+ },
+ {
+  "name": "sort",
+  "category": "Essential",
+  "figmaSetId": "9544:3915"
+ },
+ {
+  "name": "sound",
+  "category": "Essential",
+  "figmaSetId": "9544:3931"
+ },
+ {
+  "name": "sticker",
+  "category": "Essential",
+  "figmaSetId": "9544:3965"
+ },
+ {
+  "name": "tag-cross",
+  "category": "Essential",
+  "figmaSetId": "9544:3991"
+ },
+ {
+  "name": "tag-right",
+  "category": "Essential",
+  "figmaSetId": "9544:4062"
+ },
+ {
+  "name": "tick-circle",
+  "category": "Essential",
+  "figmaSetId": "9544:4073"
+ },
+ {
+  "name": "info-circle",
+  "category": "Essential",
+  "figmaSetId": "9512:2282"
+ },
+ {
+  "name": "warning",
+  "category": "Essential",
+  "figmaSetId": "9546:5846"
+ },
+ {
+  "name": "close",
+  "category": "Essential",
+  "figmaSetId": "12086:18303"
+ },
+ {
+  "name": "close-circle",
+  "category": "Essential",
+  "figmaSetId": "9477:24834"
+ },
+ {
+  "name": "trash",
+  "category": "Essential",
+  "figmaSetId": "9546:5080"
+ },
+ {
+  "name": "tree",
+  "category": "Essential",
+  "figmaSetId": "9546:5800"
+ },
+ {
+  "name": "verify",
+  "category": "Essential",
+  "figmaSetId": "9546:5835"
+ },
+ {
+  "name": "warning-2",
+  "category": "Essential",
+  "figmaSetId": "9559:84"
+ },
+ {
+  "name": "wifi",
+  "category": "Essential",
+  "figmaSetId": "9559:131"
+ },
+ {
+  "name": "3-dots-more",
+  "category": "Essential",
+  "figmaSetId": "11175:468"
+ },
+ {
+  "name": "print",
+  "category": "Essential",
+  "figmaSetId": "12379:12490"
+ },
+ {
+  "name": "3d-rotate",
+  "category": "Delivery",
+  "figmaSetId": "9559:1221"
+ },
+ {
+  "name": "box-2",
+  "category": "Delivery",
+  "figmaSetId": "9559:1235"
+ },
+ {
+  "name": "box-add",
+  "category": "Delivery",
+  "figmaSetId": "9559:1249"
+ },
+ {
+  "name": "box-remove",
+  "category": "Delivery",
+  "figmaSetId": "9559:1256"
+ },
+ {
+  "name": "box-search",
+  "category": "Delivery",
+  "figmaSetId": "9559:1263"
+ },
+ {
+  "name": "box-tick",
+  "category": "Delivery",
+  "figmaSetId": "9559:1270"
+ },
+ {
+  "name": "box-time",
+  "category": "Delivery",
+  "figmaSetId": "9559:1277"
+ },
+ {
+  "name": "convert-3d-cube",
+  "category": "Delivery",
+  "figmaSetId": "9562:4770"
+ },
+ {
+  "name": "truck",
+  "category": "Delivery",
+  "figmaSetId": "9562:4811"
+ },
+ {
+  "name": "truck-fast",
+  "category": "Delivery",
+  "figmaSetId": "9562:4843"
+ },
+ {
+  "name": "truck-remove",
+  "category": "Delivery",
+  "figmaSetId": "9562:4854"
+ },
+ {
+  "name": "truck-tick",
+  "category": "Delivery",
+  "figmaSetId": "9562:4865"
+ },
+ {
+  "name": "truck-time",
+  "category": "Delivery",
+  "figmaSetId": "9562:4896"
+ },
+ {
+  "name": "people",
+  "category": "Users",
+  "figmaSetId": "9572:5260"
+ },
+ {
+  "name": "profile-2user",
+  "category": "Users",
+  "figmaSetId": "9572:5267"
+ },
+ {
+  "name": "user",
+  "category": "Users",
+  "figmaSetId": "9572:5323"
+ },
+ {
+  "name": "user-add",
+  "category": "Users",
+  "figmaSetId": "9572:5330"
+ },
+ {
+  "name": "user-edit",
+  "category": "Users",
+  "figmaSetId": "9572:5344"
+ },
+ {
+  "name": "user-minus",
+  "category": "Users",
+  "figmaSetId": "9572:5358"
+ },
+ {
+  "name": "user-remove",
+  "category": "Users",
+  "figmaSetId": "9572:5365"
+ },
+ {
+  "name": "user-search",
+  "category": "Users",
+  "figmaSetId": "9579:6016"
+ },
+ {
+  "name": "user-tag",
+  "category": "Users",
+  "figmaSetId": "9579:6038"
+ },
+ {
+  "name": "user-tick",
+  "category": "Users",
+  "figmaSetId": "9579:6049"
+ },
+ {
+  "name": "backward-5-seconds",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:7718"
+ },
+ {
+  "name": "backward-10-seconds",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:8184"
+ },
+ {
+  "name": "backward-15-seconds",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:8195"
+ },
+ {
+  "name": "forward-2",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:7732"
+ },
+ {
+  "name": "camera",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:7739"
+ },
+ {
+  "name": "camera-slash",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:7746"
+ },
+ {
+  "name": "forward-5-seconds",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:7753"
+ },
+ {
+  "name": "forward-3",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9579:7760"
+ },
+ {
+  "name": "forward-10-seconds",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:9594"
+ },
+ {
+  "name": "forward-15-seconds",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:9768"
+ },
+ {
+  "name": "gallery",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:9779"
+ },
+ {
+  "name": "gallery-add",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:9790"
+ },
+ {
+  "name": "gallery-edit",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:9801"
+ },
+ {
+  "name": "gallery-export",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10133"
+ },
+ {
+  "name": "gallery-favorite",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10144"
+ },
+ {
+  "name": "gallery-import",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10155"
+ },
+ {
+  "name": "gallery-remove",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10166"
+ },
+ {
+  "name": "gallery-slash",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10177"
+ },
+ {
+  "name": "gallery-tick",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10188"
+ },
+ {
+  "name": "image",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10199"
+ },
+ {
+  "name": "maximize-circle",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10210"
+ },
+ {
+  "name": "maximize-circle-2",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10246"
+ },
+ {
+  "name": "microphone-slash",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10268"
+ },
+ {
+  "name": "music",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10301"
+ },
+ {
+  "name": "music-library",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:10987"
+ },
+ {
+  "name": "music-square-add",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9595:11021"
+ },
+ {
+  "name": "music-square-remove",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:12"
+ },
+ {
+  "name": "music-square-search",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:23"
+ },
+ {
+  "name": "musicnote",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:34"
+ },
+ {
+  "name": "next",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:46"
+ },
+ {
+  "name": "pause",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:68"
+ },
+ {
+  "name": "play",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:90"
+ },
+ {
+  "name": "play-add",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:101"
+ },
+ {
+  "name": "play-remove",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:136"
+ },
+ {
+  "name": "previous",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:147"
+ },
+ {
+  "name": "radio",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:158"
+ },
+ {
+  "name": "record-circle",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9619:169"
+ },
+ {
+  "name": "repeat-music",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:223"
+ },
+ {
+  "name": "scissor",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:619"
+ },
+ {
+  "name": "screenmirroring",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:630"
+ },
+ {
+  "name": "shuffle",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:652"
+ },
+ {
+  "name": "shuffle-2",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:641"
+ },
+ {
+  "name": "subtitle",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:674"
+ },
+ {
+  "name": "video",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:685"
+ },
+ {
+  "name": "video-add",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:696"
+ },
+ {
+  "name": "video-play",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:741"
+ },
+ {
+  "name": "video-remove",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:752"
+ },
+ {
+  "name": "video-slash",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:763"
+ },
+ {
+  "name": "video-tick",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:785"
+ },
+ {
+  "name": "video-time",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:796"
+ },
+ {
+  "name": "voice-circle",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:818"
+ },
+ {
+  "name": "volume-cross",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:840"
+ },
+ {
+  "name": "volume-high",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:855"
+ },
+ {
+  "name": "volume-low1",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:866"
+ },
+ {
+  "name": "volume-mute",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:888"
+ },
+ {
+  "name": "volume-slash",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:899"
+ },
+ {
+  "name": "volume-up",
+  "category": "Video-Audio-Image",
+  "figmaSetId": "9624:910"
+ },
+ {
+  "name": "airplane",
+  "category": "Car",
+  "figmaSetId": "9624:1059"
+ },
+ {
+  "name": "bus",
+  "category": "Car",
+  "figmaSetId": "9624:1073"
+ },
+ {
+  "name": "car",
+  "category": "Car",
+  "figmaSetId": "9624:1080"
+ },
+ {
+  "name": "driving",
+  "category": "Car",
+  "figmaSetId": "9624:1087"
+ },
+ {
+  "name": "gas-station",
+  "category": "Car",
+  "figmaSetId": "9624:1094"
+ },
+ {
+  "name": "smart-car",
+  "category": "Car",
+  "figmaSetId": "9624:1101"
+ },
+ {
+  "name": "ship",
+  "category": "Car",
+  "figmaSetId": "9624:1108"
+ },
+ {
+  "name": "call",
+  "category": "Call",
+  "figmaSetId": "9624:2801"
+ },
+ {
+  "name": "call-add",
+  "category": "Call",
+  "figmaSetId": "9624:2808"
+ },
+ {
+  "name": "call-calling",
+  "category": "Call",
+  "figmaSetId": "9624:2815"
+ },
+ {
+  "name": "call-incoming",
+  "category": "Call",
+  "figmaSetId": "9624:2822"
+ },
+ {
+  "name": "call-minus",
+  "category": "Call",
+  "figmaSetId": "9624:2829"
+ },
+ {
+  "name": "call-outgoing",
+  "category": "Call",
+  "figmaSetId": "9624:2836"
+ },
+ {
+  "name": "call-received",
+  "category": "Call",
+  "figmaSetId": "9624:2843"
+ },
+ {
+  "name": "call-remove",
+  "category": "Call",
+  "figmaSetId": "9624:2850"
+ },
+ {
+  "name": "call-slash",
+  "category": "Call",
+  "figmaSetId": "9624:2951"
+ },
+ {
+  "name": "card",
+  "category": "Money",
+  "figmaSetId": "9647:4642"
+ },
+ {
+  "name": "card-add",
+  "category": "Money",
+  "figmaSetId": "9647:4649"
+ },
+ {
+  "name": "card-edit",
+  "category": "Money",
+  "figmaSetId": "9647:4656"
+ },
+ {
+  "name": "card-receive",
+  "category": "Money",
+  "figmaSetId": "9647:4670"
+ },
+ {
+  "name": "call-remove2",
+  "category": "Money",
+  "figmaSetId": "9647:4684"
+ },
+ {
+  "name": "card-send",
+  "category": "Money",
+  "figmaSetId": "9647:4691"
+ },
+ {
+  "name": "card-slash",
+  "category": "Money",
+  "figmaSetId": "9648:4770"
+ },
+ {
+  "name": "card-tick2",
+  "category": "Money",
+  "figmaSetId": "9648:4799"
+ },
+ {
+  "name": "cards",
+  "category": "Money",
+  "figmaSetId": "9648:4810"
+ },
+ {
+  "name": "chart-square",
+  "category": "Money",
+  "figmaSetId": "9648:4821"
+ },
+ {
+  "name": "coin2",
+  "category": "Money",
+  "figmaSetId": "9648:4844"
+ },
+ {
+  "name": "convert-card",
+  "category": "Money",
+  "figmaSetId": "9648:4885"
+ },
+ {
+  "name": "discount-shape",
+  "category": "Money",
+  "figmaSetId": "9648:5127"
+ },
+ {
+  "name": "dollar-circle",
+  "category": "Money",
+  "figmaSetId": "9648:5166"
+ },
+ {
+  "name": "wallet",
+  "category": "Money",
+  "figmaSetId": "9648:5188"
+ },
+ {
+  "name": "wallet-add",
+  "category": "Money",
+  "figmaSetId": "9778:9768"
+ },
+ {
+  "name": "wallet-change",
+  "category": "Money",
+  "figmaSetId": "9778:9779"
+ },
+ {
+  "name": "wallet-remove",
+  "category": "Money",
+  "figmaSetId": "9778:9790"
+ },
+ {
+  "name": "wallet-tick",
+  "category": "Money",
+  "figmaSetId": "9778:9801"
+ },
+ {
+  "name": "wallet-time",
+  "category": "Money",
+  "figmaSetId": "9778:9826"
+ },
+ {
+  "name": "math",
+  "category": "Money",
+  "figmaSetId": "9778:9837"
+ },
+ {
+  "name": "money",
+  "category": "Money",
+  "figmaSetId": "9778:9848"
+ },
+ {
+  "name": "money-add",
+  "category": "Money",
+  "figmaSetId": "9778:9867"
+ },
+ {
+  "name": "money-change",
+  "category": "Money",
+  "figmaSetId": "9778:9884"
+ },
+ {
+  "name": "money-forbidden",
+  "category": "Money",
+  "figmaSetId": "9778:9895"
+ },
+ {
+  "name": "money-recive",
+  "category": "Money",
+  "figmaSetId": "9778:9906"
+ },
+ {
+  "name": "money-remove",
+  "category": "Money",
+  "figmaSetId": "9778:9917"
+ },
+ {
+  "name": "money-send",
+  "category": "Money",
+  "figmaSetId": "9778:9928"
+ },
+ {
+  "name": "money-tick",
+  "category": "Money",
+  "figmaSetId": "9778:9952"
+ },
+ {
+  "name": "money-time",
+  "category": "Money",
+  "figmaSetId": "9778:9963"
+ },
+ {
+  "name": "moneys",
+  "category": "Money",
+  "figmaSetId": "9779:9974"
+ },
+ {
+  "name": "percentage-circle",
+  "category": "Money",
+  "figmaSetId": "9779:9985"
+ },
+ {
+  "name": "receipt-add",
+  "category": "Money",
+  "figmaSetId": "9779:10153"
+ },
+ {
+  "name": "receipt-disscount",
+  "category": "Money",
+  "figmaSetId": "9779:10168"
+ },
+ {
+  "name": "receipt-edit",
+  "category": "Money",
+  "figmaSetId": "9779:10181"
+ },
+ {
+  "name": "receipt-minus",
+  "category": "Money",
+  "figmaSetId": "9779:10193"
+ },
+ {
+  "name": "receipt-search",
+  "category": "Money",
+  "figmaSetId": "9779:10204"
+ },
+ {
+  "name": "receipt-text",
+  "category": "Money",
+  "figmaSetId": "9779:10215"
+ },
+ {
+  "name": "strongbox",
+  "category": "Money",
+  "figmaSetId": "9792:10248"
+ },
+ {
+  "name": "tag",
+  "category": "Money",
+  "figmaSetId": "9792:10593"
+ },
+ {
+  "name": "ticket",
+  "category": "Money",
+  "figmaSetId": "9792:11152"
+ },
+ {
+  "name": "ticket-discount",
+  "category": "Money",
+  "figmaSetId": "9792:11165"
+ },
+ {
+  "name": "ticket-expired",
+  "category": "Money",
+  "figmaSetId": "9792:11198"
+ },
+ {
+  "name": "ticket-star",
+  "category": "Money",
+  "figmaSetId": "9792:11229"
+ },
+ {
+  "name": "calculator",
+  "category": "Money",
+  "figmaSetId": "13296:29063"
+ },
+ {
+  "name": "dislike",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9797:12385"
+ },
+ {
+  "name": "heart",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9797:12392"
+ },
+ {
+  "name": "heart-add",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9809:21"
+ },
+ {
+  "name": "heart-edit",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9809:43"
+ },
+ {
+  "name": "heart-edit-2",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9809:55"
+ },
+ {
+  "name": "heart-search",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9809:66"
+ },
+ {
+  "name": "heart-slash",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9809:78"
+ },
+ {
+  "name": "heart-tick",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9809:1109"
+ },
+ {
+  "name": "like",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:1133"
+ },
+ {
+  "name": "like-dislike",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:1169"
+ },
+ {
+  "name": "magic-star",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:1277"
+ },
+ {
+  "name": "medal-star",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:1299"
+ },
+ {
+  "name": "message-question",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:1310"
+ },
+ {
+  "name": "ranking-2",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:1321"
+ },
+ {
+  "name": "smileys",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:3430"
+ },
+ {
+  "name": "star",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:3484"
+ },
+ {
+  "name": "star-slash",
+  "category": "Support- Like- Question",
+  "figmaSetId": "9811:3495"
+ },
+ {
+  "name": "archive-book",
+  "category": "Files",
+  "figmaSetId": "11574:8818"
+ },
+ {
+  "name": "clipboard-close",
+  "category": "Files",
+  "figmaSetId": "11574:8832"
+ },
+ {
+  "name": "clipboard-export",
+  "category": "Files",
+  "figmaSetId": "11574:8839"
+ },
+ {
+  "name": "clipboard-import",
+  "category": "Files",
+  "figmaSetId": "11574:8846"
+ },
+ {
+  "name": "clipboard-tick",
+  "category": "Files",
+  "figmaSetId": "11574:8860"
+ },
+ {
+  "name": "copyright",
+  "category": "Files",
+  "figmaSetId": "11574:8867"
+ },
+ {
+  "name": "creative-commons",
+  "category": "Files",
+  "figmaSetId": "11574:8874"
+ },
+ {
+  "name": "document",
+  "category": "Files",
+  "figmaSetId": "11574:8881"
+ },
+ {
+  "name": "document-cloud",
+  "category": "Files",
+  "figmaSetId": "11574:8888"
+ },
+ {
+  "name": "document-copy",
+  "category": "Files",
+  "figmaSetId": "11574:8895"
+ },
+ {
+  "name": "document-download",
+  "category": "Files",
+  "figmaSetId": "11574:8902"
+ },
+ {
+  "name": "document-favorite",
+  "category": "Files",
+  "figmaSetId": "11609:2044"
+ },
+ {
+  "name": "document-filter",
+  "category": "Files",
+  "figmaSetId": "11574:8909"
+ },
+ {
+  "name": "document-forward",
+  "category": "Files",
+  "figmaSetId": "11574:8916"
+ },
+ {
+  "name": "document-normal",
+  "category": "Files",
+  "figmaSetId": "11574:8930"
+ },
+ {
+  "name": "medal-star-2",
+  "category": "Files",
+  "figmaSetId": "11574:8937"
+ },
+ {
+  "name": "document-text",
+  "category": "Files",
+  "figmaSetId": "11574:8951"
+ },
+ {
+  "name": "document-upload",
+  "category": "Files",
+  "figmaSetId": "11574:8965"
+ },
+ {
+  "name": "edit",
+  "category": "Files",
+  "figmaSetId": "11574:8972"
+ },
+ {
+  "name": "edit-square",
+  "category": "Files",
+  "figmaSetId": "11574:8979"
+ },
+ {
+  "name": "folder",
+  "category": "Files",
+  "figmaSetId": "11609:3095"
+ },
+ {
+  "name": "folder-add",
+  "category": "Files",
+  "figmaSetId": "11609:3160"
+ },
+ {
+  "name": "folder-cloud",
+  "category": "Files",
+  "figmaSetId": "11609:3171"
+ },
+ {
+  "name": "folder-cross",
+  "category": "Files",
+  "figmaSetId": "11609:3201"
+ },
+ {
+  "name": "folder-favorite",
+  "category": "Files",
+  "figmaSetId": "11609:3212"
+ },
+ {
+  "name": "folder-minus",
+  "category": "Files",
+  "figmaSetId": "11609:6142"
+ },
+ {
+  "name": "note",
+  "category": "Files",
+  "figmaSetId": "11609:6153"
+ },
+ {
+  "name": "note-2",
+  "category": "Files",
+  "figmaSetId": "11609:6181"
+ },
+ {
+  "name": "note-favorite",
+  "category": "Files",
+  "figmaSetId": "11609:6192"
+ },
+ {
+  "name": "clipboard-text",
+  "category": "Files",
+  "figmaSetId": "12649:8960"
+ },
+ {
+  "name": "note-remove",
+  "category": "Files",
+  "figmaSetId": "12649:8971"
+ },
+ {
+  "name": "stickynote",
+  "category": "Files",
+  "figmaSetId": "12649:9070"
+ },
+ {
+  "name": "task",
+  "category": "Files",
+  "figmaSetId": "12649:9508"
+ },
+ {
+  "name": "lamp-charge",
+  "category": "Notifications",
+  "figmaSetId": "12642:5754"
+ },
+ {
+  "name": "lamp-on",
+  "category": "Notifications",
+  "figmaSetId": "12642:5761"
+ },
+ {
+  "name": "lamp-slash",
+  "category": "Notifications",
+  "figmaSetId": "12642:5768"
+ },
+ {
+  "name": "notification",
+  "category": "Notifications",
+  "figmaSetId": "12642:5775"
+ },
+ {
+  "name": "clipboard-tick-2",
+  "category": "Notifications",
+  "figmaSetId": "12642:5782"
+ },
+ {
+  "name": "notification-favorite",
+  "category": "Notifications",
+  "figmaSetId": "12642:5789"
+ },
+ {
+  "name": "creative-commons-2",
+  "category": "Notifications",
+  "figmaSetId": "12642:5796"
+ },
+ {
+  "name": "bag",
+  "category": "Shop",
+  "figmaSetId": "12703:2709"
+ },
+ {
+  "name": "bag-cross",
+  "category": "Shop",
+  "figmaSetId": "12703:2716"
+ },
+ {
+  "name": "bag-tick",
+  "category": "Shop",
+  "figmaSetId": "12703:2723"
+ },
+ {
+  "name": "bag-timer",
+  "category": "Shop",
+  "figmaSetId": "12703:2730"
+ },
+ {
+  "name": "barcode",
+  "category": "Shop",
+  "figmaSetId": "12703:2737"
+ },
+ {
+  "name": "shop-remove",
+  "category": "Shop",
+  "figmaSetId": "12703:2744"
+ },
+ {
+  "name": "shop-add",
+  "category": "Shop",
+  "figmaSetId": "12703:2751"
+ },
+ {
+  "name": "shop-remove-2",
+  "category": "Shop",
+  "figmaSetId": "12710:3087"
+ },
+ {
+  "name": "shopping-cart",
+  "category": "Shop",
+  "figmaSetId": "12720:3200"
+ },
+ {
+  "name": "facebook",
+  "category": "Brand",
+  "figmaSetId": "13413:5312"
+ },
+ {
+  "name": "instagram-2",
+  "category": "Brand",
+  "figmaSetId": "13413:5319"
+ },
+ {
+  "name": "tiktok",
+  "category": "Brand",
+  "figmaSetId": "13413:5326"
+ },
+ {
+  "name": "cloud",
+  "category": "Weather",
+  "figmaSetId": "14231:2828"
+ },
+ {
+  "name": "sun",
+  "category": "Weather",
+  "figmaSetId": "14231:29249"
+ },
+ {
+  "name": "sun-fog",
+  "category": "Weather",
+  "figmaSetId": "14231:29288"
+ },
+ {
+  "name": "moon",
+  "category": "Weather",
+  "figmaSetId": "14231:29345"
+ },
+ {
+  "name": "sms",
+  "category": "Emails-Messages",
+  "figmaSetId": "14330:61789"
+ },
+ {
+  "name": "setting",
+  "category": "Settings",
+  "figmaSetId": "14948:6812"
+ },
+ {
+  "name": "toogle",
+  "category": "Settings",
+  "figmaSetId": "17265:2234"
+ },
+ {
+  "name": "grid",
+  "category": "Settings",
+  "figmaSetId": "17923:35816"
+ },
+ {
+  "name": "row-vertical",
+  "category": "Settings",
+  "figmaSetId": "17923:35875"
+ }
+]
