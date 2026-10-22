@@ -1,32 +1,56 @@
-# React + TypeScript + Vite
+# Sistema de diseño CAOS
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Librería de componentes React fiel a Figma, construida con React 19, TypeScript, Tailwind v4 y Storybook.
 
-Currently, two official plugins are available:
+## Requisitos y comandos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Node.js reciente y npm.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install                      # instala dependencias
+npm run dev                      # showcase en Vite
+npm run storybook                # Storybook en http://localhost:6006
+npm run build                    # tsc -b y build de producción
+npm run lint                     # oxlint
+npm run check:tokens             # verifica las variables CSS usadas
+npx vitest run                   # pruebas
+node scripts/build-icons.mjs     # regenera src/icons desde icons/svg
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Tokens
+
+`src/styles/tokens.css` es la fuente de verdad, exportada de Figma. No se edita a mano. Las utilidades de Tailwind con prefijo `ds-` (por ejemplo `bg-ds-background-container-default-on-card` o `p-ds-space-general-xl`) salen de ese archivo. `npm run check:tokens` falla si un componente usa una variable que no existe en él.
+
+## Íconos
+
+Los SVG exportados de Figma viven en `icons/svg/`. `scripts/build-icons.mjs` los convierte en componentes en `src/icons/`, con `currentColor` para que hereden el color del texto.
+
+## Estructura de un componente
+
+```
+src/components/Button/
+  Button.tsx          implementación
+  Button.types.ts     props y tipos
+  Button.variants.ts  variantes (class-variance-authority)
+  Button.stories.tsx  historias de Storybook
+  Button.docs.json    documentación legible por herramientas e IA
+  index.ts            exportaciones públicas
+```
+
+`*.docs.json` describe el componente, sus props, valores por defecto y el nodo de Figma de origen en un formato estructurado, para que herramientas y asistentes de IA lo lean sin analizar el código.
+
+## Temas
+
+Oscuro por defecto. Para el tema claro, agrega `data-theme="light"` al elemento `<html>`.
+
+## Componentes
+
+| Componente | Historia de Storybook |
+| --- | --- |
+| Button | `General Controls/Button` |
+| ButtonLink | `General Controls/Button link` |
+| ButtonCorner | `General Controls/Button corner` |
+| Input | `Form Controls/Input` |
+| Checkbox | `Form Controls/Checkbox` |
+| Radio | `Form Controls/Radio` |
+| Subtract | `Components/Subtract` |

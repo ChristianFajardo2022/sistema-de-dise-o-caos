@@ -1,250 +1,386 @@
-import { useState } from 'react';
-import { Input } from './components/Input';
-import { Button } from './components/Button';
+import { useEffect, useId, useState } from 'react';
+import type { ReactNode } from 'react';
+import { Button, type ButtonState, type ButtonProps } from './components/Button';
+import { ButtonCorner } from './components/ButtonCorner';
+import { ButtonLink } from './components/ButtonLink';
+import { Checkbox } from './components/Checkbox';
+import { Input, type InputState } from './components/Input';
+import { Radio } from './components/Radio';
 import { Subtract } from './components/Subtract';
-import { ShieldCheck, Download, RefreshCw } from 'lucide-react';
 import { AddIcon } from './icons/AddIcon';
 import { ArrowRightIcon } from './icons/ArrowRightIcon';
-import { TrashIcon } from './icons/TrashIcon';
+import { ExportIcon } from './icons/ExportIcon';
 import { SettingIcon } from './icons/SettingIcon';
+import { TrashIcon } from './icons/TrashIcon';
+
+type Theme = 'dark' | 'light';
+
+/** Clases compartidas, todas con utilidades ds- generadas desde tokens.css */
+const card =
+  'rounded-ds-radius-container-on-card border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card p-ds-space-general-5xl';
+const h2Class =
+  'm-0 mb-ds-space-general-4xl text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg font-semibold text-ds-text-neutral-heading text-balance';
+const h3Class =
+  'm-0 mb-ds-space-general-xl text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md font-semibold text-ds-text-neutral-heading';
+const noteClass =
+  'm-0 text-ds-typography-body-size-sm leading-ds-typography-body-line-height-short-sm text-pretty';
+/** Superficie oscura fija: Unicolor lleva texto e ícono blancos en ambos temas */
+const darkSurface =
+  'rounded-ds-radius-general-xl bg-ds-primitives-color-primary-n01 p-ds-space-general-4xl text-ds-primitives-color-primary-b01';
+
+function Block({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-ds-space-general-lg">
+      <h3 className={h3Class}>{title}</h3>
+      {note && <p className={noteClass}>{note}</p>}
+      {children}
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  const id = useId();
+  return (
+    <section aria-labelledby={id} className={card}>
+      <h2 id={id} className={h2Class}>
+        {title}
+      </h2>
+      <div className="flex flex-col gap-ds-space-general-5xl">{children}</div>
+    </section>
+  );
+}
+
+const STATES: { state: ButtonState; label: string }[] = [
+  { state: 'default', label: 'Default' },
+  { state: 'hover', label: 'Hover' },
+  { state: 'focus', label: 'Focus' },
+  { state: 'press', label: 'Press' },
+  { state: 'inactive', label: 'Inactive' },
+  { state: 'delete', label: 'Delete' },
+  { state: 'load', label: 'Load' },
+];
+
+type Row = { label: string; props: Partial<ButtonProps> & { variant: 'primary' | 'secondary' | 'tertiary' } };
+
+const ROWS: Row[] = [
+  { label: 'Primary', props: { variant: 'primary' } },
+  { label: 'Secondary low', props: { variant: 'secondary', contrast: 'low' } },
+  { label: 'Secondary high', props: { variant: 'secondary', contrast: 'high' } },
+  { label: 'Tertiary', props: { variant: 'tertiary' } },
+];
+const UNICOLOR_ROWS: Row[] = [
+  { label: 'Secondary low', props: { variant: 'secondary', contrast: 'low', unicolor: true } },
+  { label: 'Secondary high', props: { variant: 'secondary', contrast: 'high', unicolor: true } },
+  { label: 'Tertiary', props: { variant: 'tertiary', unicolor: true } },
+];
+
+function StateTable({ caption, rows }: { caption: string; rows: Row[] }) {
+  return (
+    <div
+      role="region"
+      aria-label={caption}
+      tabIndex={0}
+      className="overflow-x-auto rounded-ds-radius-general-sm"
+    >
+      <table className="border-separate border-spacing-ds-space-general-lg text-left">
+        <caption className="sr-only">{caption}</caption>
+        <thead>
+          <tr>
+            <th scope="col" className="sr-only">
+              Tipo
+            </th>
+            {STATES.map((s) => (
+              <th key={s.state} scope="col" className="font-normal text-ds-typography-body-size-sm">
+                {s.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.label}>
+              <th scope="row" className="whitespace-nowrap pr-ds-space-general-xl font-normal text-ds-typography-body-size-sm">
+                {row.label}
+              </th>
+              {STATES.map((s) => (
+                <td key={s.state}>
+                  {row.props.variant === 'tertiary' && s.state === 'load' ? (
+                    <span className="text-ds-typography-body-size-sm">No aplica</span>
+                  ) : (
+                    <Button {...(row.props as ButtonProps)} state={s.state}>
+                      Botón
+                    </Button>
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+const INPUT_STATES: { state: InputState; label: string; extra?: Record<string, unknown> }[] = [
+  { state: 'default', label: 'Default' },
+  { state: 'filled', label: 'Filled' },
+  { state: 'active', label: 'Active' },
+  { state: 'burnt-in', label: 'Burnt-in' },
+  { state: 'disabled', label: 'Disabled' },
+  { state: 'error', label: 'Error', extra: { errorText: 'Revisa este campo' } },
+  { state: 'success', label: 'Success', extra: { successText: 'Dato verificado' } },
+];
+
+function InputStates() {
+  return (
+    <div className="grid grid-cols-1 gap-ds-space-general-4xl sm:grid-cols-2 lg:grid-cols-3">
+      {INPUT_STATES.map(({ state, label, extra }) => (
+        <Input
+          key={state}
+          label={label}
+          state={state}
+          defaultValue={state === 'default' ? undefined : 'Texto de ejemplo'}
+          readOnly={state === 'burnt-in'}
+          disabled={state === 'disabled'}
+          {...extra}
+        />
+      ))}
+    </div>
+  );
+}
+
+function Selection() {
+  const [plan, setPlan] = useState('mensual');
+  const surfaces = [
+    { contrast: 'positive' as const, className: 'bg-ds-background-general-black text-ds-text-neutral-white', title: 'Positive' },
+    { contrast: 'negative' as const, className: 'bg-ds-background-general-white text-ds-text-neutral-black', title: 'Negative' },
+  ];
+  return (
+    <div className="grid grid-cols-1 gap-ds-space-general-4xl md:grid-cols-2">
+      {surfaces.map(({ contrast, className, title }) => (
+        <div
+          key={contrast}
+          className={`${className} flex flex-col gap-ds-space-general-4xl rounded-ds-radius-general-xl border border-ds-border-general-gray-fifth p-ds-space-general-4xl`}
+        >
+          <p className={`${noteClass} font-semibold`}>{title}</p>
+          <fieldset className="m-0 flex flex-col gap-ds-space-general-xl border-0 p-0">
+            <legend className={`${noteClass} mb-ds-space-general-lg`}>Checkbox</legend>
+            <Checkbox contrast={contrast} defaultChecked>
+              Recibir novedades
+            </Checkbox>
+            <Checkbox contrast={contrast}>Aceptar términos</Checkbox>
+            <Checkbox contrast={contrast} disabled>
+              Opción no disponible
+            </Checkbox>
+          </fieldset>
+          <fieldset className="m-0 flex flex-col gap-ds-space-general-xl border-0 p-0">
+            <legend className={`${noteClass} mb-ds-space-general-lg`}>Radio</legend>
+            {[
+              ['mensual', 'Plan mensual'],
+              ['anual', 'Plan anual'],
+            ].map(([value, text]) => (
+              <Radio
+                key={value}
+                contrast={contrast}
+                name={`plan-${contrast}`}
+                value={value}
+                checked={plan === value}
+                onChange={() => setPlan(value)}
+              >
+                {text}
+              </Radio>
+            ))}
+            <Radio contrast={contrast} name={`plan-${contrast}-off`} disabled>
+              Plan no disponible
+            </Radio>
+          </fieldset>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function App() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [textValue, setTextValue] = useState('Christian Camilo');
-  const [searchValue, setSearchValue] = useState('');
-  const [passwordValue, setPasswordValue] = useState('Secret123!');
-  const [errorValue, setErrorValue] = useState('usuario.invalido@domain');
-  const [isBtnLoading, setIsBtnLoading] = useState(false);
+  const [theme, setTheme] = useState<Theme>('dark');
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [query, setQuery] = useState('');
 
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
-    if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  };
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
-  const handleSimulateLoading = () => {
-    setIsBtnLoading(true);
-    setTimeout(() => setIsBtnLoading(false), 2500);
-  };
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setLoading(false), 2500);
+    return () => clearTimeout(t);
+  }, [loading]);
+
+  const nextTheme: Theme = theme === 'dark' ? 'light' : 'dark';
 
   return (
-    <div className="min-h-screen bg-[var(--background-container-surface,#f6f8f9)] text-[var(--text-neutral-heading,#1d1c1c)] p-8 transition-colors duration-300 font-sans">
-      <header className="max-w-4xl mx-auto flex items-center justify-between pb-8 mb-8 border-b border-[var(--border-general-gray-fourth,#d0d4dc)]">
+    <div className="min-h-dvh bg-ds-background-container-default-on-canva font-ds-primitives-typography-family-primary text-ds-text-neutral-heading">
+      <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-ds-space-general-2xl px-ds-space-general-4xl py-ds-space-general-5xl">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-left m-0 flex items-center gap-3">
-            <ShieldCheck className="w-8 h-8 text-[var(--border-field-active,#aa3bff)]" />
-            CAOS Design System
+          <h1 className="m-0 text-ds-typography-heading-size-2xl leading-ds-typography-heading-line-height-2xl font-semibold text-ds-text-neutral-heading text-balance">
+            Sistema de diseño CAOS
           </h1>
-          <p className="text-sm text-[var(--text-neutral-body,#5e6165)] mt-1">
-            Component Showcase — Input & Button Components
+          <p className={`${noteClass} mt-ds-space-general-md`}>
+            Muestra de los componentes disponibles, con los tokens exportados de Figma.
           </p>
         </div>
-        <button
-          onClick={toggleTheme}
-          className="px-4 py-2 rounded-lg font-medium text-sm bg-[var(--background-container-default-on-card,#ffffff)] border border-[var(--border-general-gray-tertiary,#898e98)] hover:bg-gray-100 dark:hover:bg-gray-800 transition-all shadow-sm cursor-pointer"
-        >
-          {theme === 'light' ? '🌙 Modo Oscuro' : '☀️ Modo Claro'}
-        </button>
+        <Button variant="secondary" size="sm" onClick={() => setTheme(nextTheme)}>
+          {nextTheme === 'light' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+        </Button>
       </header>
 
-      <main className="max-w-4xl mx-auto space-y-10 text-left">
-        {/* ================================================================= */}
-        {/* BUTTON COMPONENT MATRIX                                            */}
-        {/* ================================================================= */}
-        <section className="bg-[var(--background-field-surface,#ffffff)] p-6 rounded-2xl shadow-sm border border-[var(--border-general-gray-fifth,#e5e8ec)]">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold m-0 text-left">Matriz del Componente Button</h2>
-            <Button
-              size="sm"
-              variant="tertiary"
-              leftIcon={<RefreshCw />}
-              onClick={handleSimulateLoading}
-            >
-              Simular Carga
-            </Button>
+      <main className="mx-auto flex max-w-6xl flex-col gap-ds-space-general-5xl px-ds-space-general-4xl pb-ds-space-general-6xl">
+        <Section title="Button">
+          <Block title="Type y Contrast" note="Primary, Secondary (low y high) y Tertiary.">
+            <div className="flex flex-wrap items-center gap-ds-space-general-xl">
+              <Button variant="primary" leftIcon={<AddIcon />}>
+                Primary
+              </Button>
+              <Button variant="secondary" rightIcon={<ArrowRightIcon />}>
+                Secondary low
+              </Button>
+              <Button variant="secondary" contrast="high">
+                Secondary high
+              </Button>
+              <Button variant="tertiary">Tertiary</Button>
+            </div>
+          </Block>
+
+          <Block title="Tamaños" note="md 56 · sm 48 · xs 32.">
+            <div className="flex flex-wrap items-center gap-ds-space-general-xl">
+              <Button size="md">md 56</Button>
+              <Button size="sm">sm 48</Button>
+              <Button size="xs">xs 32</Button>
+            </div>
+          </Block>
+
+          <Block title="Icon-single" note="Botón cuadrado solo con ícono: exige aria-label.">
+            <div className="flex flex-wrap items-center gap-ds-space-general-xl">
+              <Button iconOnly size="md" variant="primary" aria-label="Agregar">
+                <AddIcon />
+              </Button>
+              <Button iconOnly size="sm" variant="secondary" aria-label="Exportar">
+                <ExportIcon />
+              </Button>
+              <Button iconOnly size="xs" variant="tertiary" aria-label="Ajustes">
+                <SettingIcon />
+              </Button>
+              <Button iconOnly size="md" variant="primary" state="delete" aria-label="Eliminar">
+                <TrashIcon />
+              </Button>
+            </div>
+          </Block>
+
+          <Block title="Load en uso" note="Con loading el botón queda ocupado y anuncia aria-busy.">
+            <div>
+              <Button variant="primary" loading={loading} onClick={() => setLoading(true)}>
+                {loading ? 'Guardando' : 'Guardar cambios'}
+              </Button>
+            </div>
+          </Block>
+
+          <Block
+            title="Estados"
+            note="La prop state fuerza el aspecto solo para documentación; en uso normal salen de la interacción."
+          >
+            <StateTable caption="Estados de Button por tipo" rows={ROWS} />
+          </Block>
+
+          <Block
+            title="Unicolor"
+            note="Texto e ícono de un solo color. Va sobre superficie oscura; Inactive y Delete conservan sus colores."
+          >
+            <div className={darkSurface}>
+              <StateTable caption="Estados de Button unicolor" rows={UNICOLOR_ROWS} />
+            </div>
+          </Block>
+        </Section>
+
+        <Section title="ButtonLink">
+          <div className="flex flex-wrap items-center gap-ds-space-general-4xl">
+            <ButtonLink href="#button-link">Enlace</ButtonLink>
+            <ButtonLink href="#button-link" iconRight>
+              Enlace con ícono
+            </ButtonLink>
+            <ButtonLink href="#button-link" icon={<ArrowRightIcon />} iconRight>
+              Ícono propio
+            </ButtonLink>
+            <ButtonLink disabled>Enlace inactivo</ButtonLink>
           </div>
+        </Section>
 
-          <div className="space-y-6">
-            {/* 1. Type */}
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Type y Contrats
-              </h3>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button variant="primary" leftIcon={<AddIcon />}>
-                  Primary
-                </Button>
-                <Button variant="secondary" rightIcon={<ArrowRightIcon />}>
-                  Secondary low
-                </Button>
-                <Button variant="secondary" contrast="high">
-                  Secondary high
-                </Button>
-                <Button variant="tertiary">Tertiary</Button>
-                <Button variant="secondary" unicolor>
-                  Unicolor
-                </Button>
-              </div>
+        <Section title="Button corner">
+          <Block title="Types" note="Icon, Dots, Radiobutton, Checkbox y Favorite (md 40 · sm 32). Sobre tarjeta usan On card.">
+            <div className="flex flex-wrap items-center gap-ds-space-general-xl">
+              <ButtonCorner variant="icon" status="on-card" aria-label="Abrir detalle" />
+              <ButtonCorner variant="dots" status="on-card" aria-label="Más opciones" />
+              <ButtonCorner variant="radiobutton" status="on-card" aria-label="Elegir" />
+              <ButtonCorner variant="checkbox" status="on-card" aria-label="Seleccionar" />
+              <ButtonCorner variant="favorite" status="on-card" aria-label="Agregar a favoritos" />
+              <ButtonCorner variant="icon" status="on-card" size="sm" stroke aria-label="Abrir detalle" />
             </div>
-
-            {/* 2. State */}
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Estados (Inactive, Delete, Load)
-              </h3>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button variant="primary" loading={isBtnLoading}>
-                  {isBtnLoading ? 'Guardando...' : 'Normal / Carga'}
-                </Button>
-                <Button variant="secondary" loading>
-                  Cargando
-                </Button>
-                <Button variant="primary" disabled>
-                  Inactive
-                </Button>
-                <Button variant="primary" state="delete" leftIcon={<TrashIcon />}>
-                  Eliminar
-                </Button>
-                <Button variant="secondary" state="delete">
-                  Eliminar
-                </Button>
-                <Button variant="tertiary" state="delete">
-                  Eliminar
-                </Button>
-              </div>
+          </Block>
+          <Block title="Unicolor canva" note="Sobre foto o color: no cambia con el tema.">
+            <div className={`${darkSurface} flex flex-wrap items-center gap-ds-space-general-xl`}>
+              <ButtonCorner variant="icon" status="unicolor-canva" aria-label="Abrir detalle" />
+              <ButtonCorner variant="dots" status="unicolor-canva" stroke aria-label="Más opciones" />
+              <ButtonCorner variant="favorite" status="unicolor-canva" aria-label="Agregar a favoritos" />
             </div>
+          </Block>
+        </Section>
 
-            {/* 3. Size */}
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Tamaños (Size: md, sm, xs)
-              </h3>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button size="md" variant="primary">
-                  md (56px)
-                </Button>
-                <Button size="sm" variant="primary">
-                  sm (48px)
-                </Button>
-                <Button size="xs" variant="primary">
-                  xs (32px)
-                </Button>
-              </div>
-            </div>
-
-            {/* 4. Icon-single */}
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--text-neutral-body,#5e6165)] mb-3">
-                Solo ícono (Icon-single)
-              </h3>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button size="md" iconOnly variant="primary" aria-label="Agregar">
-                  <AddIcon />
-                </Button>
-                <Button size="sm" iconOnly variant="secondary" aria-label="Descargar">
-                  <Download />
-                </Button>
-                <Button size="xs" iconOnly variant="tertiary" aria-label="Ajustes">
-                  <SettingIcon />
-                </Button>
-                <Button size="md" iconOnly variant="primary" state="delete" aria-label="Eliminar">
-                  <TrashIcon />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ================================================================= */}
-        {/* INPUT COMPONENT SHOWCASE                                          */}
-        {/* ================================================================= */}
-        <section className="bg-[var(--background-field-surface,#ffffff)] p-6 rounded-2xl shadow-sm border border-[var(--border-general-gray-fifth,#e5e8ec)]">
-          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 m-0 text-left">
-            <span>Variantes de Estado de Input</span>
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
+        <Section title="Input">
+          <Block title="Types" note="Text, Password, Search (56) y Search header (48).">
+            <div className="grid grid-cols-1 gap-ds-space-general-4xl md:grid-cols-2">
               <Input
-                label="Nombre de usuario (Default)"
+                label="Nombre completo"
                 optional
-                placeholder="Ej. camilofhernandez"
-                value={textValue}
-                onChange={(e) => setTextValue(e.target.value)}
-                helperText="Nombre visible en la plataforma"
-                tooltip="Nombre oficial registrado"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                helperText="Como aparece en tu documento"
+                tooltip="Nombre registrado en tu documento"
               />
-            </div>
-
-            <div>
+              <Input label="Contraseña" variant="password" helperText="Usa el ojo para mostrar u ocultar" />
               <Input
-                label="Búsqueda global (Search Type / Active)"
+                label="Buscar"
                 variant="search"
-                placeholder="Buscar componente o token..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                helperText="Presiona Enter para buscar"
-                state="active"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
               />
+              <Input label="Buscar en el sitio" variant="search-header" />
             </div>
+          </Block>
+          <Block title="Estados" note="Los ocho estados de Figma; la prop state solo fuerza el aspecto.">
+            <InputStates />
+          </Block>
+        </Section>
 
-            <div>
-              <Input
-                label="Contraseña (Password Type)"
-                variant="password"
-                placeholder="Ingresa tu contraseña"
-                value={passwordValue}
-                onChange={(e) => setPasswordValue(e.target.value)}
-                helperText="Haz clic en el icono del ojo para alternar visibilidad"
-              />
-            </div>
+        <Section title="Checkbox y Radio">
+          <Selection />
+        </Section>
 
-            <div>
-              <Input
-                label="Correo electrónico (Error State)"
-                type="email"
-                value={errorValue}
-                onChange={(e) => setErrorValue(e.target.value)}
-                errorText="El formato del correo electrónico no es válido"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-[var(--background-field-surface,#ffffff)] p-6 rounded-2xl shadow-sm border border-[var(--border-general-gray-fifth,#e5e8ec)]">
-          <h2 className="text-xl font-semibold mb-6 m-0 text-left">
-            Componente Subtract de Figma
-          </h2>
-          <div className="flex flex-wrap items-start gap-8">
-            <div className="rounded-2xl bg-white p-4">
+        <Section title="Subtract">
+          <div className="flex flex-wrap items-start gap-ds-space-general-5xl">
+            <div className="rounded-ds-radius-general-xl bg-ds-background-general-white p-ds-space-general-4xl">
               <Subtract width={184} />
             </div>
-            <dl className="m-0 grid gap-4 text-sm">
+            <dl className="m-0 grid gap-ds-space-general-2xl text-ds-typography-body-size-md">
               <div>
-                <dt className="font-semibold">
-                  background/container/default-on-canva
-                </dt>
-                <dd className="m-0 flex items-center gap-2">
-                  <span
-                    aria-hidden="true"
-                    className="inline-block h-4 w-4 rounded border border-black/10 bg-[#1d1c1c]"
-                  />
-                  #1D1C1C
-                </dd>
+                <dt className="font-semibold text-ds-text-neutral-heading">Color</dt>
+                <dd className="m-0">background/container/default-on-canva</dd>
               </div>
               <div>
-                <dt className="font-semibold">radius/general/2xl</dt>
-                <dd className="m-0">24 px</dd>
+                <dt className="font-semibold text-ds-text-neutral-heading">Radio</dt>
+                <dd className="m-0">radius/general/2xl, 24 px</dd>
               </div>
             </dl>
           </div>
-        </section>
+        </Section>
       </main>
     </div>
   );
