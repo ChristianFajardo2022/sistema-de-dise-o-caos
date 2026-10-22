@@ -5,10 +5,10 @@
 /* CAOS — Hover de Primary: la forma difuminada cruza de izquierda a derecha y reinicia (3s, una fase) */
 @keyframes caos-primary-sweep {
   from {
-    left: -104px;
+    transform: translateX(-104px);
   }
   to {
-    left: 100%;
+    transform: translateX(100%);
   }
 }
 

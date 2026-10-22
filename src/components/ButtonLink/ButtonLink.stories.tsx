@@ -51,11 +51,11 @@ export const StatesMatrix: Story = {
     <div className="grid grid-cols-[auto_repeat(5,auto)] items-center gap-x-8 gap-y-4">
       <span />
       {STATES.map((s) => (
-        <span key={s} className="text-xs text-neutral-400">{s}</span>
+        <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
       ))}
       {[true, false].map((iconRight) => (
         <div key={String(iconRight)} className="contents">
-          <span className="text-xs text-neutral-400">{iconRight ? 'Icon right' : 'Sin ícono'}</span>
+          <span className="text-xs text-ds-text-neutral-body">{iconRight ? 'Icon right' : 'Sin ícono'}</span>
           {STATES.map((s) => (
             <div key={s}>
               <ButtonLink href="#" state={s} iconRight={iconRight}>Button</ButtonLink>

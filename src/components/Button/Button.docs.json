@@ -32,7 +32,7 @@
     "loading": {
       "type": "boolean",
       "default": false,
-      "description": "Estado load: deshabilita el botón, muestra el spinner de 20px y establece aria-busy."
+      "description": "Estado load: deshabilita el botón, muestra 3 puntos de 8px y establece aria-busy. Usa aria-disabled en vez de disabled (conserva el foco), cancela onClick y el submit mientras carga, y el nombre accesible queda \"<texto> Cargando\"."
     },
     "disabled": {
       "type": "boolean",
@@ -52,7 +52,7 @@
     "iconOnly": {
       "type": "boolean",
       "default": false,
-      "description": "Icon-single: botón cuadrado (56, 48 o 32). Pasar el ícono como children y un aria-label."
+      "description": "Icon-single: botón cuadrado (56, 48 o 32). Pasar el ícono como children. Con iconOnly es obligatorio aria-label o aria-labelledby (el tipo lo exige)."
     }
   },
   "examples": [
@@ -62,7 +62,7 @@
     },
     {
       "title": "Secondary high con ícono",
-      "code": "<Button variant=\"secondary\" contrast=\"high\" leftIcon={<Plus />}>Agregar ítem</Button>"
+      "code": "<Button variant=\"secondary\" contrast=\"high\" leftIcon={<AddIcon />}>Agregar ítem</Button>"
     },
     {
       "title": "Load",
@@ -70,11 +70,11 @@
     },
     {
       "title": "Delete",
-      "code": "<Button variant=\"primary\" state=\"delete\" leftIcon={<Trash2 />}>Eliminar cuenta</Button>"
+      "code": "<Button variant=\"primary\" state=\"delete\" leftIcon={<TrashIcon />}>Eliminar cuenta</Button>"
     },
     {
       "title": "Icon-single",
-      "code": "<Button variant=\"tertiary\" iconOnly aria-label=\"Ajustes\"><Settings /></Button>"
+      "code": "<Button variant=\"tertiary\" iconOnly aria-label=\"Ajustes\"><SettingIcon /></Button>"
     }
   ]
 }

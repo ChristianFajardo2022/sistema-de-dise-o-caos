@@ -25,7 +25,7 @@ export const buttonVariants = cva(
   [
     'group relative box-border inline-flex shrink-0 items-center justify-center overflow-hidden',
     'cursor-pointer select-none whitespace-nowrap outline-none',
-    'transition-[background-color,border-color,color,min-width] duration-300 ease-out',
+    'transition-[background-color,border-color,color] duration-300 ease-out',
     'disabled:cursor-not-allowed',
     // Button/Button-md-600: Helvetica Neue, peso 400, 14px fijo (md-uniform, no el responsive), tracking 0
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
@@ -68,7 +68,7 @@ export const buttonVariants = cva(
         press: '',
         inactive: '',
         delete: '',
-        load: 'disabled:cursor-wait',
+        load: 'cursor-wait',
       },
 
       iconOnly: {

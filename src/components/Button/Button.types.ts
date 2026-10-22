@@ -14,7 +14,7 @@ export type ButtonSize = 'md' | 'sm' | 'xs';
  */
 export type ButtonState = 'default' | 'hover' | 'focus' | 'press' | 'inactive' | 'delete' | 'load';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonBaseProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Type: jerarquía visual del botón */
   variant?: ButtonVariant;
   /** Contrats: nivel de contraste de secondary */
@@ -31,9 +31,23 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: ReactNode;
   /** Ícono después del texto (iconRigth en Figma). Se dibuja a 20px con el color del estado. */
   rightIcon?: ReactNode;
-  /** Icon-single: botón cuadrado solo con ícono (pasar el ícono como children y un aria-label) */
-  iconOnly?: boolean;
   /** Clases adicionales */
   className?: string;
   children?: ReactNode;
 }
+
+/** Con iconOnly el nombre accesible es obligatorio: aria-label o aria-labelledby (uno de los dos) */
+type ButtonIconOnlyProps = ButtonBaseProps & {
+  /** Icon-single: botón cuadrado solo con ícono (pasar el ícono como children) */
+  iconOnly: true;
+} & (
+    | { 'aria-label': string; 'aria-labelledby'?: string }
+    | { 'aria-labelledby': string; 'aria-label'?: string }
+  );
+
+type ButtonTextProps = ButtonBaseProps & {
+  /** Icon-single: botón cuadrado solo con ícono (con true exige aria-label o aria-labelledby) */
+  iconOnly?: false;
+};
+
+export type ButtonProps = ButtonIconOnlyProps | ButtonTextProps;

@@ -1,49 +1,65 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react';
+import type { ComponentType } from 'react';
 import { Button } from './Button';
-import type { ButtonProps, ButtonState } from './Button.types';
+import type { ButtonBaseProps, ButtonProps, ButtonState } from './Button.types';
 import { AddIcon } from '../../icons/AddIcon';
 import { ArrowRightIcon } from '../../icons/ArrowRightIcon';
 import { TrashIcon } from '../../icons/TrashIcon';
 import { SettingIcon } from '../../icons/SettingIcon';
 
-const meta: Meta<typeof Button> = {
+/** Args de Storybook: props base sin la unión (los args son parciales); iconOnly sin exigir aria-label */
+type ButtonArgs = ButtonBaseProps & { iconOnly?: boolean };
+
+/** Omit que conserva la unión discriminada de ButtonProps */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+
+const meta: Meta<ButtonArgs> = {
   title: 'General Controls/Button',
-  component: Button,
+  component: Button as unknown as ComponentType<ButtonArgs>,
   tags: ['autodocs'],
+  // Tipos explícitos: con la unión discriminada de ButtonProps el docgen no los infiere y Storybook descarta los args de la URL
   argTypes: {
     variant: {
+      type: { name: 'enum', value: ['primary', 'secondary', 'tertiary'] },
       control: 'select',
       options: ['primary', 'secondary', 'tertiary'],
       description: 'Type: jerarquía visual del botón',
     },
     contrast: {
+      type: { name: 'enum', value: ['low', 'high'] },
       control: 'radio',
       options: ['low', 'high'],
       description: 'Contrats: solo aplica a secondary',
     },
     unicolor: {
+      type: { name: 'boolean' },
       control: 'boolean',
       description: 'Unicolor: secondary y tertiary sin icon-single',
     },
     size: {
+      type: { name: 'enum', value: ['md', 'sm', 'xs'] },
       control: 'radio',
       options: ['md', 'sm', 'xs'],
       description: 'Size: md 56 · sm 48 · xs 32',
     },
     state: {
+      type: { name: 'enum', value: ['default', 'hover', 'focus', 'press', 'inactive', 'delete', 'load'] },
       control: 'select',
       options: ['default', 'hover', 'focus', 'press', 'inactive', 'delete', 'load'],
       description: 'State forzado (hover, focus y press solo para visualización). Tertiary no tiene load.',
     },
     loading: {
+      type: { name: 'boolean' },
       control: 'boolean',
       description: 'Estado load: spinner y aria-busy',
     },
     disabled: {
+      type: { name: 'boolean' },
       control: 'boolean',
       description: 'Estado inactive',
     },
     iconOnly: {
+      type: { name: 'boolean' },
       control: 'boolean',
       description: 'Icon-single: botón cuadrado solo con ícono',
     },
@@ -132,7 +148,7 @@ export const Inactive: Story = {
 export const StatesMatrix: Story = {
   render: () => {
     // Orden de Figma: texto (con Unicolor) y luego Icon-single
-    const rows: { label: string; props: Omit<ButtonProps, 'state'> }[] = [
+    const rows: { label: string; props: DistributiveOmit<ButtonProps, 'state'> }[] = [
       { label: 'Primary', props: { variant: 'primary' } },
       { label: 'Secondary low', props: { variant: 'secondary', contrast: 'low' } },
       { label: 'Unicolor', props: { variant: 'secondary', contrast: 'low', unicolor: true } },
@@ -149,11 +165,11 @@ export const StatesMatrix: Story = {
       <div className="grid grid-cols-[auto_repeat(7,auto)] items-center gap-4">
         <span />
         {STATES.map((s) => (
-          <span key={s} className="text-xs text-neutral-400">{s}</span>
+          <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
         ))}
         {rows.map((row, i) => (
           <div key={`${row.label}-${i}`} className="contents">
-            <span className="text-xs text-neutral-400">{row.label}</span>
+            <span className="text-xs text-ds-text-neutral-body">{row.label}</span>
             {STATES.map((s) =>
               row.props.variant === 'tertiary' && s === 'load' ? (
                 <span key={s} />
@@ -177,7 +193,7 @@ export const IconSingleMatrix: Story = {
     <div className="flex flex-col gap-4">
       {(['md', 'sm', 'xs'] as const).map((size) => (
         <div key={size} className="flex items-center gap-3">
-          <span className="w-8 text-xs text-neutral-400">{size}</span>
+          <span className="w-8 text-xs text-ds-text-neutral-body">{size}</span>
           <Button size={size} iconOnly variant="primary" aria-label="Agregar"><AddIcon /></Button>
           <Button size={size} iconOnly variant="secondary" aria-label="Agregar"><AddIcon /></Button>
           <Button size={size} iconOnly variant="secondary" contrast="high" aria-label="Agregar"><AddIcon /></Button>
@@ -206,10 +222,10 @@ export const HoverSpecifications: Story = {
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
-        <h3 className="text-sm font-semibold mb-2 text-neutral-400">
+        <h3 className="text-sm font-semibold mb-2 text-ds-text-neutral-body">
           Interacción en vivo (Dissolve 300 ms, Ease out)
         </h3>
-        <p className="text-xs text-neutral-500 mb-4">
+        <p className="text-xs text-ds-text-neutral-body mb-4">
           Pasa el cursor para ver el ciclo de 4 fases en Primary, el cambio de borde en Secondary y el fondo y subrayado en Tertiary. Usa Tab para ver Focus y mantén presionado para ver Press.
         </p>
         <div className="flex items-center gap-6">

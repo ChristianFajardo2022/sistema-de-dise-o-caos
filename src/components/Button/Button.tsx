@@ -74,6 +74,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       children,
       type = 'button',
+      onClick,
       ...restProps
     },
     ref
@@ -81,7 +82,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const wantsLoad = loading || state === 'load';
     // Tertiary no tiene Load en Figma: se muestra como Inactive
     const isLoading = wantsLoad && variant !== 'tertiary';
-    const isDisabled = disabled || state === 'inactive' || wantsLoad;
+    // Load conserva el foco: usa aria-disabled en vez de disabled. Inactive (y Tertiary, que no tiene Load) usan disabled nativo
+    const isDisabled = disabled || state === 'inactive' || (wantsLoad && !isLoading);
     const computedState: ButtonState = isLoading
       ? 'load'
       : isDisabled
@@ -97,7 +99,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         type={type}
         disabled={isDisabled}
+        aria-disabled={isLoading && !isDisabled ? true : undefined}
         aria-busy={wantsLoad || undefined}
+        onClick={(e) => {
+          // Mientras carga no se dispara el clic ni el submit
+          if (isLoading) {
+            e.preventDefault();
+            return;
+          }
+          onClick?.(e);
+        }}
         className={cn(
           buttonVariants({
             variant,
@@ -127,7 +138,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     : 'opacity-0 group-hover:opacity-100 group-active:opacity-0'
                 )}
               >
-                <EffectUnion className="top-1/2 -translate-y-1/2 animate-[caos-primary-sweep_3s_linear_infinite]" />
+                {/* Pista del ancho del botón: translateX en % del recorrido, sin animar left */}
+                <span className="absolute inset-y-0 left-0 w-full animate-[caos-primary-sweep_3s_linear_infinite]">
+                  <EffectUnion className="left-0 top-1/2 -translate-y-1/2" />
+                </span>
               </span>
             )}
 
@@ -162,11 +176,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           />
         )}
 
-        {/* Contenido sobre el efecto; en Load se oculta y quedan los 3 puntos centrados */}
+        {/* Contenido sobre el efecto; en Load se oculta con opacity-0 (sigue en el árbol de accesibilidad) y quedan los 3 puntos centrados */}
         <span
           className={cn(
             'relative z-10 inline-flex items-center justify-center gap-ds-space-button-lg',
-            isLoading && 'invisible'
+            isLoading && 'opacity-0'
           )}
         >
           {iconOnly ? (
@@ -181,7 +195,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         </span>
 
         {isLoading && <LoadDots />}
-        {isLoading && <span className="sr-only">Cargando</span>}
+        {isLoading && <span className="sr-only"> Cargando</span>}
       </button>
     );
   }

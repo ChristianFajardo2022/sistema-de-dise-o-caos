@@ -3,7 +3,14 @@ import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import '../src/index.css';
 
+// Primitivos de tokens.css: no hay semánticos con el mismo valor en cada modo (heading claro es #1d1c1c, no #000)
+const BG = { dark: 'var(--color-ds-primitives-color-primary-n01)', light: 'var(--color-ds-primitives-color-primary-g01)' };
+const FG = { dark: 'var(--color-ds-primitives-color-primary-b01)', light: 'var(--color-ds-primitives-color-primary-n01)' };
+
 function ThemeWrapper({ theme: selectedTheme, children }: { theme: string; children: ReactNode }) {
+  const mode = selectedTheme === 'dark' ? 'dark' : 'light';
+  const bg = BG[mode];
+  const fg = FG[mode];
   useEffect(() => {
     const root = document.documentElement;
     if (selectedTheme === 'dark') {
@@ -13,21 +20,19 @@ function ThemeWrapper({ theme: selectedTheme, children }: { theme: string; child
       root.classList.remove('dark');
       root.setAttribute('data-theme', 'light');
     }
-    document.body.style.backgroundColor =
-      selectedTheme === 'dark' ? '#000000' : '#FAFBFC';
-    document.body.style.color =
-      selectedTheme === 'dark' ? '#FEFEFE' : '#000000';
-  }, [selectedTheme]);
+    document.body.style.backgroundColor = bg;
+    document.body.style.color = fg;
+  }, [bg, fg, selectedTheme]);
 
   return (
     <div
       style={{
         padding: '32px',
         minHeight: '100px',
-        background: selectedTheme === 'dark' ? '#000000' : '#FAFBFC',
-        color: selectedTheme === 'dark' ? '#FEFEFE' : '#000000',
-        transition: 'all 0.2s',
+        backgroundColor: bg,
+        color: fg,
       }}
+      className="transition-[background-color,color] duration-200 motion-reduce:transition-none"
     >
       {children}
     </div>
@@ -44,7 +49,8 @@ const preview: Preview = {
   parameters: {
     controls: {
       matchers: {
-        color: /(background|color)$/i,
+        // Sin el fallo de "unicolor": solo props que se llamen background o color, o terminen en Background/Color
+        color: /^(background|color)$|(Background|Color)$/,
         date: /Date$/i,
       },
     },
