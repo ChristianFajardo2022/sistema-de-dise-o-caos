@@ -5,7 +5,8 @@ import type { ReactNode } from 'react';
 const BG = { dark: 'var(--color-ds-primitives-color-primary-n01)', light: 'var(--color-ds-primitives-color-primary-g01)' };
 const FG = { dark: 'var(--color-ds-primitives-color-primary-b01)', light: 'var(--color-ds-primitives-color-primary-n01)' };
 
-export function ThemeWrapper({ theme: selectedTheme, children }: { theme: string; children: ReactNode }) {
+/** flush: sin relleno, para historias con layout fullscreen (páginas que llevan su propio encabezado a sangre) */
+export function ThemeWrapper({ theme: selectedTheme, flush = false, children }: { theme: string; flush?: boolean; children: ReactNode }) {
   const mode = selectedTheme === 'dark' ? 'dark' : 'light';
   const bg = BG[mode];
   const fg = FG[mode];
@@ -25,7 +26,7 @@ export function ThemeWrapper({ theme: selectedTheme, children }: { theme: string
   return (
     <div
       style={{
-        padding: '32px',
+        padding: flush ? 0 : '32px',
         minHeight: '100px',
         backgroundColor: bg,
         color: fg,
