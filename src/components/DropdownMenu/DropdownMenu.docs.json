@@ -1,0 +1,40 @@
+{
+  "name": "DropdownMenu",
+  "component": "DropdownMenu",
+  "description": "Menú desplegable del sistema de diseño CAOS, fiel a los component sets \"Dropdown menu\" (5331:1745, el panel, fuera del lienzo de Figma) y \"Dropdown list\" (el ítem) de Figma. Tres piezas: DropdownMenuPanel (panel visual en línea, sin abrir ni cerrar), DropdownMenuItem (ítem) y DropdownMenu (panel + disparador + popover nativo + teclado). Dos usos. Modo menu (por defecto): menú de acciones o selección, patrón WAI-ARIA APG Menu Button; roles menu y menuitem / menuitemcheckbox / menuitemradio, foco dentro, flechas, Inicio, Fin, letra inicial, Enter y Espacio activan, Esc cierra y devuelve el foco, Tab sale. Modo list: lista informativa (p. ej. los avatares ocultos de un grupo, abierta desde el \"+N\" de AvatarGroup); ul/li no accionables, sin roles de menú, el foco se queda en el disparador. Usa el atributo nativo popover (capa superior, clic fuera y Esc) y se posiciona con getBoundingClientRect: abajo y con el borde derecho alineado al del disparador; se ajusta al viewport (375) y pasa arriba si abajo no cabe. Type=Search usa el componente Input (variant search); filtrar los ítems lo hace quien usa el menú. Riel de scroll reutiliza ScrollArea.",
+  "category": "Overlays",
+  "props": {
+    "trigger": { "type": "ReactElement | (props) => ReactNode", "required": true, "description": "Disparador. Elemento que reenvíe ref y props al nativo (Button, AvatarPlus), o función que recibe aria-*, popoverTarget, ref y onKeyDown." },
+    "mode": { "type": "'menu' | 'list'", "default": "'menu'", "description": "menu = acciones/selección (Menu Button, foco dentro). list = lista informativa (ul/li, sin acción, foco en el disparador)." },
+    "type": { "type": "'simple' | 'search'", "default": "'simple'", "description": "Type de Figma: con o sin campo de búsqueda arriba." },
+    "aria-label": { "type": "string", "required": true, "description": "Nombre accesible del menú o de la lista." },
+    "align": { "type": "'start' | 'end'", "default": "'end'", "description": "end: borde derecho del panel con el borde derecho del disparador (Figma)." },
+    "side": { "type": "'bottom' | 'top'", "default": "'bottom'", "description": "Lado preferido; si no cabe pasa al otro." },
+    "scrollbar": { "type": "boolean", "default": "true", "description": "Prop Scroll bar de Figma: reserva y dibuja el riel de 6." },
+    "maxHeight": { "type": "string | number", "default": "'20rem'", "description": "Alto máximo del área de ítems; pasado ese alto se desplaza." },
+    "open": { "type": "boolean", "required": false, "description": "Abierto (controlado). Usar con onOpenChange." },
+    "defaultOpen": { "type": "boolean", "default": false, "description": "Abierto al inicio." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Cambia al abrir o cerrar (clic fuera, Esc, selección, disparador)." },
+    "searchLabel": { "type": "string", "default": "'Buscar'", "description": "Label del campo de búsqueda (type=search)." },
+    "searchValue": { "type": "string", "required": false, "description": "Valor del campo de búsqueda (controlado)." },
+    "onSearchChange": { "type": "(value: string) => void", "required": false, "description": "Cambio del campo de búsqueda." },
+    "children": { "type": "ReactNode", "required": false, "description": "DropdownMenuItem. Es el slot Check List de Figma." }
+  },
+  "itemProps": {
+    "type": { "type": "'simple' | 'icon' | 'checkbox' | 'radio' | 'avatar'", "default": "'simple'", "description": "Type del ítem de Figma (simple con Icono=true es icon)." },
+    "icon": { "type": "IconName", "default": "'add-circle'", "description": "Ícono de type=icon." },
+    "avatar": { "type": "ReactNode", "required": false, "description": "Avatar de type=avatar, p. ej. <Avatar variant=\"photo\" size=\"xs\" … />." },
+    "checked / defaultChecked / onCheckedChange": { "type": "boolean / boolean / (checked) => void", "required": false, "description": "Marcado de checkbox y radio." },
+    "selected": { "type": "boolean", "default": false, "description": "Aspecto Select en simple, icon y avatar." },
+    "disabled": { "type": "boolean", "default": false, "description": "aria-disabled; las flechas lo saltan." },
+    "onSelect": { "type": "() => void", "required": false, "description": "Se activa con clic, Enter o Espacio (solo modo menu)." },
+    "closeOnSelect": { "type": "boolean", "default": "true (false en checkbox)", "description": "Cierra el panel al activar." },
+    "state": { "type": "'default' | 'hover' | 'select' | 'disabled'", "required": false, "description": "Fuerza el aspecto de un State, solo documentación." }
+  },
+  "examples": [
+    { "title": "Menú de acciones", "code": "<DropdownMenu aria-label=\"Acciones\" trigger={<Button variant=\"secondary\" size=\"sm\">Acciones</Button>}>\n  <DropdownMenuItem type=\"icon\" onSelect={duplicar}>Duplicar</DropdownMenuItem>\n  <DropdownMenuItem onSelect={compartir}>Compartir</DropdownMenuItem>\n</DropdownMenu>" },
+    { "title": "Selección múltiple con búsqueda", "code": "<DropdownMenu type=\"search\" aria-label=\"Personas\" searchValue={q} onSearchChange={setQ} trigger={<Button>Personas</Button>}>\n  {shown.map((p) => (\n    <DropdownMenuItem key={p.id} type=\"checkbox\" checked={sel.has(p.id)} onCheckedChange={(on) => toggle(p.id, on)}>{p.name}</DropdownMenuItem>\n  ))}\n</DropdownMenu>" },
+    { "title": "\"+N\" de AvatarGroup (lista informativa)", "code": "<DropdownMenu mode=\"list\" aria-label=\"Personas ocultas\" trigger={<AvatarPlus count={hidden.length} />}>\n  {hidden.map((p) => (\n    <DropdownMenuItem key={p.id} type=\"avatar\" avatar={<Avatar variant=\"photo\" size=\"xs\" src={p.src} alt=\"\" />}>{p.name}</DropdownMenuItem>\n  ))}\n</DropdownMenu>" },
+    { "title": "Panel en línea", "code": "<DropdownMenuPanel aria-label=\"Opciones\" type=\"search\">…</DropdownMenuPanel>" }
+  ]
+}
