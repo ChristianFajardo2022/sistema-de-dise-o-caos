@@ -66,6 +66,16 @@ const meta = {
     name: 'Hugo García',
     badgeLabel: 'En línea',
   },
+  // Al cambiar variant desde los controles, brand y photo necesitan contenido: se usa el de muestra
+  render: (args) => (
+    <Avatar
+      {...args}
+      logo={args.logo ?? (args.variant === 'brand' ? <SampleLogo /> : undefined)}
+      src={args.src ?? (args.variant === 'photo' && args.children == null ? SAMPLE_PHOTO_SRC : undefined)}
+      alt={args.alt ?? (args.variant === 'photo' ? args.name : undefined)}
+      label={args.label ?? (args.variant === 'brand' ? 'Marca' : undefined)}
+    />
+  ),
 } satisfies Meta<typeof Avatar>;
 
 export default meta;
