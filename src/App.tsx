@@ -205,6 +205,10 @@ export function App() {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [query, setQuery] = useState('');
+  // Ejemplos de alternancia de ButtonCorner (aria-pressed)
+  const [cornerPressed, setCornerPressed] = useState({ radiobutton: false, checkbox: false, favorite: false });
+  const toggleCorner = (key: keyof typeof cornerPressed) =>
+    setCornerPressed((prev) => ({ ...prev, [key]: !prev[key] }));
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -220,6 +224,13 @@ export function App() {
 
   return (
     <div className="min-h-dvh bg-ds-background-container-default-on-canva font-ds-primitives-typography-family-primary text-ds-text-neutral-heading">
+      {/* Visible solo con foco: salta la cabecera y va directo al contenido */}
+      <a
+        href="#contenido"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-ds-space-general-md focus:left-ds-space-general-md focus:z-50 focus:rounded-sm focus:bg-ds-background-container-default-on-canva focus:px-ds-space-general-xl focus:py-ds-space-general-md focus:text-ds-text-neutral-heading focus:outline-2 focus:outline-offset-2 focus:outline-solid focus:outline-ds-border-field-active"
+      >
+        Saltar al contenido
+      </a>
       <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-ds-space-general-2xl px-ds-space-general-4xl py-ds-space-general-5xl">
         <div>
           <h1 className="m-0 text-ds-typography-heading-size-2xl leading-ds-typography-heading-line-height-2xl font-semibold text-ds-text-neutral-heading text-balance">
@@ -234,7 +245,7 @@ export function App() {
         </Button>
       </header>
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-ds-space-general-5xl px-ds-space-general-4xl pb-ds-space-general-6xl">
+      <main id="contenido" tabIndex={-1} className="focus:outline-hidden mx-auto flex max-w-6xl flex-col gap-ds-space-general-5xl px-ds-space-general-4xl pb-ds-space-general-6xl">
         <Section title="Button">
           <Block title="Type y Contrast" note="Primary, Secondary (low y high) y Tertiary.">
             <div className="flex flex-wrap items-center gap-ds-space-general-xl">
@@ -315,13 +326,13 @@ export function App() {
         </Section>
 
         <Section title="Button corner">
-          <Block title="Types" note="Icon, Dots, Radiobutton, Checkbox y Favorite (md 40 · sm 32). Sobre tarjeta usan On card.">
+          <Block title="Types" note="Icon, Dots, Radiobutton, Checkbox y Favorite (md 40 · sm 32). Sobre tarjeta usan On card. Radiobutton, Checkbox y Favorite alternan aria-pressed al hacer clic; el aspecto no cambia porque Figma no define estado seleccionado.">
             <div className="flex flex-wrap items-center gap-ds-space-general-xl">
               <ButtonCorner variant="icon" status="on-card" aria-label="Abrir detalle" />
               <ButtonCorner variant="dots" status="on-card" aria-label="Más opciones" />
-              <ButtonCorner variant="radiobutton" status="on-card" aria-label="Elegir" />
-              <ButtonCorner variant="checkbox" status="on-card" aria-label="Seleccionar" />
-              <ButtonCorner variant="favorite" status="on-card" aria-label="Agregar a favoritos" />
+              <ButtonCorner variant="radiobutton" status="on-card" aria-label="Elegir" pressed={cornerPressed.radiobutton} onClick={() => toggleCorner('radiobutton')} />
+              <ButtonCorner variant="checkbox" status="on-card" aria-label="Seleccionar" pressed={cornerPressed.checkbox} onClick={() => toggleCorner('checkbox')} />
+              <ButtonCorner variant="favorite" status="on-card" aria-label="Agregar a favoritos" pressed={cornerPressed.favorite} onClick={() => toggleCorner('favorite')} />
               <ButtonCorner variant="icon" status="on-card" size="sm" stroke aria-label="Abrir detalle" />
             </div>
           </Block>

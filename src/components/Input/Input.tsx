@@ -44,6 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const autoId = useId();
     const inputId = id ?? autoId;
     const messageId = `${inputId}-message`;
+    const tooltipId = `${inputId}-tooltip`;
     const [showPassword, setShowPassword] = useState(false);
 
     const isDisabled = disabled || state === 'disabled';
@@ -85,7 +86,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <div className="flex items-center gap-ds-space-general-lg">
           <div
             className={inputFieldVariants({ variant, state: computedState })}
-            aria-disabled={isDisabled || undefined}
           >
             {leading && (
               <span data-slot="icon-left" aria-hidden="true" className={ICON_SLOT}>
@@ -103,7 +103,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 disabled={isDisabled}
                 readOnly={readOnly}
                 aria-invalid={isError || undefined}
-                aria-describedby={cn(message && messageId, ariaDescribedBy) || undefined}
+                aria-describedby={cn(message && messageId, tooltip && tooltipId, ariaDescribedBy) || undefined}
                 className={inputControlVariants({ showPlaceholder: forceFloat && Boolean(placeholder) })}
                 {...restProps}
               />
@@ -131,8 +131,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 onClick={() => setShowPassword((v) => !v)}
                 className={cn(
                   ICON_SLOT,
-                  'cursor-pointer rounded-sm border-0 bg-transparent p-0 outline-none',
-                  'focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-ds-border-field-active',
+                  'cursor-pointer rounded-sm border-0 bg-transparent p-0 outline-hidden',
+                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
                   'disabled:cursor-not-allowed'
                 )}
               >
@@ -142,20 +142,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </div>
 
           {tooltip && (
+            <>
+            {/* Texto del tooltip para lectores de pantalla; lo referencia aria-describedby del input */}
+            <span id={tooltipId} className="sr-only">
+              {tooltip}
+            </span>
             <button
               type="button"
               aria-label={tooltip}
               title={tooltip}
               className={cn(
                 ICON_SLOT,
-                'cursor-help rounded-sm border-0 bg-transparent p-0 outline-none',
-                'focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-ds-border-field-active',
+                'cursor-help rounded-sm border-0 bg-transparent p-0 outline-hidden',
+                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
                 '[--ico:var(--color-ds-icon-general-white)]',
                 isDisabled && '[--ico:var(--color-ds-icon-general-disabled-positive)]'
               )}
             >
               <InfoCircleIcon />
             </button>
+            </>
           )}
         </div>
 

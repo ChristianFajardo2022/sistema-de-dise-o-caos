@@ -93,6 +93,9 @@ export const inputLabelVariants = cva(
           'peer-[:placeholder-shown:not(:focus)]:text-ds-typography-field-size-sm',
           'peer-[:placeholder-shown:not(:focus)]:leading-(--ds-responsive-typography-field-line-height-sm)',
           'peer-[:placeholder-shown:not(:focus)]:text-(color:--lbl-in)',
+          // Autocompletado del navegador: el label sube como si hubiera valor
+          'peer-autofill:top-[1px] peer-autofill:text-ds-typography-field-size-xs',
+          'peer-autofill:leading-(--ds-responsive-typography-field-line-height-xs) peer-autofill:text-(color:--lbl-up)',
         ].join(' '),
         always: '',
       },
