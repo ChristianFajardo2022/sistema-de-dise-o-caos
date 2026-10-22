@@ -3,7 +3,8 @@ import path from 'node:path';
 
 /**
  * Falla si el código usa una variable CSS que no existe en src/styles/tokens.css
- * (la fuente de verdad exportada de Figma) ni en src/index.css.
+ * (la fuente de verdad exportada de Figma) ni en src/index.css, ni la declara
+ * un componente como variable local.
  */
 const root = path.resolve(import.meta.dirname, '..');
 const sources = ['src/styles/tokens.css', 'src/index.css'];
@@ -26,8 +27,15 @@ function walk(dir) {
   });
 }
 
+const files = scanDirs.flatMap((d) => walk(path.join(root, d)));
+
+// Variables locales que un componente declara con una clase arbitraria de Tailwind ([--btn-icon:…])
+for (const file of files) {
+  for (const m of fs.readFileSync(file, 'utf8').matchAll(/\[(--[\w-]+):/g)) defined.add(m[1]);
+}
+
 const missing = [];
-for (const file of scanDirs.flatMap((d) => walk(path.join(root, d)))) {
+for (const file of files) {
   fs.readFileSync(file, 'utf8').split('\n').forEach((line, i) => {
     for (const m of line.matchAll(/var\((--[\w-]+)/g)) {
       if (!defined.has(m[1])) missing.push(`${path.relative(root, file)}:${i + 1}  ${m[1]}`);
