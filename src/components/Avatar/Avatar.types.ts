@@ -90,8 +90,15 @@ export interface AvatarGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   max?: number;
   /** Tamaño de los avatares del grupo. Por defecto `sm` (Figma: grupo Size lg, avatares de 32). */
   size?: AvatarSize;
-  /** Al activar el "+N". Con Dropdown podrá abrir la lista de los restantes. */
+  /** Al activar el "+N". Con `overflowMenu` se llama al abrir la lista. */
   onOverflowClick?: () => void;
+  /**
+   * El "+N" abre (clic, Enter o Espacio) una lista con los avatares ocultos a tamaño `xs` y su nombre
+   * (`name` ?? `alt` ?? `label`; sin ninguno, "Persona sin nombre"). Con `false` solo llama a `onOverflowClick`. Por defecto `true`.
+   */
+  overflowMenu?: boolean;
+  /** Nombre accesible de la lista de personas ocultas. Por defecto "Personas ocultas". */
+  overflowMenuLabel?: string;
   /** Nombre accesible del "+N". Recibe la cantidad y debe contener "+N" (WCAG 2.5.3). Por defecto "Ver +N más". */
   overflowLabel?: (count: number) => string;
   /** Clases adicionales para el elemento raíz. */

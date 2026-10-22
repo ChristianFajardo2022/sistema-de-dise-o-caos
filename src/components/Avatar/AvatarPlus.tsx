@@ -7,7 +7,7 @@ import { cn } from '../../utils/cn';
  * "+N" de un grupo de avatares: botón accesible. Su nombre por defecto es "Ver +N más", que
  * contiene el texto visible "+N" (WCAG 2.5.3). `ref` y el resto de props nativas van al `<button>`,
  * para que un Dropdown pueda pasar `aria-haspopup`, `aria-expanded`, `aria-controls` o `disabled`.
- * El menú con la lista de los restantes que Figma abre en Hover (Dropdown) todavía no existe.
+ * `AvatarGroup` lo envuelve en un `DropdownMenu` (modo lista) con los avatares ocultos.
  */
 export const AvatarPlus = forwardRef<HTMLButtonElement, AvatarPlusProps>(
   ({ count, size = 'sm', state = 'default', label, className, ...restProps }, ref) => (

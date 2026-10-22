@@ -1,11 +1,31 @@
 /** Datos de muestra de las historias; no se exportan desde el paquete. */
 
-export type PortraitName = 'woman-1' | 'woman-2' | 'woman-3' | 'woman-4' | 'man-1' | 'man-2' | 'man-3' | 'man-4';
+import photoWoman1 from './assets/photo-woman-1.jpg';
+import photoWoman2 from './assets/photo-woman-2.jpg';
+import photoWoman3 from './assets/photo-woman-3.jpg';
+import photoWoman4 from './assets/photo-woman-4.jpg';
+import photoMen1 from './assets/photo-men-1.jpg';
+import photoMen2 from './assets/photo-men-2.jpg';
+import photoMen3 from './assets/photo-men-3.jpg';
+import photoMen4 from './assets/photo-men-4.jpg';
+import photoDisabled from './assets/photo-disabled.jpg';
 
-export const PORTRAIT_NAMES: PortraitName[] = [
-  'woman-1', 'woman-2', 'woman-3', 'woman-4', 'man-1', 'man-2', 'man-3', 'man-4',
-];
+/** Valores de `Photo` del set "Photos (Atom)" de Figma. */
+export type PhotoName = 'Woman_1' | 'Woman_2' | 'Woman_3' | 'Woman_4' | 'Men_1' | 'Men_2' | 'Men_3' | 'Men_4' | 'Disabled';
 
-/** Imagen de ejemplo para la prop `src` (data URI sin colores de marca). */
-export const SAMPLE_PHOTO_SRC =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='lightgray'/><circle cx='50' cy='40' r='18' fill='gray'/><ellipse cx='50' cy='104' rx='38' ry='34' fill='gray'/></svg>";
+export const PHOTO_SRC: Record<PhotoName, string> = {
+  Woman_1: photoWoman1,
+  Woman_2: photoWoman2,
+  Woman_3: photoWoman3,
+  Woman_4: photoWoman4,
+  Men_1: photoMen1,
+  Men_2: photoMen2,
+  Men_3: photoMen3,
+  Men_4: photoMen4,
+  Disabled: photoDisabled,
+};
+
+export const PHOTO_NAMES = Object.keys(PHOTO_SRC) as PhotoName[];
+
+/** Foto de ejemplo para la prop `src`. */
+export const SAMPLE_PHOTO_SRC = PHOTO_SRC.Woman_1;

@@ -5,9 +5,9 @@ import { Avatar } from './Avatar';
 import { AvatarGroup } from './AvatarGroup';
 import { AvatarPlus } from './AvatarPlus';
 import type { AvatarColor, AvatarContrast, AvatarSize, AvatarVariant } from './Avatar.types';
-import { PortraitSample, SampleLogo } from './Avatar.samples';
-import { PORTRAIT_NAMES, SAMPLE_PHOTO_SRC } from './Avatar.sample-data';
-import type { PortraitName } from './Avatar.sample-data';
+import { PhotoSample, SampleLogo } from './Avatar.samples';
+import { PHOTO_SRC, SAMPLE_PHOTO_SRC } from './Avatar.sample-data';
+import type { PhotoName } from './Avatar.sample-data';
 
 const VARIANT_OPTIONS: AvatarVariant[] = ['initials', 'user', 'photo', 'brand', 'icon'];
 const SIZE_OPTIONS: AvatarSize[] = ['xs', 'sm', 'md', 'lg'];
@@ -82,7 +82,7 @@ export const User: Story = { args: { variant: 'user', color: 'blue', label: 'Hug
 export const Photo: Story = {
   render: (args) => (
     <Avatar {...args} variant="photo" alt="Hugo García">
-      <PortraitSample name="woman-1" />
+      <PhotoSample name="Woman_1" />
     </Avatar>
   ),
 };
@@ -94,16 +94,63 @@ export const Brand: Story = {
 
 export const IconAvatar: Story = { args: { variant: 'icon', badge: false, label: 'Carpeta', icon: 'folder' } };
 
+/** Nombres de ejemplo (inventados) para las fotos de muestra */
+const SAMPLE_NAMES: Record<PhotoName, string> = {
+  Woman_1: 'Laura Méndez',
+  Woman_2: 'Sofía Ramírez',
+  Woman_3: 'Valentina Ortiz',
+  Woman_4: 'Camila Torres',
+  Men_1: 'Andrés Rojas',
+  Men_2: 'Diego Castro',
+  Men_3: 'Mateo Vargas',
+  Men_4: 'Samuel Pineda',
+  Disabled: 'Tomás Herrera',
+};
+
 export const Group: Story = {
+  parameters: { layout: 'fullscreen' },
   render: () => (
-    <AvatarGroup aria-label="Participantes" max={4}>
-      {(['woman-1', 'woman-2', 'man-1', 'man-2', 'woman-3', 'man-3'] as PortraitName[]).map((p) => (
-        <Avatar key={p} variant="photo" alt={p}>
-          <PortraitSample name={p} />
-        </Avatar>
-      ))}
-    </AvatarGroup>
+    <div className="flex min-h-64 w-[28rem] max-w-full justify-end p-4">
+      <AvatarGroup aria-label="Participantes" max={4}>
+        {(['Woman_1', 'Woman_2', 'Men_1', 'Men_2', 'Woman_3', 'Men_3'] as PhotoName[]).map((p) => (
+          <Avatar key={p} variant="photo" alt={SAMPLE_NAMES[p]}>
+            <PhotoSample name={p} />
+          </Avatar>
+        ))}
+      </AvatarGroup>
+    </div>
   ),
+};
+
+/**
+ * El "+2" abre la lista de los avatares ocultos (Dropdown menu Simple, Item=Avatar de Figma): avatar de 24
+ * (foto, o iniciales con su color) y nombre. Aquí se abre al cargar para verla; en uso normal se abre con clic, Enter o Espacio.
+ */
+export const GroupOverflowMenu: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: () => (
+    <div className="flex min-h-64 w-[28rem] max-w-full justify-end p-4">
+      <AvatarGroup aria-label="Participantes" max={3}>
+        <Avatar variant="photo" alt="Ana Bernal">
+          <PhotoSample name="Woman_2" />
+        </Avatar>
+        <Avatar variant="photo" alt="Carlos Duarte">
+          <PhotoSample name="Men_2" />
+        </Avatar>
+        <Avatar variant="photo" alt="Fabiola Gil">
+          <PhotoSample name="Woman_3" />
+        </Avatar>
+        <Avatar variant="photo" alt="Hugo García">
+          <PhotoSample name="Men_1" />
+        </Avatar>
+        <Avatar variant="initials" color="green" name="Angélica Chávez" />
+      </AvatarGroup>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Ver +2 más' }));
+  },
 };
 
 /* ---------------------------------- Matrices ---------------------------------- */
@@ -148,7 +195,7 @@ export const FigmaMatrixAvatar: Story = {
       <div className="flex items-center gap-8">
         <div data-figma="Type=Photo" className="inline-flex gap-2.5">
           <Avatar variant="photo" size="lg" badge alt="Hugo García" badgeLabel="En línea">
-            <PortraitSample name="woman-1" />
+            <PhotoSample name="Woman_1" />
           </Avatar>
         </div>
         <div data-figma="Type=Brand" className="inline-flex gap-2.5">
@@ -214,7 +261,7 @@ export const FigmaMatrixAvatarPhoto: Story = {
             alt="Hugo García"
             data-figma={`Size=${s.figma}`}
           >
-            <PortraitSample name="woman-1" />
+            <PhotoSample name="Woman_1" />
           </Avatar>
         ))}
       </div>
@@ -286,7 +333,8 @@ export const FigmaMatrixAvatarPlus: Story = {
 
 const GROUP_COLORS: AvatarColor[] = ['purple', 'green', 'blue', 'yellow', 'red', 'purple', 'green'];
 const GROUP_NAMES = ['Ana Bernal', 'Carlos Duarte', 'Fabiola Gil', 'Hugo Imbert', 'Julia Kent', 'Laura Mejia', 'Nora Ortiz'];
-const GROUP_PORTRAITS: PortraitName[] = ['woman-1', 'woman-2', 'woman-3', 'woman-4', 'man-1', 'man-2', 'man-3'];
+/** Figma: el grupo Photo usa Woman_1..4 y Men_1; los dos "+N" restantes no dibujan foto. */
+const GROUP_PHOTOS: PhotoName[] = ['Woman_1', 'Woman_2', 'Woman_3', 'Woman_4', 'Men_1', 'Men_2', 'Men_3'];
 
 /** Set "Avatar group": Type names, user y Photo (Size lg: avatares de 32 + "+2"). */
 export const FigmaMatrixAvatarGroup: Story = {
@@ -307,7 +355,7 @@ export const FigmaMatrixAvatarGroup: Story = {
         <AvatarGroup data-figma="Type=Photo, Size=lg">
           {GROUP_NAMES.map((n, i) => (
             <Avatar key={n} variant="photo" alt={n}>
-              <PortraitSample name={GROUP_PORTRAITS[i]} />
+              <PhotoSample name={GROUP_PHOTOS[i]} />
             </Avatar>
           ))}
         </AvatarGroup>
@@ -316,38 +364,25 @@ export const FigmaMatrixAvatarGroup: Story = {
   ),
 };
 
-/** Set "photos": las 9 fotos de muestra de Figma, aquí retratos neutros hechos en código (102 × 68.53). */
+/** Set "photos": las 9 fotos de Figma (102 × 68.53). Disabled es otra foto, en grises como en Figma. */
 export const FigmaMatrixPhotos: Story = {
   parameters: { layout: 'padded' },
-  render: () => {
-    const items: { figma: string; portrait: PortraitName; disabled?: boolean }[] = [
-      { figma: 'Woman_1', portrait: PORTRAIT_NAMES[0] },
-      { figma: 'Woman_2', portrait: PORTRAIT_NAMES[1] },
-      { figma: 'Woman_3', portrait: PORTRAIT_NAMES[2] },
-      { figma: 'Woman_4', portrait: PORTRAIT_NAMES[3] },
-      { figma: 'Men_1', portrait: PORTRAIT_NAMES[4] },
-      { figma: 'Men_2', portrait: PORTRAIT_NAMES[5] },
-      { figma: 'Men_3', portrait: PORTRAIT_NAMES[6] },
-      { figma: 'Men_4', portrait: PORTRAIT_NAMES[7] },
-      { figma: 'Disabled', portrait: PORTRAIT_NAMES[7], disabled: true },
-    ];
-    return (
-      <Frame>
-        <div className="flex flex-wrap items-center gap-8">
-          {items.map((p) => (
-            <div
-              key={p.figma}
-              data-figma={`Photo=${p.figma}`}
-              className={p.disabled ? 'overflow-hidden grayscale' : 'overflow-hidden'}
-              style={{ width: 102, height: 68.53 }}
-            >
-              <PortraitSample name={p.portrait} />
-            </div>
-          ))}
-        </div>
-      </Frame>
-    );
-  },
+  render: () => (
+    <Frame>
+      <div className="flex flex-wrap items-center gap-8">
+        {(Object.keys(PHOTO_SRC) as PhotoName[]).map((p) => (
+          <div
+            key={p}
+            data-figma={`Photo=${p}`}
+            className={p === 'Disabled' ? 'overflow-hidden grayscale' : 'overflow-hidden'}
+            style={{ width: 102, height: 68.53 }}
+          >
+            <PhotoSample name={p} />
+          </div>
+        ))}
+      </div>
+    </Frame>
+  ),
 };
 
 /* ------------------------------------ Tests ------------------------------------ */
@@ -363,10 +398,10 @@ export const AccessibleNameTest: Story = {
       <Avatar variant="photo" alt="Retrato de Hugo" src={SAMPLE_PHOTO_SRC} />
       <Avatar variant="photo" src={SAMPLE_PHOTO_SRC} data-testid="photo-decorative" />
       <Avatar variant="photo" alt="Retrato con hijos" data-testid="photo-children">
-        <PortraitSample name="woman-1" />
+        <PhotoSample name="Woman_1" />
       </Avatar>
       <Avatar variant="photo" data-testid="photo-children-decorative">
-        <PortraitSample name="woman-2" />
+        <PhotoSample name="Woman_2" />
       </Avatar>
       <Avatar variant="icon" label="Carpeta" />
       <Avatar variant="brand" label="Marca de ejemplo" logo={<SampleLogo />} />
@@ -400,7 +435,7 @@ export const GroupOverflowTest: Story = {
   },
   render: () => {
     return (
-      <AvatarGroup aria-label="Participantes" max={3} onOverflowClick={onOverflowClick} data-testid="group">
+      <AvatarGroup aria-label="Participantes" max={3} overflowMenu={false} onOverflowClick={onOverflowClick} data-testid="group">
         {['Ana Bernal', 'Carlos Duarte', 'Fabiola Gil', 'Hugo Imbert', 'Julia Kent'].map((n) => (
           <Avatar key={n} name={n} />
         ))}
@@ -421,6 +456,46 @@ export const GroupOverflowTest: Story = {
     await expect(onOverflowClick).toHaveBeenCalledTimes(2);
     await userEvent.click(plus);
     await expect(onOverflowClick).toHaveBeenCalledTimes(3);
+    await expect(canvas.queryByRole('list')).toBeNull();
+  },
+};
+
+/** Test: el "+N" abre con Enter la lista de ocultos (con nombre), Esc la cierra y el foco sigue en el "+N" */
+export const GroupOverflowMenuTest: Story = {
+  tags: ['!autodocs'],
+  beforeEach: () => {
+    onOverflowClick.mockClear();
+  },
+  render: () => (
+    <AvatarGroup aria-label="Participantes" max={2} onOverflowClick={onOverflowClick}>
+      <Avatar name="Ana Bernal" />
+      <Avatar name="Carlos Duarte" />
+      <Avatar variant="photo" alt="Fabiola Gil">
+        <PhotoSample name="Woman_1" />
+      </Avatar>
+      <Avatar variant="initials" color="blue" name="Hugo Imbert" />
+      <Avatar variant="user" />
+    </AvatarGroup>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const plus = canvas.getByRole('button', { name: 'Ver +3 más' });
+    await expect(canvas.queryByRole('list')).toBeNull();
+    await userEvent.tab();
+    await expect(plus).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(plus).toHaveAttribute('aria-expanded', 'true');
+    await expect(onOverflowClick).toHaveBeenCalledTimes(1);
+    const list = await canvas.findByRole('list', { name: 'Personas ocultas' });
+    const items = within(list).getAllByRole('listitem');
+    await expect(items).toHaveLength(3);
+    await expect(items[0]).toHaveTextContent('Fabiola Gil');
+    await expect(items[1]).toHaveTextContent('Hugo Imbert');
+    await expect(items[2]).toHaveTextContent('Persona sin nombre');
+    await userEvent.keyboard('{Escape}');
+    await expect(plus).toHaveAttribute('aria-expanded', 'false');
+    await expect(canvas.queryByRole('list')).toBeNull();
+    await expect(plus).toHaveFocus();
   },
 };
 

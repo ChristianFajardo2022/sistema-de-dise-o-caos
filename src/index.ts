@@ -9,6 +9,7 @@ export * from './components/Button';
 export * from './components/ButtonCorner';
 export * from './components/ButtonLink';
 export * from './components/Checkbox';
+export * from './components/DropdownMenu';
 export * from './components/Icon';
 export * from './components/Input';
 export * from './components/Radio';
