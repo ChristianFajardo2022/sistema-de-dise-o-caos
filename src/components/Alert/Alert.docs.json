@@ -1,0 +1,21 @@
+{
+  "name": "Alert",
+  "component": "Alert",
+  "description": "Mensaje en línea del sistema de diseño CAOS, fiel al component set Alerts de Figma (11521:9733, 8 variantes: Type × Background). Type: success, alert, error, info; cada uno con su ícono relleno de 20 (tick-circle, warning, forbidden-2, info-circle) y su color icon/semantic/*. Background=True añade padding de 16 y un contorno de 0.5 por tipo (border/semantic/*, dibujado con box-shadow inset); False lo quita. Esquina radius/general/2xl, gap 8. Título (Subheading, Prospero semibold) y descripción (Helvetica Neue regular 12) son opcionales, como los booleanos Tittle y Description. Semántica: no es interactivo. Por defecto role=\"status\" (aviso cortés para mensajes en línea o no urgentes); usa role=\"alert\" solo para errores o avisos urgentes que aparecen de forma dinámica (p. ej. tras enviar un formulario), porque interrumpe al lector; no lo pongas en alertas presentes al cargar la página. El tipo se antepone como texto sr-only (Éxito, Advertencia, Error, Información; configurable con label) porque color e ícono solos no bastan (WCAG 1.4.1). El ícono es decorativo.",
+  "category": "Feedback",
+  "props": {
+    "type": { "type": "'success' | 'alert' | 'error' | 'info'", "default": "'success'", "description": "Type de Figma: color semántico e ícono." },
+    "background": { "type": "boolean", "default": "true", "description": "Background de Figma: contorno y padding (true) o sin ellos (false)." },
+    "title": { "type": "ReactNode", "required": false, "description": "Prop Tittle de Figma. Si se omite no se dibuja." },
+    "children": { "type": "ReactNode", "required": false, "description": "Prop Description de Figma. Si se omite no se dibuja." },
+    "icon": { "type": "IconName", "required": false, "description": "Sobrescribe el ícono de Figma del type." },
+    "label": { "type": "string", "required": false, "description": "Texto sr-only con el tipo. Por defecto Éxito, Advertencia, Error o Información; cadena vacía lo desactiva." },
+    "role": { "type": "'status' | 'alert'", "default": "'status'", "description": "status para mensajes en línea; alert solo para errores urgentes dinámicos." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para el div raíz. El resto de props nativas y el ref van al div." }
+  },
+  "examples": [
+    { "title": "Éxito", "code": "<Alert type=\"success\" title=\"Cambios guardados\">Tu perfil se actualizó.</Alert>" },
+    { "title": "Error dinámico", "code": "<Alert type=\"error\" role=\"alert\" title=\"No se pudo enviar\">Revisa los campos.</Alert>" },
+    { "title": "Sin fondo", "code": "<Alert type=\"info\" background={false}>Hay una nueva versión.</Alert>" }
+  ]
+}
