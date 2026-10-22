@@ -16,6 +16,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+const MANIFEST_POR_SET = Object.fromEntries(
+  JSON.parse(fs.readFileSync(new URL('../../icons/caos/manifest.json', import.meta.url), 'utf8')).map((m) => [m.figmaSetId, m.name]),
+);
+
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const MODO_RESPONSIVE = 'Desktop';
 const TOL_COLOR = 2;
@@ -153,6 +157,7 @@ function medirEnPagina({ nombre, partes }) {
     },
     textos: {},
     iconos: {},
+    conteos: {},
     partesPresentes: [...raiz.querySelectorAll('[data-figma-part]')].map((e) => e.getAttribute('data-figma-part')),
   };
 
@@ -174,21 +179,26 @@ function medirEnPagina({ nombre, partes }) {
       contenido: el.textContent.trim().slice(0, 40),
     };
   };
+  const marcados = (n) => [...(raiz.matches(sel(n)) ? [raiz] : []), ...raiz.querySelectorAll(sel(n))];
   for (const t of partes.textos) {
     let el = null;
+    const todos = marcados(t.nombre);
+    out.conteos[t.nombre] = todos.length;
     if (t.parte) {
-      const e = raiz.matches(sel(t.nombre)) ? raiz : raiz.querySelector(sel(t.nombre));
+      const e = todos[t.ord] || null;
       el = e && (primerTexto(e) || e);
     }
-    if (!el && t.primero) el = primerTexto(raiz);
-    if (el) out.textos[t.nombre] = medirTexto(el);
+    if (!el && t.primero && todos.length === 0) el = primerTexto(raiz);
+    if (el) out.textos[t.nombre + '#' + t.ord] = medirTexto(el);
   }
   const svgs = [...raiz.querySelectorAll('svg')];
   partes.iconos.forEach((ic, i) => {
     let svg = null;
-    const e = raiz.matches(sel(ic.nombre)) ? raiz : raiz.querySelector(sel(ic.nombre));
+    const todos = marcados(ic.nombre);
+    out.conteos[ic.nombre] = todos.length;
+    const e = todos[ic.ord];
     if (e) svg = e.tagName.toLowerCase() === 'svg' ? e : e.querySelector('svg');
-    if (!svg) svg = svgs[i] || null;
+    if (!svg && todos.length === 0) svg = svgs[i] || null;
     if (!svg) return;
     const b = svg.getBoundingClientRect();
     const c = getComputedStyle(svg);
@@ -196,7 +206,7 @@ function medirEnPagina({ nombre, partes }) {
     if (c.fill && c.fill !== 'none') color = rgba(c.fill);
     else if (c.stroke && c.stroke !== 'none') color = rgba(c.stroke);
     else color = rgba(c.color);
-    out.iconos[ic.nombre + '#' + i] = { w: b.width, h: b.height, color };
+    out.iconos[ic.nombre + '#' + ic.ord] = { w: b.width, h: b.height, color, nombre: svg.getAttribute('data-icon'), variante: svg.getAttribute('data-icon-variant') };
   });
   return out;
 }
@@ -314,10 +324,11 @@ function compararVariante(variante, m, spec, tema, tol) {
 
   // textos
   for (const t of m.__textos) {
-    const sb = m.textos[t.nombre];
+    const sb = m.textos[t.nombre + '#' + t.ord];
     const seg = t.nodo.texto.segmentos[0];
     const pre = `texto "${t.nombre}" `;
     if (!sb) {
+      if (m.conteos[t.nombre] > 0) continue; // sin par: se resume en la entrada informativa
       lista.push({ propiedad: `${pre}presente`, figma: 'sí', storybook: 'no encontrado', ok: false });
       continue;
     }
@@ -342,10 +353,11 @@ function compararVariante(variante, m, spec, tema, tol) {
   }
 
   // íconos
-  m.__iconos.forEach((ic, i) => {
-    const sb = m.iconos[ic.nombre + '#' + i];
+  m.__iconos.forEach((ic) => {
+    const sb = m.iconos[ic.nombre + '#' + ic.ord];
     const pre = `ícono "${ic.nombre}" `;
     if (!sb) {
+      if (m.conteos[ic.nombre] > 0) return;
       lista.push({ propiedad: `${pre}presente`, figma: 'sí', storybook: 'svg no encontrado', ok: false });
       return;
     }
@@ -354,7 +366,22 @@ function compararVariante(variante, m, spec, tema, tol) {
     num(`${pre}alto`, tam, sb.h);
     const c = R.colorPintura(ic.nodo.icono.color);
     if (c) col(`${pre}color`, c, sb.color);
+    // Dibujo: el nombre sale del manifest por figmaSetId (en Figma hay nombres repetidos)
+    const esperado = MANIFEST_POR_SET[ic.nodo.icono.figmaSetId];
+    lista.push({ propiedad: `${pre}dibujo`, figma: esperado ?? `${ic.nodo.icono.nombre} (${ic.nodo.icono.figmaSetId}, no está en la biblioteca)`, storybook: sb.nombre ?? '—', ok: !!esperado && sb.nombre === esperado });
+    const outline = ic.nodo.icono.variante && ic.nodo.icono.variante.Outline;
+    if (outline) {
+      const v = outline === 'Yes' ? 'line' : 'fill';
+      lista.push({ propiedad: `${pre}variante`, figma: v, storybook: sb.variante ?? '—', ok: sb.variante === v });
+    }
   });
+  // Nodos de la spec vs elementos marcados con el mismo nombre (solo si hay marcados)
+  const enSpec = {};
+  for (const x of [...m.__textos, ...m.__iconos]) enSpec[x.nombre] = (enSpec[x.nombre] || 0) + 1;
+  for (const [nombre, nSpec] of Object.entries(enSpec)) {
+    const nSb = m.conteos[nombre];
+    if (nSb > 0 && nSb !== nSpec) lista.push({ propiedad: `partes "${nombre}"`, figma: nSpec, storybook: nSb, ok: true });
+  }
   return lista;
 }
 
@@ -450,21 +477,24 @@ async function main() {
     const textos = [];
     const iconos = [];
     let primero = true;
+    const ords = {};
+    const ordDe = (n) => (ords[n] = (ords[n] ?? -1) + 1);
     recorrer(v.arbol, (nodo) => {
       if (nodo.oculto) return;
       if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
-        textos.push({ nombre: nodo.nombre, nodo, parte: true, primero });
+        textos.push({ nombre: nodo.nombre, nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre) });
         primero = false;
       }
       if (nodo.icono) {
         const size = nodo.instancia?.variante?.Size;
-        iconos.push({ nombre: nodo.nombre, nodo, size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined });
+        iconos.push({ nombre: nodo.nombre, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined });
       }
     });
     return { def: v, slug: slugDe(v), textos, iconos };
   });
 
-  const browser = await chromium.launch();
+  // Sin --hide-scrollbars (default de Playwright): las barras de scroll también son parte del diseño
+  const browser = await chromium.launch({ ignoreDefaultArgs: ['--hide-scrollbars'] });
   const resultado = {
     carpeta: args.carpeta,
     story: args.story,
@@ -509,7 +539,7 @@ async function main() {
         const salida = resultado.variantes[i].porTema;
         const m = await page.evaluate(medirEnPagina, {
           nombre: v.def.nombre,
-          partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, parte: t.parte, primero: t.primero })), iconos: v.iconos.map((x) => ({ nombre: x.nombre })) },
+          partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, parte: t.parte, primero: t.primero, ord: t.ord })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, ord: x.ord })) },
         });
         if (!m) {
           salida[tema] = { encontrada: false, comparaciones: [] };

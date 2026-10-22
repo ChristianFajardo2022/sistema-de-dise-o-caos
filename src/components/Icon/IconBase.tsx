@@ -7,7 +7,8 @@ import { cn } from '../../utils/cn';
  * Para tree-shaking: `<IconBase icon={searchIcon} />`.
  */
 export function IconBase({ icon, size = 24, variant, className, 'aria-label': ariaLabel, ...restProps }: IconBareProps) {
-  const markup = icon[variant ?? defaultIconVariant(size)];
+  const drawn = variant ?? defaultIconVariant(size);
+  const markup = icon[drawn];
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -16,6 +17,7 @@ export function IconBase({ icon, size = 24, variant, className, 'aria-label': ar
       height={size}
       fill="currentColor"
       data-icon={icon.name}
+      data-icon-variant={drawn}
       className={cn('inline-block shrink-0', className)}
       aria-label={ariaLabel}
       role={ariaLabel ? 'img' : undefined}

@@ -34,7 +34,7 @@ const preview: Preview = {
     controls: {
       matchers: {
         // Sin el fallo de "unicolor": solo props que se llamen background o color, o terminen en Background/Color
-        color: /^(background|color)$|(Background|Color)$/,
+        color: /^color$|(Background|Color)$/,
         date: /Date$/i,
       },
     },
