@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Input } from './components/Input';
 import { Button } from './components/Button';
 import { Subtract } from './components/Subtract';
-import { Mail, Lock, User, ShieldCheck, Download, RefreshCw } from 'lucide-react';
+import { ShieldCheck, Download, RefreshCw } from 'lucide-react';
 import { AddIcon } from './icons/AddIcon';
 import { ArrowRightIcon } from './icons/ArrowRightIcon';
 import { TrashIcon } from './icons/TrashIcon';
@@ -173,12 +173,11 @@ export function App() {
             <div>
               <Input
                 label="Nombre de usuario (Default)"
-                secondaryLabel="Opcional"
+                optional
                 placeholder="Ej. camilofhernandez"
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
                 helperText="Nombre visible en la plataforma"
-                leftIcon={<User className="w-4 h-4 text-gray-400" />}
                 tooltip="Nombre oficial registrado"
               />
             </div>
@@ -186,7 +185,7 @@ export function App() {
             <div>
               <Input
                 label="Búsqueda global (Search Type / Active)"
-                inputType="search"
+                variant="search"
                 placeholder="Buscar componente o token..."
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
@@ -198,23 +197,21 @@ export function App() {
             <div>
               <Input
                 label="Contraseña (Password Type)"
-                inputType="password"
+                variant="password"
                 placeholder="Ingresa tu contraseña"
                 value={passwordValue}
                 onChange={(e) => setPasswordValue(e.target.value)}
                 helperText="Haz clic en el icono del ojo para alternar visibilidad"
-                leftIcon={<Lock className="w-4 h-4 text-gray-400" />}
               />
             </div>
 
             <div>
               <Input
                 label="Correo electrónico (Error State)"
-                inputType="email"
+                type="email"
                 value={errorValue}
                 onChange={(e) => setErrorValue(e.target.value)}
                 errorText="El formato del correo electrónico no es válido"
-                leftIcon={<Mail className="w-4 h-4 text-gray-400" />}
               />
             </div>
           </div>

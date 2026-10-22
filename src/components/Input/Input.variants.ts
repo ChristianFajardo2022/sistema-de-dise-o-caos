@@ -1,132 +1,146 @@
 import { cva } from 'class-variance-authority';
 
-export const inputContainerVariants = cva(
-  'flex flex-col gap-1 w-full font-sans transition-colors duration-200',
-  {
-    variants: {
-      fullWidth: {
-        true: 'w-full',
-        false: 'max-w-md',
-      },
-    },
-    defaultVariants: {
-      fullWidth: true,
-    },
-  }
-);
+/**
+ * CAOS Design System — Input Variants
+ *
+ * Fuente: component set "General input" de Figma (Type: Text, Password, Search y Search header).
+ *
+ * - Campo: alto dimention/field/Input/default (56, mobile 48), padding 8/12, gap 8,
+ *   borde de 1px por dentro y radio field/md (16). Search header: alto 48 y radio field/sm (12).
+ * - Label flotante: vacío y sin foco va dentro en 14/18; con foco o valor sube a 12/16
+ *   y el valor (14/18) queda debajo, separado 4. Se resuelve en CSS con `placeholder-shown`.
+ * - Los colores salen de variables locales (--lbl-*, --ico, --val) que fija cada estado.
+ */
 
-export const inputWrapperVariants = cva(
-  'relative flex items-center transition-all duration-200 border border-solid box-border outline-none focus-within:ring-2',
+/** Contenedor del campo (el recuadro con borde). */
+export const inputFieldVariants = cva(
+  [
+    'relative flex w-full min-w-0 items-center gap-ds-space-general-lg',
+    'px-ds-space-field-md py-ds-space-field-sm border border-solid',
+    'transition-colors duration-150',
+    '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
+    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+  ].join(' '),
   {
     variants: {
+      variant: {
+        text: 'h-ds-dimention-field-input-default rounded-ds-radius-field-md',
+        password: 'h-ds-dimention-field-input-default rounded-ds-radius-field-md',
+        search: 'h-ds-dimention-field-input-default rounded-ds-radius-field-md',
+        'search-header': 'h-[48px] rounded-ds-radius-field-sm',
+      },
       state: {
         default: [
-          'bg-[var(--background-field-default,#f6f8f9)]',
-          'border-[var(--border-field-default,#d0d4dc)]',
-          'text-[var(--text-field-label,#1d1c1c)]',
-          'focus-within:border-[var(--border-field-active,#aa3bff)]',
-          'focus-within:ring-[var(--border-field-active,#aa3bff)]/20',
-          'hover:border-[var(--border-general-gray-firts,#5e6165)]',
+          'border-ds-border-field-default focus-within:border-ds-border-field-active',
+          '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],
         filled: [
-          'bg-[var(--background-field-surface,#ffffff)]',
-          'border-[var(--border-general-gray-secondary,#898e98)]',
-          'text-[var(--text-field-label,#1d1c1c)]',
-          'focus-within:border-[var(--border-field-active,#aa3bff)]',
+          'border-ds-border-field-default focus-within:border-ds-border-field-active',
+          '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],
         active: [
-          'bg-[var(--background-field-surface,#ffffff)]',
-          'border-[var(--border-field-active,#aa3bff)]',
-          'ring-2 ring-[var(--border-field-active,#aa3bff)]/30',
+          'border-ds-border-field-active',
+          '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
+        ],
+        'burnt-in': [
+          'border-ds-border-field-default bg-ds-background-field-burnt-in',
+          '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
+          '[--val:var(--color-ds-text-field-disabled-negative)] [--ico:var(--color-ds-icon-general-disabled-positive)]',
         ],
         disabled: [
-          'bg-[var(--background-field-disabled,#f0f2f5)]',
-          'border-[var(--border-field-disabled,#adb0b4)]',
-          'text-[var(--text-neutral-disabled-positive,#7e8187)]',
-          'cursor-not-allowed opacity-75',
+          'cursor-not-allowed border-ds-border-field-disabled',
+          '[--lbl-in:var(--color-ds-text-field-disabled-negative)] [--lbl-up:var(--color-ds-text-field-disabled-negative)]',
+          '[--val:var(--color-ds-text-field-disabled-negative)] [--ico:var(--color-ds-icon-general-disabled-positive)]',
         ],
         error: [
-          'bg-[var(--background-field-surface,#ffffff)]',
-          'border-[var(--border-semantic-alert,#e53935)]',
-          'ring-2 ring-[var(--border-semantic-alert,#e53935)]/20',
-          'focus-within:border-[var(--border-semantic-alert,#e53935)]',
+          'border-ds-border-semantic-error',
+          '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-semantic-error-secondary)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],
         success: [
-          'bg-[var(--background-field-surface,#ffffff)]',
-          'border-[var(--border-semantic-success,#43a047)]',
-          'ring-2 ring-[var(--border-semantic-success,#43a047)]/20',
-          'focus-within:border-[var(--border-semantic-success,#43a047)]',
-        ],
-      },
-      sizeVariant: {
-        sm: [
-          'h-10 px-[var(--space-field-sm,8px)]',
-          'rounded-[var(--radius-field-sm,6px)]',
-          'text-[var(--typography-field-size-xs,12px)]',
-        ],
-        md: [
-          'h-12 px-[var(--space-field-md,12px)]',
-          'rounded-[var(--radius-field-md,8px)]',
-          'text-[var(--typography-field-size-sm,14px)]',
-        ],
-        lg: [
-          'h-14 px-[var(--space-field-lg,16px)]',
-          'rounded-[var(--radius-field-lg,12px)]',
-          'text-[var(--typography-field-size-md,16px)]',
+          'border-ds-border-semantic-success',
+          '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-semantic-success-secondary)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],
       },
     },
-    defaultVariants: {
-      state: 'default',
-      sizeVariant: 'md',
-    },
+    defaultVariants: { variant: 'text', state: 'default' },
   }
 );
 
-export const inputFieldVariants = cva(
-  'w-full h-full bg-transparent border-none outline-none focus:ring-0 text-inherit placeholder-[var(--text-field-placeholder,#7e8187)] disabled:cursor-not-allowed font-sans',
+/**
+ * Label flotante. `float`:
+ * - auto: sube con foco o valor (peer = el <input> hermano anterior).
+ * - always: siempre arriba (estados active, filled y burnt-in forzados).
+ */
+export const inputLabelVariants = cva(
+  [
+    'pointer-events-none absolute left-0 right-0 truncate whitespace-nowrap',
+    'transition-[top,font-size,line-height] duration-150 ease-out motion-reduce:transition-none',
+    // Flotando: 12/16 arriba (stack de 16 + 4 + 18 centrado en 40)
+    'top-[1px] text-ds-typography-field-size-xs leading-(--ds-responsive-typography-field-line-height-xs)',
+    'text-(color:--lbl-up)',
+  ].join(' '),
   {
     variants: {
-      sizeVariant: {
-        sm: 'text-[var(--typography-field-size-xs,12px)]',
-        md: 'text-[var(--typography-field-size-sm,14px)]',
-        lg: 'text-[var(--typography-field-size-md,16px)]',
+      float: {
+        // Vacío y sin foco: dentro del campo en 14/18, centrado
+        auto: [
+          'peer-[:placeholder-shown:not(:focus)]:top-[11px]',
+          'peer-[:placeholder-shown:not(:focus)]:text-ds-typography-field-size-sm',
+          'peer-[:placeholder-shown:not(:focus)]:leading-(--ds-responsive-typography-field-line-height-sm)',
+          'peer-[:placeholder-shown:not(:focus)]:text-(color:--lbl-in)',
+        ].join(' '),
+        always: '',
       },
     },
-    defaultVariants: {
-      sizeVariant: 'md',
-    },
+    defaultVariants: { float: 'auto' },
   }
 );
 
-export const labelVariants = cva(
-  'flex items-center justify-between font-medium text-[var(--text-field-label,#2e3033)]',
+/** El <input> real, superpuesto al label. */
+export const inputControlVariants = cva(
+  [
+    'peer absolute inset-0 h-[40px] w-full min-w-0 appearance-none border-0 bg-transparent p-0 outline-none',
+    'pt-[21px] pb-[1px] text-ds-typography-field-size-sm leading-(--ds-responsive-typography-field-line-height-sm)',
+    'text-(color:--val) [font-family:inherit] [font-weight:inherit]',
+    'disabled:cursor-not-allowed',
+    // El placeholder del consumidor solo se ve con foco (vacío); el " " interno nunca se ve
+    'placeholder:text-(color:--ph) [--ph:transparent] focus:[--ph:var(--val)]',
+    // Quita la "x" nativa del type=search
+    '[&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden',
+  ].join(' '),
   {
     variants: {
-      sizeVariant: {
-        sm: 'text-xs',
-        md: 'text-sm',
-        lg: 'text-base',
+      showPlaceholder: {
+        // Estados forzados de documentación: el placeholder se ve siempre
+        true: '[--ph:var(--val)]',
+        false: '',
       },
     },
-    defaultVariants: {
-      sizeVariant: 'md',
-    },
+    defaultVariants: { showPlaceholder: false },
   }
 );
 
-export const helperTextVariants = cva('text-xs flex items-center gap-1 mt-1 font-normal', {
-  variants: {
-    state: {
-      default: 'text-[var(--text-neutral-body,#5e6165)]',
-      filled: 'text-[var(--text-neutral-body,#5e6165)]',
-      active: 'text-[var(--text-neutral-body,#5e6165)]',
-      disabled: 'text-[var(--text-neutral-disabled-positive,#adb0b4)]',
-      error: 'text-[var(--border-semantic-alert,#e53935)]',
-      success: 'text-[var(--border-semantic-success,#43a047)]',
+/** Fila de mensaje debajo del campo: ícono de 14 + texto 14/18. */
+export const inputMessageVariants = cva(
+  [
+    'mt-ds-space-general-lg flex items-center gap-ds-space-general-lg',
+    'text-ds-typography-field-size-sm leading-(--ds-responsive-typography-field-line-height-sm)',
+    '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
+    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+  ].join(' '),
+  {
+    variants: {
+      kind: {
+        error: 'text-ds-text-semantic-error-secondary [--msg-ico:var(--color-ds-icon-semantic-error-firts)]',
+        success: 'text-ds-text-semantic-success-secondary [--msg-ico:var(--color-ds-icon-semantic-success-secondary)]',
+        helper: 'text-ds-text-semantic-information-secondary [--msg-ico:var(--color-ds-icon-semantic-information-neutral)]',
+      },
     },
-  },
-  defaultVariants: {
-    state: 'default',
-  },
-});
+    defaultVariants: { kind: 'helper' },
+  }
+);

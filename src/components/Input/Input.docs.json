@@ -1,91 +1,108 @@
 {
   "name": "Input",
   "component": "Input",
-  "description": "Componente de entrada de texto accesible y configurable perteneciente al sistema de diseño CAOS. Soporta estados de validación (Error, Success), variantes de tamaño, tipos (Text, Search, Password) e integración completa con tokens CSS y WAI-ARIA.",
+  "description": "Campo de texto del sistema de diseño CAOS, fiel al component set General input de Figma. Types Text, Password, Search y Search header; label flotante (dentro del campo si está vacío y sin foco, arriba con foco o valor, resuelto en CSS sin estado en JS); estados Default, Filled, Active/Focus, Burnt-In (readOnly), Disabled, Error y Success; mensaje de ayuda, error o éxito debajo (error > éxito > ayuda); label opcional y tooltip. Alto 56 (mobile 48; Search header 48), radio 16 (Search header 12), borde de 1px por dentro. Íconos de 16px. Sin anillo de foco: el foco se ve en el borde.",
   "figmaNodeId": "8026-2056",
   "category": "Form Controls",
   "props": {
+    "variant": {
+      "type": "'text' | 'password' | 'search' | 'search-header'",
+      "default": "'text'",
+      "description": "Type de Figma. Password agrega el botón para mostrar u ocultar; Search y Search header agregan la lupa. Para text se puede pasar el type nativo (email, tel, url)."
+    },
     "label": {
       "type": "string",
-      "required": false,
-      "description": "Etiqueta descriptiva superior del campo de texto."
+      "required": true,
+      "description": "Texto del label flotante, asociado con htmlFor."
     },
-    "secondaryLabel": {
-      "type": "string",
-      "required": false,
-      "description": "Texto secundario opcional alineado a la derecha de la etiqueta."
-    },
-    "helperText": {
-      "type": "string",
-      "required": false,
-      "description": "Texto de ayuda o descripción inferior."
-    },
-    "errorText": {
-      "type": "string",
-      "required": false,
-      "description": "Mensaje de error que conmuta el estado a 'error' y activa aria-invalid."
-    },
-    "successText": {
-      "type": "string",
-      "required": false,
-      "description": "Mensaje de éxito que conmuta el estado visual a 'success'."
-    },
-    "inputType": {
-      "type": "'text' | 'search' | 'password' | 'email' | 'number' | 'tel'",
-      "default": "'text'",
-      "description": "Tipo de entrada HTML o variante especial (search, password con toggle automático)."
-    },
-    "state": {
-      "type": "'default' | 'filled' | 'active' | 'disabled' | 'error' | 'success'",
-      "default": "'default'",
-      "description": "Estado del campo de texto."
-    },
-    "sizeVariant": {
-      "type": "'sm' | 'md' | 'lg'",
-      "default": "'md'",
-      "description": "Tamaño del input (altura y espaciados)."
-    },
-    "leftIcon": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Icono o elemento React renderizado a la izquierda."
-    },
-    "rightIcon": {
-      "type": "ReactNode",
-      "required": false,
-      "description": "Icono o elemento React renderizado a la derecha."
+    "optional": {
+      "type": "boolean",
+      "default": false,
+      "description": "Muestra ' | Opcional' después del label."
     },
     "tooltip": {
       "type": "string",
       "required": false,
-      "description": "Texto desplegable informativo al pasar el cursor sobre el icono de ayuda."
+      "description": "Ícono de información fuera del campo, a la derecha, como botón con aria-label y title con este texto."
+    },
+    "helperText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de ayuda debajo del campo."
+    },
+    "errorText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de error: borde y label en rojo, aria-invalid y prioridad sobre éxito y ayuda."
+    },
+    "successText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de éxito: borde y label en verde. Prioridad sobre la ayuda."
+    },
+    "leftIcon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Ícono de 16px a la izquierda. En search y search-header es la lupa por defecto."
+    },
+    "rightIcon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Ícono de 16px a la derecha."
     },
     "fullWidth": {
       "type": "boolean",
-      "default": true,
-      "description": "Indica si el contenedor ocupa el 100% del espacio del padre."
+      "default": false,
+      "description": "Ocupa el 100 % del ancho del contenedor."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Estado Disabled: el label queda dentro y no flota (salvo que haya valor)."
+    },
+    "readOnly": {
+      "type": "boolean",
+      "default": false,
+      "description": "Estado Burnt-In: fondo burnt-in y valor atenuado."
+    },
+    "state": {
+      "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'",
+      "default": "'default'",
+      "description": "Fuerza el aspecto de un estado. Solo para documentación; en uso real el estado sale del foco, el valor, disabled, readOnly y los mensajes."
     }
   },
+  "accessibility": [
+    "label asociado con htmlFor y useId",
+    "aria-invalid en error",
+    "aria-describedby apunta al mensaje visible",
+    "mensaje en región aria-live polite",
+    "botón de contraseña alcanzable con teclado, con aria-label y aria-pressed",
+    "required nativo, sin asterisco"
+  ],
   "examples": [
     {
-      "title": "Default Input with Label & Helper Text",
-      "code": "<Input label=\"Nombre de usuario\" placeholder=\"Ingresa tu usuario\" helperText=\"Debe contener al menos 4 caracteres\" />"
+      "title": "Text con ayuda",
+      "code": "<Input label=\"Nombre completo\" helperText=\"Como aparece en tu documento\" />"
     },
     {
-      "title": "Password Input with Toggle",
-      "code": "<Input label=\"Contraseña\" inputType=\"password\" placeholder=\"••••••••\" />"
+      "title": "Password",
+      "code": "<Input variant=\"password\" label=\"Contraseña\" />"
     },
     {
-      "title": "Search Input",
-      "code": "<Input inputType=\"search\" placeholder=\"Buscar en el portal...\" />"
+      "title": "Search header",
+      "code": "<Input variant=\"search-header\" label=\"Buscar en el portal\" />"
     },
     {
-      "title": "Error State Input",
-      "code": "<Input label=\"Correo electrónico\" value=\"correo-invalido\" errorText=\"Introduce una dirección de correo válida.\" />"
+      "title": "Error",
+      "code": "<Input label=\"Correo electrónico\" type=\"email\" errorText=\"Escribe un correo válido\" />"
     },
     {
-      "title": "Disabled State Input",
-      "code": "<Input label=\"Código de referencia\" value=\"REF-99201\" state=\"disabled\" disabled />"
+      "title": "Opcional con tooltip",
+      "code": "<Input label=\"Teléfono\" optional tooltip=\"Solo para notificaciones\" />"
+    },
+    {
+      "title": "Burnt-In",
+      "code": "<Input label=\"Código\" value=\"CAOS-8026\" readOnly />"
     }
   ]
 }

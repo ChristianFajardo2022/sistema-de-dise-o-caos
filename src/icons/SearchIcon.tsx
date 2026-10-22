@@ -1,0 +1,4 @@
+import type { SVGProps } from "react";
+export function SearchIcon(props: SVGProps<SVGSVGElement>) {
+  return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" {...props}><path fill="currentColor" d="M19.264 19.264a.9.9 0 0 1 1.273 0l2 2a.9.9 0 0 1-1.273 1.273l-2-2a.9.9 0 0 1 0-1.273" /><path fill="currentColor" fillRule="evenodd" d="M11.4 1c5.744 0 10.4 4.657 10.4 10.4s-4.656 10.4-10.4 10.4C5.657 21.8 1 17.145 1 11.4 1 5.657 5.657 1 11.4 1m0 1.8a8.6 8.6 0 0 0-8.6 8.6 8.6 8.6 0 0 0 8.6 8.6 8.6 8.6 0 0 0 8.6-8.6 8.6 8.6 0 0 0-8.6-8.6" clipRule="evenodd" /></svg>;
+}

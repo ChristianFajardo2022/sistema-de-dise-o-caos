@@ -1,152 +1,174 @@
 import { forwardRef, useId, useState } from 'react';
-import { Eye, EyeOff, Search, AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react';
-import type { InputProps } from './Input.types';
+import type { InputProps, InputState } from './Input.types';
 import {
-  inputContainerVariants,
-  inputWrapperVariants,
+  inputControlVariants,
   inputFieldVariants,
-  labelVariants,
-  helperTextVariants,
+  inputLabelVariants,
+  inputMessageVariants,
 } from './Input.variants';
+import { CloseCircleIcon } from '../../icons/CloseCircleIcon';
+import { EyeIcon } from '../../icons/EyeIcon';
+import { EyeSlashIcon } from '../../icons/EyeSlashIcon';
+import { InfoCircleIcon } from '../../icons/InfoCircleIcon';
+import { SearchIcon } from '../../icons/SearchIcon';
+import { TickCircleIcon } from '../../icons/TickCircleIcon';
 import { cn } from '../../utils/cn';
+
+const ICON_SLOT = 'inline-flex size-4 shrink-0 items-center justify-center text-(color:--ico) [&>svg]:size-full';
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      id: externalId,
+      variant = 'text',
       label,
-      secondaryLabel,
+      optional = false,
+      tooltip,
       helperText,
       errorText,
       successText,
-      inputType = 'text',
-      state = 'default',
-      sizeVariant = 'md',
       leftIcon,
       rightIcon,
-      tooltip,
-      fullWidth = true,
-      className,
-      disabled,
-      required,
-      value,
-      onChange,
+      fullWidth = false,
+      state = 'default',
+      disabled = false,
+      readOnly = false,
+      type,
       placeholder,
+      className,
+      id,
       'aria-describedby': ariaDescribedBy,
       ...restProps
     },
     ref
   ) => {
-    const generatedId = useId();
-    const inputId = externalId || generatedId;
-    const helperTextId = `${inputId}-helper`;
-    const errorTextId = `${inputId}-error`;
-
+    const autoId = useId();
+    const inputId = id ?? autoId;
+    const messageId = `${inputId}-message`;
     const [showPassword, setShowPassword] = useState(false);
 
-    // Compute effective input type (handling password toggle)
-    const effectiveType = inputType === 'password' ? (showPassword ? 'text' : 'password') : inputType;
+    const isDisabled = disabled || state === 'disabled';
+    const isError = Boolean(errorText) || state === 'error';
+    const isSuccess = !isError && (Boolean(successText) || state === 'success');
 
-    // Compute effective state (error state takes precedence if errorText is provided)
-    const computedState = errorText ? 'error' : state;
-    const isDisabled = disabled || computedState === 'disabled';
+    // Prioridad visual: disabled > error > success > burnt-in (readOnly) > state forzado
+    const computedState: InputState = isDisabled
+      ? 'disabled'
+      : isError
+        ? 'error'
+        : isSuccess
+          ? 'success'
+          : readOnly || state === 'burnt-in'
+            ? 'burnt-in'
+            : state;
 
-    // Toggle password visibility
-    const handleTogglePassword = () => {
-      setShowPassword((prev) => !prev);
-    };
+    // Estados forzados de documentación y burnt-in: el label siempre arriba
+    const forceFloat = !isDisabled && (readOnly || ['filled', 'active', 'burnt-in', 'error', 'success'].includes(state));
 
-    // Determine left icon fallback for search type
-    const renderedLeftIcon = leftIcon || (inputType === 'search' ? <Search className="w-4 h-4 text-gray-400" /> : null);
+    // Mensaje: error > success > helper
+    const message = errorText
+      ? { kind: 'error' as const, text: errorText }
+      : successText
+        ? { kind: 'success' as const, text: successText }
+        : helperText
+          ? { kind: 'helper' as const, text: helperText }
+          : null;
 
-    // Determine right icon fallback for password toggle or status indicators
-    let renderedRightIcon = rightIcon;
-    if (inputType === 'password') {
-      renderedRightIcon = (
-        <button
-          type="button"
-          onClick={handleTogglePassword}
-          tabIndex={-1}
-          disabled={isDisabled}
-          className="p-1 focus:outline-none text-gray-500 hover:text-gray-700 disabled:opacity-50 transition-colors"
-          aria-label={showPassword ? 'Hide password' : 'Show password'}
-        >
-          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-        </button>
-      );
-    } else if (!rightIcon && computedState === 'error') {
-      renderedRightIcon = <AlertCircle className="w-4 h-4 text-[var(--border-semantic-alert,#e53935)]" />;
-    } else if (!rightIcon && computedState === 'success') {
-      renderedRightIcon = <CheckCircle2 className="w-4 h-4 text-[var(--border-semantic-success,#43a047)]" />;
-    }
+    const isPassword = variant === 'password';
+    const isSearch = variant === 'search' || variant === 'search-header';
+    const nativeType = isPassword ? (showPassword ? 'text' : 'password') : isSearch ? 'search' : (type ?? 'text');
+    const leading = leftIcon ?? (isSearch ? <SearchIcon /> : null);
 
-    const describedBy = [
-      ariaDescribedBy,
-      helperText ? helperTextId : null,
-      errorText ? errorTextId : null,
-    ]
-      .filter(Boolean)
-      .join(' ');
+    const MessageIcon = message?.kind === 'error' ? CloseCircleIcon : message?.kind === 'success' ? TickCircleIcon : InfoCircleIcon;
 
     return (
-      <div className={cn(inputContainerVariants({ fullWidth }), className)}>
-        {/* Header Label Row */}
-        {(label || secondaryLabel || tooltip) && (
-          <div className={labelVariants({ sizeVariant })}>
-            <label htmlFor={inputId} className="flex items-center gap-1 cursor-pointer font-medium">
-              {label}
-              {required && <span className="text-[var(--border-semantic-alert,#e53935)]">*</span>}
-              {tooltip && (
-                <span className="cursor-help text-gray-400 hover:text-gray-600 transition-colors" title={tooltip}>
-                  <HelpCircle className="w-3.5 h-3.5 inline" />
-                </span>
-              )}
-            </label>
-            {secondaryLabel && (
-              <span className="text-xs text-[var(--text-neutral-body,#898e98)] font-normal">{secondaryLabel}</span>
+      <div className={cn('flex flex-col', fullWidth ? 'w-full' : 'w-[320px] max-w-full', className)}>
+        <div className="flex items-center gap-ds-space-general-lg">
+          <div
+            className={inputFieldVariants({ variant, state: computedState })}
+            aria-disabled={isDisabled || undefined}
+          >
+            {leading && (
+              <span data-slot="icon-left" aria-hidden="true" className={ICON_SLOT}>
+                {leading}
+              </span>
+            )}
+
+            <div className="relative h-[40px] min-w-0 flex-1">
+              <input
+                ref={ref}
+                id={inputId}
+                type={nativeType}
+                // " " mantiene :placeholder-shown para flotar el label sin estado en JS
+                placeholder={placeholder || ' '}
+                disabled={isDisabled}
+                readOnly={readOnly}
+                aria-invalid={isError || undefined}
+                aria-describedby={cn(message && messageId, ariaDescribedBy) || undefined}
+                className={inputControlVariants({ showPlaceholder: forceFloat && Boolean(placeholder) })}
+                {...restProps}
+              />
+              <label htmlFor={inputId} className={inputLabelVariants({ float: forceFloat ? 'always' : 'auto' })}>
+                {label}
+                {optional && (
+                  <span className="text-ds-text-acent-firts"> | Opcional</span>
+                )}
+              </label>
+            </div>
+
+            {rightIcon && (
+              <span data-slot="icon-right" aria-hidden="true" className={ICON_SLOT}>
+                {rightIcon}
+              </span>
+            )}
+
+            {isPassword && (
+              <button
+                type="button"
+                disabled={isDisabled}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                aria-pressed={showPassword}
+                aria-controls={inputId}
+                onClick={() => setShowPassword((v) => !v)}
+                className={cn(
+                  ICON_SLOT,
+                  'cursor-pointer rounded-sm border-0 bg-transparent p-0 outline-none',
+                  'focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-ds-border-field-active',
+                  'disabled:cursor-not-allowed'
+                )}
+              >
+                {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
+              </button>
             )}
           </div>
-        )}
 
-        {/* Input Wrapper Field */}
-        <div className={inputWrapperVariants({ state: computedState, sizeVariant })}>
-          {renderedLeftIcon && <div className="flex items-center pr-2 shrink-0">{renderedLeftIcon}</div>}
-
-          <input
-            ref={ref}
-            id={inputId}
-            type={effectiveType}
-            disabled={isDisabled}
-            required={required}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            aria-invalid={computedState === 'error'}
-            aria-disabled={isDisabled}
-            aria-describedby={describedBy || undefined}
-            className={inputFieldVariants({ sizeVariant })}
-            {...restProps}
-          />
-
-          {renderedRightIcon && <div className="flex items-center pl-2 shrink-0">{renderedRightIcon}</div>}
+          {tooltip && (
+            <button
+              type="button"
+              aria-label={tooltip}
+              title={tooltip}
+              className={cn(
+                ICON_SLOT,
+                'cursor-help rounded-sm border-0 bg-transparent p-0 outline-none',
+                'focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-ds-border-field-active',
+                '[--ico:var(--color-ds-icon-general-white)]',
+                isDisabled && '[--ico:var(--color-ds-icon-general-disabled-positive)]'
+              )}
+            >
+              <InfoCircleIcon />
+            </button>
+          )}
         </div>
 
-        {/* Helper Text / Feedback Message */}
-        {errorText ? (
-          <p id={errorTextId} className={helperTextVariants({ state: 'error' })} role="alert">
-            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            {errorText}
-          </p>
-        ) : successText ? (
-          <p className={helperTextVariants({ state: 'success' })}>
-            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-            {successText}
-          </p>
-        ) : helperText ? (
-          <p id={helperTextId} className={helperTextVariants({ state: computedState })}>
-            {helperText}
-          </p>
-        ) : null}
+        <div aria-live="polite">
+          {message && (
+            <div id={messageId} className={inputMessageVariants({ kind: message.kind })}>
+              <span aria-hidden="true" className="inline-flex size-3.5 shrink-0 items-center justify-center text-(color:--msg-ico) [&>svg]:size-full">
+                <MessageIcon />
+              </span>
+              <span className="min-w-0">{message.text}</span>
+            </div>
+          )}
+        </div>
       </div>
     );
   }

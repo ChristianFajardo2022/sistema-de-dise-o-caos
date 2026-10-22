@@ -1,0 +1,4 @@
+import type { SVGProps } from "react";
+export function InfoCircleIcon(props: SVGProps<SVGSVGElement>) {
+  return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" {...props}><path fill="currentColor" fillRule="evenodd" d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10m-.38-13.08c.24.1.52.1.76 0q.18-.075.33-.21.135-.15.21-.33c.05-.12.08-.25.08-.38s-.03-.26-.08-.38c-.05-.13-.12-.23-.21-.33q-.15-.135-.33-.21A1 1 0 0 0 12 7c-.13 0-.26.03-.38.08q-.18.075-.33.21c-.09.1-.16.2-.21.33-.05.12-.08.25-.08.38s.03.26.08.38q.075.18.21.33.15.135.33.21m.38 7.83c.41 0 .75-.34.75-.75v-5c0-.41-.34-.75-.75-.75s-.75.34-.75.75v5c0 .41.34.75.75.75" clipRule="evenodd" /></svg>;
+}
