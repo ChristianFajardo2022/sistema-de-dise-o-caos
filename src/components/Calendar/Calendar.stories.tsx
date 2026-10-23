@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ComponentType } from 'react';
 import { useState } from 'react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Calendar } from './Calendar';
 import type { CalendarBaseProps, CalendarCellState, CalendarProps, CalendarRangeCellState, CalendarSingleProps, DateRange } from './Calendar.types';
 import { CalendarDayCell, CalendarPeriodCell, CalendarRangeCell } from './CalendarCells';
@@ -420,5 +420,23 @@ export const ActionsTest: Story = {
     await expect(args.onApply).toHaveBeenCalledWith(new Date(2026, 9, 14));
     await userEvent.click(canvas.getByRole('button', { name: 'Limpiar' }));
     await expect(args.onCancel).toHaveBeenCalledTimes(1);
+  },
+};
+
+/** Test: `autoFocus` enfoca el día activo al montar; en `range`, el desplegable Mes abre con el foco en el mes elegido. */
+export const FocusTest: Story = {
+  tags: ['!autodocs'],
+  render: (args) => (
+    <div className="flex flex-col gap-6">
+      <Calendar today={args.today} autoFocus defaultValue={new Date(2026, 9, 14)} />
+      <Calendar today={args.today} mode="range" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() => expect(canvas.getAllByRole('button', { name: 'miércoles, 14 de octubre de 2026' })[0]).toHaveFocus());
+    await userEvent.click(canvas.getByRole('button', { name: /^Mes ?octubre/i }));
+    const menu = await canvas.findByRole('menu', { name: 'Elegir mes' });
+    await waitFor(() => expect(within(menu).getByRole('menuitem', { name: /octubre/i })).toHaveFocus());
   },
 };

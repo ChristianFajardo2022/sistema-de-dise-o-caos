@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { ButtonHTMLAttributes, KeyboardEvent } from 'react';
 import type { CalendarLabels, CalendarProps, CalendarView, DateRange } from './Calendar.types';
 import {
@@ -159,6 +159,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) =
     onApply,
     onCancel,
     labels: labelsProp,
+    autoFocus = false,
     className,
     ...rest
   } = props as Omit<CalendarProps, 'value' | 'defaultValue' | 'onChange' | 'mode'> & {
@@ -239,11 +240,21 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) =
           ? today
           : startOfMonth(month);
 
+  const focusRoving = () => rootRef.current?.querySelector<HTMLElement>('[data-cal-cell][tabindex="0"]')?.focus();
+
   useLayoutEffect(() => {
     if (!pendingFocus.current) return;
     pendingFocus.current = false;
-    rootRef.current?.querySelector<HTMLElement>('[data-cal-cell][tabindex="0"]')?.focus();
+    focusRoving();
   });
+
+  // autoFocus: el día activo (elegido, hoy o el primero del mes) recibe el foco al montar. Va en un efecto pasivo para
+  // que corra después de que un popover contenedor se coloque y se haga visible (DatePicker).
+  useEffect(() => {
+    if (autoFocus) focusRoving();
+    // Solo al montar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const moveDayFocus = (date: Date) => {
     const target = clampDate(startOfDay(date), minDate, maxDate);

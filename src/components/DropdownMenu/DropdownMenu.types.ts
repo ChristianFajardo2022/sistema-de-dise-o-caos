@@ -57,6 +57,14 @@ export interface DropdownMenuPanelProps extends Omit<HTMLAttributes<HTMLDivEleme
   searchValue?: string;
   /** Cambio del campo de búsqueda. */
   onSearchChange?: (value: string) => void;
+  /**
+   * Atributos del área de ítems (el slot "Check List", en modo `menu`): `id`, `ref`, `role`, `aria-labelledby`…
+   * Con `role: 'listbox'` el panel sirve de lista de opciones (patrón combobox): los hijos son `role="option"` propios y
+   * el foco no entra en el panel. Por defecto `role="menu"`.
+   */
+  listProps?: HTMLAttributes<HTMLDivElement> & { ref?: Ref<HTMLDivElement>; role?: 'menu' | 'listbox' } & {
+    [K in `data-${string}`]?: string | number | boolean;
+  };
   /** Ítems (`DropdownMenuItem`). Es el slot "Check List" de Figma. */
   children?: ReactNode;
   className?: string;
@@ -64,7 +72,7 @@ export interface DropdownMenuPanelProps extends Omit<HTMLAttributes<HTMLDivEleme
 
 /** Props del menú con disparador: panel + popover + teclado. */
 export interface DropdownMenuProps
-  extends Omit<DropdownMenuPanelProps, 'onToggle' | 'onBeforeToggle' | 'id' | 'children'> {
+  extends Omit<DropdownMenuPanelProps, 'onToggle' | 'onBeforeToggle' | 'id' | 'children' | 'listProps'> {
   /**
    * Disparador. Un elemento (se clona con `aria-*`, `popoverTarget`, `ref` y `onKeyDown`; debe reenviar `ref` y props al
    * elemento nativo, como `Button` o `AvatarPlus`) o una función que recibe esas props.

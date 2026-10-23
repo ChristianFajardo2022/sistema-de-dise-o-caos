@@ -24,7 +24,8 @@
     "showActions": { "type": "boolean", "default": false, "description": "Dibuja el pie con Cancelar y Aplicar. En móvil los botones se apilan con Aplicar arriba." },
     "onApply": { "type": "(value) => void", "required": false, "description": "Se pulsa Aplicar con la selección actual." },
     "onCancel": { "type": "() => void", "required": false, "description": "Se pulsa Cancelar." },
-    "labels": { "type": "Partial<CalendarLabels>", "required": false, "description": "Textos de la interfaz (español por defecto): calendar, previous, next, views, changeView, monthField, yearField, monthList, yearList, cancel, apply." }
+    "labels": { "type": "Partial<CalendarLabels>", "required": false, "description": "Textos de la interfaz (español por defecto): calendar, previous, next, views, changeView, monthField, yearField, monthList, yearList, cancel, apply." },
+    "autoFocus": { "type": "boolean", "required": false, "description": "Enfoca al montar la celda activa (día elegido, hoy o el primero del mes). Para abrirlo en un popover o diálogo." }
   },
   "examples": [
     { "title": "Una fecha", "code": "<Calendar defaultValue={new Date(2026, 9, 14)} onChange={setDate} />" },

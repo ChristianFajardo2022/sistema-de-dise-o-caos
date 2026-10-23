@@ -1,19 +1,15 @@
-import { cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { KeyboardEvent, ReactElement, SyntheticEvent } from 'react';
+import { cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent, ReactElement, Ref, SyntheticEvent } from 'react';
 import { DropdownMenuContext } from './DropdownMenu.context';
 import type { DropdownMenuProps, DropdownMenuTriggerProps } from './DropdownMenu.types';
 import { DropdownMenuPanel } from './DropdownMenuPanel';
+import { useAnchoredPosition } from '../../utils/anchoredPosition';
+import { assignRef } from '../../utils/refs';
 
 /** Separación entre el disparador y el panel, y margen mínimo con el borde de la pantalla. */
 const OFFSET = 4;
 const MARGIN = 8;
 const TYPEAHEAD_RESET_MS = 600;
-
-/** Asigna un nodo a un ref de callback o de objeto. */
-function assignRef<T>(ref: unknown, node: T | null) {
-  if (typeof ref === 'function') ref(node);
-  else if (ref && typeof ref === 'object') (ref as { current: T | null }).current = node;
-}
 
 interface TriggerElementProps {
   onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
@@ -24,6 +20,8 @@ interface TriggerElementProps {
 type FocusIntent = 'first' | 'last' | 'none';
 
 const ITEM_SELECTOR = '[role^="menuitem"]:not([aria-disabled="true"])';
+/** Ítem elegido (aspecto Select o radio marcado): recibe el foco al abrir en lugar del primero. */
+const SELECTED_SELECTOR = '[aria-current="true"], [role="menuitemradio"][aria-checked="true"]';
 
 /**
  * Panel con disparador, sobre el atributo nativo `popover` (capa superior, clic fuera y Esc los resuelve el navegador).
@@ -33,8 +31,11 @@ const ITEM_SELECTOR = '[role^="menuitem"]:not([aria-disabled="true"])';
  *   Tab cierra y sigue al elemento siguiente al disparador. Activar un ítem cierra (salvo `checkbox`).
  * - `mode="list"`: lista informativa (`ul`/`li`). El foco se queda en el disparador; no hay roles de menú.
  *
- * Posición: se calcula con `getBoundingClientRect` al abrir y mientras esté abierto (scroll, resize). Por defecto abajo y
- * con el borde derecho del panel alineado al del disparador; se ajusta para no salirse de la pantalla y pasa arriba si abajo no cabe.
+ * Al abrir, el foco va al ítem elegido (`selected` o radio marcado) si lo hay; si no, al primero.
+ *
+ * Posición (compartida con Select y DatePicker, `utils/anchoredPosition`): se calcula al abrir y mientras esté abierto
+ * (scroll, resize). Por defecto abajo y con el borde derecho del panel alineado al del disparador; no se sale de la
+ * pantalla, pasa al otro lado si no cabe y, si no cabe en ninguno, usa el lado con más espacio con el alto limitado.
  */
 export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
   (
@@ -75,26 +76,8 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       triggerRef.current = node;
     }, []);
 
-    const place = useCallback(() => {
-      const pop = popoverRef.current;
-      const anchor = triggerRef.current;
-      if (!pop || !anchor || !pop.matches(':popover-open')) return;
-      const a = anchor.getBoundingClientRect();
-      const { width, height } = pop.getBoundingClientRect();
-      const vw = document.documentElement.clientWidth;
-      const vh = window.innerHeight;
-      const rawLeft = align === 'end' ? a.right - width : a.left;
-      const left = Math.max(MARGIN, Math.min(rawLeft, vw - width - MARGIN));
-      const below = a.bottom + OFFSET;
-      const above = a.top - OFFSET - height;
-      const fitsBelow = below + height <= vh - MARGIN;
-      const fitsAbove = above >= MARGIN;
-      const useBottom = side === 'bottom' ? fitsBelow || !fitsAbove : !fitsAbove && fitsBelow;
-      const top = useBottom ? below : Math.max(MARGIN, above);
-      pop.style.left = `${left}px`;
-      pop.style.top = `${top}px`;
-      pop.style.visibility = '';
-    }, [align, side]);
+    const getAnchor = useCallback(() => triggerRef.current, []);
+    const place = useAnchoredPosition(open, popoverRef, getAnchor, { align, side, offset: OFFSET, margin: MARGIN });
 
     const items = () => Array.from(popoverRef.current?.querySelectorAll<HTMLElement>(ITEM_SELECTOR) ?? []);
 
@@ -109,8 +92,10 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       const pop = popoverRef.current;
       const search = pop?.querySelector<HTMLInputElement>('input[type="search"]');
       const list = items();
+      const selected = pop?.querySelector<HTMLElement>(SELECTED_SELECTOR);
       if (intentRef.current === 'last' && list.length) list[list.length - 1].focus();
       else if (search) search.focus();
+      else if (selected && list.includes(selected)) selected.focus();
       else list[0]?.focus();
       intentRef.current = 'first';
     };
@@ -123,19 +108,6 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       if (open && !isOpen) pop.showPopover();
       else if (!open && isOpen) pop.hidePopover();
     }, [open]);
-
-    // Mientras esté abierto, seguir al disparador
-    useLayoutEffect(() => {
-      if (!open) return;
-      place();
-      const onMove = () => place();
-      window.addEventListener('resize', onMove);
-      window.addEventListener('scroll', onMove, true);
-      return () => {
-        window.removeEventListener('resize', onMove);
-        window.removeEventListener('scroll', onMove, true);
-      };
-    }, [open, place]);
 
     const handleBeforeToggle = (event: SyntheticEvent<HTMLDivElement>) => {
       // Oculto hasta medir y colocar, para que no se vea un frame en otra posición
@@ -252,7 +224,7 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
         id: ownId ?? triggerId,
         ref: (node: HTMLElement | null) => {
           setTriggerRef(node);
-          assignRef(ownRef, node);
+          assignRef(ownRef as Ref<HTMLElement> | undefined, node);
         },
         onKeyDown: (e: KeyboardEvent<HTMLElement>) => {
           own?.(e);

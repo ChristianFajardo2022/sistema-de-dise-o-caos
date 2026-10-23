@@ -17,6 +17,7 @@ import { cn } from '../../utils/cn';
  * Panel visual del set "Dropdown" de Figma (11673:7804): superficie con radio 16 y sombra, campo de búsqueda opcional
  * y área de ítems con riel de scroll. No abre ni cierra nada: para eso, `DropdownMenu`.
  * Sirve también en línea (documentación, medición contra Figma).
+ * Con `listProps` el área de ítems puede cambiar de rol (p. ej. `role="listbox"` con opciones propias, como Select).
  */
 export const DropdownMenuPanel = forwardRef<HTMLDivElement, DropdownMenuPanelProps>(
   (
@@ -29,6 +30,7 @@ export const DropdownMenuPanel = forwardRef<HTMLDivElement, DropdownMenuPanelPro
       searchLabel = 'Buscar',
       searchValue,
       onSearchChange,
+      listProps,
       children,
       className,
       ...restProps
@@ -70,7 +72,8 @@ export const DropdownMenuPanel = forwardRef<HTMLDivElement, DropdownMenuPanelPro
               aria-label={ariaLabel}
               maxHeight={maxHeight}
               data-figma-part="Check List"
-              className={scrollClass}
+              {...listProps}
+              className={cn(scrollClass, listProps?.className)}
             >
               {children}
             </ScrollArea>

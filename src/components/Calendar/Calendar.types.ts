@@ -92,6 +92,11 @@ export interface CalendarBaseProps
   onApply?: (value: Date | null | DateRange) => void;
   /** Se pulsa Cancelar (el de Figma, "Limpiar"). */
   onCancel?: () => void;
+  /**
+   * Enfoca al montar la celda activa de la cuadrícula (el día elegido, hoy o el primero del mes; en las vistas Mes y Año,
+   * el mes o el año visible). Pensado para abrir el calendario en un popover o diálogo (APG Date Picker Dialog).
+   */
+  autoFocus?: boolean;
   /** Textos de la interfaz; se mezclan con los de español. */
   labels?: Partial<Omit<CalendarLabels, 'previous' | 'next' | 'views'>> & {
     previous?: Partial<CalendarLabels['previous']>;
