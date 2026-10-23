@@ -1,17 +1,17 @@
 import { cva } from 'class-variance-authority';
 
 /**
- * CAOS Design System — Dropdown menu Variants
+ * CAOS Design System — Dropdown Variants
  *
- * Fuente: component sets "Dropdown menu" (5331:1745, fuera del lienzo) y "Dropdown list" (el ítem) de Figma.
+ * Fuente: component sets "Dropdown" (11673:7804, el panel, visible en el lienzo; reemplaza al viejo "Dropdown menu" 5331:1745) y "Dropdown list" (el ítem) de Figma.
  *
  * Panel:
- * - Fondo background/field/surface, trazo de 1 por dentro (border/field/default), radio field/md (16),
- *   sombra effect/shadow md (0 12 32 -2), ancho 310.
+ * - Fondo background/field/surface, trazo de 1 por dentro (border/general/gray-sixth), radio field/md (16),
+ *   sombra effect/shadow md (0 12 28 -2), ancho 310.
  * - Simple: padding 8 (lados space/field/sm), gap 8; Search: padding y gap space/field/sm (8, mobile 4), campo arriba.
  * - Área de ítems: 280 + gap 8 + riel de 6 (prop Scroll bar). Ítems separados 4 (Simple) u 8 (Search).
  * Ítem:
- * - Alto 34 (36 dentro del panel; avatar 40), padding 8, gap 8, radio field/sm (12), texto 14/18 field/size/sm.
+ * - Alto 34 natural (8 + 18 + 8; avatar 40), sin alto mínimo, padding 8, gap 8, radio field/sm (12), texto 14/18 field/size/sm.
  * - Default sin relleno, Hover background/field/hover, Select background/field/active-slow-contrast,
  *   Disabled texto text/neutral/disabled-positive.
  * - Control checkbox/radio de 16 (como Selection): anillo de 1.5 con box-shadow inset.
@@ -19,7 +19,7 @@ import { cva } from 'class-variance-authority';
  */
 
 const panelStroke =
-  '[box-shadow:inset_0_0_0_var(--ds-primitives-stroke-lg)_var(--color-ds-border-field-default),0_12px_32px_-2px_var(--ds-responsive-effect-shadow-md)]';
+  '[box-shadow:inset_0_0_0_var(--ds-primitives-stroke-lg)_var(--color-ds-border-general-gray-sixth),0_12px_28px_-2px_var(--ds-responsive-effect-shadow-md)]';
 
 export const dropdownMenuPanelVariants = cva(
   [
@@ -47,8 +47,8 @@ export const dropdownMenuScrollVariants = cva(
   {
     variants: {
       type: { simple: dropdownMenuSimpleGap, search: 'gap-ds-space-field-sm' },
-      // Menú: los ítems son hijos directos (ítems de 36 de alto mínimo dentro del panel). Lista: el `ul` los envuelve.
-      list: { true: '', false: 'flex flex-col [&>*]:min-h-9' },
+      // Menú: los ítems son hijos directos. Lista: el `ul` los envuelve.
+      list: { true: '', false: 'flex flex-col' },
       scrollbar: {
         true: 'overflow-y-scroll pr-ds-space-general-lg',
         false: '[&::-webkit-scrollbar]:hidden [scrollbar-width:none]',
@@ -58,9 +58,16 @@ export const dropdownMenuScrollVariants = cva(
   }
 );
 
-/** Marco del campo de búsqueda: el borde del campo es border/general/gray-fourth, no el del Input por defecto. */
-export const dropdownMenuSearchClass =
-  'w-full [&>div:first-child>div:first-child:not(:focus-within)]:border-ds-border-general-gray-fourth';
+/**
+ * Campo de búsqueda: usa los ganchos de CSS de Input (sin depender de su DOM interno). Borde en reposo
+ * border/general/gray-fourth, gap ícono→texto de 12 (space/field/md) y label en reposo 16/20 a 10 del borde
+ * (typography/field/size/md, line-height/md); flotando conserva el 12/16 de Input.
+ */
+export const dropdownMenuSearchClass = [
+  'w-full [--input-border:var(--color-ds-border-general-gray-fourth)] [--input-field-gap:var(--ds-responsive-space-field-md)]',
+  '[--input-label-rest-top:10px] [--input-label-rest-size:var(--ds-responsive-typography-field-size-md)]',
+  '[--input-label-rest-leading:var(--ds-responsive-typography-field-line-height-md)]',
+].join(' ');
 
 export const dropdownMenuItemVariants = cva(
   [

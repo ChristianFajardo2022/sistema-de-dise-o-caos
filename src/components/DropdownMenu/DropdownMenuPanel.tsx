@@ -8,12 +8,13 @@ import {
   dropdownMenuSimpleGap,
   dropdownMenuSearchClass,
 } from './DropdownMenu.variants';
+import { Icon } from '../Icon';
 import { Input } from '../Input';
 import { ScrollArea } from '../ScrollArea';
 import { cn } from '../../utils/cn';
 
 /**
- * Panel visual del "Dropdown menu" de Figma: superficie con radio 16 y sombra, campo de búsqueda opcional
+ * Panel visual del set "Dropdown" de Figma (11673:7804): superficie con radio 16 y sombra, campo de búsqueda opcional
  * y área de ítems con riel de scroll. No abre ni cierra nada: para eso, `DropdownMenu`.
  * Sirve también en línea (documentación, medición contra Figma).
  */
@@ -49,6 +50,7 @@ export const DropdownMenuPanel = forwardRef<HTMLDivElement, DropdownMenuPanelPro
               variant="search"
               label={searchLabel}
               fullWidth
+              leftIcon={<Icon name="search" size={16} variant="line" aria-hidden="true" data-figma-part="Icon Search" />}
               data-figma-part="Input"
               {...searchProps}
               onChange={(event) => onSearchChange?.(event.target.value)}
@@ -57,7 +59,7 @@ export const DropdownMenuPanel = forwardRef<HTMLDivElement, DropdownMenuPanelPro
           )}
           {isList ? (
             <ScrollArea aria-label={ariaLabel} maxHeight={maxHeight} className={scrollClass}>
-              <ul aria-label={ariaLabel} className={cn('m-0 flex list-none flex-col p-0', type === 'search' ? 'gap-ds-space-field-sm' : dropdownMenuSimpleGap, '[&>*]:min-h-9')}>
+              <ul aria-label={ariaLabel} className={cn('m-0 flex list-none flex-col p-0', type === 'search' ? 'gap-ds-space-field-sm' : dropdownMenuSimpleGap)}>
                 {children}
               </ul>
             </ScrollArea>

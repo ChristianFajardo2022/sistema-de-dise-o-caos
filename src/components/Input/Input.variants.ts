@@ -9,13 +9,15 @@ import { cva } from 'class-variance-authority';
  *   borde de 1px por dentro y radio field/md (16). Search header: alto 48 y radio field/sm (12).
  * - Label flotante: vacío y sin foco va dentro en 14/18; con foco o valor sube a 12/16
  *   y el valor (14/18) queda debajo, separado 4. Se resuelve en CSS con `placeholder-shown`.
+ * - Ganchos de CSS (no son API): `--input-field-gap` (gap ícono/texto, 8), `--input-border` (borde en reposo),
+ *   `--input-label-rest-top|size|leading` (label en reposo, 11px / 14 / 18). Un contenedor puede fijarlos en su `className`.
  * - Los colores salen de variables locales (--lbl-*, --ico, --val) que fija cada estado.
  */
 
 /** Contenedor del campo (el recuadro con borde). */
 export const inputFieldVariants = cva(
   [
-    'relative flex w-full min-w-0 items-center gap-ds-space-general-lg',
+    'relative flex w-full min-w-0 items-center gap-(--input-field-gap,var(--ds-responsive-space-general-lg))',
     'px-ds-space-field-md py-ds-space-field-sm border border-solid',
     'transition-colors duration-150',
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
@@ -31,12 +33,12 @@ export const inputFieldVariants = cva(
       },
       state: {
         default: [
-          'border-ds-border-field-default focus-within:border-ds-border-field-active',
+          'border-(--input-border,var(--color-ds-border-field-default)) focus-within:border-ds-border-field-active',
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
           '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],
         filled: [
-          'border-ds-border-field-default focus-within:border-ds-border-field-active',
+          'border-(--input-border,var(--color-ds-border-field-default)) focus-within:border-ds-border-field-active',
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
           '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],
@@ -89,9 +91,9 @@ export const inputLabelVariants = cva(
       float: {
         // Vacío y sin foco: dentro del campo en 14/18, centrado
         auto: [
-          'peer-[:placeholder-shown:not(:focus)]:top-[11px]',
-          'peer-[:placeholder-shown:not(:focus)]:text-ds-typography-field-size-sm',
-          'peer-[:placeholder-shown:not(:focus)]:leading-(--ds-responsive-typography-field-line-height-sm)',
+          'peer-[:placeholder-shown:not(:focus)]:top-(--input-label-rest-top,11px)',
+          'peer-[:placeholder-shown:not(:focus)]:text-(length:--input-label-rest-size,var(--ds-responsive-typography-field-size-sm))',
+          'peer-[:placeholder-shown:not(:focus)]:leading-(--input-label-rest-leading,var(--ds-responsive-typography-field-line-height-sm))',
           'peer-[:placeholder-shown:not(:focus)]:text-(color:--lbl-in)',
           // Autocompletado del navegador: el label sube como si hubiera valor
           'peer-autofill:top-[1px] peer-autofill:text-ds-typography-field-size-xs',
