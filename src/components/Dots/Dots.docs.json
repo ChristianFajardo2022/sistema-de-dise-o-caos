@@ -1,0 +1,18 @@
+{
+  "name": "Dots",
+  "component": "Dots",
+  "description": "Botón de ícono \"más opciones\" (tres puntos) del sistema de diseño CAOS, fiel al component set Dots-moreoptions de Figma (11194:12200): State Default/Hover/Focus/Press/Inactive × Size xs/sm/md. Círculo de 56 (md), 48 (sm) o 32 (xs) con el ícono 3-dots-more relleno centrado (24 en md y sm, 16 en xs), estilo Button tertiary: sin relleno en reposo, relleno background/button/tertiary/hover en Hover y Press. Es un button nativo; el nombre accesible sale de label (por defecto \"Más opciones\"). Hover, foco con teclado (outline de 2px, agregado: Figma no lo dibuja) y Press (:active o aria-expanded=true) salen de CSS. Para abrir un menú se usa como trigger de DropdownMenu, que reenvía ref, aria-* y popoverTarget; no duplica el panel (en Figma, Press muestra el set Dropdown abierto debajo). Categoría: Navigation.",
+  "category": "Navigation",
+  "props": {
+    "size": { "type": "'xs' | 'sm' | 'md'", "default": "'md'", "description": "Size de Figma: 32, 48 o 56 px." },
+    "label": { "type": "string", "default": "'Más opciones'", "description": "Nombre accesible del botón (el ícono es decorativo). Conviene precisarlo: \"Acciones de la fila\"." },
+    "disabled": { "type": "boolean", "default": false, "description": "State Inactive de Figma (button deshabilitado nativo)." },
+    "state": { "type": "'default' | 'hover' | 'focus' | 'press' | 'inactive'", "required": false, "description": "Fuerza el aspecto de un State, solo para documentación." },
+    "onClick": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Va al button nativo, igual que el resto de props nativas. El ref también apunta al button." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<Dots label=\"Más opciones de la tarjeta\" onClick={abrir} />" },
+    { "title": "Con menú", "code": "<DropdownMenu aria-label=\"Acciones\" trigger={<Dots label=\"Acciones\" />}>\n  <DropdownMenuItem type=\"icon\" icon=\"add-circle\">Duplicar</DropdownMenuItem>\n</DropdownMenu>" },
+    { "title": "Pequeño", "code": "<Dots size=\"xs\" label=\"Más opciones\" />" }
+  ]
+}
