@@ -1,0 +1,24 @@
+{
+  "name": "InformationCard",
+  "component": "InformationCard",
+  "description": "Tarjeta de información del sistema de diseño CAOS, fiel al component set Information card de Figma (14195:31274), Type Option 1, 2 y 3 (498 de ancho). Las tres opciones son la misma tarjeta con secciones distintas, así que es un solo componente por slots (leading, tags, title, subtitle, description, children, footer, actions) sobre la superficie interna común de las tarjetas (NotchedSurface, sin muesca); las opciones de Figma son composiciones documentadas (historias Option1, Option2 y Option3). Raíz article nombrada por el título (encabezado h3 por defecto), padding 24 y gap 32, superficie background/container/default-on-canva con radio 24 y las sombras de Figma: effect/shadow sm (box-shadow shadow-ds-on-card) y md con spread −2 (shadow-ds-on-canva). Título 16/20 truncado, subtítulo 12/16 y descripción 14/18. Con footer se dibuja la línea divisoria de 0.5 y la fila del pie (gap 24) con las acciones a la derecha. No es interactiva: los controles son los que se le pasan (Button, ListItem, AvatarGroup, ProgressBar, NumberRating). `actions` es un grupo de botones del pie (en DataCard, `action` es un solo control al final de la fila: tienen sentido distinto). Criterio común de las tarjetas: title/subtitle/description para los textos, leading para el slot de la izquierda y headingLevel para el nivel del título.",
+  "category": "Data Display",
+  "props": {
+    "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma. Encabezado y nombre accesible del article." },
+    "subtitle": { "type": "ReactNode", "required": false, "description": "Prop Subtitle de Figma." },
+    "description": { "type": "ReactNode", "required": false, "description": "Prop Description de Figma." },
+    "leading": { "type": "ReactNode", "required": false, "description": "Prop Icon de Figma: avatar arriba a la izquierda." },
+    "tags": { "type": "ReactNode", "required": false, "description": "Prop Tag de Figma." },
+    "tagsPosition": { "type": "'header' | 'content'", "default": "'header'", "description": "Etiquetas arriba (a la derecha del leading o solas; Option 2 y 3) o bajo el título (Option 1)." },
+    "children": { "type": "ReactNode", "required": false, "description": "Contenido entre la descripción y el pie: bloque de progreso (Progress) o lista de ListItem (List)." },
+    "footer": { "type": "ReactNode", "required": false, "description": "Lado izquierdo del pie (Avatar group, Content). Con footer se dibuja la línea divisoria." },
+    "actions": { "type": "ReactNode", "required": false, "description": "Prop Group button: botones a la derecha del pie." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "3", "description": "Nivel del encabezado del título; 'none' lo deja como párrafo. Mismo criterio que DataCard." },
+    "className": { "type": "string", "required": false, "description": "Clases para el article raíz." }
+  },
+  "examples": [
+    { "title": "Option 1", "code": "<InformationCard\n  leading={<Avatar variant=\"icon\" />}\n  title=\"Lanzamiento de la app\"\n  subtitle=\"Equipo de producto\"\n  tagsPosition=\"content\"\n  tags={<Tag>Diseño</Tag>}\n  description=\"Versión con pagos en línea…\"\n  footer={<AvatarGroup aria-label=\"Participantes\">…</AvatarGroup>}\n  actions={<><Button variant=\"secondary\" size=\"sm\">Ver detalle</Button><Button size=\"sm\">Unirme</Button></>}\n/>" },
+    { "title": "Option 2 (progreso)", "code": "<InformationCard title=\"Lanzamiento\" tags={<Tag iconLeft={false}>Web</Tag>} actions={…}>\n  <ProgressBar value={50} label=\"Avance del proyecto\" />\n</InformationCard>" },
+    { "title": "Option 3 (lista)", "code": "<InformationCard leading={<Avatar variant=\"icon\" />} title=\"Lanzamiento\" tags={…} footer={<NumberRating value={4.5} />} actions={…}>\n  <ul role=\"list\"><ListItem title=\"Diseño de pantallas\" selectable /></ul>\n</InformationCard>" }
+  ]
+}

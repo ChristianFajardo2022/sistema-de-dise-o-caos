@@ -1,0 +1,20 @@
+{
+  "name": "DataCard",
+  "component": "DataCard",
+  "description": "Tarjeta de dato del sistema de diseño CAOS, fiel al component set Data card de Figma (14043:59910, una sola variante). Fila con padding 16 y gap 24 sobre background/container/default-on-card con esquina de 24 (superficie interna común de las tarjetas): Avatar icon de 48 (On Card), título en Prospero semibold 48/52, descripción 16/22 y un slot gráfico que reparte el ancho con el texto. Es una composición: el gráfico va como children y los controles que Figma deja ocultos (Toggle, Button, Selection) van en el slot action, con los componentes Switch, Button, Checkbox o Radio. El título es un encabezado (h3 por defecto; headingLevel 2…6 o 'none' para un párrafo, mismo criterio que InformationCard). `action` es un solo control al final de la fila (en InformationCard, `actions` es el grupo de botones del pie). Criterio común de las tarjetas: leading para el slot de la izquierda e icon para el ícono del avatar por defecto. El gráfico es decorativo salvo que traiga su propio texto.",
+  "category": "Data Display",
+  "props": {
+    "title": { "type": "ReactNode", "required": true, "description": "Título: dato o métrica principal (Tittle de Figma)." },
+    "description": { "type": "ReactNode", "required": false, "description": "Descripción bajo el título (Description de Figma)." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "3", "description": "Nivel del encabezado del título; 'none' lo deja como párrafo (antes titleAs)." },
+    "icon": { "type": "IconName", "default": "'chart-square'", "description": "Ícono del avatar." },
+    "leading": { "type": "ReactNode", "required": false, "description": "Contenido de la izquierda: reemplaza al avatar de ícono por defecto; null lo quita (antes avatar)." },
+    "children": { "type": "ReactNode", "required": false, "description": "Slot gráfico de la derecha (Container graphic de Figma)." },
+    "action": { "type": "ReactNode", "required": false, "description": "Control al final: Switch, Button, Checkbox o Radio." }
+  },
+  "examples": [
+    { "title": "Con gráfico", "code": "<DataCard title=\"1.284\" description=\"Visitas esta semana\"><Sparkline /></DataCard>" },
+    { "title": "Con interruptor", "code": "<DataCard title=\"Alertas\" description=\"Avisar si baja el rendimiento\" action={<Switch aria-label=\"Activar alertas\" />} />" },
+    { "title": "Con botón", "code": "<DataCard title=\"24\" description=\"Reportes\" action={<Button variant=\"tertiary\" size=\"sm\" iconOnly aria-label=\"Abrir\"><Icon name=\"arrow-right3\" size={24} /></Button>} />" }
+  ]
+}
