@@ -12,6 +12,7 @@ export * from './components/ButtonCorner';
 export * from './components/ButtonLink';
 export * from './components/Calendar';
 export * from './components/Checkbox';
+export * from './components/CodeInput';
 export * from './components/DigitInput';
 export * from './components/Dots';
 export * from './components/DropdownMenu';

@@ -1,0 +1,38 @@
+{
+  "name": "CodeInput",
+  "component": "CodeInput",
+  "description": "Código de verificación (OTP) del sistema de diseño CAOS, fiel al tipo Code del component set General input de Figma (7856:1485: State Default, Filled, Active/Focus, Burnt-In, Disabled, Error, Success, Helper text). Compone N casillas DigitInput (6 por defecto, Size 56, mismo ancho cada una, gap space/general/lg) y un NotificationText para el mensaje. Escribir un dígito avanza a la siguiente casilla; Retroceso borra y retrocede; Suprimir borra sin moverse; flechas, Inicio y Fin recorren las casillas. Pegar reparte el código (solo los dígitos, aunque venga con letras o espacios) y un código completo siempre empieza en la primera casilla. La primera casilla lleva autoComplete=\"one-time-code\" y no tiene límite de un carácter, para que el código que ofrece el sistema llegue entero y se reparta. El valor es un string de dígitos sin huecos: una casilla más allá de la primera libre manda el foco a esa, y borrar una casilla intermedia corre las siguientes. onComplete se llama al llenar todas. Accesibilidad: role=\"group\" con el label visible como nombre (hideLabel lo deja solo para lectores de pantalla), cada casilla se llama \"Dígito N de M\" (getDigitLabel para otro idioma), el mensaje se asocia por aria-describedby, error marca aria-invalid, inputMode=\"numeric\" y roving tabindex: Tab entra en la primera casilla libre y sale del grupo con el siguiente Tab, sin trampas de foco. Se eligieron casillas separadas (un input por dígito) en lugar de un solo input con apariencia de casillas para reutilizar el átomo DigitInput y su estado visual por casilla; las desventajas conocidas de ese patrón (pegado, autocompletado, Tab por cada casilla, anuncios repetidos) se resuelven en el grupo. Burnt-In se mapea a readOnly (se lee y se recorre, no se edita). Disabled usa border/field/disabled como en Figma. La prop state solo fuerza el aspecto en documentación. Con name, el código viaja en el formulario en un input oculto.",
+  "category": "Form Controls",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Nombre del grupo, visible encima de las casillas." },
+    "hideLabel": { "type": "boolean", "default": false, "description": "Deja el label solo para lectores de pantalla (Figma no lo dibuja en Type=Code)." },
+    "length": { "type": "number", "default": 6, "description": "Número de casillas." },
+    "value": { "type": "string", "required": false, "description": "Valor controlado (solo dígitos)." },
+    "defaultValue": { "type": "string", "required": false, "description": "Valor inicial no controlado." },
+    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Se llama con el código (solo dígitos) cada vez que cambia." },
+    "onComplete": { "type": "(code: string) => void", "required": false, "description": "Se llama cuando se llenan todas las casillas." },
+    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda (State=Helper text)." },
+    "errorText": { "type": "string", "required": false, "description": "Mensaje de error; marca aria-invalid. Tiene prioridad." },
+    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito (State=Success)." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In (solo lectura)." },
+    "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del ancho (por defecto 320px, como Input)." },
+    "size": { "type": "'56' | '32'", "default": "'56'", "description": "Size de las casillas (DigitInput)." },
+    "placeholder": { "type": "string", "required": false, "description": "Carácter visible en cada casilla vacía." },
+    "name": { "type": "string", "required": false, "description": "Envía el código en un input oculto del formulario." },
+    "autoFocus": { "type": "boolean", "default": false, "description": "Enfoca la primera casilla libre al montar." },
+    "getDigitLabel": { "type": "(index: number, length: number) => string", "default": "\"Dígito N de M\"", "description": "Nombre accesible de cada casilla." },
+    "state": {
+      "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'",
+      "default": "'default'",
+      "description": "Fuerza el aspecto, solo para documentación."
+    },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales. El resto de props y el ref van al contenedor raíz." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<CodeInput label=\"Código de verificación\" helperText=\"Te lo enviamos por SMS\" onComplete={verify} />" },
+    { "title": "Controlado", "code": "<CodeInput label=\"Código\" value={code} onValueChange={setCode} />" },
+    { "title": "Error", "code": "<CodeInput label=\"Código\" defaultValue=\"123456\" errorText=\"El código no es válido\" />" },
+    { "title": "Cuatro dígitos en un formulario", "code": "<CodeInput label=\"PIN\" length={4} name=\"pin\" />" }
+  ]
+}
