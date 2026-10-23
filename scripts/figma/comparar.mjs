@@ -4,7 +4,9 @@
  *
  * Uso:
  *   node scripts/figma/comparar.mjs --carpeta badge --story data-display-badge--figma-matrix \
- *        [--port 6006] [--temas dark,light] [--tol 0.5]
+ *        [--port 6006] [--temas dark,light] [--tol 0.5] [--out <carpeta>]
+ *
+ * `--out` escribe comparacion.json/html y capturas en otra carpeta (para no pisar la de otro agente).
  *
  * Lee .qa/figma/componentes/<carpeta>/spec.json (generado por extraer.js), abre la historia
  * FigmaMatrix en Storybook y compara cada variante (`[data-figma="<nombre>"]`) contra la spec.
@@ -87,7 +89,21 @@ function crearResolvedor(spec, tema) {
     const p = primerSolido(lista);
     return p ? colorDe(p.color, p.var) : null;
   };
-  return { colorDe, numDe, colorPintura, primerSolido };
+  // Color de un efecto. Si está enlazado a una variable de la colección Responsive, el modo trae
+  // `{ color: alias, opacity }` (no un hex): se resuelve el alias del color y se aplica la opacidad.
+  const colorEfecto = (e) => {
+    const v = e.vars && e.vars.color && vars[e.vars.color];
+    const val = v && v.porModo && (v.porModo[MODO_RESPONSIVE] ?? Object.values(v.porModo)[0]);
+    if (val && typeof val === 'object' && val.color) {
+      const base = vars[val.color.id];
+      const mc = base && base.porModo && parseHex(base.porModo[modoColor] ?? Object.values(base.porModo)[0]);
+      const rgb = mc || parseHex(e.color) || [0, 0, 0, 1];
+      return [rgb[0], rgb[1], rgb[2], typeof val.opacity === 'number' ? val.opacity : rgb[3]];
+    }
+    if (typeof val === 'string') return parseHex(val) || parseHex(e.color);
+    return parseHex(e.color);
+  };
+  return { colorDe, numDe, colorPintura, primerSolido, colorEfecto };
 }
 
 function recorrer(nodo, fn) {
@@ -144,6 +160,39 @@ function medirEnPagina({ nombre, partes }) {
       sombras.push({ inset, color: rgba(col ? col[0] : null), x: resto[0] || 0, y: resto[1] || 0, blur: resto[2] || 0, spread: resto[3] || 0 });
     }
   }
+  // `filter: drop-shadow(...)` (siluetas con muesca): en la raíz y en la capa de superficie `Canva`.
+  // drop-shadow no admite spread; el valor computado trae el color primero.
+  const filtros = (el) => {
+    const f = getComputedStyle(el).filter;
+    const res = [];
+    if (!f || f === 'none') return res;
+    let i = 0;
+    while ((i = f.indexOf('drop-shadow(', i)) >= 0) {
+      let j = i + 12, nivel = 1;
+      while (j < f.length && nivel > 0) {
+        if (f[j] === '(') nivel++;
+        else if (f[j] === ')') nivel--;
+        j++;
+      }
+      const cuerpo = f.slice(i + 12, j - 1);
+      const col = /(rgba?\([^)]*\)|color\([^)]*\)|oklch\([^)]*\)|oklab\([^)]*\)|#[0-9a-f]+)/i.exec(cuerpo);
+      const resto = cuerpo.replace(col ? col[0] : '', '').trim().split(/\s+/).map(px);
+      res.push({ inset: false, filtro: true, color: rgba(col ? col[0] : null), x: resto[0] || 0, y: resto[1] || 0, blur: resto[2] || 0, spread: 0 });
+      i = j;
+    }
+    return res;
+  };
+  sombras.push(...filtros(raiz));
+  for (const capa of raiz.querySelectorAll(sel('Canva'))) sombras.push(...filtros(capa).map((f) => ({ ...f, deCanva: true })));
+  // Distancia real entre los dos primeros hijos visibles (para gaps negativos de Figma, que en CSS son márgenes)
+  const hijosVis = [...raiz.children].filter((h) => h.getBoundingClientRect().height > 0 || h.getBoundingClientRect().width > 0);
+  const vertical = cs.flexDirection.startsWith('column') || (cs.display !== 'flex' && cs.display !== 'inline-flex');
+  let gapReal = null;
+  if (hijosVis.length > 1) {
+    const a = hijosVis[0].getBoundingClientRect();
+    const b = hijosVis[1].getBoundingClientRect();
+    gapReal = vertical ? b.top - a.bottom : b.left - a.right;
+  }
   const lados = ['Top', 'Right', 'Bottom', 'Left'];
   const borde = {
     grosores: lados.map((l) => px(cs[`border${l}Width`]) * (cs[`border${l}Style`] === 'none' ? 0 : 1)),
@@ -155,6 +204,7 @@ function medirEnPagina({ nombre, partes }) {
       h: r.height,
       padding: lados.map((l) => px(cs[`padding${l}`])),
       columnGap: px(cs.columnGap),
+      gapReal,
       rowGap: px(cs.rowGap),
       radios: ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'].map((c) => radio(`border${c}Radius`, raiz, cs)),
       fondo: rgba(cs.backgroundColor),
@@ -198,7 +248,10 @@ function medirEnPagina({ nombre, partes }) {
     const todos = marcados(t.nombre);
     out.conteos[t.nombre] = todos.length;
     if (t.parte) {
-      const e = todos[t.ord] || null;
+      // Un nombre puede repetirse en elementos que no son este texto (p. ej. un botón de otra parte llamado
+      // igual): para un nodo TEXT solo se emparejan los marcados con texto propio y sin hijos marcados iguales
+      const conTexto = todos.filter((x) => primerTexto(x) && !x.querySelector(sel(t.nombre)));
+      const e = (conTexto.length >= 1 && conTexto.length < todos.length ? conTexto : todos)[t.ord] || null;
       el = e && (primerTexto(e) || e);
     }
     if (!el && t.primero && todos.length === 0) el = primerTexto(raiz);
@@ -246,7 +299,10 @@ function compararVariante(variante, m, spec, tema, tol) {
   const rz = m.raiz;
 
   // tamaño
-  if (!lay || lay.tamH === 'HUG' || lay.tamH === 'FIXED') num('ancho', n.w, rz.w);
+  // Ancho HUG que depende de texto: Figma usa Helvetica y el navegador Helvetica Neue, y la métrica de la fuente
+  // mueve el ancho unas décimas. Tolerancia relativa de 1 % (con tope de 3 px) solo en ese caso.
+  const tolAncho = lay && lay.tamH === 'HUG' && m.__textos.length ? Math.max(tol, Math.min(n.w * 0.01, 3)) : tol;
+  if (!lay || lay.tamH === 'HUG' || lay.tamH === 'FIXED') num('ancho', n.w, rz.w, tolAncho);
   if (!lay || lay.tamV === 'HUG' || lay.tamV === 'FIXED') num('alto', n.h, rz.h);
 
   // layout
@@ -258,7 +314,9 @@ function compararVariante(variante, m, spec, tema, tol) {
     const visibles = (n.hijos || []).filter((h) => !h.oculto).length;
     if (visibles > 1) {
       const gap = R.numDe(lay.gap, v.itemSpacing);
-      num(lay.modo === 'VERTICAL' ? 'gap (row-gap)' : 'gap (column-gap)', gap, lay.modo === 'VERTICAL' ? rz.rowGap : rz.columnGap);
+      // Un gap negativo no existe en CSS (se resuelve con margen negativo): se mide la distancia real entre hermanos
+      const medido = gap < 0 && rz.gapReal != null ? rz.gapReal : lay.modo === 'VERTICAL' ? rz.rowGap : rz.columnGap;
+      num(lay.modo === 'VERTICAL' ? 'gap (row-gap)' : 'gap (column-gap)', gap, medido);
     }
   }
 
@@ -319,7 +377,8 @@ function compararVariante(variante, m, spec, tema, tol) {
 
   // sombras
   const efectos = (n.efectos || []).filter((e) => e.tipo === 'DROP_SHADOW' || e.tipo === 'INNER_SHADOW');
-  const sbSombras = rz.sombras.filter((s) => !(n.trazos && ((s.inset && s.blur === 0 && s.x === 0 && s.y === 0) || esTrazoLado(s))));
+  // La sombra de la capa `Canva` solo cuenta si Figma define el efecto en este nodo (si vive en un hijo, no se mide aquí)
+  const sbSombras = rz.sombras.filter((s) => !(s.deCanva && !efectos.length)).filter((s) => !(n.trazos && ((s.inset && s.blur === 0 && s.x === 0 && s.y === 0) || esTrazoLado(s))));
   const dropSb = sbSombras.filter((s) => !s.inset);
   const innerSb = sbSombras.filter((s) => s.inset);
   const cuenta = { DROP_SHADOW: 0, INNER_SHADOW: 0 };
@@ -334,8 +393,9 @@ function compararVariante(variante, m, spec, tema, tol) {
     num(`${etq} x`, e.x, s.x);
     num(`${etq} y`, e.y, s.y);
     num(`${etq} blur`, e.radio, s.blur);
-    num(`${etq} spread`, e.spread || 0, s.spread);
-    col(`${etq} color`, parseHex(e.color), s.color);
+    // drop-shadow no tiene spread: no se compara
+    if (!s.filtro) num(`${etq} spread`, e.spread || 0, s.spread);
+    col(`${etq} color`, R.colorEfecto(e), s.color);
   }
   const sobran = dropSb.length - (cuenta.DROP_SHADOW || 0);
   if (sobran > 0) lista.push({ propiedad: 'sombra extra', figma: 'sin sombra', storybook: `${sobran} box-shadow`, ok: false });
@@ -443,7 +503,7 @@ function generarHtml(res) {
       return `<section><h2>${esc(v.nombre)}</h2>
         <table class="fila"><thead><tr><th>Figma (2x a la mitad)</th>${temas.map((t) => `<th>Storybook ${esc(t)}</th>`).join('')}</tr></thead>
         <tbody><tr><td><div class="lienzo">${
-          v.png ? `<img src="${esc(v.png)}" alt="Figma ${esc(v.nombre)}" style="width:${v.w}px;height:${v.h}px">` : '<em>Sin PNG</em>'
+          v.png ? `<img src="${esc((res.pngBase ? res.pngBase + '/' : '') + v.png)}" alt="Figma ${esc(v.nombre)}" style="width:${v.w}px;height:${v.h}px">` : '<em>Sin PNG</em>'
         }</div></td>${celdas}</tr></tbody></table>${tablas}</section>`;
     })
     .join('');
@@ -481,8 +541,10 @@ async function main() {
   const port = args.port || '6006';
   const temas = (args.temas || 'dark,light').split(',').map((s) => s.trim()).filter(Boolean);
   const tol = args.tol !== undefined ? parseFloat(args.tol) : 0.5;
-  const dir = path.join(RAIZ, '.qa', 'figma', 'componentes', args.carpeta);
-  const specPath = path.join(dir, 'spec.json');
+  const dirSpec = path.join(RAIZ, '.qa', 'figma', 'componentes', args.carpeta);
+  const dir = args.out ? path.resolve(args.out) : dirSpec;
+  fs.mkdirSync(dir, { recursive: true });
+  const specPath = path.join(dirSpec, 'spec.json');
   if (!fs.existsSync(specPath)) {
     console.error(`No existe ${specPath}`);
     process.exit(2);
@@ -519,6 +581,7 @@ async function main() {
     tol,
     fecha: new Date().toISOString().slice(0, 16).replace('T', ' '),
     temas,
+    pngBase: args.out ? path.relative(dir, dirSpec).split(path.sep).join('/') : '',
     variantes: variantes.map((v) => ({
       nombre: v.def.nombre,
       png: v.def.png || null,
