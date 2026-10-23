@@ -1,4 +1,4 @@
-import { forwardRef, useId, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useRef, useState } from 'react';
 import type { ChangeEvent, FocusEvent, KeyboardEvent, MouseEvent } from 'react';
 import type { NumberPickerProps } from './NumberPicker.types';
 import {
@@ -7,7 +7,9 @@ import {
   numberPickerRootVariants,
 } from './NumberPicker.variants';
 import { cn } from '../../utils/cn';
+import { useMergedRefs } from '../../utils/refs';
 import { Button } from '../Button';
+import { FieldMessage, FieldRow, useField } from '../Field';
 import { Icon } from '../Icon';
 
 const decimalsOf = (n: number) => (String(n).split('.')[1] ?? '').length;
@@ -16,6 +18,8 @@ const decimalsOf = (n: number) => (String(n).split('.')[1] ?? '').length;
  * Campo de cantidad con botones − y +. Patrón APG "Spinbutton": el campo de texto lleva
  * role="spinbutton" con aria-valuenow/min/max; flechas ±step, RePág/AvPág ±largeStep, Inicio/Fin
  * llevan al mínimo y al máximo. Los botones quedan fuera del orden de tabulación (el teclado usa el campo).
+ * El `ref` y los atributos nativos van al `<input>`; `className` y `rootProps` van a la raíz. Mensajes y tooltip con la
+ * base común de los campos (Figma no los dibuja en este set).
  */
 export const NumberPicker = forwardRef<HTMLInputElement, NumberPickerProps>(
   (
@@ -34,19 +38,24 @@ export const NumberPicker = forwardRef<HTMLInputElement, NumberPickerProps>(
       fullWidth = false,
       disabled = false,
       readOnly = false,
+      helperText,
+      errorText,
+      successText,
+      tooltip,
       className,
       rootProps,
       id,
+      'aria-describedby': ariaDescribedBy,
       onKeyDown,
       onBlur,
       ...restProps
     },
     ref
   ) => {
-    const autoId = useId();
-    const inputId = id ?? autoId;
+    const field = useField({ id, helperText, errorText, successText, tooltip, disabled, readOnly });
+    const inputId = field.ids.control;
     const inputRef = useRef<HTMLInputElement>(null);
-    useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
+    const setInputRef = useMergedRefs(inputRef, ref);
 
     const isControlled = valueProp !== undefined;
     const [inner, setInner] = useState<number | undefined>(defaultValue);
@@ -166,56 +175,62 @@ export const NumberPicker = forwardRef<HTMLInputElement, NumberPickerProps>(
 
     return (
       <div {...rootProps} className={cn(numberPickerRootVariants({ fullWidth }), rootProps?.className, className)}>
-        <div data-figma-part="Input" className={numberPickerFieldVariants({ size, visual })}>
-          <Button
-            variant="tertiary"
-            size="xs"
-            iconOnly
-            tabIndex={-1}
-            aria-label={decrementLabel}
-            aria-controls={inputId}
-            disabled={isDisabled || isReadOnly || atMin}
-            onMouseDown={keepFocus}
-            onClick={() => move(-step)}
-            data-figma-part="Button"
-          >
-            <Icon name="minus" size={20} />
-          </Button>
-          <input
-            {...restProps}
-            ref={inputRef}
-            id={inputId}
-            type="text"
-            role="spinbutton"
-            inputMode={decimals > 0 ? 'decimal' : 'numeric'}
-            autoComplete="off"
-            value={display}
-            disabled={isDisabled}
-            readOnly={isReadOnly}
-            aria-valuenow={value}
-            aria-valuemin={min}
-            aria-valuemax={max}
-            aria-readonly={isReadOnly || undefined}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            className={numberPickerInputVariants()}
-          />
-          <Button
-            variant="tertiary"
-            size="xs"
-            iconOnly
-            tabIndex={-1}
-            aria-label={incrementLabel}
-            aria-controls={inputId}
-            disabled={isDisabled || isReadOnly || atMax}
-            onMouseDown={keepFocus}
-            onClick={() => move(step)}
-            data-figma-part="Button"
-          >
-            <Icon name="add-2" size={20} />
-          </Button>
-        </div>
+        <FieldRow tooltip={tooltip ? { id: field.ids.tooltip, text: tooltip, disabled: isDisabled } : null}>
+          <div data-figma-part="Input" className={numberPickerFieldVariants({ size, visual })}>
+            <Button
+              variant="tertiary"
+              size="xs"
+              iconOnly
+              tabIndex={-1}
+              aria-label={decrementLabel}
+              aria-controls={inputId}
+              disabled={isDisabled || isReadOnly || atMin}
+              onMouseDown={keepFocus}
+              onClick={() => move(-step)}
+              data-figma-part="Button"
+            >
+              <Icon name="minus" size={20} />
+            </Button>
+            <input
+              {...restProps}
+              ref={setInputRef}
+              id={inputId}
+              type="text"
+              role="spinbutton"
+              inputMode={decimals > 0 ? 'decimal' : 'numeric'}
+              autoComplete="off"
+              value={display}
+              disabled={isDisabled}
+              readOnly={isReadOnly}
+              aria-valuenow={value}
+              aria-valuemin={min}
+              aria-valuemax={max}
+              aria-readonly={isReadOnly || undefined}
+              aria-invalid={field.isError || undefined}
+              aria-describedby={field.describedBy(ariaDescribedBy)}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              className={numberPickerInputVariants()}
+            />
+            <Button
+              variant="tertiary"
+              size="xs"
+              iconOnly
+              tabIndex={-1}
+              aria-label={incrementLabel}
+              aria-controls={inputId}
+              disabled={isDisabled || isReadOnly || atMax}
+              onMouseDown={keepFocus}
+              onClick={() => move(step)}
+              data-figma-part="Button"
+            >
+              <Icon name="add-2" size={20} />
+            </Button>
+          </div>
+        </FieldRow>
+
+        <FieldMessage id={field.ids.message} message={field.message} />
       </div>
     );
   }

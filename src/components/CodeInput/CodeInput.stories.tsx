@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { CodeInput } from './CodeInput';
@@ -184,8 +184,8 @@ export const AutofillTest: Story = {
   args: { onComplete: fn() },
   play: async ({ canvasElement, args }) => {
     const cells = getCells(canvasElement);
-    // La casilla que recibe el autocompletado no tiene límite de un carácter
-    await expect(cells[0]).not.toHaveAttribute('maxlength');
+    // La casilla que recibe el autocompletado acepta el código entero (DigitInput maxLength); las demás, un carácter
+    await expect(cells[0]).toHaveAttribute('maxlength', String(cells.length));
     await expect(cells[1]).toHaveAttribute('maxlength', '1');
     cells[0].focus();
     // Simula al navegador: escribe el valor completo en el input y dispara el evento input
@@ -221,5 +221,45 @@ export const StatesTest: Story = {
     await userEvent.keyboard('{ArrowRight}');
     await expect(canvas.getByRole('textbox', { name: 'Lectura 3' })).toHaveFocus();
     await expect(canvas.getByRole('textbox', { name: 'Off 1' })).toBeDisabled();
+  },
+};
+
+function CodeInputApiDemo() {
+  const ref = useRef<HTMLInputElement>(null);
+  const [refs, setRefs] = useState('');
+  const [error, setError] = useState<string | undefined>();
+  useEffect(() => setRefs(`${ref.current?.getAttribute('aria-label')}`), []);
+  return (
+    <div className="flex flex-col gap-4">
+      <CodeInput ref={ref} label="Código" optional required tooltip="Llega por SMS" errorText={error} />
+      <button type="button" onClick={() => setError('El código no es válido')}>
+        Validar
+      </button>
+      <output data-testid="refs">{refs}</output>
+    </div>
+  );
+}
+
+/**
+ * API común: `ref` a la primera casilla, `required` nativo, " | Opcional", tooltip, y el error en la región viva común
+ * (`aria-live="polite"`, sin `role="alert"`) que describe cada casilla.
+ */
+export const ApiTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <CodeInputApiDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('refs')).toHaveTextContent('Dígito 1 de 6');
+    await expect(canvas.getByRole('group', { name: /^Código ?\| Opcional$/ })).toBeVisible();
+    const cells = getCells(canvasElement);
+    await expect(cells[0]).toBeRequired();
+    await expect(cells[0]).toHaveAccessibleDescription('Llega por SMS');
+    const region = canvasElement.querySelector('[aria-live="polite"]')!;
+    await expect(region).toBeEmptyDOMElement();
+    await userEvent.click(canvas.getByRole('button', { name: 'Validar' }));
+    await expect(region).toHaveTextContent('El código no es válido');
+    await expect(canvas.queryByRole('alert')).toBeNull();
+    await expect(cells[2]).toHaveAttribute('aria-invalid', 'true');
+    await expect(cells[2]).toHaveAccessibleDescription('El código no es válido Llega por SMS');
   },
 };

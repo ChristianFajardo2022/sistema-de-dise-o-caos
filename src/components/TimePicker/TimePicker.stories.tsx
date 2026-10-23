@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { TimePicker } from './TimePicker';
@@ -231,5 +231,44 @@ export const LockedTest: Story = {
     const field = bad.getByRole('spinbutton', { name: 'Hora' });
     await expect(field).toHaveAttribute('aria-invalid', 'true');
     await expect(field).toHaveAccessibleDescription('Elige una hora válida');
+  },
+};
+
+function TimePickerApiDemo() {
+  const ref = useRef<HTMLInputElement>(null);
+  const [value, setValue] = useState('');
+  const [refs, setRefs] = useState('');
+  useEffect(() => setRefs(`${ref.current?.id.endsWith('-hour')}`), []);
+  return (
+    <div className="flex flex-col gap-4">
+      <TimePicker ref={ref} label="Hora de llegada" helperText="Hora local" tooltip="Formato de 12 horas" required optional onValueChange={setValue} />
+      <output data-testid="valor">{value}</output>
+      <output data-testid="refs">{refs}</output>
+    </div>
+  );
+}
+
+/**
+ * API común: `ref` al campo de la hora, `onValueChange`, `required` nativo, " | Opcional", tooltip y el mensaje en cada
+ * control (no en el grupo, para no leerlo dos veces).
+ */
+export const ApiTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <TimePickerApiDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('refs')).toHaveTextContent('true');
+    const group = canvas.getByRole('group', { name: 'Hora de llegada' });
+    await expect(group).not.toHaveAttribute('aria-describedby');
+    const hour = canvas.getByRole('spinbutton', { name: /^Hora ?\| Opcional$/ });
+    const minute = canvas.getByRole('spinbutton', { name: /^Minutos ?\| Opcional$/ });
+    await expect(hour).toBeRequired();
+    await expect(minute).toBeRequired();
+    await expect(hour).toHaveAccessibleDescription('Hora local Formato de 12 horas');
+    await expect(canvas.getByRole('button', { name: 'Formato de 12 horas' })).toBeVisible();
+    await userEvent.type(hour, '9');
+    await userEvent.type(minute, '30');
+    await userEvent.click(canvas.getByRole('radio', { name: 'PM' }));
+    await expect(canvas.getByTestId('valor')).toHaveTextContent('21:30');
   },
 };

@@ -19,7 +19,7 @@ export type DigitInputState =
 
 type DigitInputBaseProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  'size' | 'type' | 'maxLength' | 'children' | 'autoComplete'
+  'size' | 'type' | 'children' | 'autoComplete'
 > & {
   /** Size de Figma: 56 (por defecto) o 32. */
   size?: DigitInputSize;
@@ -35,6 +35,11 @@ type DigitInputBaseProps = Omit<
    * Con varias casillas, solo la primera debería llevarlo.
    */
   oneTimeCode?: boolean;
+  /**
+   * Caracteres que acepta la casilla. Por defecto 1. Un grupo de casillas puede dejar más en la primera para recibir
+   * el código entero del autocompletado del sistema (`one-time-code`) y repartirlo (CodeInput usa `length`).
+   */
+  maxLength?: number;
   /** Clases adicionales. */
   className?: string;
 };

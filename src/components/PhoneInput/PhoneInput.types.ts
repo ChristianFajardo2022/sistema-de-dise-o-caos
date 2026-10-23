@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from 'react';
 import type { InputState } from '../Input/Input.types';
+import type { FieldRootProps } from '../Field/Field.types';
 
 /** State de Figma (Type=Number de "General input"). Solo para forzar el aspecto en documentación. */
 export type PhoneInputState = InputState;
@@ -10,7 +11,8 @@ export interface PhoneInputCountry {
   code: string;
   /** Indicativo internacional, con o sin `+` (`+57` o `57`). Es lo que se ve en el campo de prefijo. */
   dialCode: string;
-  /** Nombre del país. Hoy no se muestra ni se anuncia: las opciones del prefijo usan solo `dialCode`. */
+  /** Nombre del país. Se ve en la lista con el indicativo ("Colombia +57"), es el nombre accesible de la opción y sirve
+   * para saltar escribiendo. */
   label: string;
 }
 
@@ -24,6 +26,8 @@ export interface PhoneInputProps
   placeholder?: string;
   /** Lista de países del selector. Por defecto una lista corta de ejemplo (+57, +1, +52, +34, +54). */
   countries?: PhoneInputCountry[];
+  /** Texto de cada país en la lista. Por defecto "`label` `dialCode`" ("Colombia +57"). El campo muestra solo `dialCode`. */
+  getCountryLabel?: (country: PhoneInputCountry) => string;
   /** `code` del país elegido (controlado). `null` = ninguno. */
   countryCode?: string | null;
   /** `code` inicial (no controlado). Por defecto, el primero de `countries`. */
@@ -40,6 +44,14 @@ export interface PhoneInputProps
   groupDigits?: boolean;
   /** Máximo de dígitos del número. Por defecto 15. */
   maxDigits?: number;
+  /** Lista de países abierta (controlado). */
+  open?: boolean;
+  /** Lista de países abierta al montar (no controlado). */
+  defaultOpen?: boolean;
+  /** Se abre o se cierra la lista de países. */
+  onOpenChange?: (open: boolean) => void;
+  /** Texto de ayuda en un ícono de información a la derecha del control. */
+  tooltip?: string;
   /** Mensaje de ayuda debajo del control. */
   helperText?: string;
   /** Mensaje de error (tiene prioridad sobre éxito y ayuda). */
@@ -60,8 +72,10 @@ export interface PhoneInputProps
   required?: boolean;
   /** Ocupa el 100 % del ancho del contenedor (si no, 320). */
   fullWidth?: boolean;
-  /** Fuerza el aspecto de un estado (solo documentación). `active` dibuja además la lista de muestra debajo. */
+  /** Fuerza el aspecto de un estado (solo documentación). `active` abre además la lista de países bajo el control. */
   state?: PhoneInputState;
   /** Clases del elemento raíz. */
   className?: string;
+  /** Atributos para la raíz (`data-*`, `style`, `ref`…); se suman al resto de props, que también van a la raíz. */
+  rootProps?: FieldRootProps;
 }

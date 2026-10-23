@@ -26,7 +26,13 @@
     "required": { "type": "boolean", "default": false, "description": "Número obligatorio (required nativo)." },
     "fullWidth": { "type": "boolean", "default": false, "description": "100 % del contenedor (si no, 320)." },
     "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'", "required": false, "description": "Fuerza el aspecto, solo para documentación. active dibuja además una lista de muestra." },
-    "ref": { "type": "Ref<HTMLInputElement>", "required": false, "description": "Apunta al input del número. className y el resto de props van a la raíz." }
+    "ref": { "type": "Ref<HTMLInputElement>", "required": false, "description": "Apunta al input del número. className y el resto de props van a la raíz." },
+    "getCountryLabel": { "type": "(country: PhoneInputCountry) => string", "required": false, "description": "Texto de cada país en la lista. Por defecto \"Colombia +57\"; el campo muestra solo el indicativo." },
+    "open": { "type": "boolean", "required": false, "description": "Lista de países abierta (controlado)." },
+    "defaultOpen": { "type": "boolean", "required": false, "description": "Lista abierta al montar." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Se abre o se cierra la lista." },
+    "tooltip": { "type": "string", "required": false, "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)." },
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." }
   },
   "examples": [
     { "title": "Básico", "code": "<PhoneInput label=\"Teléfono\" placeholder=\"300 123 4567\" name=\"telefono\" />" },

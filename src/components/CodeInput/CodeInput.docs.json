@@ -22,12 +22,13 @@
     "name": { "type": "string", "required": false, "description": "Envía el código en un input oculto del formulario." },
     "autoFocus": { "type": "boolean", "default": false, "description": "Enfoca la primera casilla libre al montar." },
     "getDigitLabel": { "type": "(index: number, length: number) => string", "default": "\"Dígito N de M\"", "description": "Nombre accesible de cada casilla." },
-    "state": {
-      "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'",
-      "default": "'default'",
-      "description": "Fuerza el aspecto, solo para documentación."
-    },
-    "className": { "type": "string", "required": false, "description": "Clases adicionales. El resto de props y el ref van al contenedor raíz." }
+    "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'", "default": "'default'", "description": "Fuerza el aspecto, solo para documentación." },
+    "className": { "type": "string", "required": false, "description": "Clases de la raíz. El resto de props va a la raíz; el ref, a la primera casilla." },
+    "tooltip": { "type": "string", "required": false, "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)." },
+    "required": { "type": "boolean", "required": false, "description": "required nativo en cada casilla." },
+    "optional": { "type": "boolean", "required": false, "description": "Agrega \" | Opcional\" al label." },
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." },
+    "ref": { "type": "Ref<HTMLInputElement>", "required": false, "description": "A la primera casilla (antes iba a la raíz). Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps." }
   },
   "examples": [
     { "title": "Básico", "code": "<CodeInput label=\"Código de verificación\" helperText=\"Te lo enviamos por SMS\" onComplete={verify} />" },

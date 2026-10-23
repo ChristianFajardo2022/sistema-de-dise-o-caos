@@ -12,7 +12,18 @@ import { cva } from 'class-variance-authority';
  * - Ganchos de CSS (no son API): `--input-field-gap` (gap ícono/texto, 8), `--input-border` (borde en reposo),
  *   `--input-label-rest-top|size|leading` (label en reposo, 11px / 14 / 18). Un contenedor puede fijarlos en su `className`.
  * - Los colores salen de variables locales (--lbl-*, --ico, --val) que fija cada estado.
+ * - Error y Success no cambian el borde con el foco: llevan un anillo de 2 (borde activo) cuando el control de dentro
+ *   (`input`, `textarea` o `[role=combobox]`) tiene foco visible (WCAG 2.4.7). Lo heredan todos los campos que usan esta base.
+ * - Alto, padding y radio se ajustan con `className` (cn() resuelve el conflicto con las utilidades ds-).
  */
+
+/** Anillo de foco del recuadro en Error y Success (el borde semántico no cambia con el foco). */
+const FOCUS_RING_WITHIN = [
+  'has-[input:focus-visible,textarea:focus-visible,[role=combobox]:focus-visible]:outline-2',
+  'has-[input:focus-visible,textarea:focus-visible,[role=combobox]:focus-visible]:outline-offset-2',
+  'has-[input:focus-visible,textarea:focus-visible,[role=combobox]:focus-visible]:outline-solid',
+  'has-[input:focus-visible,textarea:focus-visible,[role=combobox]:focus-visible]:outline-ds-border-field-active',
+].join(' ');
 
 /** Contenedor del campo (el recuadro con borde). */
 export const inputFieldVariants = cva(
@@ -49,7 +60,8 @@ export const inputFieldVariants = cva(
         ],
         'burnt-in': [
           'border-ds-border-field-default bg-ds-background-field-burnt-in',
-          '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
+          // Label en reposo (solo lectura sin valor): text/field/disabled-negative, como Figma (Type=Number, Burnt-In)
+          '[--lbl-in:var(--color-ds-text-field-disabled-negative)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
           '[--val:var(--color-ds-text-field-disabled-negative)] [--ico:var(--color-ds-icon-general-disabled-positive)]',
         ],
         disabled: [
@@ -59,11 +71,13 @@ export const inputFieldVariants = cva(
         ],
         error: [
           'border-ds-border-semantic-error',
+          FOCUS_RING_WITHIN,
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-semantic-error-secondary)]',
           '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],
         success: [
           'border-ds-border-semantic-success',
+          FOCUS_RING_WITHIN,
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-semantic-success-secondary)]',
           '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
         ],

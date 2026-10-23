@@ -1,14 +1,14 @@
 {
   "name": "DatePicker",
   "component": "DatePicker",
-  "description": "Campo de fecha del sistema de diseño CAOS, fiel al component set Date picker de Figma (8096:3344; State Dafault, Filled, Active/Focus, Burnt-In, Disabled, Error, Success y Helper text). Usa la base visual de Input (campo de 56, mobile 48, radio 16, label flotante y NotificationText para los mensajes) con el ícono calendar de 16 a la derecha (icon/general/gray-high-contrast). La fecha se puede escribir en el formato del idioma (dd/mm/aaaa en español) con una máscara ligera que pone los separadores y completa con cero ('1/' → '01/'); una fecha completa y válida se aplica al momento y los errores (fecha imposible, fuera de minDate/maxDate o deshabilitada) se muestran al salir del campo o con Enter. El botón del ícono abre el Calendar debajo, alineado a la derecha y 8 por debajo, en un popover nativo no modal que se ajusta a la pantalla (mismo cálculo que DropdownMenu). Patrón WAI-ARIA APG Date Picker Dialog: botón 'Elegir fecha' con la fecha actual en el nombre accesible, aria-haspopup='dialog' y aria-expanded; al abrir, el foco va al día elegido o a hoy; Esc cierra sin aplicar y devuelve el foco al botón; Aplicar y Cancelar con showActions (sin él, elegir el día o el fin del rango aplica y cierra); Alt + Flecha abajo en el campo también abre; Tab fuera cierra. Modo range: texto 'dd/mm/aaaa – dd/mm/aaaa' y calendario de dos meses. Con name envía un input oculto en ISO.",
+  "description": "Campo de fecha del sistema de diseño CAOS, fiel al component set Date picker de Figma (8096:3344; State Dafault, Filled, Active/Focus, Burnt-In, Disabled, Error, Success y Helper text). Usa la base visual de Input (campo de 56, mobile 48, radio 16, label flotante y NotificationText para los mensajes) con el ícono calendar de 16 a la derecha (icon/general/gray-high-contrast). La fecha se puede escribir en el formato del idioma (dd/mm/aaaa en español) con una máscara ligera que pone los separadores y completa con cero ('1/' → '01/'); una fecha completa y válida se aplica al momento y los errores (fecha imposible, fuera de minDate/maxDate o deshabilitada) se muestran al salir del campo o con Enter. El botón del ícono abre el Calendar debajo, alineado a la derecha y 8 por debajo, en un popover nativo no modal que se ajusta a la pantalla (mismo cálculo que DropdownMenu). Patrón WAI-ARIA APG Date Picker Dialog: botón 'Elegir fecha' con la fecha actual en el nombre accesible, aria-haspopup='dialog' y aria-expanded; al abrir, el foco va al día elegido o a hoy; Esc cierra sin aplicar y devuelve el foco al botón; Aplicar y Cancelar con showActions (sin él, elegir el día o el fin del rango aplica y cierra); Alt + Flecha abajo en el campo también abre; Tab fuera cierra. Modo range: texto 'dd/mm/aaaa – dd/mm/aaaa' y calendario de dos meses. Con name envía un input oculto en ISO. El calendario se abre con el foco en el día activo (Calendar autoFocus) y se coloca con el posicionamiento compartido.",
   "figmaNodeId": "8096-3344",
   "category": "Form Controls",
   "props": {
     "mode": { "type": "'single' | 'range'", "default": "'single'", "description": "Una fecha o un rango." },
     "value": { "type": "Date | null | DateRange", "required": false, "description": "Fecha o rango (controlado). Usar con onChange." },
     "defaultValue": { "type": "Date | null | DateRange", "required": false, "description": "Valor inicial (no controlado)." },
-    "onChange": { "type": "(value: Date | null | DateRange) => void", "required": false, "description": "Al aplicar en el calendario o al escribir una fecha completa y válida (null al vaciar el campo)." },
+    "onChange": { "type": "(value: Date | null | DateRange) => void", "required": false, "description": "Obsoleto: usar onValueChange (se sigue llamando)." },
     "label": { "type": "string", "required": true, "description": "Label flotante, asociado al input con htmlFor." },
     "placeholder": { "type": "string", "required": false, "description": "Se ve con foco. Por defecto, la pista del idioma (dd/mm/aaaa)." },
     "optional": { "type": "boolean", "default": false, "description": "Agrega ' | Opcional' después del label." },
@@ -35,11 +35,16 @@
     "readOnly": { "type": "boolean", "default": false, "description": "Burnt-In: muestra el valor y no se abre." },
     "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del contenedor (por defecto 320)." },
     "name": { "type": "string", "required": false, "description": "Input oculto con el valor ISO (2026-10-14; rango 2026-10-12/2026-11-04)." },
-    "inputProps": { "type": "InputHTMLAttributes<HTMLInputElement>", "required": false, "description": "Props extra del input de texto. El ref del componente va a la raíz; el del input, por inputRef." }
+    "inputProps": { "type": "InputHTMLAttributes<HTMLInputElement>", "required": false, "description": "Props extra del input de texto (el ref del componente ya va a este input)." },
+    "onValueChange": { "type": "(value: Date | null | DateRange) => void", "required": false, "description": "Cambia la fecha o el rango (al aplicar o al escribir uno completo y válido)." },
+    "inputRef": { "type": "Ref<HTMLInputElement>", "required": false, "description": "Obsoleto: el ref ya va al input; recibe el mismo nodo." },
+    "required": { "type": "boolean", "required": false, "description": "required nativo en el input de texto." },
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." },
+    "ref": { "type": "Ref<HTMLInputElement>", "required": false, "description": "Al input de texto (antes iba a la raíz). Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps." }
   },
   "examples": [
-    { "title": "Una fecha", "code": "<DatePicker label=\"Fecha de entrega\" value={fecha} onChange={setFecha} />" },
-    { "title": "Rango sin pie", "code": "<DatePicker mode=\"range\" label=\"Periodo\" showActions={false} onChange={setRango} />" },
+    { "title": "Una fecha", "code": "<DatePicker label=\"Fecha de entrega\" value={fecha} onValueChange={setFecha} />" },
+    { "title": "Rango sin pie", "code": "<DatePicker mode=\"range\" label=\"Periodo\" showActions={false} onValueChange={setRango} />" },
     { "title": "Con límites", "code": "<DatePicker label=\"Fecha de la cita\" minDate={hoy} maxDate={enUnMes} isDateDisabled={(d) => d.getDay() === 0} />" },
     { "title": "En un formulario", "code": "<DatePicker label=\"Fecha de nacimiento\" name=\"nacimiento\" required />" }
   ]

@@ -17,6 +17,8 @@ export * from './components/DatePicker';
 export * from './components/DigitInput';
 export * from './components/Dots';
 export * from './components/DropdownMenu';
+// Base interna de los campos: solo se exporta el tipo de `rootProps`, común a todos los controles de formulario
+export type { FieldRootProps } from './components/Field';
 export * from './components/Icon';
 export * from './components/InlineField';
 export * from './components/Input';

@@ -14,7 +14,8 @@
     },
     "onChange": {
       "type": "(value: string) => void",
-      "description": "Recibe \"HH:mm\" cuando hay hora válida y \"\" cuando deja de haberla."
+      "required": false,
+      "description": "Obsoleto: usar onValueChange (se sigue llamando)."
     },
     "hourCycle": {
       "type": "12 | 24",
@@ -28,8 +29,8 @@
     },
     "label": {
       "type": "string",
-      "description": "Nombre accesible del grupo (no se dibuja).",
-      "default": "'Seleccionar hora'"
+      "required": false,
+      "description": "Nombre accesible del grupo; Figma no lo dibuja (los campos tienen su label visible). Por defecto \"Seleccionar hora\"."
     },
     "hourLabel": {
       "type": "string",
@@ -89,16 +90,46 @@
       "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'",
       "description": "Fuerza el aspecto de un estado (solo documentación).",
       "default": "'default'"
+    },
+    "onValueChange": {
+      "type": "(value: string) => void",
+      "required": false,
+      "description": "\"HH:mm\" (24 h) cuando la hora es válida; \"\" cuando deja de serlo."
+    },
+    "tooltip": {
+      "type": "string",
+      "required": false,
+      "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)."
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "description": "required nativo en hora y minutos."
+    },
+    "optional": {
+      "type": "boolean",
+      "required": false,
+      "description": "Agrega \" | Opcional\" a los labels de hora y minutos."
+    },
+    "rootProps": {
+      "type": "FieldRootProps",
+      "required": false,
+      "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz."
+    },
+    "ref": {
+      "type": "Ref<HTMLInputElement>",
+      "required": false,
+      "description": "Al campo de la hora (antes iba a la raíz). Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps."
     }
   },
   "examples": [
     {
       "title": "Básico",
-      "code": "<TimePicker label=\"Hora de la cita\" onChange={(v) => console.log(v)} />"
+      "code": "<TimePicker label=\"Hora de la cita\" onValueChange={(v) => console.log(v)} />"
     },
     {
       "title": "Controlado en 24 h",
-      "code": "<TimePicker hourCycle={24} value={hora} onChange={setHora} minuteStep={5} />"
+      "code": "<TimePicker hourCycle={24} value={hora} onValueChange={setHora} minuteStep={5} />"
     },
     {
       "title": "Con error",

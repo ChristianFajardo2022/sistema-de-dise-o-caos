@@ -16,6 +16,7 @@ export const DigitInput = forwardRef<HTMLInputElement, DigitInputProps>(
       readOnly = false,
       inputMode = 'numeric',
       pattern = '[0-9]',
+      maxLength = 1,
       className,
       onChange,
       ...restProps
@@ -56,7 +57,7 @@ export const DigitInput = forwardRef<HTMLInputElement, DigitInputProps>(
         type="text"
         inputMode={inputMode}
         pattern={pattern}
-        maxLength={1}
+        maxLength={maxLength}
         autoComplete={oneTimeCode ? 'one-time-code' : 'off'}
         disabled={isDisabled}
         readOnly={isReadOnly}

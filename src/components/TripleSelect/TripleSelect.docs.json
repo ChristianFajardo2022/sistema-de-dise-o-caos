@@ -1,10 +1,10 @@
 {
   "name": "TripleSelect",
   "component": "TripleSelect",
-  "description": "Tres selectores en un mismo recuadro, fiel al Type=Triple del component set General input de Figma (7856:1485, 8 estados, ancho 496, alto 56 y 82 con mensaje). Es genérico: no depende de fechas; sirve para día/mes/año, departamento/ciudad/barrio o cualquier terna de listas. Cada sección es un Select con frame=\"none\" (patrón APG Select-Only Combobox, teclado completo) y la lista de cada una se abre bajo todo el recuadro (anchorRef). El marco común usa la base visual de Input (borde, estados, radio) y los mensajes NotificationText. Accesibilidad: role=\"group\" con nombre (label), cada combobox con su propio nombre, mensaje asociado por aria-describedby en las tres secciones y en el grupo, aria-invalid en error, foco visible por sección (el borde del recuadro cambia con :focus-within; anillo de 2 en error y éxito). Si se necesitan otras composiciones (por ejemplo un campo de texto junto a un selector), se puede armar con Select frame=\"none\" y inputFieldVariants. Figma set 'General input' (Type=Triple).",
+  "description": "Tres selectores en un mismo recuadro, fiel al Type=Triple del component set General input de Figma (7856:1485, 8 estados, ancho 496, alto 56 y 82 con mensaje). Es genérico: no depende de fechas; sirve para día/mes/año, departamento/ciudad/barrio o cualquier terna de listas. Cada sección es un Select con frame=\"none\" (patrón APG Select-Only Combobox, teclado completo) y la lista de cada una se abre bajo todo el recuadro (anchorRef). El marco común usa la base visual de Input (borde, estados, radio) y los mensajes NotificationText. Accesibilidad: role=\"group\" con nombre (label), cada combobox con su propio nombre, mensaje asociado por aria-describedby en las tres secciones (no en el grupo, para no leerlo dos veces), aria-invalid en error. Foco: solo el borde exterior del recuadro, como Figma (cambia con :focus-within; en error y éxito, anillo de 2 alrededor del recuadro); las secciones no tienen anillo propio, así que con teclado no se distingue qué sección tiene el foco (decisión de producto). Si se necesitan otras composiciones (por ejemplo un campo de texto junto a un selector), se puede armar con Select frame=\"none\" y inputFieldVariants. Figma set 'General input' (Type=Triple).",
   "category": "Form Controls",
   "props": {
-    "label": { "type": "string", "required": true, "description": "Nombre accesible del grupo (no se dibuja)." },
+    "label": { "type": "string", "required": true, "description": "Nombre accesible del grupo; Figma no lo dibuja (cada sección tiene su label visible)." },
     "fields": { "type": "[TripleSelectField, TripleSelectField, TripleSelectField]", "required": true, "description": "Las tres secciones, de izquierda a derecha: { name?, label, placeholder?, options, value?, defaultValue?, onValueChange?, optional? }." },
     "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda debajo (aria-describedby)." },
     "errorText": { "type": "string", "required": false, "description": "Mensaje de error; marca aria-invalid en las tres secciones. Prioridad: error > éxito > ayuda." },
@@ -13,7 +13,10 @@
     "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In: se enfocan y se leen, no abren." },
     "fullWidth": { "type": "boolean", "default": false, "description": "100 % del contenedor (si no, 496)." },
     "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'", "required": false, "description": "Fuerza el aspecto, solo para documentación. Nunca abre la lista." },
-    "ref": { "type": "Ref<HTMLDivElement>", "required": false, "description": "Apunta al recuadro con role=group. className y el resto de props van al elemento raíz." }
+    "ref": { "type": "Ref<HTMLButtonElement>", "required": false, "description": "Al primer combobox (antes iba a la raíz). Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps." },
+    "tooltip": { "type": "string", "required": false, "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)." },
+    "required": { "type": "boolean", "required": false, "description": "aria-required en las tres secciones." },
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." }
   },
   "examples": [
     { "title": "Fecha de nacimiento", "code": "<TripleSelect\n  label=\"Fecha de nacimiento\"\n  fields={[\n    { name: 'dia', label: 'Día', options: dias },\n    { name: 'mes', label: 'Mes', options: meses },\n    { name: 'anio', label: 'Año', options: anios },\n  ]}\n/>" },

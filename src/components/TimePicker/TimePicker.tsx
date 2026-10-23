@@ -1,11 +1,11 @@
-import { forwardRef, useId, useState } from 'react';
+import { forwardRef, useState } from 'react';
 import type { ChangeEvent, KeyboardEvent } from 'react';
 import type { InputState } from '../Input/Input.types';
-import { inputControlVariants, inputFieldVariants, inputLabelVariants } from '../Input/Input.variants';
-import { NotificationText } from '../NotificationText';
+import { inputControlVariants, inputFieldVariants } from '../Input/Input.variants';
+import { FieldLabel, FieldMessage, FieldRow, joinIds, useField } from '../Field';
 import { cn } from '../../utils/cn';
 import type { TimePickerProps } from './TimePicker.types';
-import { TIME_PICKER_MESSAGE_GAP, timePickerPeriodVariants, timePickerRootVariants, timePickerRowVariants } from './TimePicker.variants';
+import { timePickerPeriodVariants, timePickerRootVariants, timePickerRowVariants } from './TimePicker.variants';
 
 type Period = 'AM' | 'PM';
 
@@ -53,11 +53,18 @@ function stepValue(current: number | null, dir: 1 | -1, min: number, max: number
   return next;
 }
 
-export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
+/**
+ * Selector de hora (tipo "Time picker" de General input): campos de hora y minutos (spinbutton) y el par AM/PM.
+ * `label` es el nombre accesible del grupo (Figma no lo dibuja; cada campo tiene su label visible).
+ * El `ref` va al campo de la hora (el primer control); `className`, `rootProps` y el resto de props van a la raíz.
+ * El mensaje se asocia (`aria-describedby`) a cada control, no al grupo, para que no se lea dos veces.
+ */
+export const TimePicker = forwardRef<HTMLInputElement, TimePickerProps>(
   (
     {
       value,
       defaultValue,
+      onValueChange,
       onChange,
       hourCycle = 12,
       minuteStep = 1,
@@ -72,23 +79,27 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
       helperText,
       errorText,
       successText,
+      tooltip,
       disabled = false,
       readOnly = false,
+      required,
+      optional = false,
       name,
       fullWidth = false,
       state = 'default',
       className,
+      rootProps,
       id,
       'aria-describedby': ariaDescribedBy,
       ...restProps
     },
     ref
   ) => {
-    const autoId = useId();
-    const baseId = id ?? autoId;
+    const base = useField({ id, helperText, errorText, successText, tooltip, state, disabled, readOnly });
+    const { ids, message, isDisabled, isError, isSuccess, isReadOnly } = base;
+    const baseId = ids.control;
     const hourId = `${baseId}-hour`;
     const minuteId = `${baseId}-minute`;
-    const messageId = `${baseId}-message`;
 
     const is12 = hourCycle === 12;
     const hMin = is12 ? 1 : 0;
@@ -108,13 +119,12 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
     const commit = (next: Draft) => {
       setDraft(next);
       const nextValue = toValue(next, hourCycle);
-      if (nextValue !== composed) onChange?.(nextValue);
+      if (nextValue !== composed) {
+        onValueChange?.(nextValue);
+        onChange?.(nextValue);
+      }
     };
 
-    const isDisabled = disabled || state === 'disabled';
-    const isError = Boolean(errorText) || state === 'error';
-    const isSuccess = !isError && (Boolean(successText) || state === 'success');
-    const isReadOnly = readOnly || state === 'burnt-in';
     const locked = isDisabled || isReadOnly;
 
     // Prioridad visual: disabled > error > success > burnt-in (readOnly) > state forzado
@@ -134,14 +144,8 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
 
     const forceFloat = !isDisabled && (isReadOnly || ['filled', 'active', 'error', 'success'].includes(state) || isError || isSuccess);
 
-    const message = errorText
-      ? { kind: 'error' as const, text: errorText }
-      : successText
-        ? { kind: 'success' as const, text: successText }
-        : helperText
-          ? { kind: 'helper' as const, text: helperText }
-          : null;
-    const describedBy = cn(message && messageId, ariaDescribedBy) || undefined;
+    // Mensaje y tooltip: en cada control (no en el grupo, que lo repetiría al entrar)
+    const describedBy = base.describedBy(ariaDescribedBy);
 
     const radioName = `${baseId}-period`;
 
@@ -204,6 +208,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
           <div className={inputFieldVariants({ variant: 'text', state: isHour ? baseState : minuteState })}>
             <div className="relative h-10 min-w-0 flex-1">
               <input
+                ref={isHour ? ref : undefined}
                 id={id}
                 type="text"
                 role="spinbutton"
@@ -214,6 +219,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
                 placeholder={placeholder || ' '}
                 disabled={isDisabled}
                 readOnly={isReadOnly}
+                required={required}
                 aria-valuemin={min}
                 aria-valuemax={max}
                 aria-valuenow={n ?? undefined}
@@ -222,7 +228,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
                 aria-invalid={isError || outOfRange || undefined}
                 className={inputControlVariants({ showPlaceholder: forceFloat && Boolean(placeholder) })}
                 {...ownerProps}
-                aria-describedby={cn(describedBy, userDescribedBy) || undefined}
+                aria-describedby={joinIds(describedBy, userDescribedBy)}
                 onChange={(e) => {
                   userChange?.(e);
                   if (!e.defaultPrevented) onText(key)(e);
@@ -236,9 +242,9 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
                   if (!e.defaultPrevented) onKeyDown(key)(e);
                 }}
               />
-              <label htmlFor={id} data-figma-part="Label" className={inputLabelVariants({ float: forceFloat ? 'always' : 'auto' })}>
+              <FieldLabel htmlFor={id} data-figma-part="Label" float={forceFloat} optional={optional}>
                 {isHour ? hourLabel : minuteLabel}
-              </label>
+              </FieldLabel>
             </div>
           </div>
         </div>
@@ -247,71 +253,60 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
 
     return (
       <div
-        ref={ref}
         role="group"
         aria-label={label}
-        aria-describedby={describedBy}
-        className={cn(timePickerRootVariants({ fullWidth }), message && TIME_PICKER_MESSAGE_GAP, className)}
         {...restProps}
+        {...rootProps}
+        className={cn(timePickerRootVariants({ fullWidth }), rootProps?.className, className)}
       >
-        <div className={timePickerRowVariants()}>
-          {field('hour')}
-          {field('minute')}
-          {is12 && (
-            // Radiogroup nativo: AM/PM son una elección excluyente, y los radios traen flechas y Tab (un solo
-            // punto de tabulación) sin código propio. `form` apunta a un id inexistente para que no se envíen:
-            // el valor del formulario es el campo oculto `name`.
-            <div role="radiogroup" aria-label={periodLabel} className="flex min-w-0 flex-1 gap-ds-space-general-md" data-figma-part="Container AM/PM">
-              {(['AM', 'PM'] as const).map((p) => {
-                const selected = draft.period === p;
-                const periodState: InputState = isDisabled ? 'disabled' : isReadOnly ? 'burnt-in' : selected ? 'active' : 'default';
-                return (
-                  <label key={p} className="block min-w-0 flex-1">
-                    <input
-                      type="radio"
-                      name={radioName}
-                      form={`${baseId}-sin-formulario`}
-                      value={p}
-                      checked={selected}
-                      disabled={isDisabled}
-                      aria-describedby={describedBy}
-                      onChange={() => {
-                        if (!locked) commit({ ...draft, period: p });
-                      }}
-                      onClick={(e) => {
-                        // Solo lectura: se enfoca pero no cambia
-                        if (isReadOnly) e.preventDefault();
-                      }}
-                      className="peer sr-only"
-                    />
-                    <span
-                      data-figma-part="Label"
-                      className={cn(inputFieldVariants({ variant: 'text', state: periodState }), timePickerPeriodVariants(), isDisabled && 'cursor-not-allowed')}
-                    >
-                      {p}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        <FieldRow tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled } : null}>
+          <div className={timePickerRowVariants()}>
+            {field('hour')}
+            {field('minute')}
+            {is12 && (
+              // Radiogroup nativo: AM/PM son una elección excluyente, y los radios traen flechas y Tab (un solo
+              // punto de tabulación) sin código propio. `form` apunta a un id inexistente para que no se envíen:
+              // el valor del formulario es el campo oculto `name`.
+              <div role="radiogroup" aria-label={periodLabel} className="flex min-w-0 flex-1 gap-ds-space-general-md" data-figma-part="Container AM/PM">
+                {(['AM', 'PM'] as const).map((p) => {
+                  const selected = draft.period === p;
+                  const periodState: InputState = isDisabled ? 'disabled' : isReadOnly ? 'burnt-in' : selected ? 'active' : 'default';
+                  return (
+                    <label key={p} className="block min-w-0 flex-1">
+                      <input
+                        type="radio"
+                        name={radioName}
+                        form={`${baseId}-sin-formulario`}
+                        value={p}
+                        checked={selected}
+                        disabled={isDisabled}
+                        aria-describedby={describedBy}
+                        onChange={() => {
+                          if (!locked) commit({ ...draft, period: p });
+                        }}
+                        onClick={(e) => {
+                          // Solo lectura: se enfoca pero no cambia
+                          if (isReadOnly) e.preventDefault();
+                        }}
+                        className="peer sr-only"
+                      />
+                      <span
+                        data-figma-part="Label"
+                        className={cn(inputFieldVariants({ variant: 'text', state: periodState }), timePickerPeriodVariants(), isDisabled && 'cursor-not-allowed')}
+                      >
+                        {p}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </FieldRow>
 
         {name && <input type="hidden" name={name} value={composed} disabled={isDisabled} />}
 
-        {/* Región viva siempre presente (debe existir antes de que cambie su texto) */}
-        <div aria-live="polite">
-          {message && (
-            <NotificationText
-              id={messageId}
-              state={message.kind === 'success' ? 'confirmation' : message.kind}
-              announce={false}
-              data-figma-part="Helper text"
-            >
-              {message.text}
-            </NotificationText>
-          )}
-        </div>
+        <FieldMessage id={ids.message} message={message} data-figma-part="Helper text" />
       </div>
     );
   }

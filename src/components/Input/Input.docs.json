@@ -69,6 +69,21 @@
       "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'",
       "default": "'default'",
       "description": "Fuerza el aspecto de un estado. Solo para documentación; en uso real el estado sale del foco, el valor, disabled, readOnly y los mensajes."
+    },
+    "onValueChange": {
+      "type": "(value: string) => void",
+      "required": false,
+      "description": "Cambia el valor (recibe el texto). Se llama junto con el onChange nativo."
+    },
+    "rootProps": {
+      "type": "FieldRootProps",
+      "required": false,
+      "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz."
+    },
+    "ref": {
+      "type": "Ref<HTMLInputElement>",
+      "required": false,
+      "description": "Al <input>. Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps."
     }
   },
   "accessibility": [

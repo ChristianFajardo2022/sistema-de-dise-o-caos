@@ -1,8 +1,10 @@
 import type { HTMLAttributes } from 'react';
+import type { FieldRootProps } from '../Field/Field.types';
+import type { InputState } from '../Input/Input.types';
 import type { SelectOptionData } from '../Select/Select.types';
 
-/** State de Figma (Type=Triple de "General input"). Solo para forzar el aspecto en documentación. */
-export type TripleSelectState = 'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success';
+/** State de Figma (Type=Triple de "General input"), el mismo de Input. Solo para forzar el aspecto en documentación. */
+export type TripleSelectState = InputState;
 
 /** Una de las tres secciones: un `Select` sin marco propio. */
 export interface TripleSelectField {
@@ -38,6 +40,10 @@ export interface TripleSelectProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   errorText?: string;
   /** Mensaje de éxito. */
   successText?: string;
+  /** Texto de ayuda en un ícono de información a la derecha del recuadro. */
+  tooltip?: string;
+  /** Marca las tres secciones como obligatorias (`aria-required`). La validación es de quien lo usa. */
+  required?: boolean;
   /** Deshabilita las tres secciones. */
   disabled?: boolean;
   /** Solo lectura = estado Burnt-In: se enfoca y se lee, no abre. */
@@ -46,4 +52,6 @@ export interface TripleSelectProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   fullWidth?: boolean;
   /** Fuerza el aspecto de un estado (solo documentación). Nunca abre la lista. */
   state?: TripleSelectState;
+  /** Atributos para la raíz (`data-*`, `style`, `ref`…); se suman al resto de props, que también van a la raíz. */
+  rootProps?: FieldRootProps;
 }

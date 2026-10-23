@@ -1,4 +1,5 @@
-import type { HTMLAttributes, InputHTMLAttributes } from 'react';
+import type { InputHTMLAttributes } from 'react';
+import type { FieldRootProps } from '../Field/Field.types';
 
 /** Size de Figma (set 12609:18389): `sm` mide 56 de alto y `md` 48, tal como están en el archivo. */
 export type NumberPickerSize = 'sm' | 'md';
@@ -39,11 +40,19 @@ type NumberPickerBaseProps = Omit<
   state?: NumberPickerState;
   /** Clases adicionales para el contenedor raíz (el resto de props nativas y el ref van al `<input>`). */
   className?: string;
+  /** Mensaje de ayuda debajo del campo. */
+  helperText?: string;
+  /** Mensaje de error (tiene prioridad sobre éxito y ayuda). Marca el campo con `aria-invalid`. */
+  errorText?: string;
+  /** Mensaje de éxito. */
+  successText?: string;
+  /** Texto de ayuda en un ícono de información a la derecha del campo. */
+  tooltip?: string;
   /**
-   * Atributos para el contenedor raíz (`data-*`, `id`, `style`, etc.), p. ej. `data-figma` para medir contra Figma.
-   * `className` se mezcla con el de la raíz; los atributos nativos sueltos siguen yendo al `<input>`.
+   * Atributos para el contenedor raíz (`data-*`, `id`, `style`, `ref`…), p. ej. `data-figma` para medir contra Figma.
+   * `className` se mezcla con el de la raíz; el `ref` del componente y los atributos nativos sueltos van al `<input>`.
    */
-  rootProps?: HTMLAttributes<HTMLDivElement> & { [K in `data-${string}`]?: string | number | boolean };
+  rootProps?: FieldRootProps;
 };
 
 /** El campo necesita nombre accesible (p. ej. "Cantidad"): aria-label o aria-labelledby. */

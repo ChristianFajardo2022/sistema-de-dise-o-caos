@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
@@ -106,7 +106,8 @@ const STATE_PROPS: { figma: string; props: Partial<ComponentProps<typeof TripleS
   { figma: 'Default', props: {} },
   { figma: 'Filled', props: { state: 'filled' } },
   { figma: 'Active/Focus', props: { state: 'active' } },
-  { figma: 'Burnt-In', props: { readOnly: true } },
+  // Estado forzado: Figma dibuja "Placeholder" (el valor de muestra) bajo el label; un `readOnly` real sin valor deja el label dentro
+  { figma: 'Burnt-In', props: { state: 'burnt-in' } },
   { figma: 'Disabled', props: { disabled: true } },
   { figma: 'Error', props: { errorText: 'Error text' } },
   { figma: 'Success', props: { successText: 'Confirmation text' } },
@@ -246,5 +247,78 @@ export const StatesTest: Story = {
     first.focus();
     await userEvent.keyboard('{ArrowDown}');
     await expect(first).toHaveAttribute('aria-expanded', 'false');
+  },
+};
+
+function TripleSelectApiDemo() {
+  const ref = useRef<HTMLButtonElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const [refs, setRefs] = useState('');
+  useEffect(() => setRefs(`${ref.current?.getAttribute('role')}|${root.current?.dataset.testid}`), []);
+  return (
+    <div className="flex flex-col gap-4">
+      <TripleSelect
+        ref={ref}
+        rootProps={{ ref: root, 'data-testid': 'raiz' }}
+        label="Fecha de nacimiento"
+        fields={BIRTH_FIELDS}
+        helperText="Como aparece en tu documento"
+        tooltip="Debes ser mayor de edad"
+        required
+      />
+      <output data-testid="refs">{refs}</output>
+    </div>
+  );
+}
+
+/** API común: `ref` al primer combobox, `rootProps.ref` a la raíz, `required`, tooltip y el mensaje solo en las secciones. */
+export const ApiTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <TripleSelectApiDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('refs')).toHaveTextContent('combobox|raiz');
+    const group = canvas.getByRole('group', { name: 'Fecha de nacimiento' });
+    await expect(group).not.toHaveAttribute('aria-describedby');
+    for (const combo of within(group).getAllByRole('combobox')) {
+      await expect(combo).toHaveAttribute('aria-required', 'true');
+      await expect(combo).toHaveAccessibleDescription('Como aparece en tu documento Debes ser mayor de edad');
+    }
+    await expect(canvas.getByRole('button', { name: 'Debes ser mayor de edad' })).toBeVisible();
+  },
+};
+
+/**
+ * Test: el foco se marca solo en el borde exterior del recuadro (como Figma): las secciones no tienen anillo propio.
+ * En error, el anillo de 2 de la base rodea el recuadro.
+ */
+export const FocusTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div className="flex flex-col gap-6 p-4">
+      <TripleSelect label="Normal" fields={BIRTH_FIELDS} />
+      <TripleSelect label="Con error" fields={BIRTH_FIELDS} errorText="Revisa la fecha" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const section = (combo: HTMLElement) => getComputedStyle(combo.parentElement!.parentElement!);
+    const normal = canvas.getByRole('group', { name: 'Normal' });
+    const [first] = within(normal).getAllByRole('combobox');
+    const rest = getComputedStyle(normal).borderTopColor;
+    await userEvent.tab();
+    await expect(first).toHaveFocus();
+    await expect(section(first).outlineStyle).toBe('none');
+    // El borde pasa al activo con una transición de 150 ms
+    await waitFor(() => expect(getComputedStyle(normal).borderTopColor).not.toBe(rest));
+    await expect(getComputedStyle(normal).outlineStyle).toBe('none');
+
+    const error = canvas.getByRole('group', { name: 'Con error' });
+    const [firstError] = within(error).getAllByRole('combobox');
+    firstError.focus();
+    await userEvent.keyboard('{Shift>}{Tab}{/Shift}{Tab}');
+    await waitFor(() => expect(firstError).toHaveFocus());
+    await expect(section(firstError).outlineStyle).toBe('none');
+    await expect(getComputedStyle(error).outlineStyle).toBe('solid');
   },
 };

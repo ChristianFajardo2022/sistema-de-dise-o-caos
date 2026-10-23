@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode, RefObject } from 'react';
 import type { IconName } from '../Icon/Icon.types';
 import type { InputState } from '../Input/Input.types';
+import type { FieldRootProps } from '../Field/Field.types';
 
 /** State de Figma (Type=Dropdown de "General input"). Solo para forzar el aspecto en documentación. */
 export type SelectState = InputState;
@@ -17,8 +18,10 @@ export type SelectFrame = 'field' | 'none';
 export interface SelectOptionData {
   /** Valor que se guarda y se envía con el formulario. Único en la lista. */
   value: string;
-  /** Texto visible. También sirve para saltar escribiendo (typeahead). */
+  /** Texto de la opción en la lista. Es su nombre accesible y sirve para saltar escribiendo (typeahead). */
   label: string;
+  /** Texto en el campo cuando está elegida, si es distinto del de la lista (p. ej. "+57" para "Colombia +57"). */
+  displayLabel?: string;
   /** Opción no seleccionable: se ve atenuada y las flechas la saltan. */
   disabled?: boolean;
   /** Ícono de 16 de la biblioteca CAOS a la izquierda del texto (el "Icono" del ítem "Dropdown list"). */
@@ -29,8 +32,10 @@ export interface SelectOptionData {
 export interface SelectOptionProps {
   /** Valor de la opción. */
   value: string;
-  /** Texto visible (solo texto). */
+  /** Texto de la opción en la lista (solo texto). */
   children: string;
+  /** Texto en el campo cuando está elegida, si es distinto del de la lista. */
+  displayLabel?: string;
   /** Opción no seleccionable. */
   disabled?: boolean;
   /** Ícono de 16 a la izquierda. */
@@ -63,7 +68,11 @@ export interface SelectProps
   defaultValue?: string;
   /** Cambia al elegir una opción (clic, Enter, Espacio, Tab o Alt + Flecha arriba). */
   onValueChange?: (value: string) => void;
-  /** Cambia al abrir o cerrar la lista. */
+  /** Lista abierta (controlado). Deshabilitado o en solo lectura no abre aunque sea `true`. */
+  open?: boolean;
+  /** Lista abierta al montar (no controlado). */
+  defaultOpen?: boolean;
+  /** Cambia al abrir o cerrar la lista (teclado, puntero, elegir, Esc o perder el foco). */
   onOpenChange?: (open: boolean) => void;
   /** Nombre del campo en el formulario: se envía el `value` con un input oculto. */
   name?: string;
@@ -71,7 +80,7 @@ export interface SelectProps
   id?: string;
   /** Deshabilitado: no se enfoca ni se envía. */
   disabled?: boolean;
-  /** Solo lectura (estado Burnt-In): se enfoca y se lee, pero no abre. */
+  /** Solo lectura (estado Burnt-In): se enfoca y se lee, pero no abre. Sin valor, el label se queda dentro. */
   readOnly?: boolean;
   /** Marca el campo como obligatorio para tecnologías de apoyo (`aria-required`). La validación es de quien lo usa. */
   required?: boolean;
@@ -92,4 +101,6 @@ export interface SelectProps
   maxHeight?: string | number;
   /** Clases del elemento raíz. */
   className?: string;
+  /** Atributos para la raíz (`data-*`, `style`, `ref`…); se suman al resto de props, que también van a la raíz. */
+  rootProps?: FieldRootProps;
 }

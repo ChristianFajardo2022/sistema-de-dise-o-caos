@@ -31,14 +31,17 @@ export const selectFrameVariants = cva('', {
   variants: {
     frame: {
       field: 'cursor-pointer',
-      // Con `!`: cn() no reconoce como conflicto las utilidades ds- del campo (alto, padding, radio)
-      // Sin recuadro propio el foco se dibuja por sección: anillo de 2 con el borde activo (WCAG 2.4.7); el marco
-      // que contiene las secciones conserva su :focus-within
-      none: 'h-auto! cursor-pointer rounded-ds-radius-field-sm! border-0! bg-transparent! p-0! has-[[role=combobox]:focus-visible]:outline-2 has-[[role=combobox]:focus-visible]:outline-offset-2 has-[[role=combobox]:focus-visible]:outline-solid has-[[role=combobox]:focus-visible]:outline-ds-border-field-active',
+      // Quita alto, borde, padding, radio y fondo del campo (cn() resuelve el conflicto con las utilidades ds-).
+      // Sin anillo propio (ni el de Error/Success de la base): el foco lo marca solo el borde del recuadro que contiene
+      // las secciones (:focus-within), como Figma en TripleSelect. Decisión de producto; ver su doc.
+      none: 'h-auto cursor-pointer rounded-ds-radius-field-sm border-0 bg-transparent p-0 has-[input:focus-visible,textarea:focus-visible,[role=combobox]:focus-visible]:outline-none',
     },
     // Burnt-In: Figma usa border/field/disabled (Input usa border/field/default)
     burntIn: { true: '', false: '' },
-    // Error y éxito no cambian el borde con el foco: anillo de 2 para que el foco se vea (WCAG 2.4.7)
+    /**
+     * @deprecated El anillo de foco de Error y Success ya lo dibuja la base (`inputFieldVariants`). Se conserva por
+     * compatibilidad.
+     */
     focusRing: {
       true: 'has-[[role=combobox]:focus-visible]:outline-2 has-[[role=combobox]:focus-visible]:outline-offset-2 has-[[role=combobox]:focus-visible]:outline-solid has-[[role=combobox]:focus-visible]:outline-ds-border-field-active',
       false: '',

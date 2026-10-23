@@ -1,16 +1,22 @@
-import { forwardRef, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ChangeEvent, ClipboardEvent, FocusEvent, KeyboardEvent } from 'react';
 import type { CodeInputProps } from './CodeInput.types';
 import { codeInputLabelVariants, codeInputVariants } from './CodeInput.variants';
 import { cn } from '../../utils/cn';
 import { DigitInput } from '../DigitInput';
 import type { DigitInputState } from '../DigitInput';
-import { NotificationText } from '../NotificationText';
+import { FieldMessage, FieldTooltip, useField } from '../Field';
+import { assignRef } from '../../utils/refs';
 
 const onlyDigits = (s: string | undefined) => (s ?? '').replace(/\D/g, '');
 const defaultDigitLabel = (index: number, length: number) => `Dígito ${index + 1} de ${length}`;
 
-export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
+/**
+ * Código de verificación (Type=Code de "General input"): una casilla DigitInput por dígito en un `role="group"`
+ * nombrado por `label`. El `ref` va a la primera casilla (el primer control enfocable); `className`, `rootProps` y el
+ * resto de props van a la raíz.
+ */
+export const CodeInput = forwardRef<HTMLInputElement, CodeInputProps>(
   (
     {
       label,
@@ -23,8 +29,11 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
       helperText,
       errorText,
       successText,
+      tooltip,
       disabled = false,
       readOnly = false,
+      required,
+      optional = false,
       fullWidth = false,
       size = '56',
       placeholder,
@@ -34,14 +43,14 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
       state = 'default',
       id,
       className,
+      rootProps,
       ...restProps
     },
     ref
   ) => {
-    const autoId = useId();
-    const baseId = id ?? autoId;
-    const labelId = `${baseId}-label`;
-    const messageId = `${baseId}-message`;
+    const base = useField({ id, helperText, errorText, successText, tooltip, state, disabled, readOnly });
+    const { ids, message, isDisabled, isReadOnly, isError, isSuccess } = base;
+    const baseId = ids.control;
 
     const isControlled = value !== undefined;
     const [inner, setInner] = useState(() => onlyDigits(defaultValue).slice(0, length));
@@ -55,20 +64,7 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
 
     const cells = useRef<(HTMLInputElement | null)[]>([]);
 
-    const isDisabled = disabled || state === 'disabled';
-    const isReadOnly = readOnly || state === 'burnt-in';
-    const isError = Boolean(errorText) || state === 'error';
-    const isSuccess = !isError && (Boolean(successText) || state === 'success');
     const editable = !isDisabled && !isReadOnly;
-
-    // Mensaje: error > success > helper
-    const message = errorText
-      ? { kind: 'error' as const, text: errorText }
-      : successText
-        ? { kind: 'confirmation' as const, text: successText }
-        : helperText
-          ? { kind: 'helper' as const, text: helperText }
-          : null;
 
     // Estado forzado de documentación que se pasa a cada casilla (los demás salen de las props)
     const forcedCellState: DigitInputState | undefined =
@@ -76,12 +72,6 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
 
     // Casilla que recibe el Tab (roving tabindex): la primera libre, o la última si está lleno
     const activeIndex = Math.min(current.length, length - 1);
-
-    // Con maxLength=1 el autocompletado del sistema (one-time-code) se corta al primer dígito.
-    // DigitInput fija maxLength=1, así que en la primera casilla se quita el límite y el código se reparte aquí.
-    useLayoutEffect(() => {
-      cells.current[0]?.removeAttribute('maxlength');
-    });
 
     useEffect(() => {
       if (autoFocus) cells.current[Math.min(latest.current.length, length - 1)]?.focus();
@@ -214,22 +204,23 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
 
     return (
       <div
-        ref={ref}
         id={id}
-        className={cn(codeInputVariants({ fullWidth }), className)}
         {...restProps}
+        {...rootProps}
+        className={cn(codeInputVariants({ fullWidth }), rootProps?.className, className)}
       >
         <label
-          id={labelId}
+          id={ids.label}
           htmlFor={`${baseId}-0`}
           className={cn(codeInputLabelVariants({ disabled: isDisabled }), hideLabel && 'sr-only')}
         >
           {label}
+          {optional && <span className="text-ds-text-acent-firts"> | Opcional</span>}
         </label>
 
         <div
           role="group"
-          aria-labelledby={labelId}
+          aria-labelledby={ids.label}
           data-figma-part="Input+Tooltip"
           className="flex w-full min-w-0 items-center gap-ds-space-general-lg"
         >
@@ -238,6 +229,7 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
               key={i}
               ref={(el) => {
                 cells.current[i] = el;
+                if (i === 0) assignRef(ref, el);
               }}
               id={`${baseId}-${i}`}
               data-figma-part="Placeholder"
@@ -246,13 +238,16 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
               value={current[i] ?? ''}
               placeholder={placeholder}
               oneTimeCode={i === 0}
+              // La primera casilla acepta el código entero (autocompletado one-time-code) y lo reparte
+              maxLength={i === 0 ? length : 1}
+              required={required}
               invalid={isError}
               confirmed={isSuccess}
               disabled={isDisabled}
               readOnly={isReadOnly}
               tabIndex={i === activeIndex ? 0 : -1}
               aria-label={getDigitLabel(i, length)}
-              aria-describedby={message ? messageId : undefined}
+              aria-describedby={base.describedBy()}
               onFocus={handleFocus(i)}
               onChange={handleChange(i)}
               onKeyDown={handleKeyDown(i)}
@@ -260,15 +255,12 @@ export const CodeInput = forwardRef<HTMLDivElement, CodeInputProps>(
               className={cn('w-auto min-w-0 flex-1', isDisabled && 'border-ds-border-field-disabled')}
             />
           ))}
+          {tooltip && <FieldTooltip id={ids.tooltip} text={tooltip} disabled={isDisabled} />}
         </div>
 
         {name && <input type="hidden" name={name} value={current} disabled={isDisabled} />}
 
-        {message && (
-          <NotificationText id={messageId} data-figma-part="Message" state={message.kind}>
-            {message.text}
-          </NotificationText>
-        )}
+        <FieldMessage id={ids.message} message={message} data-figma-part="Message" />
       </div>
     );
   }

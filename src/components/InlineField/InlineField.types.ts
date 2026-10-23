@@ -1,4 +1,5 @@
-import type { HTMLAttributes, InputHTMLAttributes, ReactNode } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
+import type { FieldRootProps } from '../Field/Field.types';
 
 /** Size de Figma (set 18445:46293): `sm` mide 40 de alto (texto 14/18) y `md` 56 (texto 32/36). */
 export type InlineFieldSize = 'sm' | 'md';
@@ -33,9 +34,13 @@ export interface InlineFieldProps extends Omit<InputHTMLAttributes<HTMLInputElem
   fullWidth?: boolean;
   /** Fuerza el aspecto de un estado (solo documentación). */
   state?: InlineFieldState;
+  /** Texto de ayuda en un ícono de información a la derecha del campo. */
+  tooltip?: string;
+  /** Cambia el valor (recibe el texto). Se llama junto con el `onChange` nativo. */
+  onValueChange?: (value: string) => void;
   /**
-   * Atributos para el contenedor raíz (`data-*`, `id`, `style`, etc.), p. ej. `data-figma` para medir contra Figma.
-   * `className` se mezcla con el de la raíz; los atributos nativos sueltos siguen yendo al `<input>`.
+   * Atributos para el contenedor raíz (`data-*`, `id`, `style`, `ref`…), p. ej. `data-figma` para medir contra Figma.
+   * `className` se mezcla con el de la raíz; el `ref` del componente y los atributos nativos sueltos van al `<input>`.
    */
-  rootProps?: HTMLAttributes<HTMLDivElement> & { [K in `data-${string}`]?: string | number | boolean };
+  rootProps?: FieldRootProps;
 }

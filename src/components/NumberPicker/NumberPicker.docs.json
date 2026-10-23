@@ -20,7 +20,11 @@
     "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
     "aria-label": { "type": "string", "required": true, "description": "Nombre accesible del campo (o aria-labelledby)." },
     "className": { "type": "string", "required": false, "description": "Clases para el contenedor raíz. El resto de props nativas y el ref van al input." },
-    "rootProps": { "type": "HTMLAttributes<HTMLDivElement> & data-*", "required": false, "description": "Atributos para el contenedor raíz (data-*, style, etc.); por ejemplo data-figma para medir contra Figma." }
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." },
+    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda debajo del campo." },
+    "errorText": { "type": "string", "required": false, "description": "Mensaje de error; marca aria-invalid." },
+    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito." },
+    "tooltip": { "type": "string", "required": false, "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)." }
   },
   "examples": [
     { "title": "Cantidad con límites", "code": "<NumberPicker aria-label=\"Cantidad\" defaultValue={1} min={1} max={10} />" },

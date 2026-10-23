@@ -10,9 +10,9 @@ import { cva } from 'class-variance-authority';
  * - Fila: gap space/general/lg (8); hora, minutos y el par AM/PM ocupan un tercio cada uno.
  * - Par AM/PM: gap space/general/md (4); cada botón con alto de campo, padding X 16, radio field/sm (12),
  *   borde de 1px por dentro y texto 12/16. El seleccionado lleva el borde activo (border/field/active).
- * - El mensaje va debajo con NotificationText, separado 8 (row-gap de la rejilla raíz, solo con mensaje).
+ * - El mensaje va debajo con NotificationText, separado 8 (gap de la raíz; la región viva vacía no suma gap).
  */
-export const timePickerRootVariants = cva('grid gap-x-ds-space-general-lg', {
+export const timePickerRootVariants = cva('flex flex-col gap-ds-space-general-lg', {
   variants: {
     fullWidth: {
       true: 'w-full',
@@ -22,7 +22,7 @@ export const timePickerRootVariants = cva('grid gap-x-ds-space-general-lg', {
   defaultVariants: { fullWidth: false },
 });
 
-/** Separación (8) entre la fila y el mensaje; solo existe cuando hay mensaje. */
+/** @deprecated La raíz ya separa la fila y el mensaje (8). Se conserva por compatibilidad. */
 export const TIME_PICKER_MESSAGE_GAP = 'gap-y-ds-space-general-lg';
 
 /** Fila con los tres controles. */

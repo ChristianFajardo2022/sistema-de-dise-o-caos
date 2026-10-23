@@ -186,3 +186,24 @@ export const LockedTest: Story = {
     await expect(canvas.getAllByRole('button', { name: 'Aumentar' })[1]).toBeDisabled();
   },
 };
+
+/** Test: mensajes y tooltip de la base común (región viva, `aria-describedby` y `aria-invalid` con error). */
+export const MessagesTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div className="flex flex-col gap-4 p-4">
+      <NumberPicker aria-label="Personas" helperText="Máximo 8" tooltip="Incluye a los niños" min={1} max={8} />
+      <NumberPicker aria-label="Habitaciones" errorText="Elige al menos una" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const people = canvas.getByRole('spinbutton', { name: 'Personas' });
+    await expect(people).toHaveAccessibleDescription('Máximo 8 Incluye a los niños');
+    await expect(people).not.toHaveAttribute('aria-invalid');
+    const rooms = canvas.getByRole('spinbutton', { name: 'Habitaciones' });
+    await expect(rooms).toHaveAttribute('aria-invalid', 'true');
+    await expect(rooms).toHaveAccessibleDescription('Elige al menos una');
+    await expect(canvasElement.querySelectorAll('[aria-live="polite"]')).toHaveLength(2);
+  },
+};

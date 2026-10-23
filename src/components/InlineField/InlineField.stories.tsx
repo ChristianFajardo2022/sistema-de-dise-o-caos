@@ -185,3 +185,24 @@ export const StatesTest: Story = {
     await expect(off).toBeDisabled();
   },
 };
+
+/** Test: `onValueChange` recibe el texto y el tooltip describe el campo (base común). */
+export const ValueChangeTest: Story = {
+  tags: ['!autodocs'],
+  render: function Demo() {
+    const [value, setValue] = useState('');
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <InlineField label="Monto" suffix="COP" tooltip="Sin decimales" onValueChange={setValue} />
+        <output data-testid="valor">{value}</output>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Monto' });
+    await userEvent.type(input, '2500');
+    await expect(canvas.getByTestId('valor')).toHaveTextContent('2500');
+    await expect(input).toHaveAccessibleDescription('Sin decimales COP');
+  },
+};

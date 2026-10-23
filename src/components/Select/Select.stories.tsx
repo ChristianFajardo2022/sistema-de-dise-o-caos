@@ -1,6 +1,6 @@
 import { useRef, useState, type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Select, SelectOption } from './Select';
 import type { SelectOptionData, SelectState } from './Select.types';
 import { Input, inputFieldVariants } from '../Input';
@@ -329,5 +329,69 @@ export const StatesTest: Story = {
     await expect(invalid).toHaveAttribute('aria-invalid', 'true');
     await expect(invalid).toHaveAttribute('aria-required', 'true');
     await expect(invalid).toHaveAccessibleDescription('Elige un país');
+  },
+};
+
+const DIAL_CODES: SelectOptionData[] = [
+  { value: 'CO', label: 'Colombia +57', displayLabel: '+57' },
+  { value: 'US', label: 'Estados Unidos +1', displayLabel: '+1' },
+  { value: 'MX', label: 'México +52', displayLabel: '+52' },
+];
+
+/** `displayLabel`: la lista dice "México +52", el campo "+52"; escribir salta por el texto de la lista. */
+export const DisplayLabelTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <Select label="Indicativo" options={DIAL_CODES} defaultValue="CO" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const combo = canvas.getByRole('combobox', { name: 'Indicativo' });
+    await expect(combo).toHaveTextContent(/^\+57$/);
+    combo.focus();
+    await userEvent.keyboard('m');
+    await waitFor(() => expect(combo).toHaveAttribute('aria-expanded', 'true'));
+    const mexico = canvas.getByRole('option', { name: 'México +52' });
+    await expect(combo).toHaveAttribute('aria-activedescendant', mexico.id);
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(combo).toHaveAttribute('aria-expanded', 'false'));
+    await expect(combo).toHaveTextContent(/^\+52$/);
+  },
+};
+
+/** `open` controlado: la lista sigue la prop y `onOpenChange` avisa al pedir cerrar (Esc). `defaultOpen` abre al montar. */
+export const ControlledOpenTest: Story = {
+  tags: ['!autodocs'],
+  args: { onOpenChange: fn() },
+  render: (args) => (
+    <div className="flex min-h-96 flex-col gap-4 p-4">
+      <Select label="Abierto" options={COUNTRIES} open onOpenChange={args.onOpenChange} />
+      <Select label="Inicial" options={COUNTRIES} defaultOpen />
+    </div>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const combo = canvas.getByRole('combobox', { name: 'Abierto' });
+    await expect(combo).toHaveAttribute('aria-expanded', 'true');
+    combo.focus();
+    await userEvent.keyboard('{Escape}');
+    await expect(args.onOpenChange).toHaveBeenCalledWith(false);
+    // Controlado: sigue abierto hasta que el padre cambie `open`
+    await expect(combo).toHaveAttribute('aria-expanded', 'true');
+    await expect(canvas.getByRole('combobox', { name: 'Inicial' })).toHaveAttribute('aria-expanded', 'true');
+  },
+};
+
+/** Solo lectura sin valor: el label se queda dentro del campo (14/18); con valor, sube (12/16). */
+export const ReadOnlyLabelTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div className="flex flex-col gap-4 p-4">
+      <Select label="Sin valor" options={COUNTRIES} readOnly />
+      <Select label="Con valor" options={COUNTRIES} defaultValue="co" readOnly />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const label = (text: string) => within(canvasElement).getByText(text, { selector: 'label' });
+    await expect(getComputedStyle(label('Sin valor')).fontSize).toBe('14px');
+    await expect(getComputedStyle(label('Con valor')).fontSize).toBe('12px');
   },
 };

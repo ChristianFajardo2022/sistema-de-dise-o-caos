@@ -1,12 +1,14 @@
 import type { HTMLAttributes } from 'react';
 import type { DigitInputSize } from '../DigitInput';
+import type { FieldRootProps } from '../Field/Field.types';
+import type { InputState } from '../Input/Input.types';
 
 /**
  * State de Figma (Type=Code de "General input"). Solo para forzar el aspecto en documentación:
  * en uso real el estado sale de la interacción (foco, `disabled`, `readOnly`) y de los mensajes.
  * `active` cubre "Active/Focus", `burnt-in` es solo lectura y "Helper text" es `default` con `helperText`.
  */
-export type CodeInputState = 'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success';
+export type CodeInputState = InputState;
 
 export interface CodeInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'children' | 'role'> {
@@ -30,6 +32,12 @@ export interface CodeInputProps
   errorText?: string;
   /** Mensaje de éxito (State=Success). */
   successText?: string;
+  /** Texto de ayuda en un ícono de información a la derecha de las casillas. */
+  tooltip?: string;
+  /** Obligatorio: `required` nativo en cada casilla (el navegador señala la primera vacía). */
+  required?: boolean;
+  /** Agrega " | Opcional" después del label. */
+  optional?: boolean;
   /** Deshabilita todas las casillas. */
   disabled?: boolean;
   /** Solo lectura (State=Burnt-In): el código se lee y se recorre con flechas, pero no se edita. */
@@ -48,4 +56,6 @@ export interface CodeInputProps
   getDigitLabel?: (index: number, length: number) => string;
   /** Fuerza el aspecto de un estado (solo documentación). */
   state?: CodeInputState;
+  /** Atributos para la raíz (`data-*`, `style`, `ref`…); se suman al resto de props, que también van a la raíz. */
+  rootProps?: FieldRootProps;
 }

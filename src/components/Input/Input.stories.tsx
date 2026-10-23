@@ -1,4 +1,4 @@
-import { useState, type ComponentProps } from 'react';
+import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Input } from './Input';
@@ -224,5 +224,55 @@ export const DisabledTest: Story = {
     await expect(input).toBeDisabled();
     await userEvent.type(input, 'hola');
     await expect(input).toHaveValue('');
+  },
+};
+
+function FieldBaseDemo() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [value, setValue] = useState('');
+  const [refs, setRefs] = useState('');
+  useEffect(() => setRefs(`${inputRef.current?.tagName}|${rootRef.current?.dataset.testid}`), []);
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <Input
+        ref={inputRef}
+        label="Correo"
+        errorText="Escribe un correo válido"
+        onValueChange={setValue}
+        rootProps={{ ref: rootRef, 'data-testid': 'raiz' }}
+      />
+      <Input label="Usuario" successText="Disponible" />
+      <output data-testid="valor">{value}</output>
+      <output data-testid="refs">{refs}</output>
+    </div>
+  );
+}
+
+/**
+ * Test de la base común de los campos: `ref` al input y `rootProps` (con su `ref`) a la raíz, `onValueChange` con el
+ * texto, foco visible en Error y Success (anillo de 2 en el recuadro, WCAG 2.4.7) y una sola región viva por campo.
+ */
+export const FieldBaseTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <FieldBaseDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('refs')).toHaveTextContent('INPUT|raiz');
+    const email = canvas.getByLabelText('Correo');
+    await userEvent.type(email, 'ana');
+    await expect(canvas.getByTestId('valor')).toHaveTextContent('ana');
+    const ring = (input: HTMLElement) => getComputedStyle(input.parentElement!.parentElement!);
+    await expect(ring(email).outlineStyle).toBe('solid');
+    await expect(ring(email).outlineWidth).toBe('2px');
+    await userEvent.tab();
+    const user = canvas.getByLabelText('Usuario');
+    await expect(user).toHaveFocus();
+    await expect(ring(user).outlineStyle).toBe('solid');
+    await expect(ring(email).outlineStyle).toBe('none');
+    // Mensajes: región viva polite por campo, sin role="alert"
+    await expect(canvasElement.querySelectorAll('[aria-live="polite"]')).toHaveLength(2);
+    await expect(canvas.queryByRole('alert')).toBeNull();
+    await expect(email).toHaveAccessibleDescription('Escribe un correo válido');
   },
 };

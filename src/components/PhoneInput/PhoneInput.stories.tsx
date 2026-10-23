@@ -83,13 +83,23 @@ const FIGMA_VARIANTS: { name: string; props: Partial<ComponentProps<typeof Phone
   { name: 'Helper text', props: { state: 'filled', helperText: 'Helper text' } },
 ];
 
-/** Los 8 estados del Type=Number de "General input", con los textos de muestra de Figma y el prefijo sin elegir. */
+/** Países de muestra con los textos de Figma: la lista real del prefijo dibuja "Text item" en Active/Focus. */
+const FIGMA_COUNTRIES = [
+  { code: 'A', dialCode: '+57', label: 'Text item' },
+  { code: 'B', dialCode: '+1', label: 'Text item' },
+];
+
+/**
+ * Los 8 estados del Type=Number de "General input", con los textos de muestra de Figma y el prefijo sin elegir.
+ * Active/Focus abre la lista real del prefijo (capa superior, bajo todo el control, como en Figma).
+ */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
     <div className={`grid w-fit grid-cols-[repeat(2,496px)] items-start gap-x-6 gap-y-10 p-6 ${SURFACE}`}>
       {FIGMA_VARIANTS.map(({ name, props }) => (
-        <div key={name} className="flex flex-col gap-2">
+        // La lista abierta de Active/Focus va en la capa superior: se le deja sitio debajo para no tapar la fila siguiente
+        <div key={name} className={`flex flex-col gap-2 ${name === 'Active/Focus' ? 'pb-24' : ''}`}>
           <span className="text-ds-typography-body-size-xs text-ds-text-neutral-white">{name}</span>
           <PhoneInput
             fullWidth
@@ -97,6 +107,8 @@ export const FigmaMatrix: Story = {
             prefixLabel="Label"
             placeholder="Placeholder"
             defaultCountryCode={null}
+            countries={FIGMA_COUNTRIES}
+            getCountryLabel={(c) => c.label}
             data-figma={`Type=Number, State=${name}`}
             {...props}
           />
@@ -193,5 +205,27 @@ export const ControlledTest: Story = {
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByLabelText('Registro')).toHaveTextContent('[AR]');
     await expect(new FormData(canvasElement.querySelector('form')!).get('telefono')).toBe('+54612');
+  },
+};
+
+/** La lista muestra el país con su indicativo ("Colombia +57") y el campo solo el indicativo; escribir salta por país. */
+export const CountryListTest: Story = {
+  tags: ['!autodocs'],
+  render: renderTest,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const prefix = canvas.getByRole('combobox', { name: 'Indicativo' });
+    await expect(prefix).toHaveTextContent(/^\+57$/);
+    prefix.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(prefix).toHaveAttribute('aria-expanded', 'true'));
+    await expect(canvas.getByRole('option', { name: 'Colombia +57' })).toHaveAttribute('aria-selected', 'true');
+    await expect(canvas.getByRole('option', { name: 'Estados Unidos +1' })).toBeInTheDocument();
+    await userEvent.keyboard('esp');
+    const spain = canvas.getByRole('option', { name: 'España +34' });
+    await expect(prefix).toHaveAttribute('aria-activedescendant', spain.id);
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(prefix).toHaveAttribute('aria-expanded', 'false'));
+    await expect(prefix).toHaveTextContent(/^\+34$/);
   },
 };

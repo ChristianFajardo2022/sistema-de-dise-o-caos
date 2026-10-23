@@ -1,5 +1,6 @@
-import type { HTMLAttributes, TextareaHTMLAttributes } from 'react';
+import type { TextareaHTMLAttributes } from 'react';
 import type { InputState } from '../Input/Input.types';
+import type { FieldRootProps } from '../Field/Field.types';
 
 /**
  * State de Figma (tipo Coment de General input). Solo para forzar el aspecto en documentación:
@@ -41,9 +42,11 @@ export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
   autoResize?: boolean;
   /** Control del tirador de tamaño. Por defecto `vertical`; con `autoResize` siempre es `none`. */
   resize?: TextareaResize;
+  /** Cambia el valor (recibe el texto). Se llama junto con el `onChange` nativo. */
+  onValueChange?: (value: string) => void;
   /**
-   * Atributos para el contenedor raíz (`data-*`, `id`, `style`, etc.), p. ej. `data-figma` para medir contra Figma.
-   * `className` se mezcla con el de la raíz; los atributos nativos sueltos siguen yendo al `<textarea>`.
+   * Atributos para el contenedor raíz (`data-*`, `id`, `style`, `ref`…), p. ej. `data-figma` para medir contra Figma.
+   * `className` se mezcla con el de la raíz; el `ref` del componente y los atributos nativos sueltos van al `<textarea>`.
    */
-  rootProps?: HTMLAttributes<HTMLDivElement> & { [K in `data-${string}`]?: string | number | boolean };
+  rootProps?: FieldRootProps;
 }

@@ -1,19 +1,18 @@
-import { forwardRef, useId, useState } from 'react';
-import type { InputProps, InputState } from './Input.types';
-import {
-  inputControlVariants,
-  inputFieldVariants,
-  inputLabelVariants,
-} from './Input.variants';
+import { forwardRef, useState } from 'react';
+import type { ChangeEvent } from 'react';
+import type { InputProps } from './Input.types';
+import { inputControlVariants, inputFieldVariants } from './Input.variants';
 import { EyeIcon } from '../../icons/EyeIcon';
 import { EyeSlashIcon } from '../../icons/EyeSlashIcon';
 import { InfoCircleIcon } from '../../icons/InfoCircleIcon';
 import { SearchIcon } from '../../icons/SearchIcon';
 import { cn } from '../../utils/cn';
-import { NotificationText } from '../NotificationText';
+import { FIELD_FOCUS_RING, FIELD_ICON_SLOT, FieldLabel, FieldMessage, FieldRow, useField } from '../Field';
 
-const ICON_SLOT = 'inline-flex size-4 shrink-0 items-center justify-center text-(color:--ico) [&>svg]:size-full';
-
+/**
+ * Campo de texto (set "General input": Text, Password, Search y Search header) y base visual de los demás controles
+ * de formulario. El `ref` y los atributos nativos van al `<input>`; `className` y `rootProps` van a la raíz.
+ */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
@@ -33,44 +32,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       type,
       placeholder,
       className,
+      rootProps,
       id,
+      onChange,
+      onValueChange,
       'aria-describedby': ariaDescribedBy,
       ...restProps
     },
     ref
   ) => {
-    const autoId = useId();
-    const inputId = id ?? autoId;
-    const messageId = `${inputId}-message`;
-    const tooltipId = `${inputId}-tooltip`;
+    const field = useField({ id, helperText, errorText, successText, tooltip, state, disabled, readOnly });
+    const { ids, message, isDisabled, isError, visualState } = field;
     const [showPassword, setShowPassword] = useState(false);
-
-    const isDisabled = disabled || state === 'disabled';
-    const isError = Boolean(errorText) || state === 'error';
-    const isSuccess = !isError && (Boolean(successText) || state === 'success');
-
-    // Prioridad visual: disabled > error > success > burnt-in (readOnly) > state forzado
-    const computedState: InputState = isDisabled
-      ? 'disabled'
-      : isError
-        ? 'error'
-        : isSuccess
-          ? 'success'
-          : readOnly || state === 'burnt-in'
-            ? 'burnt-in'
-            : state;
 
     // Estados forzados de documentación y burnt-in: el label siempre arriba
     const forceFloat = !isDisabled && (readOnly || ['filled', 'active', 'burnt-in', 'error', 'success'].includes(state));
 
-    // Mensaje: error > success > helper
-    const message = errorText
-      ? { kind: 'error' as const, text: errorText }
-      : successText
-        ? { kind: 'success' as const, text: successText }
-        : helperText
-          ? { kind: 'helper' as const, text: helperText }
-          : null;
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+      onChange?.(event);
+      onValueChange?.(event.target.value);
+    };
 
     const isPassword = variant === 'password';
     const isSearch = variant === 'search' || variant === 'search-header';
@@ -78,13 +59,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const leading = leftIcon ?? (isSearch ? <SearchIcon /> : null);
 
     return (
-      <div className={cn('flex flex-col', fullWidth ? 'w-full' : 'w-[320px] max-w-full', className)}>
-        <div className="flex items-center gap-ds-space-general-lg">
-          <div
-            className={inputFieldVariants({ variant, state: computedState })}
-          >
+      <div {...rootProps} className={cn('flex flex-col', fullWidth ? 'w-full' : 'w-[320px] max-w-full', rootProps?.className, className)}>
+        <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled, icon: <InfoCircleIcon /> } : null}>
+          <div className={inputFieldVariants({ variant, state: visualState })}>
             {leading && (
-              <span data-slot="icon-left" aria-hidden="true" className={ICON_SLOT}>
+              <span data-slot="icon-left" aria-hidden="true" className={FIELD_ICON_SLOT}>
                 {leading}
               </span>
             )}
@@ -92,27 +71,25 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <div className="relative h-[40px] min-w-0 flex-1">
               <input
                 ref={ref}
-                id={inputId}
+                id={ids.control}
                 type={nativeType}
                 // " " mantiene :placeholder-shown para flotar el label sin estado en JS
                 placeholder={placeholder || ' '}
                 disabled={isDisabled}
                 readOnly={readOnly}
                 aria-invalid={isError || undefined}
-                aria-describedby={cn(message && messageId, tooltip && tooltipId, ariaDescribedBy) || undefined}
+                aria-describedby={field.describedBy(ariaDescribedBy)}
                 className={inputControlVariants({ showPlaceholder: forceFloat && Boolean(placeholder) })}
                 {...restProps}
+                onChange={handleChange}
               />
-              <label htmlFor={inputId} className={inputLabelVariants({ float: forceFloat ? 'always' : 'auto' })}>
+              <FieldLabel htmlFor={ids.control} float={forceFloat} optional={optional}>
                 {label}
-                {optional && (
-                  <span className="text-ds-text-acent-firts"> | Opcional</span>
-                )}
-              </label>
+              </FieldLabel>
             </div>
 
             {rightIcon && (
-              <span data-slot="icon-right" aria-hidden="true" className={ICON_SLOT}>
+              <span data-slot="icon-right" aria-hidden="true" className={FIELD_ICON_SLOT}>
                 {rightIcon}
               </span>
             )}
@@ -123,56 +100,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 disabled={isDisabled}
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 aria-pressed={showPassword}
-                aria-controls={inputId}
+                aria-controls={ids.control}
                 onClick={() => setShowPassword((v) => !v)}
-                className={cn(
-                  ICON_SLOT,
-                  'cursor-pointer rounded-sm border-0 bg-transparent p-0 outline-hidden',
-                  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
-                  'disabled:cursor-not-allowed'
-                )}
+                className={cn(FIELD_ICON_SLOT, 'cursor-pointer rounded-sm border-0 bg-transparent p-0', FIELD_FOCUS_RING, 'disabled:cursor-not-allowed')}
               >
                 {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
               </button>
             )}
           </div>
+        </FieldRow>
 
-          {tooltip && (
-            <>
-            {/* Texto del tooltip para lectores de pantalla; lo referencia aria-describedby del input */}
-            <span id={tooltipId} className="sr-only">
-              {tooltip}
-            </span>
-            <button
-              type="button"
-              aria-label={tooltip}
-              title={tooltip}
-              className={cn(
-                ICON_SLOT,
-                'cursor-help rounded-sm border-0 bg-transparent p-0 outline-hidden',
-                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
-                '[--ico:var(--color-ds-icon-general-white)]',
-                isDisabled && '[--ico:var(--color-ds-icon-general-disabled-positive)]'
-              )}
-            >
-              <InfoCircleIcon />
-            </button>
-            </>
-          )}
-        </div>
-
-        <div aria-live="polite">
-          {message && (
-            <NotificationText
-              id={messageId}
-              state={message.kind === 'success' ? 'confirmation' : message.kind}
-              announce={false}
-              className="mt-ds-space-general-lg"
-            >
-              {message.text}
-            </NotificationText>
-          )}
-        </div>
+        <FieldMessage id={ids.message} message={message} className="mt-ds-space-general-lg" />
       </div>
     );
   }

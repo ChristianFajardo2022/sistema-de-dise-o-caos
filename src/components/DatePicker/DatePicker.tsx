@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, FocusEvent, KeyboardEvent, SyntheticEvent } from 'react';
 import type { DatePickerProps } from './DatePicker.types';
 import {
@@ -14,25 +14,21 @@ import { datePickerButtonVariants, datePickerPanelVariants, datePickerVariants }
 import { Calendar } from '../Calendar';
 import type { DateRange } from '../Calendar';
 import { compareDays, startOfDay } from '../Calendar/Calendar.utils';
+import { FieldLabel, FieldMessage, FieldRow, joinIds, resolveField, useField } from '../Field';
 import { Icon } from '../Icon';
-import { inputControlVariants, inputFieldVariants, inputLabelVariants } from '../Input';
+import { inputControlVariants, inputFieldVariants } from '../Input';
 import type { InputState } from '../Input';
-import { NotificationText } from '../NotificationText';
+import { useAnchoredPosition } from '../../utils/anchoredPosition';
 import { cn } from '../../utils/cn';
+import { useMergedRefs } from '../../utils/refs';
 
-/** Separación entre el campo y el calendario (Figma: 8) y margen mínimo con el borde de la pantalla. */
+/** Separación entre el campo y el calendario (Figma: 8). */
 const OFFSET = 8;
-const MARGIN = 8;
 
 const EMPTY_RANGE: DateRange = { start: null, end: null };
 
 type Value = Date | null | DateRange;
 type ValidationError = 'invalid' | 'unavailable' | null;
-
-function assignRef<T>(ref: unknown, node: T | null) {
-  if (typeof ref === 'function') ref(node);
-  else if (ref && typeof ref === 'object') (ref as { current: T | null }).current = node;
-}
 
 const sameDay = (a: Date | null, b: Date | null) => (a && b ? compareDays(a, b) === 0 : a === b);
 const sameValue = (a: Value, b: Value, range: boolean) => {
@@ -51,12 +47,14 @@ const sameValue = (a: Value, b: Value, range: boolean) => {
  * - Patrón WAI-ARIA APG "Date Picker Dialog": botón "Elegir fecha" (con la fecha actual en el nombre accesible),
  *   `aria-haspopup="dialog"` y `aria-expanded`; al abrir, el foco va al día elegido o a hoy; Esc cierra y devuelve el
  *   foco al botón; Aplicar confirma y Cancelar descarta (con `showActions`). Alt + Flecha abajo en el campo también abre.
+ * - El `ref` va al input de texto (como Input); `className`, `rootProps` y el resto de props van a la raíz.
  */
-export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, ref) => {
+export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, ref) => {
   const {
     mode = 'single',
     value: valueProp,
     defaultValue,
+    onValueChange,
     onChange,
     label,
     optional = false,
@@ -88,22 +86,22 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
     id,
     inputProps,
     inputRef,
+    rootProps,
     className,
     onBlur: onRootBlur,
     ...rest
-  } = props as Omit<DatePickerProps, 'value' | 'defaultValue' | 'onChange' | 'mode'> & {
+  } = props as Omit<DatePickerProps, 'value' | 'defaultValue' | 'onChange' | 'onValueChange' | 'mode'> & {
     mode?: 'single' | 'range';
     value?: Value;
     defaultValue?: Value;
+    onValueChange?: (value: Value) => void;
     onChange?: (value: Value) => void;
   };
 
   const isRange = mode === 'range';
-  const autoId = useId();
-  const inputId = id ?? `${autoId}-input`;
-  const messageId = `${inputId}-message`;
+  const { ids } = useField({ id });
+  const inputId = ids.control;
   const hintId = `${inputId}-hint`;
-  const tooltipId = `${inputId}-tooltip`;
   const panelId = `${inputId}-calendar`;
 
   // ── Formato ──
@@ -129,6 +127,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
   const commit = (next: Value) => {
     if (sameValue(next, value, isRange)) return;
     if (valueProp === undefined) setInnerValue(next);
+    onValueChange?.(next);
     onChange?.(next);
   };
 
@@ -208,54 +207,17 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
   const panelRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const focusOnOpen = useRef(false);
-  const pendingFocus = useRef(false);
+  // El calendario recibe el foco al montar si se abrió con el botón o el teclado
+  const [focusCalendar, setFocusCalendar] = useState(false);
 
-  const setRootRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      rootRef.current = node;
-      assignRef(ref, node);
-    },
-    [ref]
-  );
-  const setInputRef = useCallback((node: HTMLInputElement | null) => assignRef(inputRef, node), [inputRef]);
+  const setRootRef = useMergedRefs(rootRef, rootProps?.ref);
+  // `inputRef` (obsoleto) sigue recibiendo el input, igual que `ref`
+  const setInputRef = useMergedRefs(ref, inputRef);
 
   // Selección en curso dentro del calendario (se confirma con Aplicar) y mes visible
   const [draft, setDraft] = useState<Value>(value);
   const anchorOf = (v: Value) => (isRange ? ((v as DateRange | null)?.start ?? null) : ((v as Date | null) ?? null));
   const [month, setMonth] = useState<Date>(() => anchorOf(value) ?? calendarProps?.defaultMonth ?? calendarProps?.today ?? new Date());
-
-  const place = useCallback(() => {
-    const pop = panelRef.current;
-    const anchor = fieldRef.current;
-    if (!pop || !anchor || !pop.matches(':popover-open')) return;
-    const a = anchor.getBoundingClientRect();
-    // Mide el alto natural (sin el límite de una colocación anterior)
-    pop.style.maxHeight = '';
-    pop.style.overflowY = '';
-    const { width, height } = pop.getBoundingClientRect();
-    const vw = document.documentElement.clientWidth;
-    const vh = window.innerHeight;
-    // Como Figma: alineado al borde derecho del campo, 8 por debajo; arriba si abajo no cabe
-    const left = Math.max(MARGIN, Math.min(a.right - width, vw - width - MARGIN));
-    const below = a.bottom + OFFSET;
-    const spaceBelow = vh - MARGIN - below;
-    const spaceAbove = a.top - OFFSET - MARGIN;
-    let top = below;
-    if (height <= spaceBelow) top = below;
-    else if (height <= spaceAbove) top = a.top - OFFSET - height;
-    else {
-      // No cabe en ningún lado: el lado con más espacio, con el alto limitado y desplazamiento interno
-      // (Aplicar y Cancelar siempre se alcanzan)
-      const useBelow = spaceBelow >= spaceAbove;
-      const room = Math.max(0, useBelow ? spaceBelow : spaceAbove);
-      top = useBelow ? below : MARGIN;
-      pop.style.maxHeight = `${room}px`;
-      pop.style.overflowY = 'auto';
-    }
-    pop.style.left = `${left}px`;
-    pop.style.top = `${top}px`;
-    pop.style.visibility = '';
-  }, []);
 
   // Estado controlado o inicial -> popover nativo
   useEffect(() => {
@@ -266,29 +228,10 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
     else if (!open && isOpen) pop.hidePopover();
   }, [open, inline]);
 
-  // Mientras esté abierto, seguir al campo
-  useLayoutEffect(() => {
-    if (!open || inline) return;
-    place();
-    // El desplazamiento interno del calendario no debe recolocarlo
-    const onScroll = (event: Event) => {
-      if (event.target instanceof Node && panelRef.current?.contains(event.target)) return;
-      place();
-    };
-    window.addEventListener('resize', place);
-    window.addEventListener('scroll', onScroll, true);
-    return () => {
-      window.removeEventListener('resize', place);
-      window.removeEventListener('scroll', onScroll, true);
-    };
-  }, [open, inline, place]);
-
-  // Al abrir por el usuario: foco al día elegido o a hoy (la celda con tabindex 0 del Calendar)
-  useLayoutEffect(() => {
-    if (!pendingFocus.current || !open) return;
-    pendingFocus.current = false;
-    panelRef.current?.querySelector<HTMLElement>('[data-cal-cell][tabindex="0"]')?.focus();
-  });
+  // Mientras esté abierto, seguir al campo: alineado a su borde derecho, 8 por debajo (arriba si no cabe; si no cabe en
+  // ningún lado, el lado con más espacio con el alto limitado, así Aplicar y Cancelar siempre se alcanzan)
+  const getAnchor = useCallback(() => fieldRef.current, []);
+  useAnchoredPosition(open && !inline, panelRef, getAnchor, { align: 'end', offset: OFFSET });
 
   const handleBeforeToggle = (event: SyntheticEvent<HTMLDivElement>) => {
     // React propaga el toggle de los popovers internos (Mes/Año del rango): solo cuenta el propio
@@ -304,7 +247,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
     const next = (event.nativeEvent as ToggleEvent).newState === 'open';
     // La posición se calcula en el efecto de `open`, cuando el calendario ya está montado
     if (next) {
-      if (focusOnOpen.current) pendingFocus.current = true;
+      setFocusCalendar(focusOnOpen.current);
     } else if (panelRef.current?.contains(document.activeElement) || document.activeElement === document.body) {
       // Cierre con el foco dentro (o perdido): vuelve al botón
       buttonRef.current?.focus();
@@ -389,30 +332,12 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
         ? (unavailableDateText ?? 'Esa fecha no está disponible')
         : undefined;
   const shownError = errorText ?? validationText;
-  const isError = Boolean(shownError) || state === 'error';
-  const isSuccess = !isError && (Boolean(successText) || state === 'success');
+  // La validación interna es un error más: se resuelve con la base común
+  const { message, isError, isSuccess, visualState } = resolveField({ errorText: shownError, successText, helperText, state, disabled, readOnly });
   const isOpen = open || inline;
-
-  const fieldState: InputState = isDisabled
-    ? 'disabled'
-    : isError
-      ? 'error'
-      : isSuccess
-        ? 'success'
-        : isBurntIn
-          ? 'burnt-in'
-          : isOpen
-            ? 'active'
-            : state;
+  const fieldState: InputState = isDisabled || isError || isSuccess || isBurntIn ? visualState : isOpen ? 'active' : state;
 
   const forceFloat = !isDisabled && (isBurntIn || isOpen || ['filled', 'active', 'error', 'success'].includes(state));
-  const message = shownError
-    ? { kind: 'error' as const, text: shownError }
-    : successText
-      ? { kind: 'confirmation' as const, text: successText }
-      : helperText
-        ? { kind: 'helper' as const, text: helperText }
-        : null;
 
   const hint = isRange ? `${pattern.hint}${RANGE_SEPARATOR}${pattern.hint}` : pattern.hint;
   const shownPlaceholder = placeholder ?? hint;
@@ -453,6 +378,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
       maxDate={maxDate}
       isDateDisabled={isDateDisabled}
       showActions={showActions}
+      autoFocus={focusCalendar}
       labels={{ cancel: 'Cancelar', apply: 'Aplicar', ...calendarProps?.labels }}
       onApply={(v) => applyValue(v)}
       onCancel={() => close(true)}
@@ -462,12 +388,13 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
 
   return (
     <div
-      ref={setRootRef}
-      className={cn(datePickerVariants({ fullWidth }), className)}
       {...rest}
+      {...rootProps}
+      ref={setRootRef}
+      className={cn(datePickerVariants({ fullWidth }), rootProps?.className, className)}
       onBlur={handleRootBlur}
     >
-      <div className="flex items-center gap-ds-space-general-lg">
+      <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled } : null}>
         <div ref={fieldRef} className={inputFieldVariants({ variant: 'text', state: fieldState })}>
           <div
             className={cn(
@@ -490,7 +417,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
               readOnly={isBurntIn}
               required={required}
               aria-invalid={isError || undefined}
-              aria-describedby={cn(message && messageId, hintId, tooltip && tooltipId, inputProps?.['aria-describedby']) || undefined}
+              aria-describedby={joinIds(message && ids.message, hintId, tooltip && ids.tooltip, inputProps?.['aria-describedby'])}
               onChange={handleInputChange}
               onBlur={(e) => {
                 inputProps?.onBlur?.(e);
@@ -502,14 +429,9 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
                 inputProps?.className
               )}
             />
-            <label
-              htmlFor={inputId}
-              data-figma-part="Label"
-              className={inputLabelVariants({ float: forceFloat ? 'always' : 'auto' })}
-            >
+            <FieldLabel htmlFor={inputId} data-figma-part="Label" float={forceFloat} optional={optional}>
               {label}
-              {optional && <span className="text-ds-text-acent-firts"> | Opcional</span>}
-            </label>
+            </FieldLabel>
             <span id={hintId} className="sr-only">
               {`Formato ${hint}`}
             </span>
@@ -535,32 +457,9 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>((props, re
           </button>
         </div>
 
-        {tooltip && (
-          <>
-            <span id={tooltipId} className="sr-only">
-              {tooltip}
-            </span>
-            <button
-              type="button"
-              aria-label={tooltip}
-              title={tooltip}
-              className={cn(
-                'inline-flex size-4 shrink-0 cursor-help items-center justify-center rounded-sm border-0 bg-transparent p-0',
-                'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
-                isDisabled ? 'text-ds-icon-general-disabled-positive' : 'text-ds-icon-general-white'
-              )}
-            >
-              <Icon name="info-circle" size={16} variant="fill" />
-            </button>
-          </>
-        )}
-      </div>
+      </FieldRow>
 
-      {message && (
-        <NotificationText id={messageId} state={message.kind}>
-          {message.text}
-        </NotificationText>
-      )}
+      <FieldMessage id={ids.message} message={message} />
 
       {name && <input type="hidden" name={name} value={hiddenValue} disabled={isDisabled} />}
 

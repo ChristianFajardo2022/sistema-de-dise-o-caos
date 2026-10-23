@@ -1,8 +1,10 @@
 import type { HTMLAttributes, InputHTMLAttributes, Ref } from 'react';
 import type { CalendarBaseProps, DateRange } from '../Calendar';
+import type { FieldRootProps } from '../Field/Field.types';
+import type { InputState } from '../Input/Input.types';
 
-/** State de Figma (set 8096:3344). Solo para forzar el aspecto en documentación; `active` dibuja el calendario abierto en el flujo. */
-export type DatePickerState = 'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success';
+/** State de Figma (set 8096:3344), el mismo de Input. Solo para forzar el aspecto en documentación; `active` dibuja el calendario abierto en el flujo. */
+export type DatePickerState = InputState;
 
 /** Props del Calendar que se pueden afinar desde el DatePicker (la selección, el mes y la apertura los maneja el DatePicker). */
 export type DatePickerCalendarProps = Pick<
@@ -70,8 +72,10 @@ export interface DatePickerBaseProps
   id?: string;
   /** Props extra del input de texto (autoComplete, onBlur…). */
   inputProps?: Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'defaultValue' | 'onChange' | 'type'>;
-  /** Ref del input de texto (el `ref` del componente va a la raíz). */
+  /** @deprecated El `ref` del componente ya va al input de texto. Se conserva como alias: recibe el mismo nodo. */
   inputRef?: Ref<HTMLInputElement>;
+  /** Atributos para la raíz (`data-*`, `style`, `ref`…); se suman al resto de props, que también van a la raíz. */
+  rootProps?: FieldRootProps;
 }
 
 /** Una fecha. */
@@ -82,6 +86,8 @@ export interface DatePickerSingleProps extends DatePickerBaseProps {
   /** Fecha inicial (no controlada). */
   defaultValue?: Date | null;
   /** Cambia la fecha (al aplicar en el calendario o al escribir una fecha completa y válida). */
+  onValueChange?: (value: Date | null) => void;
+  /** @deprecated Usar `onValueChange` (mismo valor). Se sigue llamando por compatibilidad. */
   onChange?: (value: Date | null) => void;
 }
 
@@ -90,6 +96,9 @@ export interface DatePickerRangeProps extends DatePickerBaseProps {
   mode: 'range';
   value?: DateRange;
   defaultValue?: DateRange;
+  /** Cambia el rango (al aplicar o al escribir un rango completo y válido). */
+  onValueChange?: (value: DateRange) => void;
+  /** @deprecated Usar `onValueChange` (mismo valor). Se sigue llamando por compatibilidad. */
   onChange?: (value: DateRange) => void;
 }
 

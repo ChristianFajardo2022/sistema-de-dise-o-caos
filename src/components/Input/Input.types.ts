@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
+import type { FieldRootProps } from '../Field/Field.types';
 
 /** Type de Figma: Text, Password, Search y Search header. */
 export type InputVariant = 'text' | 'password' | 'search' | 'search-header';
@@ -29,4 +30,8 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   fullWidth?: boolean;
   /** Fuerza el aspecto de un estado (solo documentación). */
   state?: InputState;
+  /** Cambia el valor (recibe el texto). Se llama junto con el `onChange` nativo. */
+  onValueChange?: (value: string) => void;
+  /** Atributos para la raíz (`data-*`, `style`, `ref`…). El `ref` del componente y los atributos nativos van al `<input>`. */
+  rootProps?: FieldRootProps;
 }

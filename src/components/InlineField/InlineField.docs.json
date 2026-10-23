@@ -15,7 +15,10 @@
     "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del contenedor; si no, mide 320." },
     "disabled": { "type": "boolean", "default": false, "description": "Inactive=On de Figma." },
     "state": { "type": "'default' | 'active' | 'success' | 'success-value' | 'error' | 'disabled'", "default": "'default'", "description": "Fuerza el aspecto de un estado. Solo documentación. success-value es 'Success placeholder' (texto en verde)." },
-    "rootProps": { "type": "HTMLAttributes<HTMLDivElement> & data-*", "required": false, "description": "Atributos para el contenedor raíz (data-*, style, etc.); por ejemplo data-figma. El resto de props nativas y el ref van al input." }
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." },
+    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Cambia el valor (recibe el texto). Se llama junto con el onChange nativo." },
+    "tooltip": { "type": "string", "required": false, "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)." },
+    "ref": { "type": "Ref<HTMLInputElement>", "required": false, "description": "Al <input>. Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps." }
   },
   "accessibility": [
     "<input> nativo con label asociado por htmlFor y useId",

@@ -1,42 +1,22 @@
-import {
-  Children,
-  forwardRef,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Children, forwardRef, isValidElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, MouseEvent, ReactNode } from 'react';
 import type { SelectOptionData, SelectOptionProps, SelectProps } from './Select.types';
 import { selectFrameVariants, selectOptionActiveClass, selectTriggerVariants } from './Select.variants';
 import type { InputState } from '../Input/Input.types';
-import { inputControlVariants, inputFieldVariants, inputLabelVariants } from '../Input/Input.variants';
-import {
-  dropdownMenuItemIconVariants,
-  dropdownMenuItemTextVariants,
-  dropdownMenuItemVariants,
-  dropdownMenuPanelVariants,
-  dropdownMenuScrollVariants,
-} from '../DropdownMenu/DropdownMenu.variants';
+import { inputControlVariants, inputFieldVariants } from '../Input/Input.variants';
+import { DropdownMenuPanel } from '../DropdownMenu/DropdownMenuPanel';
+import { dropdownMenuItemIconVariants, dropdownMenuItemTextVariants, dropdownMenuItemVariants } from '../DropdownMenu/DropdownMenu.variants';
 import type { DropdownMenuItemState } from '../DropdownMenu/DropdownMenu.types';
+import { FIELD_ICON_SLOT, FieldLabel, FieldMessage, FieldRow, joinIds, useField } from '../Field';
 import { Icon } from '../Icon';
-import { NotificationText } from '../NotificationText';
-import { ScrollArea } from '../ScrollArea';
+import { useAnchoredPosition } from '../../utils/anchoredPosition';
 import { cn } from '../../utils/cn';
+import { useMergedRefs } from '../../utils/refs';
 
-/** Separación campo → lista (8, como Figma) y margen mínimo con el borde de la pantalla. */
+/** Separación campo → lista (8, como Figma). */
 const OFFSET = 8;
-const MARGIN = 8;
 const TYPEAHEAD_RESET_MS = 500;
 const PAGE_STEP = 10;
-
-const ICON_SLOT = 'inline-flex size-4 shrink-0 items-center justify-center text-(color:--ico)';
-const FOCUS_RING =
-  'outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active';
 
 /**
  * Opción declarativa de `Select`. No pinta nada por sí sola: `Select` lee sus props.
@@ -52,8 +32,8 @@ function collectOptions(children: ReactNode, options: SelectOptionData[] = []): 
   const fromChildren: SelectOptionData[] = [];
   Children.forEach(children, (child) => {
     if (isValidElement<SelectOptionProps>(child) && child.type === SelectOption) {
-      const { value, children: text, disabled, icon } = child.props;
-      fromChildren.push({ value, label: String(text), disabled, icon });
+      const { value, children: text, displayLabel, disabled, icon } = child.props;
+      fromChildren.push({ value, label: String(text), displayLabel, disabled, icon });
     }
   });
   return [...fromChildren, ...options];
@@ -69,8 +49,10 @@ function collectOptions(children: ReactNode, options: SelectOptionData[] = []): 
  * Alt + Flecha arriba eligen y cierran; Tab elige y deja seguir el foco; Esc cierra sin cambiar.
  *
  * La lista va en la capa superior (atributo `popover`), alineada al campo (o a `anchorRef`) y con su ancho; si abajo no
- * cabe, se abre arriba. El `ref` apunta al botón combobox (para enfocar, como el `<input>` de Input);
- * `className` y el resto de props van al elemento raíz.
+ * cabe, se abre arriba (posicionamiento compartido con DropdownMenu y DatePicker). El panel es el de DropdownMenu con
+ * `role="listbox"`. Apertura controlable con `open`/`defaultOpen`/`onOpenChange`.
+ * El `ref` apunta al botón combobox (para enfocar, como el `<input>` de Input); `className`, `rootProps` y el resto de
+ * props van al elemento raíz.
  */
 export const Select = forwardRef<HTMLButtonElement, SelectProps>(
   (
@@ -87,6 +69,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       value: valueProp,
       defaultValue,
       onValueChange,
+      open: openProp,
+      defaultOpen = false,
       onOpenChange,
       name,
       id,
@@ -100,18 +84,16 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       scrollbar = true,
       maxHeight = '20rem',
       className,
+      rootProps,
       'aria-describedby': ariaDescribedBy,
       ...restProps
     },
     ref
   ) => {
-    const uid = useId();
-    const triggerId = id ?? `${uid}-combobox`;
-    const labelId = `${uid}-label`;
-    const listboxId = `${uid}-listbox`;
-    const messageId = `${uid}-message`;
-    const tooltipId = `${uid}-tooltip`;
-    const optionId = (index: number) => `${uid}-option-${index}`;
+    const field = useField({ id, helperText, errorText, successText, tooltip, state, disabled, readOnly });
+    const { ids, message, isDisabled, isReadOnly, isError, isSuccess } = field;
+    const listboxId = `${ids.control}-listbox`;
+    const optionId = (index: number) => `${ids.control}-option-${index}`;
 
     const items = useMemo(() => collectOptions(children, options), [children, options]);
 
@@ -120,66 +102,39 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     const selectedIndex = items.findIndex((o) => o.value === value);
     const selected = selectedIndex >= 0 ? items[selectedIndex] : undefined;
 
-    const [openState, setOpenState] = useState(false);
+    const [openState, setOpenState] = useState(defaultOpen);
     const [activeIndex, setActiveIndex] = useState(-1);
     const [focused, setFocused] = useState(false);
 
     const triggerRef = useRef<HTMLButtonElement | null>(null);
+    const setTriggerRef = useMergedRefs(triggerRef, ref);
     const fieldRef = useRef<HTMLDivElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
     const listRef = useRef<HTMLDivElement | null>(null);
     const typeaheadRef = useRef({ text: '', timer: 0 });
 
-    const isDisabled = disabled || state === 'disabled';
-    const isReadOnly = readOnly || state === 'burnt-in';
-    const isError = Boolean(errorText) || state === 'error';
-    const isSuccess = !isError && (Boolean(successText) || state === 'success');
     // `state="active"` (documentación): lista abierta en el flujo, sin capa superior
     const isInlineOpen = state === 'active' && !isDisabled;
-    const open = isInlineOpen || (openState && !isDisabled && !isReadOnly);
+    const openValue = openProp ?? openState;
+    const open = isInlineOpen || (openValue && !isDisabled && !isReadOnly);
 
     // Prioridad visual: disabled > error > success > burnt-in (readOnly) > state forzado; con foco o abierta, active
-    const computedState: InputState = isDisabled
-      ? 'disabled'
-      : isError
-        ? 'error'
-        : isSuccess
-          ? 'success'
-          : isReadOnly
-            ? 'burnt-in'
-            : open
-              ? 'active'
-              : state;
+    const computedState: InputState = isDisabled || isError || isSuccess || isReadOnly ? field.visualState : open ? 'active' : state;
 
     const hasValue = selected !== undefined;
     const forcedFloat = ['filled', 'active', 'burnt-in', 'error', 'success'].includes(state);
-    const floated = hasValue || (!isDisabled && (focused || open || isReadOnly || forcedFloat));
-
-    const message = errorText
-      ? { kind: 'error' as const, text: errorText }
-      : successText
-        ? { kind: 'success' as const, text: successText }
-        : helperText
-          ? { kind: 'helper' as const, text: helperText }
-          : null;
+    // El label sube con valor o con foco (abierta por el usuario implica foco), como Input. Solo lectura sin valor: se queda
+    // dentro (no hay nada que leer debajo). Una lista abierta por `open` sin foco tampoco lo sube.
+    const floated = hasValue || (!isDisabled && (focused || forcedFloat));
     const isField = frame === 'field';
-
-    const setTriggerRef = useCallback(
-      (node: HTMLButtonElement | null) => {
-        triggerRef.current = node;
-        if (typeof ref === 'function') ref(node);
-        else if (ref) ref.current = node;
-      },
-      [ref]
-    );
 
     const enabledIndexes = useMemo(() => items.flatMap((o, i) => (o.disabled ? [] : [i])), [items]);
     const firstEnabled = enabledIndexes[0] ?? -1;
     const lastEnabled = enabledIndexes[enabledIndexes.length - 1] ?? -1;
 
     const setOpen = (next: boolean) => {
-      if (next === openState) return;
-      setOpenState(next);
+      if (next === openValue) return;
+      if (openProp === undefined) setOpenState(next);
       onOpenChange?.(next);
     };
 
@@ -324,22 +279,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       else openAt(defaultActive());
     };
 
-    const place = useCallback(() => {
-      const pop = popoverRef.current;
-      const anchor = anchorRef?.current ?? fieldRef.current;
-      if (!pop || !anchor || !pop.matches(':popover-open')) return;
-      const a = anchor.getBoundingClientRect();
-      pop.style.width = `${a.width}px`;
-      const { height } = pop.getBoundingClientRect();
-      const below = a.bottom + OFFSET;
-      const above = a.top - OFFSET - height;
-      const fitsBelow = below + height <= window.innerHeight - MARGIN;
-      pop.style.left = `${a.left}px`;
-      pop.style.top = `${fitsBelow || above < MARGIN ? below : above}px`;
-      pop.style.visibility = '';
-    }, [anchorRef]);
-
-    // Abierto -> capa superior; mientras esté abierto, seguir al campo
+    // Abierto -> capa superior (oculto hasta colocarlo)
     useLayoutEffect(() => {
       const pop = popoverRef.current;
       if (!pop || typeof pop.showPopover !== 'function') return;
@@ -347,45 +287,34 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       if (open && !isInlineOpen && !showing) {
         pop.style.visibility = 'hidden';
         pop.showPopover();
-        place();
       } else if ((!open || isInlineOpen) && showing) pop.hidePopover();
-      if (!open || isInlineOpen) return;
-      const onMove = () => place();
-      window.addEventListener('resize', onMove);
-      window.addEventListener('scroll', onMove, true);
-      return () => {
-        window.removeEventListener('resize', onMove);
-        window.removeEventListener('scroll', onMove, true);
-      };
-    }, [open, isInlineOpen, place]);
+    }, [open, isInlineOpen]);
+
+    // Mientras esté abierta, seguir al campo (o al ancla) con su ancho
+    const getAnchor = useCallback(() => anchorRef?.current ?? fieldRef.current, [anchorRef]);
+    useAnchoredPosition(open && !isInlineOpen, popoverRef, getAnchor, { offset: OFFSET, matchWidth: true });
 
     // La opción activa siempre a la vista dentro de la lista
     useEffect(() => {
       if (!open || activeIndex < 0) return;
-      listRef.current?.querySelector(`[id="${uid}-option-${activeIndex}"]`)?.scrollIntoView({ block: 'nearest' });
-    }, [open, activeIndex, uid]);
+      listRef.current?.querySelector(`[id="${optionId(activeIndex)}"]`)?.scrollIntoView({ block: 'nearest' });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, activeIndex, ids.control]);
 
     useEffect(() => () => window.clearTimeout(typeaheadRef.current.timer), []);
 
     const listbox = (
-      <div
+      <DropdownMenuPanel
         data-figma-part="Dropdown"
         // El foco se queda en el combobox al pulsar opciones o el riel
         onMouseDown={(e) => e.preventDefault()}
-        className={cn(dropdownMenuPanelVariants({ type: 'simple' }), 'w-full')}
+        aria-label={label}
+        scrollbar={scrollbar}
+        maxHeight={maxHeight}
+        className="w-full"
+        // El listbox se nombra con aria-labelledby, que tiene prioridad sobre el aria-label que exige el panel
+        listProps={{ ref: listRef, id: listboxId, role: 'listbox', 'aria-labelledby': ids.label }}
       >
-        <ScrollArea
-          ref={listRef}
-          id={listboxId}
-          role="listbox"
-          tabIndex={-1}
-          // ScrollArea exige aria-label; el listbox se nombra con aria-labelledby, que tiene prioridad
-          aria-label={label}
-          aria-labelledby={labelId}
-          maxHeight={maxHeight}
-          data-figma-part="Check List"
-          className={dropdownMenuScrollVariants({ type: 'simple', scrollbar, list: false })}
-        >
           {items.map((option, index) => {
             const isSelected = index === selectedIndex;
             const isActive = !isInlineOpen && index === activeIndex;
@@ -429,8 +358,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               </div>
             );
           })}
-        </ScrollArea>
-      </div>
+      </DropdownMenuPanel>
     );
 
     const trigger = (
@@ -451,15 +379,15 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         <div className="relative h-10 min-w-0 flex-1">
           <button
             ref={setTriggerRef}
-            id={triggerId}
+            id={ids.control}
             type="button"
             role="combobox"
             aria-haspopup="listbox"
             aria-expanded={open}
             aria-controls={listboxId}
             aria-activedescendant={open && !isInlineOpen && activeIndex >= 0 ? optionId(activeIndex) : undefined}
-            aria-labelledby={labelId}
-            aria-describedby={cn(isField && message && messageId, isField && tooltip && tooltipId, ariaDescribedBy) || undefined}
+            aria-labelledby={ids.label}
+            aria-describedby={isField ? field.describedBy(ariaDescribedBy) : joinIds(ariaDescribedBy)}
             aria-invalid={isError || undefined}
             aria-required={required || undefined}
             aria-readonly={isReadOnly || undefined}
@@ -469,12 +397,12 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             onFocus={() => setFocused(true)}
             onBlur={() => {
               setFocused(false);
-              if (openState) close();
+              if (openValue) close();
             }}
             className={cn(inputControlVariants(), selectTriggerVariants({ readOnly: isReadOnly }))}
           >
             <span data-figma-part="Placeholder" className={cn('block truncate', !hasValue && !floated && 'invisible')}>
-              {selected ? selected.label : placeholder}
+              {selected ? (selected.displayLabel ?? selected.label) : placeholder}
             </span>
           </button>
           {/* Valor para el formulario y "peer" del label: vacío = :placeholder-shown, el label descansa dentro */}
@@ -484,12 +412,11 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             {label}
             {optional && ' | Opcional'}
           </span>
-          <label id={labelId} htmlFor={triggerId} data-figma-part="Label" className={inputLabelVariants({ float: floated ? 'always' : 'auto' })}>
+          <FieldLabel id={ids.label} htmlFor={ids.control} data-figma-part="Label" float={floated} optional={optional}>
             {label}
-            {optional && <span data-figma-part="| Opcional" className="text-ds-text-acent-firts"> | Opcional</span>}
-          </label>
+          </FieldLabel>
         </div>
-        <span data-figma-part="Icon Right" aria-hidden="true" className={ICON_SLOT}>
+        <span data-figma-part="Icon Right" aria-hidden="true" className={FIELD_ICON_SLOT}>
           <Icon name="chevron-down" size={16} variant="line" />
         </span>
       </div>
@@ -498,36 +425,18 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     return (
       <div
         {...restProps}
+        {...rootProps}
         className={cn(
           'flex min-w-0 flex-col gap-ds-space-general-lg',
           isField && (fullWidth ? 'w-full' : 'w-80 max-w-full'),
+          rootProps?.className,
           className
         )}
       >
         {isField ? (
-          <div className="flex items-center gap-ds-space-general-lg">
+          <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled } : null}>
             {trigger}
-            {tooltip && (
-              <>
-                <span id={tooltipId} className="sr-only">
-                  {tooltip}
-                </span>
-                <button
-                  type="button"
-                  aria-label={tooltip}
-                  title={tooltip}
-                  className={cn(
-                    ICON_SLOT,
-                    'cursor-help rounded-sm border-0 bg-transparent p-0',
-                    FOCUS_RING,
-                    isDisabled ? '[--ico:var(--color-ds-icon-general-disabled-positive)]' : '[--ico:var(--color-ds-icon-general-white)]'
-                  )}
-                >
-                  <Icon name="info-circle" size={16} variant="fill" />
-                </button>
-              </>
-            )}
-          </div>
+          </FieldRow>
         ) : (
           trigger
         )}
@@ -544,16 +453,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           </div>
         )}
 
-        {isField && (
-          // Región viva siempre montada; vacía no ocupa sitio ni suma gap
-          <div aria-live="polite" className="empty:absolute">
-            {message && (
-              <NotificationText id={messageId} state={message.kind === 'success' ? 'confirmation' : message.kind} announce={false}>
-                {message.text}
-              </NotificationText>
-            )}
-          </div>
-        )}
+        {isField && <FieldMessage id={ids.message} message={message} />}
       </div>
     );
   }

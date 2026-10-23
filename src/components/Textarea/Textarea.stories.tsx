@@ -204,3 +204,23 @@ export const AutoResizeTest: Story = {
     await expect(area.scrollHeight).toBeGreaterThan(area.clientHeight);
   },
 };
+
+/** Test: `onValueChange` recibe el texto (además del `onChange` nativo) y `rootProps` llega a la raíz. */
+export const ValueChangeTest: Story = {
+  tags: ['!autodocs'],
+  render: function Demo() {
+    const [value, setValue] = useState('');
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <Textarea label="Comentario" onValueChange={setValue} rootProps={{ 'data-testid': 'raiz' }} />
+        <output data-testid="valor">{value}</output>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Comentario' }), 'Hola');
+    await expect(canvas.getByTestId('valor')).toHaveTextContent('Hola');
+    await expect(canvas.getByTestId('raiz')).toContainElement(canvas.getByRole('textbox', { name: 'Comentario' }));
+  },
+};

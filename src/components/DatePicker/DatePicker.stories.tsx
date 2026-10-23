@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import type { ComponentType } from 'react';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { DatePicker } from './DatePicker';
 import type { DatePickerBaseProps, DatePickerProps, DatePickerState } from './DatePicker.types';
@@ -162,7 +162,10 @@ export const TypeDateTest: Story = {
   },
 };
 
-/** Test: una fecha imposible marca error al salir del campo; una fuera de límites, "no disponible" */
+/**
+ * Test: una fecha imposible marca error al salir del campo; una fuera de límites, "no disponible". El error se anuncia
+ * por la región viva común de los campos (`aria-live="polite"`, sin `role="alert"`) y describe el campo.
+ */
 export const InvalidDateTest: Story = {
   tags: ['!autodocs'],
   args: { maxDate: new Date(2026, 11, 31) },
@@ -172,11 +175,14 @@ export const InvalidDateTest: Story = {
     await userEvent.type(input, '31022026');
     await userEvent.tab();
     await expect(input).toHaveAttribute('aria-invalid', 'true');
-    await expect(canvas.getByRole('alert')).toHaveTextContent('Escribe una fecha válida (dd/mm/aaaa)');
+    await expect(canvas.queryByRole('alert')).toBeNull();
+    await expect(input).toHaveAccessibleDescription(expect.stringContaining('Escribe una fecha válida (dd/mm/aaaa)'));
+    const region = canvasElement.querySelector('[aria-live="polite"]');
+    await expect(region).toHaveTextContent('Escribe una fecha válida (dd/mm/aaaa)');
     await userEvent.clear(input);
     await userEvent.type(input, '15012027');
     await userEvent.tab();
-    await expect(canvas.getByRole('alert')).toHaveTextContent('Esa fecha no está disponible');
+    await expect(region).toHaveTextContent('Esa fecha no está disponible');
     await userEvent.clear(input);
     await userEvent.type(input, '15122026');
     await userEvent.tab();
@@ -290,5 +296,41 @@ export const DisabledTest: Story = {
     await expect(canvas.getByRole('textbox', { name: 'Deshabilitado' })).toBeDisabled();
     await expect(canvas.getByRole('textbox', { name: 'Solo lectura' })).toHaveAttribute('readonly');
     for (const b of canvas.getAllByRole('button', { name: /Elegir fecha/ })) await expect(b).toBeDisabled();
+  },
+};
+
+function DatePickerApiDemo() {
+  const ref = useRef<HTMLInputElement>(null);
+  const alias = useRef<HTMLInputElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const [log, setLog] = useState('');
+  const [refs, setRefs] = useState('');
+  useEffect(() => setRefs(`${ref.current?.tagName}|${alias.current === ref.current}|${root.current?.dataset.testid}`), []);
+  return (
+    <div className="flex flex-col gap-4">
+      <DatePicker
+        ref={ref}
+        inputRef={alias}
+        rootProps={{ ref: root, 'data-testid': 'raiz' }}
+        label="Fecha de entrega"
+        calendarProps={{ today: TODAY }}
+        onValueChange={() => setLog((l) => `${l}v`)}
+        onChange={() => setLog((l) => `${l}c`)}
+      />
+      <output data-testid="log">{log}</output>
+      <output data-testid="refs">{refs}</output>
+    </div>
+  );
+}
+
+/** API común: `ref` al input (y `inputRef`, obsoleto, recibe el mismo nodo), `rootProps.ref` a la raíz, `onValueChange` y el alias `onChange`. */
+export const ApiTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <DatePickerApiDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('refs')).toHaveTextContent('INPUT|true|raiz');
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Fecha de entrega' }), '14102026');
+    await expect(canvas.getByTestId('log')).toHaveTextContent('vc');
   },
 };

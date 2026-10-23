@@ -23,12 +23,12 @@ export const tripleSelectRootVariants = cva('flex min-w-0 flex-col gap-ds-space-
   defaultVariants: { fullWidth: false },
 });
 
-/** Recuadro: se suma a `inputFieldVariants`. Con `!` porque cn() no ve como conflicto las utilidades ds-. */
+/** Recuadro: se suma a `inputFieldVariants` con cn(), que resuelve el conflicto con sus utilidades ds-. */
 export const tripleSelectFrameVariants = cva(
   'gap-ds-space-general-2xl [--input-field-gap:var(--ds-responsive-space-general-2xl)]',
   {
     variants: {
-      disabled: { true: 'border-ds-border-field-default!', false: '' },
+      disabled: { true: 'border-ds-border-field-default', false: '' },
     },
     defaultVariants: { disabled: false },
   }

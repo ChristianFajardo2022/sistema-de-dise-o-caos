@@ -20,7 +20,9 @@
     "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
     "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In (solo lectura)." },
     "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'", "default": "'default'", "description": "Fuerza el aspecto de un estado. Solo documentación." },
-    "rootProps": { "type": "HTMLAttributes<HTMLDivElement> & data-*", "required": false, "description": "Atributos para el contenedor raíz (data-*, style, etc.); por ejemplo data-figma. El resto de props nativas y el ref van al textarea." }
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." },
+    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Cambia el valor (recibe el texto). Se llama junto con el onChange nativo." },
+    "ref": { "type": "Ref<HTMLTextAreaElement>", "required": false, "description": "Al <textarea>. Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps." }
   },
   "accessibility": [
     "<textarea> nativo con label asociado por htmlFor y useId",
