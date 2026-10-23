@@ -19,6 +19,15 @@ export default defineConfig({
   test: {
     projects: [
       {
+        // Pruebas unitarias de utilidades y hooks sin navegador (`*.test.ts`)
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['src/**/*.test.ts'],
+          environment: 'node',
+        },
+      },
+      {
         extends: true,
         plugins: [
           // The plugin will run tests for the stories defined in your Storybook config
