@@ -1,0 +1,24 @@
+{
+  "name": "ProgressBar",
+  "component": "ProgressBar",
+  "description": "Barra de progreso determinada del sistema de diseño CAOS, fiel al component set Progress bar de Figma (11210:8045, 60 variantes: Type × State × Progress). Tres posiciones del texto: linear-text (pastilla a la derecha, barra de 8), text-above (burbuja sobre una pista de 12) y external-text (burbuja con puntero sobre una barra de 4). value es continuo (0 a max); los 5 pasos de Figma (0, 25, 50, 75, 100) son solo muestras. Se implementa con role=progressbar sobre un div (aria-valuenow/min/max y aria-valuetext) y no con <progress>, porque el texto, la burbuja y el puntero van dentro del mismo control. El nombre accesible es obligatorio (label o aria-labelledby). El estado se informa solo con color, así que statusLabel lo añade al valuetext. El ancho sigue al contenedor (Figma usa 347 de muestra). El ancho y la posición de la burbuja se animan 300 ms y bajo prefers-reduced-motion la duración baja a 0.01 ms. No hay modo indeterminado: Figma no lo define.",
+  "category": "Feedback",
+  "props": {
+    "value": { "type": "number", "default": "0", "description": "Progreso continuo entre 0 y max; se recorta al rango." },
+    "max": { "type": "number", "default": "100", "description": "Valor que equivale al 100 %." },
+    "type": { "type": "'linear-text' | 'text-above' | 'external-text'", "default": "'linear-text'", "description": "Type de Figma: dónde va el texto del porcentaje." },
+    "status": { "type": "'default' | 'success' | 'error' | 'alert'", "default": "'default'", "description": "State de Figma: color del progreso." },
+    "label": { "type": "string", "required": false, "description": "Nombre accesible. Obligatorio si no se pasa aria-labelledby." },
+    "aria-labelledby": { "type": "string", "required": false, "description": "Id del texto visible que nombra la barra (alternativa a label)." },
+    "showValue": { "type": "boolean", "default": true, "description": "Muestra el texto del porcentaje; en false queda solo la barra." },
+    "formatValue": { "type": "(value: number, percent: number) => string", "required": false, "description": "Formato del texto visible y de aria-valuetext. Por defecto el porcentaje redondeado." },
+    "statusLabel": { "type": "string", "required": false, "description": "Texto del estado para lectores de pantalla, añadido a aria-valuetext." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<ProgressBar label=\"Carga del archivo\" value={60} />" },
+    { "title": "Texto sobre la barra", "code": "<ProgressBar label=\"Perfil completado\" type=\"text-above\" status=\"success\" value={75} />" },
+    { "title": "Valor y máximo propios", "code": "<ProgressBar label=\"Pasos\" value={3} max={8} formatValue={(v) => `${v}/8`} />" },
+    { "title": "Con estado accesible", "code": "<ProgressBar label=\"Subida\" status=\"error\" statusLabel=\"con error\" value={40} />" },
+    { "title": "Solo barra", "code": "<ProgressBar label=\"Calificación\" showValue={false} value={4.2} max={5} />" }
+  ]
+}
