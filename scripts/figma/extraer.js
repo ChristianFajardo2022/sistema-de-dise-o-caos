@@ -109,6 +109,18 @@
     return out;
   };
 
+  // Sombras, desenfoques y texturas (NOISE no trae offset)
+  const efecto = (e) => {
+    const o = { tipo: e.type };
+    if ('radius' in e) o.radio = r2(e.radius);
+    if (e.color) o.color = hex(e.color, e.color.a);
+    if (e.offset) Object.assign(o, { x: r2(e.offset.x), y: r2(e.offset.y), spread: r2(e.spread || 0) });
+    if (e.blendMode && e.blendMode !== 'NORMAL') o.mezcla = e.blendMode;
+    if ('noiseSize' in e) Object.assign(o, { ruido: r2(e.noiseSize), densidad: r2(e.density) });
+    if (e.boundVariables && Object.keys(e.boundVariables).length) o.vars = anotarVars(e.boundVariables);
+    return o;
+  };
+
   async function nodo(n, profundidad = 0) {
     const o = { nombre: n.name, tipo: n.type, w: r2(n.width), h: r2(n.height) };
     if (n.visible === false) o.oculto = true;
@@ -140,11 +152,7 @@
         if (n.dashPattern && n.dashPattern.length) o.trazo.guiones = n.dashPattern;
       }
     }
-    if ('effects' in n && n.effects.length) {
-      o.efectos = n.effects
-        .filter((e) => e.visible !== false)
-        .map((e) => ({ tipo: e.type, radio: r2(e.radius), ...(e.color ? { color: hex(e.color, e.color.a), x: r2(e.offset.x), y: r2(e.offset.y), spread: r2(e.spread || 0) } : {}) }));
-    }
+    if ('effects' in n && n.effects.length) o.efectos = n.effects.filter((e) => e.visible !== false).map(efecto);
     if ('opacity' in n && n.opacity < 1) o.opacidad = r2(n.opacity);
     if (n.type === 'TEXT') {
       const seg = n.getStyledTextSegments(['fontName', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'fills', 'textCase', 'textDecoration']);
@@ -169,6 +177,7 @@
     const bv = anotarVars(n.boundVariables);
     delete bv.fills;
     delete bv.strokes;
+    delete bv.effects;
     if (Object.keys(bv).length) o.vars = bv;
     if (n.type === 'INSTANCE') {
       const main = await n.getMainComponentAsync();

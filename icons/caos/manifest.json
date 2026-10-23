@@ -257,7 +257,10 @@
  {
   "name": "arrow-diagonal-right",
   "category": "Arrows",
-  "figmaSetId": "14126:4944"
+  "figmaSetId": "14126:4944",
+  "copias": [
+   "18236:11030"
+  ]
  },
  {
   "name": "arrow-right3",
@@ -1607,7 +1610,10 @@
  {
   "name": "tag",
   "category": "Money",
-  "figmaSetId": "9792:10593"
+  "figmaSetId": "9792:10593",
+  "copias": [
+   "9797:12735"
+  ]
  },
  {
   "name": "ticket",
@@ -1937,7 +1943,10 @@
  {
   "name": "bag-timer",
   "category": "Shop",
-  "figmaSetId": "12703:2730"
+  "figmaSetId": "12703:2730",
+  "copias": [
+   "13413:5333"
+  ]
  },
  {
   "name": "barcode",
@@ -2017,7 +2026,10 @@
  {
   "name": "grid",
   "category": "Settings",
-  "figmaSetId": "17923:35816"
+  "figmaSetId": "17923:35816",
+  "copias": [
+   "18337:1060"
+  ]
  },
  {
   "name": "row-vertical",

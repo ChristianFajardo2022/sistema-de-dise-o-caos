@@ -17,7 +17,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const MANIFEST_POR_SET = Object.fromEntries(
-  JSON.parse(fs.readFileSync(new URL('../../icons/caos/manifest.json', import.meta.url), 'utf8')).map((m) => [m.figmaSetId, m.name]),
+  // Los sets que son copia exacta de otro ("copias") apuntan al mismo ícono
+  JSON.parse(fs.readFileSync(new URL('../../icons/caos/manifest.json', import.meta.url), 'utf8')).flatMap((m) =>
+    [m.figmaSetId, ...(m.copias || [])].map((id) => [id, m.name]),
+  ),
 );
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -88,6 +91,8 @@ function crearResolvedor(spec, tema) {
 }
 
 function recorrer(nodo, fn) {
+  // Lo oculto en Figma (y todo lo que cuelga de ahí) no se dibuja: no se mide
+  if (nodo.oculto) return;
   fn(nodo);
   (nodo.hijos || []).forEach((h) => recorrer(h, fn));
 }
@@ -168,18 +173,23 @@ function medirEnPagina({ nombre, partes }) {
     const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
     let t;
     while ((t = w.nextNode())) if (t.textContent.trim()) return t.parentElement;
-    return null;
+    // Campos de formulario: el valor o el placeholder no son nodos de texto
+    if (el.matches('input:not([type=checkbox]):not([type=radio]), textarea')) return el;
+    return el.querySelector('input:not([type=checkbox]):not([type=radio]), textarea');
   };
   const medirTexto = (el) => {
+    const campo = el.matches('input, textarea');
+    // Campo vacío: lo que se ve es el placeholder, con su propio color
     const c = getComputedStyle(el);
+    const color = campo && !el.value ? getComputedStyle(el, '::placeholder').color : c.color;
     return {
       familia: c.fontFamily,
       tamano: px(c.fontSize),
       peso: parseInt(c.fontWeight, 10),
       linea: c.lineHeight === 'normal' ? null : px(c.lineHeight),
-      color: rgba(c.color),
+      color: rgba(color),
       espaciado: px(c.letterSpacing),
-      contenido: el.textContent.trim().slice(0, 40),
+      contenido: (campo ? el.value || el.placeholder : el.textContent).trim().slice(0, 40),
     };
   };
   const marcados = (n) => [...(raiz.matches(sel(n)) ? [raiz] : []), ...raiz.querySelectorAll(sel(n))];
