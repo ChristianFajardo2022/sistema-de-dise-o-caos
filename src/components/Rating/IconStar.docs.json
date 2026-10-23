@@ -1,0 +1,13 @@
+{
+  "name": "IconStar",
+  "component": "IconStar",
+  "description": "Estrella de Ratings & Reviews del sistema de diseño CAOS (Icon Star (Atom), component set 11194:15685). Caja cuadrada de 16, 20 o 32 px. state default (gris, icon/general/gray-low-contrast) y hover (amarillo, icon/semantic/alert-firts) dibujan la estrella a 3/4 de la caja (12, 16, 24); select la dibuja a caja completa en amarillo. El dibujo es el ícono `star` de la biblioteca (el set 11194:15685 no figura en icons/caos/manifest.json). Es decorativa: siempre aria-hidden. Es un átomo interno de StarRating, RatingBar y NumberRating.",
+  "category": "Data Display/Rating",
+  "props": {
+    "state": { "type": "'default' | 'select' | 'hover'", "default": "'default'", "description": "state de Figma." },
+    "size": { "type": "16 | 20 | 32", "default": "16", "description": "size de Figma: lado de la caja en px." }
+  },
+  "examples": [
+    { "title": "Seleccionada", "code": "<IconStar state=\"select\" size={32} />" }
+  ]
+}

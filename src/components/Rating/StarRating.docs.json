@@ -1,0 +1,20 @@
+{
+  "name": "StarRating",
+  "component": "StarRating",
+  "description": "Puntaje con cinco estrellas del sistema de diseño CAOS, fiel al component set Star rating de Figma (11252:401, Size 20px/32px × State 0-5). Gap space/general/md (4) en sm y space/general/lg (8) en md. Dos modos. Solo lectura (por defecto): role=\"img\" con aria-label \"4 de 5 estrellas\"; Figma solo define estrellas completas, así que un decimal se dibuja redondeado y el nombre accesible conserva el valor real (\"4,5 de 5 estrellas\"). Interactivo (onChange o defaultValue): grupo de radios nativos (patrón APG Radio Group: Tab entra al grupo, flechas mueven y seleccionan, foco visible con outline de 2px agregado); al pasar el puntero las estrellas hasta la señalada se previsualizan con el estado hover de Icon Star. disabled baja la opacidad a 50 % (no hay token en Figma). La prop State de Figma (0-5) es `value`.",
+  "category": "Data Display/Rating",
+  "props": {
+    "size": { "type": "'sm' | 'md'", "default": "'sm'", "description": "Size de Figma: sm = 20px, md = 32px." },
+    "value": { "type": "number", "required": false, "description": "Puntaje de 0 a 5 (State de Figma). Con onChange es el valor controlado." },
+    "defaultValue": { "type": "number", "required": false, "description": "Valor inicial interactivo no controlado; activa el modo interactivo." },
+    "onChange": { "type": "(value: number) => void", "required": false, "description": "Activa el modo interactivo." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Fuerza el modo de solo lectura." },
+    "disabled": { "type": "boolean", "default": false, "description": "Deshabilita las estrellas (modo interactivo)." },
+    "name": { "type": "string", "required": false, "description": "name de los radios, para formularios. En solo lectura (readOnly) se conserva: se envía un input oculto con el valor, para que no se pierda del formulario." },
+    "label": { "type": "string", "required": false, "description": "Nombre accesible. Solo lectura: texto leído; interactivo: nombre del grupo (por defecto \"Calificación\")." }
+  },
+  "examples": [
+    { "title": "Solo lectura", "code": "<StarRating value={4} />" },
+    { "title": "Interactivo controlado", "code": "<StarRating size=\"md\" value={v} onChange={setV} label=\"Tu calificación\" />" }
+  ]
+}

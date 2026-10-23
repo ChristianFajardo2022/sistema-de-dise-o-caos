@@ -1,0 +1,16 @@
+{
+  "name": "RatingBar",
+  "component": "RatingBar",
+  "description": "Desglose de reseñas por estrellas del sistema de diseño CAOS, fiel al component set Rating bar de Figma (11569:947). Columna con gap space/general/lg (8); cada fila es un <li> con una IconStar select de 16, gap 8 y un ProgressBar de tipo linear-text (reutilizado, no copiado). Cada barra tiene nombre accesible \"5 estrellas\" y su valor como porcentaje o cantidad. La lista se nombra con `label`. Figma dibuja una sola estrella por fila y no escribe el número de estrellas; el número solo lo leen los lectores de pantalla.",
+  "category": "Data Display/Rating",
+  "props": {
+    "distribution": { "type": "{ stars: number; count: number }[]", "required": true, "description": "Filas en el orden en que se dibujan (típicamente 5 a 1)." },
+    "total": { "type": "number", "required": false, "description": "Total que equivale al 100 %. Por defecto, la suma de count." },
+    "display": { "type": "'percentage' | 'count'", "default": "'percentage'", "description": "Texto de la píldora de cada fila." },
+    "label": { "type": "string", "required": false, "description": "Nombre accesible de la lista." },
+    "barProps": { "type": "Partial<ProgressBarProps>", "required": false, "description": "Props extra para cada ProgressBar (p. ej. status)." }
+  },
+  "examples": [
+    { "title": "Porcentaje", "code": "<RatingBar label=\"Reseñas por calificación\" distribution={[{ stars: 5, count: 120 }, { stars: 4, count: 40 }, { stars: 3, count: 10 }, { stars: 2, count: 4 }, { stars: 1, count: 2 }]} />" }
+  ]
+}

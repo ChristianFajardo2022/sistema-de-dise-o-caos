@@ -18,5 +18,6 @@ export * from './components/Input';
 export * from './components/ListItem';
 export * from './components/ProgressBar';
 export * from './components/Radio';
+export * from './components/Rating';
 export * from './components/ScrollArea';
 export * from './components/Tag';
