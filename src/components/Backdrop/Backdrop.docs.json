@@ -1,0 +1,16 @@
+{
+  "name": "Backdrop",
+  "component": "Backdrop",
+  "description": "Capa de fondo para modales y drawers del sistema de diseño CAOS, fiel al component set Backdrop de Figma (11443:12074, variante Property 1=Predeterminada). Relleno background/effect/backdrop (Dark 60 %, Light 40 %) y desenfoque de fondo de 12. Es decorativa (aria-hidden) y no atrapa foco: eso corresponde al Modal. El efecto NOISE de Figma queda fuera (no hay recurso de ruido en el sistema; para diseño).",
+  "category": "Overlays",
+  "props": {
+    "open": { "type": "boolean", "default": true, "description": "Si es false no renderiza nada." },
+    "position": { "type": "'fixed' | 'absolute'", "default": "'fixed'", "description": "fixed cubre la pantalla; absolute se contiene en un padre con position relative." },
+    "onClick": { "type": "MouseEventHandler<HTMLDivElement>", "required": false, "description": "Se dispara al tocar fuera del contenido; úsalo para cerrar. La capa no es foco ni rol: ofrecer también Escape en el Modal." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para la capa." }
+  },
+  "examples": [
+    { "title": "Pantalla completa", "code": "<Backdrop open={open} onClick={() => setOpen(false)} />" },
+    { "title": "Dentro de un contenedor", "code": "<div className=\"relative\"><Backdrop position=\"absolute\" /></div>" }
+  ]
+}

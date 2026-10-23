@@ -4,6 +4,7 @@ export { cn } from './utils/cn';
 export * from './components/Accordion';
 export * from './components/Alert';
 export * from './components/Avatar';
+export * from './components/Backdrop';
 export * from './components/Badge';
 export * from './components/Button';
 export * from './components/ButtonCorner';
