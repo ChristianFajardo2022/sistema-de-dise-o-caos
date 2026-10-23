@@ -24,4 +24,5 @@ export * from './components/ProgressBar';
 export * from './components/Radio';
 export * from './components/Rating';
 export * from './components/ScrollArea';
+export * from './components/Select';
 export * from './components/Tag';

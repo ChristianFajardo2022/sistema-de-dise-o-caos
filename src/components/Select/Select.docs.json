@@ -1,0 +1,38 @@
+{
+  "name": "Select",
+  "component": "Select",
+  "description": "Campo para elegir una opción de una lista, fiel al Type=Dropdown del component set General input de Figma (7856:1485), con el panel del set Dropdown (11673:7804) debajo en Active/Focus. Reutiliza la base visual de Input (recuadro 56/48, radio 16, label flotante, colores por estado y mensajes con NotificationText) y los estilos del panel e ítems de DropdownMenu, con roles propios de lista. Patrón WAI-ARIA APG Select-Only Combobox: botón con role combobox y aria-activedescendant sobre un listbox de option; el foco nunca sale del botón. Teclado completo (flechas, Alt + flechas, Inicio, Fin, Re Pág / Av Pág, escribir para saltar, Enter, Espacio, Tab que elige, Esc que cierra). La lista va en la capa superior (popover) alineada al campo y con su ancho. Estados Default, Filled, Active/Focus, Burnt-In (readOnly), Disabled, Error, Success y Helper text. Selección simple: la múltiple queda para más adelante.",
+  "category": "Form Controls",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Label flotante; nombre accesible del combobox y de la lista." },
+    "options": { "type": "{ value: string; label: string; disabled?: boolean; icon?: IconName }[]", "required": false, "description": "Opciones como datos. También se pueden pasar como hijos SelectOption (van primero)." },
+    "children": { "type": "SelectOption[]", "required": false, "description": "Opciones declarativas: <SelectOption value=\"co\" icon?=\"…\" disabled?>Colombia</SelectOption>." },
+    "value": { "type": "string | null", "required": false, "description": "Valor elegido (controlado)." },
+    "defaultValue": { "type": "string", "required": false, "description": "Valor inicial (no controlado)." },
+    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Se llama al elegir una opción distinta." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Se llama al abrir o cerrar la lista." },
+    "placeholder": { "type": "string", "required": false, "description": "Se ve con foco o abierto mientras no hay valor." },
+    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda (aria-describedby)." },
+    "errorText": { "type": "string", "required": false, "description": "Mensaje de error; marca aria-invalid. Prioridad: error > éxito > ayuda." },
+    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito." },
+    "optional": { "type": "boolean", "default": false, "description": "Agrega \" | Opcional\" al label." },
+    "tooltip": { "type": "string", "required": false, "description": "Ícono de información fuera del campo con este texto." },
+    "name": { "type": "string", "required": false, "description": "Nombre en el formulario: un input oculto envía el value." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled: no se enfoca ni se envía." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In: se enfoca y se lee (aria-readonly), no abre." },
+    "required": { "type": "boolean", "default": false, "description": "aria-required. La validación es de quien usa el componente." },
+    "fullWidth": { "type": "boolean", "default": false, "description": "100 % del contenedor (si no, 320)." },
+    "frame": { "type": "'field' | 'none'", "default": "'field'", "description": "none: solo el disparador (label, valor y chevron) sin recuadro ni mensajes, para controles compuestos como TripleInput." },
+    "anchorRef": { "type": "RefObject<HTMLElement>", "required": false, "description": "Elemento al que se alinea la lista y del que toma el ancho (por defecto, el campo). Para PhoneInput y TripleInput." },
+    "scrollbar": { "type": "boolean", "default": true, "description": "Prop Scroll bar del panel: dibuja el riel de 6." },
+    "maxHeight": { "type": "string | number", "default": "'20rem'", "description": "Alto máximo de la lista." },
+    "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'", "required": false, "description": "Fuerza el aspecto, solo para documentación. active dibuja la lista abierta en el flujo." },
+    "ref": { "type": "Ref<HTMLButtonElement>", "required": false, "description": "Apunta al botón combobox (para enfocar). className y el resto de props van al elemento raíz." }
+  },
+  "examples": [
+    { "title": "Con datos", "code": "<Select label=\"País\" placeholder=\"Elige un país\" options={[{ value: 'co', label: 'Colombia' }, { value: 'mx', label: 'México' }]} />" },
+    { "title": "Con hijos", "code": "<Select label=\"Acción\">\n  <SelectOption value=\"crear\" icon=\"add-circle\">Crear</SelectOption>\n  <SelectOption value=\"archivar\" disabled>Archivar</SelectOption>\n</Select>" },
+    { "title": "Controlado", "code": "<Select label=\"País\" options={paises} value={pais} onValueChange={setPais} name=\"pais\" />" },
+    { "title": "En un control compuesto", "code": "<div ref={grupo} role=\"group\" aria-label=\"Fecha\" className={inputFieldVariants()}>\n  <Select frame=\"none\" anchorRef={grupo} label=\"Día\" options={dias} />\n  …\n</div>" }
+  ]
+}
