@@ -25,6 +25,9 @@ const MODO_RESPONSIVE = 'Desktop';
 const TOL_COLOR = 2;
 const TOL_ALPHA = 0.02;
 
+// Sombra inset sin blur ni spread desplazada en un solo eje: trazo de un lado
+const esTrazoLado = (s) => s.inset && s.blur === 0 && s.spread === 0 && (s.x === 0) !== (s.y === 0);
+
 // ───────────────────────── argumentos ─────────────────────────
 function leerArgs(argv) {
   const a = {};
@@ -280,17 +283,22 @@ function compararVariante(variante, m, spec, tema, tol) {
     const colorTrazo = R.colorPintura(n.trazos);
     const g = Array.isArray(n.trazo.grosor) ? n.trazo.grosor : [n.trazo.grosor, n.trazo.grosor, n.trazo.grosor, n.trazo.grosor];
     const insets = rz.sombras.filter((s) => s.inset && s.blur === 0 && s.x === 0 && s.y === 0);
+    // Trazo de un solo lado con box-shadow inset desplazado (p. ej. `inset 0 1px 0 0` = arriba)
+    const ladoDe = (s) => (s.y > 0 ? 0 : s.x < 0 ? 1 : s.y < 0 ? 2 : 3);
+    const porLado = [0, 0, 0, 0];
+    const deLado = rz.sombras.filter(esTrazoLado);
+    deLado.forEach((s) => (porLado[ladoDe(s)] = Math.abs(s.x || s.y)));
     const bordeMax = Math.max(...rz.borde.grosores);
     const usaBorde = bordeMax > 0;
     const lados = ['arriba', 'derecha', 'abajo', 'izquierda'];
-    const grosorSb = (i) => (usaBorde ? rz.borde.grosores[i] : insets[0] ? insets[0].spread : 0);
+    const grosorSb = (i) => (usaBorde ? rz.borde.grosores[i] : insets[0] ? insets[0].spread : porLado[i]);
     const iguales = g.every((x) => x === g[0]);
     for (const i of iguales ? [0] : [0, 1, 2, 3]) {
       const sb = iguales && usaBorde ? Math.max(...rz.borde.grosores) : grosorSb(i);
       num(iguales ? 'trazo grosor' : `trazo grosor ${lados[i]}`, g[i], sb);
     }
     const idx = g.findIndex((x) => x > 0);
-    const colorSb = usaBorde ? rz.borde.colores[rz.borde.grosores.findIndex((x) => x > 0)] : insets[0] ? insets[0].color : null;
+    const colorSb = usaBorde ? rz.borde.colores[rz.borde.grosores.findIndex((x) => x > 0)] : insets[0] ? insets[0].color : deLado[0] ? deLado[0].color : null;
     if (idx >= 0) col('trazo color', colorTrazo, colorSb || [0, 0, 0, 0]);
   } else if (!n.trazos && Math.max(...rz.borde.grosores) > 0) {
     lista.push({ propiedad: 'trazo', figma: 'sin trazo', storybook: `borde ${Math.max(...rz.borde.grosores)}px`, ok: false });
@@ -301,7 +309,7 @@ function compararVariante(variante, m, spec, tema, tol) {
 
   // sombras
   const efectos = (n.efectos || []).filter((e) => e.tipo === 'DROP_SHADOW' || e.tipo === 'INNER_SHADOW');
-  const sbSombras = rz.sombras.filter((s) => !(s.inset && s.blur === 0 && s.x === 0 && s.y === 0 && n.trazos));
+  const sbSombras = rz.sombras.filter((s) => !(n.trazos && ((s.inset && s.blur === 0 && s.x === 0 && s.y === 0) || esTrazoLado(s))));
   const dropSb = sbSombras.filter((s) => !s.inset);
   const innerSb = sbSombras.filter((s) => s.inset);
   const cuenta = { DROP_SHADOW: 0, INNER_SHADOW: 0 };
