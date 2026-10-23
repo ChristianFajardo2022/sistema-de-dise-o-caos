@@ -101,8 +101,8 @@ export function DayGrid({
             data-figma-part={WEEKDAY_PARTS[dow]}
             className={cn(
               'text-center text-ds-typography-field-size-xs leading-ds-typography-field-line-height-xs',
-              // Figma: Only date enlaza el primitivo color/primary/G08 (igual en ambos temas); Date range, text/neutral/gray 3
-              isRange ? 'text-ds-text-neutral-gray-2' : 'text-ds-primitives-color-primary-g08'
+              // Token de tema en ambos modos (en light el primitivo G08 daba 2,16:1). Figma enlaza el primitivo en Only date: para diseño
+              'text-ds-text-neutral-gray-2'
             )}
           >
             {fmt.weekdayShort(dow)}
