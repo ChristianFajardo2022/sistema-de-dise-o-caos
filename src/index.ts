@@ -6,6 +6,7 @@ export * from './components/Alert';
 export * from './components/Avatar';
 export * from './components/Backdrop';
 export * from './components/Badge';
+export * from './components/Breadcrumb';
 export * from './components/Button';
 export * from './components/ButtonCorner';
 export * from './components/ButtonLink';
