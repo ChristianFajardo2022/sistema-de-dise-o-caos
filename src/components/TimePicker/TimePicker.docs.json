@@ -1,0 +1,108 @@
+{
+  "name": "TimePicker",
+  "component": "TimePicker",
+  "description": "Selector de hora del sistema de diseño CAOS, tipo Time picker del component set General input de Figma (8 estados, ancho 432). Dos campos con label flotante (hora y minutos) y un par AM/PM; base visual de Input y mensajes con NotificationText. El valor es siempre una cadena 24 h \"HH:mm\", sin importar el ciclo visible. Accesibilidad: role=group con nombre; cada campo es un spinbutton (flechas arriba/abajo con vuelta, Inicio/Fin, aria-valuemin/max/now) con nombre propio; AM/PM es un radiogroup nativo (elección excluyente: flechas y un solo Tab) en vez de botones aria-pressed; los mensajes se asocian por aria-describedby. Hora 1-12 (0-23 en 24 h) y minutos 0-59: al salir del campo se acotan al rango y se rellenan a dos dígitos. En 12 h el valor solo se emite con AM/PM elegido. Figma set 'General input' (Type=Time picker).",
+  "category": "Form Controls",
+  "props": {
+    "value": {
+      "type": "string",
+      "description": "Hora 24 h \"HH:mm\" (controlado). Cadena vacía = sin hora completa."
+    },
+    "defaultValue": {
+      "type": "string",
+      "description": "Valor inicial 24 h \"HH:mm\" (no controlado)."
+    },
+    "onChange": {
+      "type": "(value: string) => void",
+      "description": "Recibe \"HH:mm\" cuando hay hora válida y \"\" cuando deja de haberla."
+    },
+    "hourCycle": {
+      "type": "12 | 24",
+      "description": "Ciclo visible; en 24 se oculta AM/PM.",
+      "default": "12"
+    },
+    "minuteStep": {
+      "type": "number",
+      "description": "Salto de las flechas en minutos; escribir acepta cualquier minuto.",
+      "default": "1"
+    },
+    "label": {
+      "type": "string",
+      "description": "Nombre accesible del grupo (no se dibuja).",
+      "default": "'Seleccionar hora'"
+    },
+    "hourLabel": {
+      "type": "string",
+      "description": "Label flotante de la hora.",
+      "default": "'Hora'"
+    },
+    "minuteLabel": {
+      "type": "string",
+      "description": "Label flotante de los minutos.",
+      "default": "'Minutos'"
+    },
+    "periodLabel": {
+      "type": "string",
+      "description": "Nombre accesible del par AM/PM.",
+      "default": "'AM/PM'"
+    },
+    "hourPlaceholder": {
+      "type": "string",
+      "description": "Placeholder de la hora."
+    },
+    "minutePlaceholder": {
+      "type": "string",
+      "description": "Placeholder de los minutos."
+    },
+    "helperText": {
+      "type": "string",
+      "description": "Mensaje de ayuda debajo."
+    },
+    "errorText": {
+      "type": "string",
+      "description": "Mensaje de error (prioridad sobre éxito y ayuda); marca aria-invalid."
+    },
+    "successText": {
+      "type": "string",
+      "description": "Mensaje de éxito."
+    },
+    "disabled": {
+      "type": "boolean",
+      "description": "Deshabilita los tres controles.",
+      "default": "false"
+    },
+    "readOnly": {
+      "type": "boolean",
+      "description": "Estado Burnt-In: enfocable, no editable.",
+      "default": "false"
+    },
+    "name": {
+      "type": "string",
+      "description": "Agrega un campo oculto con el valor \"HH:mm\" para formularios."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "description": "100 % del ancho (por defecto 432 px).",
+      "default": "false"
+    },
+    "state": {
+      "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'",
+      "description": "Fuerza el aspecto de un estado (solo documentación).",
+      "default": "'default'"
+    }
+  },
+  "examples": [
+    {
+      "title": "Básico",
+      "code": "<TimePicker label=\"Hora de la cita\" onChange={(v) => console.log(v)} />"
+    },
+    {
+      "title": "Controlado en 24 h",
+      "code": "<TimePicker hourCycle={24} value={hora} onChange={setHora} minuteStep={5} />"
+    },
+    {
+      "title": "Con error",
+      "code": "<TimePicker defaultValue=\"09:30\" errorText=\"Elige una hora dentro del horario\" />"
+    }
+  ]
+}
