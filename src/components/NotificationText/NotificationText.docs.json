@@ -1,0 +1,25 @@
+{
+  "name": "NotificationText",
+  "component": "NotificationText",
+  "description": "Mensaje bajo un campo, fiel al component set Notification text de Figma (7851:2638, State = Error, Helper text, Confirmation, Information). Fila con ícono de 14 (relleno, biblioteca CAOS) y texto Helvetica Neue regular 14/18 (typography/field/size/sm), gap 8. Colores: error text/semantic/error-secondary + icon/semantic/error-firts; helper text/semantic/information-secondary + icon/semantic/information-neutral; confirmation text/semantic/success-secondary + icon/semantic/success-secondary; information text/neutral/white + icon/general/white. El ícono es decorativo (aria-hidden): el texto lleva el mensaje. Se enlaza al campo con aria-describedby apuntando a su id. Anuncio: error usa role=\"alert\" y confirmation role=\"status\" (sin aria-live duplicado); con announce={false} no añade rol, para cuando el contenedor ya es una región viva (Input lo usa así). Ayuda e información nunca llevan rol. Input pinta con este componente sus mensajes de ayuda, error y éxito.",
+  "category": "Form Controls",
+  "props": {
+    "state": {
+      "type": "'error' | 'helper' | 'confirmation' | 'information'",
+      "default": "'helper'",
+      "description": "State de Figma. Define el ícono y los colores."
+    },
+    "children": { "type": "ReactNode", "required": true, "description": "Mensaje (prop Text helper de Figma)." },
+    "announce": {
+      "type": "boolean",
+      "default": "true",
+      "description": "Con true, error usa role=\"alert\" y confirmation role=\"status\". Con false no añade rol."
+    },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales. El resto de props nativas y el ref van al div raíz." }
+  },
+  "examples": [
+    { "title": "Ayuda enlazada al campo", "code": "<input aria-describedby=\"c-ayuda\" />\n<NotificationText id=\"c-ayuda\">Usa tu correo de trabajo</NotificationText>" },
+    { "title": "Error", "code": "<NotificationText id=\"c-error\" state=\"error\">Correo no válido</NotificationText>" },
+    { "title": "Dentro de una región viva", "code": "<div aria-live=\"polite\"><NotificationText state=\"confirmation\" announce={false}>Guardado</NotificationText></div>" }
+  ]
+}

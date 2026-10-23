@@ -4,15 +4,13 @@ import {
   inputControlVariants,
   inputFieldVariants,
   inputLabelVariants,
-  inputMessageVariants,
 } from './Input.variants';
-import { CloseCircleIcon } from '../../icons/CloseCircleIcon';
 import { EyeIcon } from '../../icons/EyeIcon';
 import { EyeSlashIcon } from '../../icons/EyeSlashIcon';
 import { InfoCircleIcon } from '../../icons/InfoCircleIcon';
 import { SearchIcon } from '../../icons/SearchIcon';
-import { TickCircleIcon } from '../../icons/TickCircleIcon';
 import { cn } from '../../utils/cn';
+import { NotificationText } from '../NotificationText';
 
 const ICON_SLOT = 'inline-flex size-4 shrink-0 items-center justify-center text-(color:--ico) [&>svg]:size-full';
 
@@ -78,8 +76,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const isSearch = variant === 'search' || variant === 'search-header';
     const nativeType = isPassword ? (showPassword ? 'text' : 'password') : isSearch ? 'search' : (type ?? 'text');
     const leading = leftIcon ?? (isSearch ? <SearchIcon /> : null);
-
-    const MessageIcon = message?.kind === 'error' ? CloseCircleIcon : message?.kind === 'success' ? TickCircleIcon : InfoCircleIcon;
 
     return (
       <div className={cn('flex flex-col', fullWidth ? 'w-full' : 'w-[320px] max-w-full', className)}>
@@ -167,12 +163,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
         <div aria-live="polite">
           {message && (
-            <div id={messageId} className={inputMessageVariants({ kind: message.kind })}>
-              <span aria-hidden="true" className="inline-flex size-3.5 shrink-0 items-center justify-center text-(color:--msg-ico) [&>svg]:size-full">
-                <MessageIcon />
-              </span>
-              <span className="min-w-0">{message.text}</span>
-            </div>
+            <NotificationText
+              id={messageId}
+              state={message.kind === 'success' ? 'confirmation' : message.kind}
+              announce={false}
+              className="mt-ds-space-general-lg"
+            >
+              {message.text}
+            </NotificationText>
           )}
         </div>
       </div>

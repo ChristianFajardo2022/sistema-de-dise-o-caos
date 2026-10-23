@@ -130,7 +130,7 @@ export const inputControlVariants = cva(
   }
 );
 
-/** Fila de mensaje debajo del campo: ícono de 14 + texto 14/18. */
+/** @deprecated Input pinta sus mensajes con NotificationText; se conserva por compatibilidad de la API pública. */
 export const inputMessageVariants = cva(
   [
     'mt-ds-space-general-lg flex items-center gap-ds-space-general-lg',
