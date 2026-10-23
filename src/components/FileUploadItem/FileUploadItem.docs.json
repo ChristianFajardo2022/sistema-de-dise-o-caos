@@ -1,0 +1,24 @@
+{
+  "name": "FileUploadItem",
+  "component": "FileUploadItem",
+  "description": "Ítem de carga de archivo del sistema de diseño CAOS, fiel al component set \"File card\" 11557:17694 de la página Card de Figma (State Loading, Complete, Error, Loading error y Alert). Tarjeta de radius/general/2xl con relleno default-on-card, padding y gap de 16. Fila con Avatar icon de 32 (folder, tick-circle, close-circle o warning con el color semántico del estado), nombre del archivo (una línea) y texto de estado, y acciones Button tertiary xs de solo ícono. Loading y Alert agregan la Progress bar (Linear text, Success o Alert). Accesibilidad: el estado se informa con texto (no solo color) en una región aria-live polite; la barra es role=\"progressbar\" (del ProgressBar) nombrada por el archivo y con el texto del estado en aria-valuetext; cada acción se nombra con el archivo, como ListItem (\"Eliminar informe.pdf\", \"Descargar…\", \"Reintentar…\"); si `title` no es texto, el nombre es genérico y el título llega por aria-describedby. Criterio común de las tarjetas: `title` es el texto principal, `icon` el ícono del avatar por defecto y los `*Label` reemplazan el nombre completo.",
+  "category": "Data Display",
+  "props": {
+    "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma: nombre del archivo (antes `fileName`, mismo nombre que en FileCard)." },
+    "status": { "type": "'loading' | 'complete' | 'error' | 'loading-error' | 'alert'", "default": "'loading'", "description": "State de Figma (estado de la carga, no de interacción)." },
+    "message": { "type": "ReactNode", "required": false, "description": "Props Alert, Error state y Loading error de Figma: texto del estado. Tiene un texto por defecto por estado." },
+    "progress": { "type": "number", "default": "0", "description": "Progreso 0-100 (loading y alert)." },
+    "icon": { "type": "IconName", "default": "'folder'", "description": "Ícono del Avatar en loading." },
+    "onDelete": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Acción Eliminar (todas las variantes)." },
+    "onDownload": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Prop Download de Figma: acción Descargar (complete y error)." },
+    "onRetry": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Acción Reintentar (loading-error y alert)." },
+    "deleteLabel": { "type": "string", "default": "'Eliminar <título>'", "description": "Nombre accesible completo de Eliminar." },
+    "downloadLabel": { "type": "string", "default": "'Descargar <título>'", "description": "Nombre accesible completo de Descargar." },
+    "retryLabel": { "type": "string", "default": "'Reintentar <título>'", "description": "Nombre accesible completo de Reintentar." }
+  },
+  "examples": [
+    { "title": "Subiendo", "code": "<FileUploadItem title=\"informe.pdf\" progress={40} onDelete={cancelar} />" },
+    { "title": "Completa", "code": "<FileUploadItem title=\"informe.pdf\" status=\"complete\" onDownload={bajar} onDelete={borrar} />" },
+    { "title": "Falló", "code": "<FileUploadItem title=\"informe.pdf\" status=\"loading-error\" onRetry={reintentar} onDelete={borrar} />" }
+  ]
+}

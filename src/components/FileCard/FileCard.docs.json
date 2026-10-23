@@ -1,0 +1,38 @@
+{
+  "name": "FileCard",
+  "component": "FileCard",
+  "description": "Tarjeta de archivo del sistema de diseño CAOS. Reúne dos component sets \"File card\" de la página Card de Figma: 14043:59452 (Type Photo e Icon × State Default, Hover y Select) y 15005:15958 (miniatura de 160×160, aquí type=\"thumbnail\"). La silueta Subtract (radius/general/2xl 24 con muesca arriba a la derecha para el Button corner) es la superficie interna común de las tarjetas (NotchedSurface, muesca de 48 o 40): se dibuja con una máscara, de modo que el relleno, el trazo de 1 px y la foto siguen la muesca. La sombra de Photo (effect/shadow sm) es un drop-shadow en una capa de superficie con la silueta entera, no en la raíz. Photo: lienzo de 160 con foto (src) o Avatar icon de 48 y bloque de texto debajo; Button corner md de más opciones. Icon: Avatar icon de 48, título y metadatos; Button corner sm con Checkbox. Thumbnail: Avatar icon de 32 centrado; en hover o con foco dentro aparecen el Backdrop y las acciones Descargar (Button primary) y Eliminar (Button primary delete), y en pantallas sin hover quedan visibles. Hover sale de CSS; Select, del control de selección marcado (input real con nombre accesible = título). La tarjeta en sí no es interactiva: cada acción se nombra con el título, como ListItem (\"Más opciones de informe.pdf\", \"Descargar…\", \"Eliminar…\"); si el título no es texto, el nombre es genérico y el título llega por aria-describedby. El ref va a la raíz (la tarjeta es un contenedor con controles opcionales, no un control); el input de selección se alcanza con selectionProps, que acepta su ref y su onChange nativo. En thumbnail el título no se ve pero queda como texto para lectores de pantalla.",
+  "category": "Data Display",
+  "props": {
+    "type": { "type": "'photo' | 'icon' | 'thumbnail'", "default": "'icon'", "description": "Type de Figma (Photo / Icon del set 14043:59452). thumbnail = set 15005:15958." },
+    "title": { "type": "ReactNode", "required": true, "description": "Props Title text y Tittle de Figma (capa Filename). Una línea, recortada. En thumbnail es solo para lectores de pantalla." },
+    "description": { "type": "ReactNode", "required": false, "description": "Capa Status de Figma (metadatos, p. ej. tamaño). No se muestra en thumbnail." },
+    "children": { "type": "ReactNode", "required": false, "description": "Contenido extra bajo el título. Reemplaza las props de Figma Normal tittle, Number tittle, Icon tittle, Subtittle, Subtittle2, Text, Description (BOOLEAN), Box text y Box text2-8, List y List2-5, List text, List interaction, Group list, Tag, Tag superior e Icon general (capas ocultas en todas las variantes)." },
+    "src": { "type": "string", "required": false, "description": "Foto del lienzo (photo y thumbnail). Sin ella se muestra el Avatar icon de Figma." },
+    "alt": { "type": "string", "required": false, "description": "Texto alternativo de la foto. Sin él la foto es decorativa." },
+    "icon": { "type": "IconName", "required": false, "description": "Ícono del Avatar icon. Por defecto image (photo, thumbnail) o folder (icon)." },
+    "selection": { "type": "'checkbox' | 'radio'", "required": false, "description": "Props Select y Radio button de Figma: Checkbox o Radio real en el Button corner. Tiene prioridad sobre el botón de más opciones." },
+    "checked": { "type": "boolean", "required": false, "description": "Marcado (controlado). Con onCheckedChange." },
+    "defaultChecked": { "type": "boolean", "required": false, "description": "Marcado inicial (no controlado)." },
+    "onCheckedChange": { "type": "(checked: boolean) => void", "required": false, "description": "Al cambiar la selección, con el nuevo valor (como Switch e InteractiveCard). El evento llega por selectionProps.onChange." },
+    "name": { "type": "string", "required": false, "description": "name del input de selección (agrupa radios)." },
+    "value": { "type": "string", "required": false, "description": "value del input de selección." },
+    "disabled": { "type": "boolean", "required": false, "description": "Deshabilita el control de selección." },
+    "selectionLabel": { "type": "string", "required": false, "description": "Nombre accesible del control. Por defecto, el título (aria-labelledby)." },
+    "selectionProps": { "type": "FileCardSelectionProps (InputHTMLAttributes + ref)", "required": false, "description": "Props del input de selección, con su ref (enfocarlo) y su onChange nativo. checked, name, value y disabled tienen su prop propia." },
+    "onMoreClick": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Prop Button corner de Figma (Type Dots): botón de más opciones. Solo photo e icon, y solo sin selection." },
+    "moreLabel": { "type": "string", "default": "'Más opciones de <título>'", "description": "Nombre accesible completo del botón de más opciones." },
+    "moreButtonProps": { "type": "ButtonHTMLAttributes<HTMLButtonElement>", "required": false, "description": "Props extra del botón de más opciones (aria-expanded, aria-controls de un menú)." },
+    "onDownload": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Solo thumbnail: acción Descargar del Hover de Figma." },
+    "downloadLabel": { "type": "string", "default": "'Descargar <título>'", "description": "Nombre accesible completo de Descargar." },
+    "onDelete": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Solo thumbnail: acción Eliminar del Hover de Figma." },
+    "deleteLabel": { "type": "string", "default": "'Eliminar <título>'", "description": "Nombre accesible completo de Eliminar." },
+    "state": { "type": "'default' | 'hover' | 'select'", "required": false, "description": "State de Figma forzado, solo para documentación. En uso normal sale de :hover y del control marcado." }
+  },
+  "examples": [
+    { "title": "Con foto y más opciones", "code": "<FileCard type=\"photo\" title=\"portada.png\" description=\"Tamaño de archivo: 23 KB\" src={url} onMoreClick={abrirMenu} />" },
+    { "title": "Seleccionable", "code": "<FileCard type=\"icon\" title=\"informe.pdf\" description=\"Tamaño de archivo: 1,2 MB\" selection=\"checkbox\" checked={sel} onCheckedChange={setSel} />" },
+    { "title": "Elección única", "code": "<FileCard selection=\"radio\" name=\"adjunto\" value=\"a\" title=\"a.pdf\" />" },
+    { "title": "Miniatura con acciones", "code": "<FileCard type=\"thumbnail\" title=\"foto-01.jpg\" selection=\"checkbox\" onDownload={bajar} onDelete={borrar} />" }
+  ]
+}
