@@ -1,0 +1,32 @@
+{
+  "name": "InlineField",
+  "component": "InlineField",
+  "description": "Campo de texto en línea del sistema de diseño CAOS, fiel al component set Text field 2 de Figma (id 18445:46293; 14 variantes: Type Label | Label+Placeholder × State Default, Active/Filled, Success, Success placeholder y Error × Size sm | md × Inactive). Se llamó InlineField porque no tiene recuadro ni fondo: el label (con ' | Opcional'), el texto y un chip a la derecha conviven en línea; en size md el texto es grande (32/36), pensado para cifras. El chip (Container text) es una etiqueta corta junto al valor, p. ej. unidad o moneda; se expone como la prop suffix y queda asociado al campo con aria-describedby. Size sm mide 40 de alto (texto 14/18) y md 56. Label flotante resuelto en CSS (dentro del campo si está vacío y sin foco, 12/16 arriba con foco o valor). Inactive=On se mapea a disabled. Inactive=O (solo en Active/Filled md) parece un error de nombre de Figma: se ve como inactivo y se trata igual que On. Los mensajes (ayuda, error, éxito) salen debajo con NotificationText; la prop Help text de Figma no tiene nodo en ninguna variante, así que esa posición es decisión del código. El foco se ve con un contorno de 2px (border/field/active) porque el campo no tiene borde.",
+  "figmaNodeId": "18445-46293",
+  "category": "Form Controls",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Texto del label flotante, asociado con htmlFor." },
+    "optional": { "type": "boolean", "default": false, "description": "Muestra ' | Opcional' después del label." },
+    "size": { "type": "'sm' | 'md'", "default": "'sm'", "description": "Size de Figma: sm (alto 40) o md (alto 56, texto grande)." },
+    "suffix": { "type": "ReactNode", "required": false, "description": "Chip a la derecha del texto (unidad, moneda o etiqueta corta). Entra en aria-describedby." },
+    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda debajo del campo." },
+    "errorText": { "type": "string", "required": false, "description": "Mensaje de error: label en rojo, aria-invalid y prioridad sobre éxito y ayuda." },
+    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito: label en verde." },
+    "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del contenedor; si no, mide 320." },
+    "disabled": { "type": "boolean", "default": false, "description": "Inactive=On de Figma." },
+    "state": { "type": "'default' | 'active' | 'success' | 'success-value' | 'error' | 'disabled'", "default": "'default'", "description": "Fuerza el aspecto de un estado. Solo documentación. success-value es 'Success placeholder' (texto en verde)." },
+    "rootProps": { "type": "HTMLAttributes<HTMLDivElement> & data-*", "required": false, "description": "Atributos para el contenedor raíz (data-*, style, etc.); por ejemplo data-figma. El resto de props nativas y el ref van al input." }
+  },
+  "accessibility": [
+    "<input> nativo con label asociado por htmlFor y useId",
+    "aria-invalid en error; aria-describedby apunta al mensaje y al chip",
+    "mensaje en región aria-live polite",
+    "foco visible con contorno de 2px (border/field/active)",
+    "el color no es el único cue de estado: hay mensaje con ícono y texto"
+  ],
+  "examples": [
+    { "title": "Monto con moneda", "code": "<InlineField label=\"Monto\" suffix=\"COP\" inputMode=\"decimal\" />" },
+    { "title": "Grande y opcional", "code": "<InlineField size=\"md\" label=\"Peso\" optional suffix=\"kg\" />" },
+    { "title": "Con error", "code": "<InlineField label=\"Cantidad\" errorText=\"Escribe solo números\" />" }
+  ]
+}
