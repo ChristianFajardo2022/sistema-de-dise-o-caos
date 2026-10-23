@@ -1,0 +1,35 @@
+{
+  "name": "Calendar",
+  "component": "Calendar",
+  "description": "Calendario en línea del sistema de diseño CAOS, fiel al component set Calendar de Figma (8098:2263; Type: Only date / Date range × Date: Day / Month / Year) y a sus celdas (Number cell Date range, Number cell Only day, Month cell, Year cell). No incluye el campo ni el popover: eso es el Date picker, que puede envolver este componente. Vistas de día, mes y año con navegación (anterior, siguiente y un chip que cambia de vista), selección de una fecha (mode single) o de un rango (mode range, dos meses lado a lado desde la tableta y uno en móvil), pie opcional con Cancelar y Aplicar (en Figma: Limpiar y Filtrar), días deshabilitados (minDate, maxDate, isDateDisabled) y días vecinos atenuados. En las vistas de mes y año se marca como elegido el mes o el año de la fecha elegida (value); el mes visible es el que recibe el foco. Solo Date e Intl nativos. Accesibilidad: patrón APG Date Picker Dialog en la parte de grilla (role grid, roving tabindex, flechas, Inicio y Fin, RePág y AvPág por mes, Mayús + RePág y AvPág por año, aria-selected, aria-current date en hoy, nombre completo por día y título del mes visible como región aria-live polite). En range, Month y Year no cambian el cuerpo (Figma muestra siempre los días): activan el campo Mes o Año del encabezado, que abren una lista (DropdownMenu).",
+  "category": "Form Controls",
+  "props": {
+    "mode": { "type": "'single' | 'range'", "default": "'single'", "description": "Type de Figma: single = Only date, range = Date range." },
+    "value": { "type": "Date | null | DateRange", "required": false, "description": "Selección controlada: una fecha en single, { start, end } en range." },
+    "defaultValue": { "type": "Date | null | DateRange", "required": false, "description": "Selección inicial (no controlada)." },
+    "onChange": { "type": "(value) => void", "required": false, "description": "En range se llama en cada clic: primero con solo start y luego con start y end." },
+    "view": { "type": "'day' | 'month' | 'year'", "required": false, "description": "Date de Figma (controlada). En range indica el campo activo del encabezado." },
+    "defaultView": { "type": "'day' | 'month' | 'year'", "default": "'day'", "description": "Vista inicial." },
+    "onViewChange": { "type": "(view) => void", "required": false, "description": "Cambia la vista." },
+    "month": { "type": "Date", "required": false, "description": "Mes visible controlado. En range es el mes de la izquierda." },
+    "defaultMonth": { "type": "Date", "required": false, "description": "Mes visible inicial. Por defecto el de la selección o el de hoy." },
+    "onMonthChange": { "type": "(month: Date) => void", "required": false, "description": "Cambia el mes visible." },
+    "locale": { "type": "string", "default": "'es'", "description": "Idioma de los nombres de mes y día (Intl.DateTimeFormat)." },
+    "weekStartsOn": { "type": "0 | 1 | 2 | 3 | 4 | 5 | 6", "default": "0", "description": "Primer día de la semana; Figma empieza en domingo." },
+    "minDate": { "type": "Date", "required": false, "description": "Fecha mínima seleccionable." },
+    "maxDate": { "type": "Date", "required": false, "description": "Fecha máxima seleccionable." },
+    "isDateDisabled": { "type": "(date: Date) => boolean", "required": false, "description": "Deshabilita días puntuales." },
+    "showOutsideDays": { "type": "boolean", "default": true, "description": "Días de los meses vecinos, atenuados y nunca seleccionables." },
+    "today": { "type": "Date", "required": false, "description": "Fecha de hoy (aria-current date). Por defecto la del sistema; pasarla hace las pruebas deterministas." },
+    "showActions": { "type": "boolean", "default": false, "description": "Dibuja el pie con Cancelar y Aplicar. En móvil los botones se apilan con Aplicar arriba." },
+    "onApply": { "type": "(value) => void", "required": false, "description": "Se pulsa Aplicar con la selección actual." },
+    "onCancel": { "type": "() => void", "required": false, "description": "Se pulsa Cancelar." },
+    "labels": { "type": "Partial<CalendarLabels>", "required": false, "description": "Textos de la interfaz (español por defecto): calendar, previous, next, views, changeView, monthField, yearField, monthList, yearList, cancel, apply." }
+  },
+  "examples": [
+    { "title": "Una fecha", "code": "<Calendar defaultValue={new Date(2026, 9, 14)} onChange={setDate} />" },
+    { "title": "Rango con pie", "code": "<Calendar mode=\"range\" showActions onApply={(range) => aplicar(range)} onCancel={cerrar} />" },
+    { "title": "Límites y días bloqueados", "code": "<Calendar minDate={hoy} maxDate={limite} isDateDisabled={(d) => d.getDay() === 0} />" },
+    { "title": "Semana desde el lunes en inglés", "code": "<Calendar locale=\"en\" weekStartsOn={1} labels={{ calendar: 'Calendar', cancel: 'Cancel', apply: 'Apply' }} />" }
+  ]
+}
