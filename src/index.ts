@@ -15,5 +15,6 @@ export * from './components/Dots';
 export * from './components/DropdownMenu';
 export * from './components/Icon';
 export * from './components/Input';
+export * from './components/ListItem';
 export * from './components/Radio';
 export * from './components/ScrollArea';
