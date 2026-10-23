@@ -1,0 +1,23 @@
+{
+  "name": "Switch",
+  "component": "Switch",
+  "description": "Interruptor del sistema de diseño CAOS, fiel a los component sets Toggle (Atom) (9504:6567) y Toggle (9335:5863) de Figma. Type simple: pista de 48×32 con ficha de 24. Type complex: pista de 38 de alto con ficha de 30 y texto dentro (trackLabel); al encender la ficha va a la derecha y el texto a la izquierda. Off gray-fifth, On success-fourth, Disabled gray-seventh. Toggle Type=Text es simple con descripción (children); Type=Only es complex con trackLabel y sin descripción. Patrón APG Switch: input checkbox con role=switch oculto pero accesible, label asociado, Espacio y Enter alternan, foco visible con outline de 2px (agregado, no está en Figma). Funciona controlado (checked + onCheckedChange) y no controlado (defaultChecked). El Type 'Toggle' de Figma es el mismo dibujo que Simple y no tiene API propia.",
+  "category": "Form Controls",
+  "props": {
+    "type": { "type": "'simple' | 'complex'", "default": "'simple'", "description": "Type del átomo de Figma." },
+    "checked": { "type": "boolean", "required": false, "description": "Encendido (controlado). Usar con onCheckedChange." },
+    "defaultChecked": { "type": "boolean", "default": false, "description": "Encendido inicial (no controlado)." },
+    "onCheckedChange": { "type": "(checked: boolean) => void", "required": false, "description": "Se llama con el nuevo valor al alternar." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estados Disabled inactive y Disabled active." },
+    "trackLabel": { "type": "ReactNode", "required": false, "description": "Texto dentro de la pista (solo type complex). Sin children ni aria-label es el nombre accesible (aria-labelledby; la pista queda aria-hidden y no se lee dos veces). No debe cambiar con el estado: el nombre no debe ser On/Off." },
+    "children": { "type": "ReactNode", "required": false, "description": "Descripción junto a la pista. Sin ella y sin trackLabel, pasar aria-label." },
+    "rootProps": { "type": "SwitchRootProps", "required": false, "description": "Props de la fila (raíz): data-*, eventos. className también va a la fila; ref e id van al input." },
+    "onChange": { "type": "ChangeEventHandler<HTMLInputElement>", "required": false, "description": "Va al input nativo, igual que name, value y el resto de props nativas. El ref también apunta al input." }
+  },
+  "examples": [
+    { "title": "Con descripción", "code": "<Switch defaultChecked>Notificaciones</Switch>" },
+    { "title": "Controlado", "code": "<Switch checked={on} onCheckedChange={setOn}>Modo avanzado</Switch>" },
+    { "title": "Texto dentro de la pista", "code": "<Switch type=\"complex\" trackLabel=\"Activo\" />" },
+    { "title": "Solo control", "code": "<Switch aria-label=\"Activar sonido\" />" }
+  ]
+}
