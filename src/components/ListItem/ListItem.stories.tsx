@@ -124,12 +124,12 @@ export const SelectableLists: Story = {
   render: (args) => <SelectableList {...args} />,
 };
 
-/** Container query: por debajo de 48rem la categoría sube sobre el título y la descripción baja a todo el ancho. */
+/** Container query: por debajo de 18rem (288 px) de contenido la categoría sube sobre el título y la descripción baja a todo el ancho. */
 export const Narrow: Story = {
   parameters: { ownList: true },
   args: { leading: folder, onEdit: fn(), onDelete: fn(), menu: menuItems },
   render: (args) => (
-    <div className="w-[375px] max-w-full bg-ds-background-general-black">
+    <div className="w-[280px] max-w-full bg-ds-background-general-black">
       <ul role="list" className="m-0 p-0">
         <ListItem {...args} />
       </ul>

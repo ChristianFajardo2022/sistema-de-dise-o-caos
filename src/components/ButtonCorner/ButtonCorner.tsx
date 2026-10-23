@@ -8,9 +8,9 @@ import {
 } from './ButtonCorner.variants';
 import { checkboxControlVariants } from '../Checkbox/Checkbox.variants';
 import { radioControlVariants } from '../Radio/Radio.variants';
-import { ArrowDiagonalRightIcon } from '../../icons/ArrowDiagonalRightIcon';
+import { Icon } from '../Icon';
+// "Favorite (Atom)" de Figma es un vector propio (no una instancia de Icon-sizes): no está en la biblioteca
 import { FavoriteIcon } from '../../icons/FavoriteIcon';
-import { MoreIcon } from '../../icons/MoreIcon';
 import { cn } from '../../utils/cn';
 
 /** Slot de ícono de 16×16: el SVG lo llena y hereda el color del slot */
@@ -53,7 +53,7 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
             className="inline-flex size-[32px] shrink-0 items-center justify-center rounded-ds-radius-button-full p-ds-space-button-lg"
           >
             <IconSlot>
-              <MoreIcon />
+              <Icon name="3-dots-more" variant="fill" size={16} />
             </IconSlot>
           </span>
         );
@@ -83,7 +83,7 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         );
         break;
       default:
-        content = <IconSlot>{icon ?? <ArrowDiagonalRightIcon />}</IconSlot>;
+        content = <IconSlot>{icon ?? <Icon name="arrow-diagonal-right" variant="line" size={16} />}</IconSlot>;
     }
 
     return (

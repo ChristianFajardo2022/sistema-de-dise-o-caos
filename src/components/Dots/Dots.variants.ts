@@ -8,7 +8,8 @@ import { cva } from 'class-variance-authority';
  * (24 en md y sm, 16 en xs; Outline=No, es decir relleno).
  *
  * - Default y Focus: sin relleno. Hover y Press: relleno background/button/tertiary/hover.
- * - Ícono: icon/button/tertiary/default | hover | focus-press, y /inactive (deshabilitado).
+ * - Ícono: icon/button/tertiary/default | hover | focus-press, y /inactive (deshabilitado). Excepción de Figma:
+ *   Size=xs Default usa icon/general/white (md y sm no).
  * - Foco con teclado: no existe en Figma; se agrega un outline de 2px (WCAG 2.4.7).
  * - Press: `:active` o `aria-expanded="true"` (panel abierto, como en Figma).
  *
@@ -44,6 +45,10 @@ export const dotsVariants = cva(
         inactive: 'cursor-not-allowed text-ds-icon-button-tertiary-inactive',
       },
     },
+    compoundVariants: [
+      // Figma pinta Size=xs Default con icon/general/white; md y sm usan icon/button/tertiary/default
+      { size: 'xs', state: 'default', class: 'text-ds-icon-general-white' },
+    ],
     defaultVariants: { size: 'md', state: 'default' },
   }
 );

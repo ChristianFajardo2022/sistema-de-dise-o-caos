@@ -9,8 +9,8 @@ import { cva } from 'class-variance-authority';
  * - Raíz: padding space/general/lg (8) lateral y space/general/2xl (16) arriba y abajo; borde superior de
  *   border/general/lg (1) en border/general/gray-sixth. El trazo de Figma es INSIDE y no suma alto: se dibuja
  *   con un box-shadow inset (no ocupa espacio, así que el padding y el alto coinciden con Figma). Es el contenedor de consulta (`@container`): el layout vive en el hijo.
- * - Desktop (contenedor >= 48rem, el mismo corte de responsive/general/desktop): una fila, gap 16 (complex) u 8 (simple).
- * - Mobile (< 48rem): la fila lleva casilla, avatar, título (con la categoría encima) y acciones;
+ * - Desktop (contenedor >= 18rem de contenido, lo que mide la fila con avatar, texto y dos botones; no el corte de viewport de 48rem, que no aplica a un container query): una fila, gap 16 (complex) u 8 (simple).
+ * - Mobile (< 18rem): la fila lleva casilla, avatar, título (con la categoría encima) y acciones;
  *   la descripción baja a todo el ancho, con gap 8.
  * - Disabled: textos en text/neutral/disabled-*; los controles se deshabilitan por su propia API.
  */
@@ -26,12 +26,12 @@ export const listItemVariants = cva(
 
 /** Marco `Desktop` / `Mobile`: una fila que en pantallas angostas deja bajar la descripción. */
 export const listItemRowVariants = cva(
-  'flex flex-wrap items-center gap-y-ds-space-general-lg @3xl:flex-nowrap',
+  'flex flex-wrap items-center gap-y-ds-space-general-lg @2xs:flex-nowrap',
   {
     variants: {
       variant: {
         complex: 'gap-x-ds-space-general-2xl',
-        simple: 'gap-x-ds-space-general-lg @3xl:h-8',
+        simple: 'gap-x-ds-space-general-lg @2xs:h-8',
       },
     },
     defaultVariants: { variant: 'complex' },
@@ -40,14 +40,14 @@ export const listItemRowVariants = cva(
 
 /** `Container` de Figma (complex): título + categoría y descripción. En angosto se disuelve (`contents`). */
 export const listItemTextBlockClass =
-  'contents @3xl:flex @3xl:min-w-0 @3xl:flex-1 @3xl:flex-col @3xl:justify-center @3xl:gap-ds-space-general-sm';
+  'contents @2xs:flex @2xs:min-w-0 @2xs:flex-1 @2xs:flex-col @2xs:justify-center @2xs:gap-ds-space-general-sm';
 
 /**
  * `Filename and Category`: en angosto la categoría va sobre el título (`flex-col-reverse`). Su base de 8rem
  * (mínimo 6rem) hace que, si no cabe, las acciones bajen a otra línea en vez de aplastar el título.
  */
 export const listItemHeadClass =
-  'flex min-w-24 flex-[1_1_8rem] flex-col-reverse gap-ds-space-general-sm @3xl:min-w-0 @3xl:flex-none @3xl:flex-row @3xl:items-center @3xl:gap-ds-space-general-lg';
+  'flex min-w-24 flex-[1_1_8rem] flex-col-reverse gap-ds-space-general-sm @2xs:min-w-0 @2xs:flex-none @2xs:flex-row @2xs:items-center @2xs:gap-ds-space-general-lg';
 
 const fontPrimary = 'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]';
 
@@ -62,7 +62,7 @@ export const listItemTitleVariants = cva(
       variant: {
         complex: '',
         // En Figma el título simple mide 100 de ancho fijo en Desktop y se trunca; en angosto ocupa el espacio libre
-        simple: 'flex-1 @3xl:w-25 @3xl:flex-none',
+        simple: 'flex-1 @2xs:w-25 @2xs:flex-none',
       },
       disabled: { true: '', false: 'text-ds-text-neutral-heading' },
     },
@@ -80,13 +80,13 @@ export const listItemTitleVariants = cva(
  * (`gray-2` no cumple el contraste en light).
  */
 export const listItemDescriptionVariants = cva(
-  `order-last basis-full ${fontPrimary} @3xl:order-none @3xl:basis-auto`,
+  `order-last basis-full ${fontPrimary} @2xs:order-none @2xs:basis-auto`,
   {
     variants: {
       variant: {
         complex: 'text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md',
         simple:
-          'min-w-0 text-ds-typography-body-size-lg leading-ds-typography-body-line-height-short-lg @3xl:flex-1',
+          'min-w-0 text-ds-typography-body-size-lg leading-ds-typography-body-line-height-short-lg @2xs:flex-1',
       },
       disabled: { true: '', false: '' },
     },
@@ -113,7 +113,7 @@ export const listItemCategoryVariants = cva(
 
 /** `Line 1`: 10 de alto, trazo border/divider/md (0.5) en border/general/gray-secondary. */
 export const listItemDividerClass =
-  'hidden h-2.5 w-(--ds-responsive-border-general-md) shrink-0 bg-ds-border-general-gray-secondary @3xl:block';
+  'hidden h-2.5 w-(--ds-responsive-border-general-md) shrink-0 bg-ds-border-general-gray-secondary @2xs:block';
 
 /** `Actions Block`: botones de ícono y menú, gap space/general/md (4). */
 export const listItemActionsClass = 'ml-auto flex shrink-0 items-center gap-ds-space-general-md';
