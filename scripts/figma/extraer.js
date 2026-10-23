@@ -35,6 +35,14 @@
     return n ? n.name.replace(/^\S+\s/, '').trim() : null;
   };
 
+  const variantesDe = (n) => {
+    try {
+      return n.variantProperties || null;
+    } catch {
+      return null;
+    }
+  };
+
   // Exportar variantes con fotos puede colgarse: tope por imagen
   const exportar = (nodo, escala) =>
     Promise.race([
@@ -187,7 +195,7 @@
           componente: (set || main).name.trim(),
           pagina: paginaDe(set || main),
           id: (set || main).id,
-          ...(set ? { variante: main.variantProperties } : {}),
+          ...(set ? { variante: variantesDe(main) } : {}),
           remota: !!(set || main).remote,
         };
         const props = n.componentProperties;
@@ -206,7 +214,7 @@
         const main = interna && (await interna.getMainComponentAsync());
         if (main) {
           const set = main.parent && main.parent.type === 'COMPONENT_SET' ? main.parent : main;
-          o.icono = { nombre: set.name.trim(), figmaSetId: set.id, variante: main.variantProperties || null };
+          o.icono = { nombre: set.name.trim(), figmaSetId: set.id, variante: variantesDe(main) };
           const relleno = interna.findOne((c) => 'fills' in c && Array.isArray(c.fills) && c.fills.some((f) => f.visible !== false));
           if (relleno) o.icono.color = relleno.fills.map(pintura).filter(Boolean);
         }
@@ -253,9 +261,11 @@
         break;
       }
       const arbol = await nodo(v);
-      const nombre = v.variantProperties ? Object.entries(v.variantProperties).map(([k, x]) => `${k}=${x}`).join(', ') : v.name;
+      // Sets con errores en Figma lanzan al leer variantProperties: se usa el nombre de la capa
+      const vp = variantesDe(v);
+      const nombre = vp ? Object.entries(vp).map(([k, x]) => `${k}=${x}`).join(', ') : v.name;
       const archivo = slug(nombre) || slug(v.id);
-      variantes.push({ id: v.id, nombre, props: v.variantProperties || {}, png: `png/${archivo}.png`, arbol });
+      variantes.push({ id: v.id, nombre, props: vp || {}, png: `png/${archivo}.png`, arbol });
       if (png) {
         const bytes = await exportar(v, 2);
         if (bytes) await enviar(`${carpeta}/png/${archivo}.png`, figma.base64Encode(bytes), true);
