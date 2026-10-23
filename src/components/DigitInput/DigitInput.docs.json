@@ -1,0 +1,28 @@
+{
+  "name": "DigitInput",
+  "component": "DigitInput",
+  "description": "Casilla de un carácter del sistema de diseño CAOS, fiel al component set Input number de Figma (12070:15078: Size 56 | 32 × State Default, Filled, Active/Focus, Burnt-In, Disabled, Error, Confirmation). Es la pieza con la que se compondrá el CodeInput (OTP). Se llama DigitInput para no confundirla con un campo numérico. Es un <input type=\"text\"> con maxLength=1, inputMode=\"numeric\", pattern=\"[0-9]\" y autoComplete=\"off\" (\"one-time-code\" con oneTimeCode). No es type=number para evitar flechas, scroll que cambia el valor y la pérdida de ceros; con inputMode=\"numeric\" (por defecto) descarta todo lo que no sea un dígito en onChange (también al pegar); con otro inputMode no filtra. El autocompletado del sistema (one-time-code) y el pegado de códigos completos los reparte el componente de grupo (CodeInput): una sola casilla con maxLength=1 no puede recibir el código entero. Size 56 mide 37×56 y Size 32 mide 40×32; padding X space/field/md, radio radius/field/sm y borde de 1px. Estados por CSS: foco (border/field/active, más un outline de 2px que no está en Figma), disabled (borde por defecto y texto text/field/disabled-positive), error (invalid, aria-invalid) y confirmation (confirmed). Burnt-In se mapea a readOnly: relleno background/field/burnt-in y texto text/field/disabled-negative; sigue siendo enfocable y se lee. La prop state solo fuerza el aspecto en documentación. Nombre accesible obligatorio (aria-label o aria-labelledby), p. ej. \"Dígito 1 de 6\".",
+  "category": "Form Controls",
+  "props": {
+    "size": { "type": "'56' | '32'", "default": "'56'", "description": "Size de Figma: alto de la casilla." },
+    "state": {
+      "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'confirmation'",
+      "required": false,
+      "description": "Fuerza el aspecto, solo para documentación."
+    },
+    "invalid": { "type": "boolean", "default": false, "description": "Estado Error: contorno de error y aria-invalid." },
+    "confirmed": { "type": "boolean", "default": false, "description": "Estado Confirmation. Pierde frente a invalid." },
+    "oneTimeCode": { "type": "boolean", "default": false, "description": "autoComplete=\"one-time-code\" en lugar de \"off\". Solo tiene sentido dentro del componente de grupo, que reparte el código autocompletado o pegado entre las casillas." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In (valor fijo, solo lectura)." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
+    "aria-label": { "type": "string", "required": true, "description": "Nombre accesible. Obligatorio (o aria-labelledby)." },
+    "inputMode": { "type": "string", "default": "'numeric'", "description": "Teclado que se muestra. Con 'numeric' (por defecto) el campo solo acepta dígitos; con otro valor no filtra, para códigos alfanuméricos." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales. El resto de props nativas y el ref van al input." }
+  },
+  "examples": [
+    { "title": "Casilla suelta", "code": "<DigitInput aria-label=\"Dígito 1 de 6\" />" },
+    { "title": "Primera casilla de un código SMS", "code": "<DigitInput oneTimeCode aria-label=\"Dígito 1 de 6\" />" },
+    { "title": "Error", "code": "<DigitInput invalid aria-label=\"Dígito 3 de 6\" defaultValue=\"4\" />" },
+    { "title": "Tamaño pequeño", "code": "<DigitInput size=\"32\" aria-label=\"Dígito 1 de 4\" />" }
+  ]
+}

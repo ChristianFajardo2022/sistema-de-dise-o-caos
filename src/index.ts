@@ -11,6 +11,7 @@ export * from './components/Button';
 export * from './components/ButtonCorner';
 export * from './components/ButtonLink';
 export * from './components/Checkbox';
+export * from './components/DigitInput';
 export * from './components/Dots';
 export * from './components/DropdownMenu';
 export * from './components/Icon';
