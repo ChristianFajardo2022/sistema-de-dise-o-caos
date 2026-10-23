@@ -1,0 +1,23 @@
+{
+  "name": "TripleSelect",
+  "component": "TripleSelect",
+  "description": "Tres selectores en un mismo recuadro, fiel al Type=Triple del component set General input de Figma (7856:1485, 8 estados, ancho 496, alto 56 y 82 con mensaje). Es genérico: no depende de fechas; sirve para día/mes/año, departamento/ciudad/barrio o cualquier terna de listas. Cada sección es un Select con frame=\"none\" (patrón APG Select-Only Combobox, teclado completo) y la lista de cada una se abre bajo todo el recuadro (anchorRef). El marco común usa la base visual de Input (borde, estados, radio) y los mensajes NotificationText. Accesibilidad: role=\"group\" con nombre (label), cada combobox con su propio nombre, mensaje asociado por aria-describedby en las tres secciones y en el grupo, aria-invalid en error, foco visible por sección (el borde del recuadro cambia con :focus-within; anillo de 2 en error y éxito). Si se necesitan otras composiciones (por ejemplo un campo de texto junto a un selector), se puede armar con Select frame=\"none\" y inputFieldVariants. Figma set 'General input' (Type=Triple).",
+  "category": "Form Controls",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Nombre accesible del grupo (no se dibuja)." },
+    "fields": { "type": "[TripleSelectField, TripleSelectField, TripleSelectField]", "required": true, "description": "Las tres secciones, de izquierda a derecha: { name?, label, placeholder?, options, value?, defaultValue?, onValueChange?, optional? }." },
+    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda debajo (aria-describedby)." },
+    "errorText": { "type": "string", "required": false, "description": "Mensaje de error; marca aria-invalid en las tres secciones. Prioridad: error > éxito > ayuda." },
+    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito." },
+    "disabled": { "type": "boolean", "default": false, "description": "Deshabilita las tres secciones." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In: se enfocan y se leen, no abren." },
+    "fullWidth": { "type": "boolean", "default": false, "description": "100 % del contenedor (si no, 496)." },
+    "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'", "required": false, "description": "Fuerza el aspecto, solo para documentación. Nunca abre la lista." },
+    "ref": { "type": "Ref<HTMLDivElement>", "required": false, "description": "Apunta al recuadro con role=group. className y el resto de props van al elemento raíz." }
+  },
+  "examples": [
+    { "title": "Fecha de nacimiento", "code": "<TripleSelect\n  label=\"Fecha de nacimiento\"\n  fields={[\n    { name: 'dia', label: 'Día', options: dias },\n    { name: 'mes', label: 'Mes', options: meses },\n    { name: 'anio', label: 'Año', options: anios },\n  ]}\n/>" },
+    { "title": "Con error", "code": "<TripleSelect label=\"Ubicación\" fields={campos} errorText=\"Completa la ubicación\" />" },
+    { "title": "Controlado", "code": "<TripleSelect label=\"Fecha\" fields={[{ ...dia, value: d, onValueChange: setD }, { ...mes, value: m, onValueChange: setM }, { ...anio, value: a, onValueChange: setA }]} />" }
+  ]
+}
