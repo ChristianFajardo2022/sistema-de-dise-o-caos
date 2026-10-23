@@ -1,0 +1,37 @@
+{
+  "name": "Textarea",
+  "component": "Textarea",
+  "description": "Área de texto multilínea del sistema de diseño CAOS, fiel al tipo Coment del component set General input de Figma (8 states: Default, Filled, Active/Focus, Burnt-In, Disabled, Error, Success y Helper text; alto 88 con una línea y contador). Usa la base visual de Input (recuadro de 1px, radio field/md, label flotante resuelto en CSS, estados) y NotificationText para los mensajes (error > éxito > ayuda). Con maxLength muestra el contador n/máx abajo a la izquierda (12/16); sin maxLength no hay contador. rows (por defecto 1) fija las líneas visibles; con autoResize el campo crece con el contenido usando field-sizing: content si el navegador lo soporta y, si no, un cálculo en JavaScript, con maxRows como tope; resize controla el tirador (none, vertical, horizontal o both; con autoResize siempre none). Burnt-In se mapea a readOnly. Controlado (value + onChange) o no controlado (defaultValue). No se implementan las propiedades de Figma Icon left/right ni Tag (siempre ocultas en las 8 variantes).",
+  "figmaNodeId": "general-input-coment",
+  "category": "Form Controls",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Texto del label flotante, asociado con htmlFor." },
+    "optional": { "type": "boolean", "default": false, "description": "Muestra ' | Opcional' después del label." },
+    "tooltip": { "type": "string", "required": false, "description": "Ícono de información fuera del campo, como botón con aria-label y title; su texto entra en aria-describedby." },
+    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda debajo del campo." },
+    "errorText": { "type": "string", "required": false, "description": "Mensaje de error: borde y label en rojo, aria-invalid y prioridad sobre éxito y ayuda." },
+    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito: borde y label en verde." },
+    "rows": { "type": "number", "default": 1, "description": "Líneas visibles; con autoResize, las mínimas." },
+    "maxRows": { "type": "number", "required": false, "description": "Con autoResize, líneas máximas antes de que aparezca el scroll." },
+    "autoResize": { "type": "boolean", "default": false, "description": "Crece con el contenido (field-sizing: content, con respaldo en JS)." },
+    "resize": { "type": "'none' | 'vertical' | 'horizontal' | 'both'", "default": "'vertical'", "description": "Tirador de tamaño. Con autoResize es siempre none." },
+    "maxLength": { "type": "number", "required": false, "description": "Límite nativo de caracteres. Muestra el contador n/máx, que también entra en aria-describedby." },
+    "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del contenedor; si no, mide 320." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In (solo lectura)." },
+    "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'", "default": "'default'", "description": "Fuerza el aspecto de un estado. Solo documentación." },
+    "rootProps": { "type": "HTMLAttributes<HTMLDivElement> & data-*", "required": false, "description": "Atributos para el contenedor raíz (data-*, style, etc.); por ejemplo data-figma. El resto de props nativas y el ref van al textarea." }
+  },
+  "accessibility": [
+    "<textarea> nativo con label asociado por htmlFor y useId",
+    "aria-invalid en error; aria-describedby apunta al mensaje, al tooltip y al contador",
+    "mensaje en región aria-live polite",
+    "foco visible en el borde del campo (border/field/active)",
+    "el contador no es región viva: se lee al enfocar, no en cada tecla"
+  ],
+  "examples": [
+    { "title": "Con contador", "code": "<Textarea label=\"Comentario\" rows={3} maxLength={200} />" },
+    { "title": "Auto-crecimiento", "code": "<Textarea label=\"Notas\" autoResize rows={2} maxRows={6} />" },
+    { "title": "Con error", "code": "<Textarea label=\"Motivo\" errorText=\"Escribe al menos 10 caracteres\" />" }
+  ]
+}
