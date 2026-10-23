@@ -1,0 +1,35 @@
+{
+  "name": "Tabs",
+  "component": "Tabs",
+  "description": "Pestañas del sistema de diseño CAOS, fieles a los component sets Tab (Atom) (11666:4226: Single Icon × Size md/sm × State Default/Hover/Focus/Select/Inactive × Contrast On canva/On card) y Tab (11793:14729: Options two…six/more options × Size × Contrast) de Figma. API compuesta: Tabs (estado y contexto), TabList (contenedor en píldora con fondo background/tab/container y el tablist dentro), Tab (píldora con ícono de 16, texto y Badge number), TabPanel y TabOverflow (botón Dots xs con DropdownMenu para lo que no cabe). Patrón WAI-ARIA APG Tabs: roles tablist/tab/tabpanel, aria-selected, aria-controls (solo hacia paneles montados), aria-labelledby, roving tabindex, flechas izquierda/derecha circulares, Inicio y Fin, y las pestañas deshabilitadas (Inactive) se saltan. Activación automática por defecto (las flechas seleccionan) o manual (Enter o Espacio). Controlado o no controlado; sin valor inicial se selecciona la primera habilitada. Hover y Focus de Figma tienen el mismo relleno; el foco con teclado agrega un outline de 2px (Figma no lo dibuja). La pestaña de solo ícono exige aria-label, que se vuelve texto sr-only para que el número visible del badge forme parte del nombre. Si las pestañas no caben (360 px, WCAG 1.4.10 Reflow) el tablist hace scroll horizontal dentro de la píldora, sin barra visible, y las flechas llevan la pestaña enfocada a la vista; para pasar lo que sobra a un menú se usa TabOverflow. Los atributos que maneja el componente (role, aria-selected, id, tabIndex, hidden) no se pueden pisar con props. Al elegir una sección del menú de TabOverflow, el ejemplo mueve el foco a la pestaña seleccionada. Categoría: Navigation.",
+  "category": "Navigation",
+  "props": {
+    "value": { "type": "string", "required": false, "description": "Tabs, controlado: pestaña seleccionada." },
+    "defaultValue": { "type": "string", "required": false, "description": "Tabs, no controlado: pestaña inicial. Sin él, la primera habilitada." },
+    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Tabs: se llama al seleccionar otra pestaña." },
+    "size": { "type": "'md' | 'sm'", "default": "'md'", "description": "Size de Figma. En Tabs se aplica a la lista y a cada pestaña; en Tab suelta, solo a ella." },
+    "contrast": { "type": "'on-canva' | 'on-card'", "default": "'on-canva'", "description": "Contrast de Figma: superficie sobre la que va (lienzo o tarjeta)." },
+    "activationMode": { "type": "'automatic' | 'manual'", "default": "'automatic'", "description": "Tabs: automatic selecciona al mover el foco con flechas; manual solo mueve el foco y se selecciona con Enter o Espacio." },
+    "aria-label (TabList)": { "type": "string", "required": true, "description": "Nombre accesible del tablist (o aria-labelledby)." },
+    "overflow": { "type": "ReactNode", "required": false, "description": "TabList: Options=more options de Figma, normalmente <TabOverflow>. Va fuera del tablist." },
+    "fullWidth": { "type": "boolean", "default": "false", "description": "TabList: las pestañas se reparten todo el ancho (marco mobile de Figma)." },
+    "rootProps": { "type": "HTMLAttributes<HTMLDivElement>", "required": false, "description": "TabList: atributos del contenedor visual. ref, aria-* y el resto van al tablist; className también va al contenedor." },
+    "value (Tab, TabPanel)": { "type": "string", "required": true, "description": "Enlaza la pestaña con su panel." },
+    "children (Tab)": { "type": "ReactNode", "required": false, "description": "Prop Text de Figma. Sin texto la pestaña es de solo ícono (Single Icon=Yes)." },
+    "icon": { "type": "IconName", "required": false, "description": "Tab: ícono de 16 relleno antes del texto (prop Icon de Figma). Obligatorio en solo ícono." },
+    "aria-label (Tab)": { "type": "string", "required": false, "description": "Obligatorio en pestañas de solo ícono." },
+    "badge": { "type": "ReactNode", "required": false, "description": "Tab: contador (prop Badge de Figma, Badge number Default; Neutral si está deshabilitada)." },
+    "badgeLabel": { "type": "string", "required": false, "description": "Tab: texto sr-only que sigue al número del badge (\"3 pedidos\")." },
+    "disabled": { "type": "boolean", "default": "false", "description": "Tab: State Inactive de Figma. No se enfoca con flechas ni se selecciona." },
+    "state": { "type": "'default' | 'hover' | 'focus' | 'select' | 'inactive'", "required": false, "description": "Tab: fuerza el aspecto de un State, solo para documentación. En uso normal sale de CSS, la selección y disabled." },
+    "focusable": { "type": "boolean", "default": "true", "description": "TabPanel: entra en el orden de Tab (tabIndex 0). Pasar false si el panel ya contiene controles enfocables (APG)." },
+    "keepMounted": { "type": "boolean", "default": "false", "description": "TabPanel: mantiene el contenido montado cuando está oculto." },
+    "label (TabOverflow)": { "type": "string", "default": "'Más pestañas'", "description": "TabOverflow: nombre accesible del botón Dots; también nombra el menú si no se da aria-label." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<Tabs defaultValue=\"pendientes\">\n  <TabList aria-label=\"Estado de los pedidos\">\n    <Tab value=\"pendientes\" icon=\"heart\" badge={3} badgeLabel=\"pedidos\">Pendientes</Tab>\n    <Tab value=\"enviados\">Enviados</Tab>\n    <Tab value=\"archivados\" disabled>Archivados</Tab>\n  </TabList>\n  <TabPanel value=\"pendientes\">…</TabPanel>\n  <TabPanel value=\"enviados\">…</TabPanel>\n  <TabPanel value=\"archivados\">…</TabPanel>\n</Tabs>" },
+    { "title": "Solo ícono", "code": "<Tab value=\"ajustes\" icon=\"setting\" aria-label=\"Ajustes\" />" },
+    { "title": "Controlado y activación manual", "code": "<Tabs value={tab} onValueChange={setTab} activationMode=\"manual\" size=\"sm\" contrast=\"on-card\">…</Tabs>" },
+    { "title": "Desborde", "code": "<TabList aria-label=\"Secciones\" overflow={<TabOverflow label=\"Más secciones\"><DropdownMenuItem onSelect={() => setTab('reportes')}>Reportes</DropdownMenuItem></TabOverflow>}>…</TabList>" }
+  ]
+}
