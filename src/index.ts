@@ -23,6 +23,7 @@ export * from './components/Input';
 export * from './components/ListItem';
 export * from './components/NotificationText';
 export * from './components/NumberPicker';
+export * from './components/PhoneInput';
 export * from './components/ProgressBar';
 export * from './components/Radio';
 export * from './components/Rating';
