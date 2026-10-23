@@ -1,0 +1,30 @@
+{
+  "name": "NumberPicker",
+  "component": "NumberPicker",
+  "description": "Campo de cantidad con botones − y + del sistema de diseño CAOS, fiel al component set Number picker de Figma (12609:18389: State Default, Filled, Active/Focus, Burnt-In, Disabled × Size sm | md). Píldora (radius/general/full) de alto 56 en sm y 48 en md (los nombres de tamaño son los del archivo de Figma), padding X space/general/2xl, borde de 1px border/field/disabled en todos los estados y texto 14/18 centrado. Los botones son instancias de Button (tertiary, xs, ícono solo) con los íconos minus y add-2 a 20px. Patrón APG Spinbutton: un <input type=\"text\"> con role=\"spinbutton\", aria-valuenow, aria-valuemin y aria-valuemax; flechas arriba/abajo cambian ±step, RePág y AvPág ±largeStep (10 × step por defecto), Inicio y Fin llevan a min y max; se puede escribir: mientras se escribe se conserva el texto crudo y el valor se acota y confirma al salir del campo (blur) o con Enter; aria-valuenow refleja el valor confirmado. Con el campo vacío, el primer paso de los botones o flechas confirma min (o 0). Los botones tienen aria-label (Disminuir / Aumentar, configurables), aria-controls al campo, quedan fuera del orden de tabulación (el teclado usa el campo) y se deshabilitan en los límites sin quitarle el foco al campo. Se usa type=\"text\" y no type=\"number\" para tener PageUp/PageDown, un teclado numérico consistente y control del texto. Burnt-In se mapea a readOnly (aria-readonly, botones deshabilitados, relleno background/field/burnt-in). Controlado con value + onValueChange o no controlado con defaultValue; un campo vacío da undefined. Nombre accesible obligatorio (aria-label o aria-labelledby).",
+  "category": "Form Controls",
+  "props": {
+    "size": { "type": "'sm' | 'md'", "default": "'sm'", "description": "Size de Figma: sm (alto 56) o md (alto 48)." },
+    "value": { "type": "number", "required": false, "description": "Valor controlado. Usar con onValueChange." },
+    "defaultValue": { "type": "number", "required": false, "description": "Valor inicial (no controlado)." },
+    "onValueChange": { "type": "(value: number | undefined) => void", "required": false, "description": "Se llama al cambiar el valor; undefined si el campo queda vacío." },
+    "min": { "type": "number", "required": false, "description": "Mínimo. El botón − se deshabilita al llegar." },
+    "max": { "type": "number", "required": false, "description": "Máximo. El botón + se deshabilita al llegar." },
+    "step": { "type": "number", "default": 1, "description": "Incremento de botones y flechas." },
+    "largeStep": { "type": "number", "default": "10 × step", "description": "Incremento de RePág y AvPág." },
+    "decrementLabel": { "type": "string", "default": "'Disminuir'", "description": "Nombre accesible del botón −." },
+    "incrementLabel": { "type": "string", "default": "'Aumentar'", "description": "Nombre accesible del botón +." },
+    "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del contenedor; si no, mide 320." },
+    "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled'", "required": false, "description": "Fuerza el aspecto, solo para documentación." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
+    "aria-label": { "type": "string", "required": true, "description": "Nombre accesible del campo (o aria-labelledby)." },
+    "className": { "type": "string", "required": false, "description": "Clases para el contenedor raíz. El resto de props nativas y el ref van al input." },
+    "rootProps": { "type": "HTMLAttributes<HTMLDivElement> & data-*", "required": false, "description": "Atributos para el contenedor raíz (data-*, style, etc.); por ejemplo data-figma para medir contra Figma." }
+  },
+  "examples": [
+    { "title": "Cantidad con límites", "code": "<NumberPicker aria-label=\"Cantidad\" defaultValue={1} min={1} max={10} />" },
+    { "title": "Controlado", "code": "<NumberPicker aria-label=\"Personas\" value={n} onValueChange={setN} min={1} max={8} size=\"md\" />" },
+    { "title": "Con paso decimal", "code": "<NumberPicker aria-label=\"Peso (kg)\" defaultValue={0.5} step={0.5} min={0} />" }
+  ]
+}
