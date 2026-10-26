@@ -9,6 +9,7 @@
  *   spec.json         props del set, variantes con su árbol, variables usadas resueltas por modo
  *   png/<variante>.png cada variante a 2x (modo por defecto del archivo)
  *   set.png           el set completo a 1x
+ * Cada variante guarda `modos` (modo de cada colección con modos: Responsive Desktop/Tablet/Mobile, tema).
  *
  * Opciones: offset/limite para sets grandes (se reparten en varias llamadas: spec-<offset>.json),
  * png:false para saltar las imágenes.
@@ -198,7 +199,12 @@
           ...(set ? { variante: variantesDe(main) } : {}),
           remota: !!(set || main).remote,
         };
-        const props = n.componentProperties;
+        let props = null;
+        try {
+          props = n.componentProperties;
+        } catch {
+          o.instancia.propsError = 'set con errores en Figma';
+        }
         if (props && Object.keys(props).length) {
           o.instancia.props = Object.fromEntries(Object.entries(props).map(([k, v]) => [k.replace(/#\d+:\d+$/, ''), v.value]));
         }
@@ -221,6 +227,23 @@
       }
     }
     return o;
+  }
+
+  // Modo de cada colección con modos (Responsive: Desktop/Tablet/Mobile, tema...) en el que está el nodo.
+  // `explicitos` = fijado en el propio nodo; `resueltos` = el que realmente aplica (heredado incluido).
+  // El comparador mide cada variante con el viewport de su modo Responsive.
+  async function modosDe(n) {
+    const out = {};
+    for (const [campo, mapa] of [['explicitos', n.explicitVariableModes], ['resueltos', n.resolvedVariableModes]]) {
+      const m = {};
+      for (const [colId, modeId] of Object.entries(mapa || {})) {
+        const col = await figma.variables.getVariableCollectionByIdAsync(colId);
+        const modo = col && col.modes.find((x) => x.modeId === modeId);
+        if (col && modo) m[col.name.trim()] = modo.name;
+      }
+      if (Object.keys(m).length) out[campo] = m;
+    }
+    return out;
   }
 
   // ---------- principal ----------
@@ -265,7 +288,7 @@
       const vp = variantesDe(v);
       const nombre = vp ? Object.entries(vp).map(([k, x]) => `${k}=${x}`).join(', ') : v.name;
       const archivo = slug(nombre) || slug(v.id);
-      variantes.push({ id: v.id, nombre, props: vp || {}, png: `png/${archivo}.png`, arbol });
+      variantes.push({ id: v.id, nombre, props: vp || {}, modos: await modosDe(v), png: `png/${archivo}.png`, arbol });
       if (png) {
         const bytes = await exportar(v, 2);
         if (bytes) await enviar(`${carpeta}/png/${archivo}.png`, figma.base64Encode(bytes), true);

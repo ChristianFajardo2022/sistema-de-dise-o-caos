@@ -4,7 +4,11 @@
  *
  * Uso:
  *   node scripts/figma/comparar.mjs --carpeta badge --story data-display-badge--figma-matrix \
- *        [--port 6006] [--temas dark,light] [--tol 0.5] [--out <carpeta>]
+ *        [--port 6006] [--temas dark,light] [--tol 0.5] [--out <carpeta>] [--modo Desktop|Tablet|Mobile]
+ *
+ * Modo Responsive: cada variante se mide con el viewport de su modo (Desktop 1440, Tablet 800, Mobile 390) y
+ * resolviendo las variables en ese modo. Sale de la spec (`modos`), o se infiere de las variables enlazadas, o
+ * se fuerza con `--modo`. Variantes con nombre repetido (sets con errores) se emparejan por orden de aparición.
  *
  * `--out` escribe comparacion.json/html y capturas en otra carpeta (para no pisar la de otro agente).
  *
@@ -26,7 +30,10 @@ const MANIFEST_POR_SET = Object.fromEntries(
 );
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const MODO_RESPONSIVE = 'Desktop';
+// Modos de la colección Responsive y el ancho de vista que activa cada uno en tokens.css
+// (< 48rem = Mobile, 48rem a < 64rem = Tablet, >= 64rem = Desktop; se mide en el centro de cada tramo).
+const MODOS = ['Desktop', 'Tablet', 'Mobile'];
+const VIEWPORT_POR_MODO = { Desktop: 1440, Tablet: 800, Mobile: 390 };
 const TOL_COLOR = 2;
 const TOL_ALPHA = 0.02;
 
@@ -64,7 +71,7 @@ function coloresIguales(a, b) {
 }
 
 // ───────────────────────── resolución de la spec ─────────────────────────
-function crearResolvedor(spec, tema) {
+function crearResolvedor(spec, tema, modoResponsive = 'Desktop') {
   const modoColor = tema === 'dark' ? 'Dark' : 'Light';
   const vars = spec.variables || {};
   const colorDe = (literal, varId) => {
@@ -79,7 +86,7 @@ function crearResolvedor(spec, tema) {
   const numDe = (literal, varId) => {
     const v = varId && vars[varId];
     if (v && v.porModo) {
-      const val = v.porModo[MODO_RESPONSIVE] ?? Object.values(v.porModo)[0];
+      const val = v.porModo[modoResponsive] ?? Object.values(v.porModo)[0];
       if (typeof val === 'number') return val;
     }
     return literal;
@@ -93,7 +100,7 @@ function crearResolvedor(spec, tema) {
   // `{ color: alias, opacity }` (no un hex): se resuelve el alias del color y se aplica la opacidad.
   const colorEfecto = (e) => {
     const v = e.vars && e.vars.color && vars[e.vars.color];
-    const val = v && v.porModo && (v.porModo[MODO_RESPONSIVE] ?? Object.values(v.porModo)[0]);
+    const val = v && v.porModo && (v.porModo[modoResponsive] ?? Object.values(v.porModo)[0]);
     if (val && typeof val === 'object' && val.color) {
       const base = vars[val.color.id];
       const mc = base && base.porModo && parseHex(base.porModo[modoColor] ?? Object.values(base.porModo)[0]);
@@ -106,9 +113,66 @@ function crearResolvedor(spec, tema) {
   return { colorDe, numDe, colorPintura, primerSolido, colorEfecto };
 }
 
+// ───────────────────────── modo Responsive de una variante ─────────────────────────
+/** Nombre del modo Responsive guardado en la spec por extraer.js (`modos.explicitos` > `modos.resueltos`). */
+function modoGuardado(variante) {
+  const m = variante.modos || {};
+  for (const grupo of [m.explicitos, m.resueltos]) {
+    for (const val of Object.values(grupo || {})) if (MODOS.includes(val)) return val;
+  }
+  return null;
+}
+
+/**
+ * Inferencia del modo para specs extraídas antes de guardar `modos`. Los frames de Figma tienen medidas (w/h)
+ * y literales (padding, gap, radio, tamaño de fuente...) tomados en el modo Responsive en que estaban, mientras
+ * que `variables[id].porModo` guarda el valor de la variable en cada modo. Para cada propiedad enlazada a una
+ * variable cuyos valores difieren entre modos, se cuenta en qué modos coincide el literal del nodo. Gana el modo
+ * con más coincidencias; en empate (p. ej. Desktop y Tablet valen igual) se prefiere Desktop > Tablet > Mobile.
+ * Sin propiedades que distingan modos, devuelve null (se usa el modo por defecto).
+ */
+function inferirModo(variante, spec) {
+  const vars = spec.variables || {};
+  const puntos = Object.fromEntries(MODOS.map((m) => [m, 0]));
+  let informativos = 0;
+  const idDe = (x) => (Array.isArray(x) ? x[0] : x);
+  const evalua = (varId, literal) => {
+    const v = varId && vars[varId];
+    if (!v || !v.porModo || typeof literal !== 'number' || !Number.isFinite(literal)) return;
+    const vals = MODOS.map((m) => v.porModo[m]);
+    if (vals.some((x) => typeof x !== 'number')) return;
+    if (new Set(vals).size < 2) return;
+    informativos++;
+    MODOS.forEach((m, i) => {
+      if (Math.abs(vals[i] - literal) < 0.01) puntos[m]++;
+    });
+  };
+  const visitar = (n) => {
+    if (n.oculto) return;
+    const vv = n.vars || {};
+    const pad = n.layout?.padding;
+    if (pad) ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'].forEach((k, i) => evalua(idDe(vv[k]), pad[i]));
+    if (n.layout) evalua(idDe(vv.itemSpacing), n.layout.gap);
+    const rad = n.radio === undefined ? null : Array.isArray(n.radio) ? n.radio : [n.radio, n.radio, n.radio, n.radio];
+    if (rad) {
+      ['topLeftRadius', 'topRightRadius', 'bottomRightRadius', 'bottomLeftRadius'].forEach((k, i) => evalua(idDe(vv[k]) ?? idDe(vv.cornerRadius), rad[i]));
+    }
+    if (n.trazo && typeof n.trazo.grosor === 'number') evalua(idDe(vv.strokeWeight), n.trazo.grosor);
+    const seg = n.texto?.segmentos?.[0];
+    if (seg) {
+      evalua(idDe(vv.fontSize), seg.tamano);
+      if (typeof seg.linea === 'string' && seg.linea.endsWith('px')) evalua(idDe(vv.lineHeight), parseFloat(seg.linea));
+    }
+    (n.hijos || []).forEach(visitar);
+  };
+  visitar(variante.arbol);
+  if (!informativos) return null;
+  return MODOS.reduce((mejor, m) => (puntos[m] > puntos[mejor] ? m : mejor), 'Desktop');
+}
+
 // ───────────────────────── medición en la página ─────────────────────────
 /** Se ejecuta en el navegador. Devuelve valores crudos ya normalizados a rgba. */
-function medirEnPagina({ nombre, partes }) {
+function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
   const busca = (x) => x.busca ?? x.nombre;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
@@ -134,7 +198,8 @@ function medirEnPagina({ nombre, partes }) {
     return Number.isFinite(n) ? n : 0;
   };
   const sel = (n) => `[data-figma-part="${CSS.escape(n)}"]`;
-  const raiz = [...document.querySelectorAll('[data-figma]')].find((e) => e.getAttribute('data-figma') === nombre);
+  // H2: si el nombre se repite en la spec, la k-ésima variante va con el k-ésimo [data-figma] igual (orden de documento)
+  const raiz = [...document.querySelectorAll('[data-figma]')].filter((e) => e.getAttribute('data-figma') === nombre)[k];
   if (!raiz) return null;
 
   const r = raiz.getBoundingClientRect();
@@ -280,7 +345,25 @@ function medirEnPagina({ nombre, partes }) {
   const marcados = (n) => [...(raiz.matches(sel(n)) ? [raiz] : []), ...raiz.querySelectorAll(sel(n))];
   for (const t of partes.textos) {
     let el = null;
-    const todos = marcados(busca(t));
+    let todos = marcados(busca(t));
+    // H3: un texto del mismo nombre que vive dentro de otra parte marcada es otro elemento (p. ej. el "+2" de un
+    // AvatarGroup, también marcado "Button", dentro del bloque de medios "Frame 6"): se excluye, igual que los svg.
+    // Solo cuenta la parte que existe en la spec con otro nombre y no es ancestro de este texto; las partes que la
+    // spec no conoce (envoltorios propios del código) no excluyen. Solo se aplica si tras excluir quedan al menos
+    // tantos elementos como textos con ese nombre en la spec (si no, se perdería el emparejamiento por orden).
+    if (t.parte && t.anc) {
+      const permitidos = new Set(t.anc);
+      const sabidos = new Set(conocidos);
+      const propios = todos.filter((x) => {
+        for (let a = x.parentElement; a && a !== raiz; a = a.parentElement) {
+          const nom = a.getAttribute('data-figma-part');
+          if (nom && sabidos.has(nom) && !permitidos.has(nom)) return false;
+        }
+        return true;
+      });
+      const nSpec = partes.textos.filter((x) => x.nombre === t.nombre).length;
+      if (propios.length >= nSpec) todos = propios;
+    }
     out.conteos[t.nombre] = todos.length;
     if (t.parte) {
       // Un nombre puede repetirse en elementos que no son este texto (p. ej. un botón de otra parte llamado
@@ -375,9 +458,9 @@ function posPrimerTexto(raiz) {
   return mejor;
 }
 
-function compararVariante(variante, m, spec, tema, tol) {
+function compararVariante(variante, m, spec, tema, tol, modo) {
   const { lista, num, col, txt } = crearComparacion(tol);
-  const R = crearResolvedor(spec, tema);
+  const R = crearResolvedor(spec, tema, modo);
   const n = variante.arbol;
   const v = n.vars || {};
   const lay = n.layout;
@@ -385,8 +468,8 @@ function compararVariante(variante, m, spec, tema, tol) {
 
   // tamaño
   // Ancho HUG que depende de texto: Figma usa Helvetica y el navegador Helvetica Neue, y la métrica de la fuente
-  // mueve el ancho unas décimas. Tolerancia relativa de 1 % (con tope de 3 px) solo en ese caso.
-  const tolAncho = lay && lay.tamH === 'HUG' && m.__textos.length ? Math.max(tol, Math.min(n.w * 0.01, 3)) : tol;
+  // mueve el ancho unas décimas. Solo en ese caso: max(tol, 1,5 px, 1 % del ancho) con tope de 3 px.
+  const tolAncho = lay && lay.tamH === 'HUG' && m.__textos.length ? Math.min(Math.max(tol, 1.5, n.w * 0.01), 3) : tol;
   if (!lay || lay.tamH === 'HUG' || lay.tamH === 'FIXED') num('ancho', n.w, rz.w, tolAncho);
   if (!lay || lay.tamV === 'HUG' || lay.tamV === 'FIXED') num('alto', n.h, rz.h);
 
@@ -602,7 +685,7 @@ function generarHtml(res) {
             .join('')}</tbody></table>`;
         })
         .join('');
-      return `<section><h2>${esc(v.nombre)}</h2>
+      return `<section><h2>${esc(v.nombre)} <small>· modo ${esc(v.modo)} (${esc(v.origenModo)}, vista ${VIEWPORT_POR_MODO[v.modo]} px)</small></h2>
         <table class="fila"><thead><tr><th>Figma (2x a la mitad)</th>${temas.map((t) => `<th>Storybook ${esc(t)}</th>`).join('')}</tr></thead>
         <tbody><tr><td><div class="lienzo">${
           v.png ? `<img src="${esc((res.pngBase ? res.pngBase + '/' : '') + v.png)}" alt="Figma ${esc(v.nombre)}" style="width:${v.w}px;height:${v.h}px">` : '<em>Sin PNG</em>'
@@ -637,7 +720,7 @@ caption{text-align:left;font-weight:600;padding:4px 0}.fila td{padding:12px}
 async function main() {
   const args = leerArgs(process.argv.slice(2));
   if (!args.carpeta || !args.story) {
-    console.error('Uso: node scripts/figma/comparar.mjs --carpeta <carpeta> --story <id-historia> [--port 6006] [--temas dark,light] [--tol 0.5]');
+    console.error('Uso: node scripts/figma/comparar.mjs --carpeta <carpeta> --story <id-historia> [--port 6006] [--temas dark,light] [--tol 0.5] [--modo Desktop|Tablet|Mobile]');
     process.exit(2);
   }
   const port = args.port || '6006';
@@ -667,21 +750,48 @@ async function main() {
     let primero = true;
     const ords = {};
     const ordDe = (n) => (ords[n] = (ords[n] ?? -1) + 1);
-    const visitar = (nodo, x, y) => {
+    const visitar = (nodo, x, y, anc = []) => {
       if (nodo.oculto) return;
       if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
-        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre) });
+        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre), anc });
         primero = false;
       }
       if (nodo.icono) {
         const size = nodo.instancia?.variante?.Size;
         iconos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], pos: { x, y }, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined });
       }
-      for (const h of nodo.hijos || []) visitar(h, x + (h.x || 0), y + (h.y || 0));
+      // Nombres de los ancestros (y su alias en código) para H3; la raíz de la variante no cuenta
+      const sig = nodo === v.arbol ? anc : [...anc, nodo.nombre, ...(aliasCarpeta[nodo.nombre] ? [aliasCarpeta[nodo.nombre]] : [])];
+      for (const h of nodo.hijos || []) visitar(h, x + (h.x || 0), y + (h.y || 0), sig);
     };
     visitar(v.arbol, 0, 0);
-    return { def: v, slug: slugDe(v), textos, iconos };
+    const conocidos = new Set();
+    const nombrar = (n) => {
+      conocidos.add(n.nombre);
+      if (aliasCarpeta[n.nombre]) conocidos.add(aliasCarpeta[n.nombre]);
+      (n.hijos || []).forEach(nombrar);
+    };
+    (v.arbol.hijos || []).forEach(nombrar);
+    return { def: v, slug: slugDe(v), textos, iconos, conocidos: [...conocidos] };
   });
+
+  // H2: nombres repetidos en la spec (sets con errores): la k-ésima con el mismo nombre se mide contra el k-ésimo
+  // [data-figma] igual; la clave del informe pasa a `nombre#k` (k desde 1) solo para los repetidos.
+  const vistos = {};
+  const total = {};
+  variantes.forEach((v) => (total[v.def.nombre] = (total[v.def.nombre] || 0) + 1));
+  for (const v of variantes) {
+    v.k = vistos[v.def.nombre] = (vistos[v.def.nombre] ?? -1) + 1;
+    v.clave = total[v.def.nombre] > 1 ? `${v.def.nombre}#${v.k + 1}` : v.def.nombre;
+    if (total[v.def.nombre] > 1) v.slug = `${v.slug}-${v.k + 1}`;
+    // Modo Responsive: --modo (forzado) > guardado en la spec > inferido de las variables > Desktop
+    const forzado = args.modo && MODOS.find((m) => m.toLowerCase() === args.modo.toLowerCase());
+    if (args.modo && !forzado) throw new Error(`--modo debe ser ${MODOS.join(', ')}`);
+    const guardado = modoGuardado(v.def);
+    const inferido = guardado || forzado ? null : inferirModo(v.def, spec);
+    v.modo = forzado || guardado || inferido || 'Desktop';
+    v.origenModo = forzado ? 'forzado' : guardado ? 'spec' : inferido ? 'inferido' : 'por defecto';
+  }
 
   // Sin --hide-scrollbars (default de Playwright): las barras de scroll también son parte del diseño
   const browser = await chromium.launch({ ignoreDefaultArgs: ['--hide-scrollbars'] });
@@ -693,7 +803,9 @@ async function main() {
     temas,
     pngBase: args.out ? path.relative(dir, dirSpec).split(path.sep).join('/') : '',
     variantes: variantes.map((v) => ({
-      nombre: v.def.nombre,
+      nombre: v.clave,
+      modo: v.modo,
+      origenModo: v.origenModo,
       png: v.def.png || null,
       w: v.def.arbol.w,
       h: v.def.arbol.h,
@@ -705,57 +817,66 @@ async function main() {
 
   try {
     for (const tema of temas) {
-      const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
-      const page = await ctx.newPage();
-      const url = `http://localhost:${port}/iframe.html?id=${encodeURIComponent(args.story)}&viewMode=story&globals=theme:${tema}`;
-      await page.goto(url, { waitUntil: 'load' });
-      try {
-        await page.waitForSelector('[data-figma]', { timeout: 20000 });
-      } catch {
-        await ctx.close();
-        throw new Error(`La historia no renderizó ningún [data-figma] (${url}). ¿Storybook corre en el puerto ${port} y el id es correcto?`);
-      }
-      await page.evaluate(() => document.fonts.ready);
-      await page.waitForFunction((t) => document.documentElement.getAttribute('data-theme') === t, tema, { timeout: 5000 }).catch(() => {});
-      await page.waitForTimeout(500); // transición de fondo del tema
-      await page.evaluate(() => document.fonts.ready);
-
-      const presentes = await page.evaluate(() => [...document.querySelectorAll('[data-figma]')].map((e) => e.getAttribute('data-figma')));
-      const esperados = new Set(variantes.map((v) => v.def.nombre));
-      resultado.sobrantes[tema] = [...new Set(presentes.filter((p) => !esperados.has(p)))];
-
-      const sumario = { variantes: variantes.length, variantesOk: 0, comprobaciones: 0, fallos: 0, faltantes: 0, sobrantes: resultado.sobrantes[tema].length };
-      for (let i = 0; i < variantes.length; i++) {
-        const v = variantes[i];
-        const salida = resultado.variantes[i].porTema;
-        const m = await page.evaluate(medirEnPagina, {
-          nombre: v.def.nombre,
-          partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos })) },
-        });
-        if (!m) {
-          salida[tema] = { encontrada: false, comparaciones: [] };
-          sumario.faltantes++;
-          continue;
+      const sumario = { variantes: variantes.length, variantesOk: 0, comprobaciones: 0, fallos: 0, faltantes: 0, sobrantes: 0 };
+      // Una página por modo Responsive, con el ancho de vista que activa ese modo en tokens.css
+      for (const modo of MODOS) {
+        const grupo = variantes.map((v, i) => ({ v, i })).filter(({ v }) => v.modo === modo);
+        if (!grupo.length) continue;
+        const ctx = await browser.newContext({ viewport: { width: VIEWPORT_POR_MODO[modo], height: 900 }, deviceScaleFactor: 2 });
+        const page = await ctx.newPage();
+        const url = `http://localhost:${port}/iframe.html?id=${encodeURIComponent(args.story)}&viewMode=story&globals=theme:${tema}`;
+        await page.goto(url, { waitUntil: 'load' });
+        try {
+          await page.waitForSelector('[data-figma]', { timeout: 20000 });
+        } catch {
+          await ctx.close();
+          throw new Error(`La historia no renderizó ningún [data-figma] (${url}). ¿Storybook corre en el puerto ${port} y el id es correcto?`);
         }
-        m.__textos = v.textos;
-        m.__iconos = v.iconos;
-        const comparaciones = compararVariante(v.def, m, spec, tema, tol);
-        const rel = path.join('capturas', tema, `${v.slug}.png`);
-        fs.mkdirSync(path.join(dir, 'capturas', tema), { recursive: true });
-        const handle = await page.evaluateHandle((n) => [...document.querySelectorAll('[data-figma]')].find((e) => e.getAttribute('data-figma') === n), v.def.nombre);
-        const el = handle.asElement();
-        await el.scrollIntoViewIfNeeded();
-        await el.screenshot({ path: path.join(dir, rel), omitBackground: false });
-        const caja = await el.boundingBox();
-        const fallos = comparaciones.filter((c) => !c.ok).length;
-        sumario.comprobaciones += comparaciones.length;
-        sumario.fallos += fallos;
-        if (!fallos) sumario.variantesOk++;
-        salida[tema] = { encontrada: true, captura: rel.split(path.sep).join('/'), capturaW: caja ? caja.width : 0, capturaH: caja ? caja.height : 0, comparaciones };
+        await page.evaluate(() => document.fonts.ready);
+        await page.waitForFunction((t) => document.documentElement.getAttribute('data-theme') === t, tema, { timeout: 5000 }).catch(() => {});
+        await page.waitForTimeout(500); // transición de fondo del tema
+        await page.evaluate(() => document.fonts.ready);
+
+        if (!resultado.sobrantes[tema]) {
+          const presentes = await page.evaluate(() => [...document.querySelectorAll('[data-figma]')].map((e) => e.getAttribute('data-figma')));
+          const esperados = new Set(variantes.map((v) => v.def.nombre));
+          resultado.sobrantes[tema] = [...new Set(presentes.filter((p) => !esperados.has(p)))];
+          sumario.sobrantes = resultado.sobrantes[tema].length;
+        }
+
+        for (const { v, i } of grupo) {
+          const salida = resultado.variantes[i].porTema;
+          const m = await page.evaluate(medirEnPagina, {
+            nombre: v.def.nombre,
+            k: v.k,
+            conocidos: v.conocidos,
+            partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord, anc: t.anc })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos })) },
+          });
+          if (!m) {
+            salida[tema] = { encontrada: false, comparaciones: [] };
+            sumario.faltantes++;
+            continue;
+          }
+          m.__textos = v.textos;
+          m.__iconos = v.iconos;
+          const comparaciones = compararVariante(v.def, m, spec, tema, tol, v.modo);
+          const rel = path.join('capturas', tema, `${v.slug}.png`);
+          fs.mkdirSync(path.join(dir, 'capturas', tema), { recursive: true });
+          const handle = await page.evaluateHandle(([n, k]) => [...document.querySelectorAll('[data-figma]')].filter((e) => e.getAttribute('data-figma') === n)[k], [v.def.nombre, v.k]);
+          const el = handle.asElement();
+          await el.scrollIntoViewIfNeeded();
+          await el.screenshot({ path: path.join(dir, rel), omitBackground: false });
+          const caja = await el.boundingBox();
+          const fallos = comparaciones.filter((c) => !c.ok).length;
+          sumario.comprobaciones += comparaciones.length;
+          sumario.fallos += fallos;
+          if (!fallos) sumario.variantesOk++;
+          salida[tema] = { encontrada: true, captura: rel.split(path.sep).join('/'), capturaW: caja ? caja.width : 0, capturaH: caja ? caja.height : 0, comparaciones };
+        }
+        await ctx.close();
       }
       // variantes no encontradas cuentan como no ok
       resultado.resumen.porTema[tema] = sumario;
-      await ctx.close();
     }
   } finally {
     await browser.close();
@@ -766,7 +887,7 @@ async function main() {
   resultado.resumen.total = tot;
 
   // JSON: por tema -> por variante -> lista
-  const json = { carpeta: args.carpeta, story: args.story, tolerancia: tol, resumen: resultado.resumen, sobrantes: resultado.sobrantes, temas: {} };
+  const json = { carpeta: args.carpeta, story: args.story, tolerancia: tol, resumen: resultado.resumen, sobrantes: resultado.sobrantes, modos: Object.fromEntries(resultado.variantes.map((v) => [v.nombre, `${v.modo} (${v.origenModo})`])), temas: {} };
   for (const t of temas) {
     json.temas[t] = {};
     resultado.variantes.forEach((v) => {
@@ -778,6 +899,9 @@ async function main() {
   fs.writeFileSync(path.join(dir, 'comparacion.html'), generarHtml(resultado));
 
   console.log(`Comparación ${args.carpeta} (${args.story}), tol ${tol}px`);
+  const porModo = {};
+  for (const v of resultado.variantes) porModo[`${v.modo} (${v.origenModo})`] = (porModo[`${v.modo} (${v.origenModo})`] || 0) + 1;
+  console.log(`  modos Responsive: ${Object.entries(porModo).map(([k, n]) => `${k} ×${n}`).join(', ')}`);
   for (const t of temas) {
     const r = resultado.resumen.porTema[t];
     console.log(`  ${t}: ${r.variantesOk}/${r.variantes} variantes ok, ${r.fallos}/${r.comprobaciones} propiedades distintas, ${r.faltantes} faltantes, ${r.sobrantes} sobrantes`);
