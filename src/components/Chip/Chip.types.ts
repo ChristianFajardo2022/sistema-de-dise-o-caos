@@ -14,8 +14,18 @@ export type ChipType = 'primary' | 'primary-avatar' | 'primary-color' | 'primary
  */
 export type ChipState = 'default' | 'hover' | 'focus' | 'select' | 'inactive';
 
-/** Color del punto de `primary-color` (los mismos cinco colores de Avatar). */
-export type ChipColor = 'purple' | 'green' | 'yellow' | 'red' | 'blue';
+/**
+ * Color del punto de `primary-color`: los cinco de Avatar más `violet` (background/graphic/acent-secondary) y `cyan`
+ * (background/graphic/information-*), que usa la paleta de colores de los filtros.
+ */
+export type ChipColor = 'purple' | 'green' | 'yellow' | 'red' | 'blue' | 'violet' | 'cyan';
+
+/**
+ * Intensidad del punto de `primary-color`.
+ * - `soft`: background/graphic/*-firts (pasteles; azul = background/tertiary/secondary), la del set Chips.
+ * - `strong`: background/graphic/*-secondary, la del filtro "Chips colors". `purple` y `violet` no cambian.
+ */
+export type ChipTone = 'soft' | 'strong';
 
 /** Props de las partes de la raíz (la cápsula). Acepta atributos `data-*`. */
 export type ChipRootProps = HTMLAttributes<HTMLSpanElement> & {
@@ -44,6 +54,8 @@ export interface ChipProps
   avatar?: ReactElement;
   /** Color del punto de `primary-color`. Por defecto `purple`. */
   color?: ChipColor;
+  /** Intensidad del punto de `primary-color` (ver `ChipTone`). Por defecto `soft`. */
+  tone?: ChipTone;
   /** Texto sr-only con el significado del color del punto (el color solo no basta). Sin él el punto es decorativo. */
   colorLabel?: string;
   /**

@@ -110,18 +110,38 @@ export const chipTextVariants = cva('', {
   defaultVariants: { type: 'primary' },
 });
 
-/** Punto de color de `primary-color` (Ellipse de 24): background/graphic/*-firts. Azul usa background/tertiary/secondary, como Figma. */
+/**
+ * Punto de color de `primary-color` (Ellipse de 24).
+ * - `soft` (set Chips): background/graphic/*-firts; azul usa background/tertiary/secondary, como Figma.
+ * - `strong` (filtro "Chips colors", 13874:43337): background/graphic/*-secondary; azul, graphic/tertiary-secondary.
+ * - `purple` (graphic/acent-firts) y `violet` (graphic/acent-secondary) son iguales en los dos tonos, como en Figma.
+ */
 export const chipDotVariants = cva('box-border size-6 shrink-0 rounded-full', {
   variants: {
     color: {
       purple: 'bg-ds-background-graphic-acent-firts',
-      green: 'bg-ds-background-graphic-success-firts',
-      yellow: 'bg-ds-background-graphic-alert-firts',
-      red: 'bg-ds-background-graphic-error-firts',
-      blue: 'bg-ds-background-tertiary-secondary',
+      violet: 'bg-ds-background-graphic-acent-secondary',
+      green: '',
+      yellow: '',
+      red: '',
+      blue: '',
+      cyan: '',
     },
+    tone: { soft: '', strong: '' },
   },
-  defaultVariants: { color: 'purple' },
+  compoundVariants: [
+    { tone: 'soft', color: 'green', class: 'bg-ds-background-graphic-success-firts' },
+    { tone: 'soft', color: 'yellow', class: 'bg-ds-background-graphic-alert-firts' },
+    { tone: 'soft', color: 'red', class: 'bg-ds-background-graphic-error-firts' },
+    { tone: 'soft', color: 'blue', class: 'bg-ds-background-tertiary-secondary' },
+    { tone: 'soft', color: 'cyan', class: 'bg-ds-background-graphic-information-firts' },
+    { tone: 'strong', color: 'green', class: 'bg-ds-background-graphic-success-secondary' },
+    { tone: 'strong', color: 'yellow', class: 'bg-ds-background-graphic-alert-secondary' },
+    { tone: 'strong', color: 'red', class: 'bg-ds-background-graphic-error-secondary' },
+    { tone: 'strong', color: 'blue', class: 'bg-ds-background-graphic-tertiary-secondary' },
+    { tone: 'strong', color: 'cyan', class: 'bg-ds-background-graphic-information-secondary' },
+  ],
+  defaultVariants: { color: 'purple', tone: 'soft' },
 });
 
 /**

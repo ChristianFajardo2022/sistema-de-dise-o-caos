@@ -31,6 +31,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref)
     iconName = 'clock',
     avatar,
     color = 'purple',
+    tone = 'soft',
     colorLabel,
     close,
     onRemove,
@@ -100,7 +101,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref)
       </span>
     ) : type === 'primary-color' ? (
       <>
-        <span aria-hidden="true" data-figma-part="Ellipse 1" className={chipDotVariants({ color })} />
+        <span aria-hidden="true" data-figma-part="Ellipse 1" className={chipDotVariants({ color, tone })} />
         {colorLabel && <span className="sr-only">{colorLabel}: </span>}
       </>
     ) : (type === 'primary' || type === 'primary-box') && icon ? (

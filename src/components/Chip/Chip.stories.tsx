@@ -48,10 +48,16 @@ const meta = {
       description: 'State forzado, solo para documentación. En uso real lo dan :hover, :focus-visible, selected y disabled.',
     },
     color: {
-      type: { name: 'enum', value: ['purple', 'green', 'yellow', 'red', 'blue'] },
+      type: { name: 'enum', value: ['purple', 'green', 'yellow', 'red', 'blue', 'violet', 'cyan'] },
       control: 'select',
-      options: ['purple', 'green', 'yellow', 'red', 'blue'],
+      options: ['purple', 'green', 'yellow', 'red', 'blue', 'violet', 'cyan'],
       description: 'Color del punto de primary-color',
+    },
+    tone: {
+      type: { name: 'enum', value: ['soft', 'strong'] },
+      control: 'radio',
+      options: ['soft', 'strong'],
+      description: 'Intensidad del punto: soft (set Chips) o strong (filtro Chips colors)',
     },
     icon: { type: { name: 'boolean' }, control: 'boolean', description: 'Icon (primary y primary-box)' },
     close: { type: { name: 'boolean' }, control: 'boolean', description: 'Close' },
