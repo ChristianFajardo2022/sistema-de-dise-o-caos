@@ -13,7 +13,7 @@ import {
   accordionTitleClass,
   accordionTriggerVariants,
 } from './Accordion.variants';
-import { useControllableState } from './useControllableState';
+import { useControllableState } from '../../utils/controllableState';
 import { Avatar } from '../Avatar';
 import { ButtonCorner } from '../ButtonCorner';
 import { Icon } from '../Icon';
@@ -46,7 +46,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>((props, ref)
   const [open, setOpen] = useControllableState<string[]>(toArray(value), toArray(defaultValue) ?? [], (next) => {
     if (type === 'multiple') (onValueChange as ((v: string[]) => void) | undefined)?.(next);
     else (onValueChange as ((v: string) => void) | undefined)?.(next[0] ?? '');
-  });
+  }, 'Accordion');
 
   const toggle = useCallback(
     (item: string) => {
@@ -128,7 +128,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
     const group = useContext(AccordionContext);
     const autoId = useId();
     const itemValue = value ?? autoId;
-    const [ownOpen, setOwnOpen] = useControllableState(openProp, defaultOpen, onOpenChange);
+    const [ownOpen, setOwnOpen] = useControllableState(openProp, defaultOpen, onOpenChange, 'AccordionItem');
     const open = group ? group.isOpen(itemValue) : ownOpen;
     // Ítem abierto que el grupo no deja cerrar (single con collapsible={false}): sigue enfocable pero deshabilitado
     const locked = Boolean(group) && open && !group?.canCollapse;
