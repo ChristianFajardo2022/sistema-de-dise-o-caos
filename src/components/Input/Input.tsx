@@ -5,8 +5,8 @@ import { inputControlVariants, inputFieldVariants } from './Input.variants';
 import { EyeIcon } from '../../icons/EyeIcon';
 import { EyeSlashIcon } from '../../icons/EyeSlashIcon';
 import { InfoCircleIcon } from '../../icons/InfoCircleIcon';
-import { SearchIcon } from '../../icons/SearchIcon';
 import { cn } from '../../utils/cn';
+import { Icon } from '../Icon';
 import { FIELD_FOCUS_RING, FIELD_ICON_SLOT, FieldLabel, FieldMessage, FieldRow, useField } from '../Field';
 
 /**
@@ -56,14 +56,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const isPassword = variant === 'password';
     const isSearch = variant === 'search' || variant === 'search-header';
     const nativeType = isPassword ? (showPassword ? 'text' : 'password') : isSearch ? 'search' : (type ?? 'text');
-    const leading = leftIcon ?? (isSearch ? <SearchIcon /> : null);
+    // Lupa de Figma: "Icon Search", ícono `search` relleno de 16 de la biblioteca
+    const leading = leftIcon ?? (isSearch ? <Icon name="search" size={16} variant="fill" /> : null);
 
     return (
       <div {...rootProps} className={cn('flex flex-col', fullWidth ? 'w-full' : 'w-[320px] max-w-full', rootProps?.className, className)}>
         <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled, icon: <InfoCircleIcon /> } : null}>
           <div className={inputFieldVariants({ variant, state: visualState })}>
             {leading && (
-              <span data-slot="icon-left" aria-hidden="true" className={FIELD_ICON_SLOT}>
+              <span
+                data-slot="icon-left"
+                data-figma-part={isSearch && !leftIcon ? 'Icon Search' : undefined}
+                aria-hidden="true"
+                className={FIELD_ICON_SLOT}
+              >
                 {leading}
               </span>
             )}
@@ -83,7 +89,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 {...restProps}
                 onChange={handleChange}
               />
-              <FieldLabel htmlFor={ids.control} float={forceFloat} optional={optional}>
+              <FieldLabel htmlFor={ids.control} data-figma-part="Label" float={forceFloat} optional={optional}>
                 {label}
               </FieldLabel>
             </div>

@@ -249,7 +249,8 @@ export const Tab = forwardRef<HTMLButtonElement, TabProps>(
         {srName && <span className="sr-only">{srName}</span>}
         {hasText && (
           <span className={tabLabelClass} data-figma-part="Text-button">
-            {children}
+            {/* Capa de texto de Figma (se llama como su texto de muestra): el comparador la empareja por nombre */}
+            <span data-figma-part="En alistamiento">{children}</span>
           </span>
         )}
         {hasBadge && (
