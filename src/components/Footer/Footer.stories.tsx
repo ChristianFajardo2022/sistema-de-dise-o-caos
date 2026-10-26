@@ -4,30 +4,11 @@ import { Footer } from './Footer';
 import type { FooterSection, FooterSocialLink } from './Footer.types';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
-
-/** Marca genérica de ejemplo (no es un logo real). */
-function BrandLogo() {
-  return (
-    <svg width="142" height="40" viewBox="0 0 142 40" role="img" aria-label="Tu marca" className="text-ds-icon-general-white">
-      <circle cx="18" cy="20" r="15" fill="none" stroke="currentColor" strokeWidth="2" />
-      <rect x="42" y="14" width="80" height="12" rx="6" fill="currentColor" />
-    </svg>
-  );
-}
-
-function BrandMark() {
-  return (
-    <span
-      role="img"
-      aria-label="Tu marca"
-      className="inline-flex size-8 items-center justify-center rounded-full border-2 border-current text-ds-icon-general-white"
-    />
-  );
-}
+import { Logo } from '../Logo';
 
 const SOCIAL: FooterSocialLink[] = [
-  { name: 'Facebook', href: '#facebook', icon: <Icon name="facebook" size={24} variant="fill" className="text-ds-icon-general-white" /> },
-  { name: 'Instagram', href: '#instagram', icon: <Icon name="instagram-2" size={24} variant="fill" className="text-ds-icon-general-white" /> },
+  { name: 'Facebook', href: '#facebook', icon: <Icon name="facebook-circle" size={24} className="text-ds-icon-general-white" /> },
+  { name: 'Instagram', href: '#instagram', icon: <Icon name="instagram-line" size={24} className="text-ds-icon-general-white" /> },
 ];
 
 const CONTACT: FooterSection = {
@@ -131,7 +112,7 @@ type Story = StoryObj<typeof meta>;
 export const Interactive: Story = {
   args: {
     type: 'portals',
-    logo: <BrandLogo />,
+    logo: <Logo type="logo" size="lg" />,
     aboutTitle: 'Acerca de nosotros:',
     about: 'Somos una empresa de ejemplo. Este texto sirve para ver cómo se comporta el bloque "acerca de" con varias líneas.',
     contact: CONTACT,
@@ -139,7 +120,7 @@ export const Interactive: Story = {
     social: SOCIAL,
     action: ACTION,
     mobileAction: MOBILE_ACTION,
-    copyright: '© 2026 Tu marca',
+    copyright: 'Copyright © 2026 - Interrapidisimo.com',
     legal: 'Todos los derechos reservados',
   },
 };
@@ -148,13 +129,13 @@ export const Interactive: Story = {
 export const Web: Story = {
   args: {
     type: 'web',
-    logo: <BrandMark />,
+    logo: <Logo type="icon" size="sm" />,
     sections: WEB_SECTIONS,
     social: SOCIAL,
     badges: <Badges widths={WIDTHS} />,
     action: ACTION,
     mobileAction: MOBILE_ACTION,
-    copyright: '© 2026 Tu marca - Todos los derechos reservados',
+    copyright: 'Copyright © 2026 - Interrapidisimo.com - Todos los derechos reservados',
   },
 };
 
@@ -163,7 +144,7 @@ export const SinAcordeonMovil: Story = {
   args: { ...Web.args, mobileAccordion: false },
 };
 
-/** Cada variante de Figma una vez (a 1440). Los textos son genéricos; los reales no se publican. */
+/** Cada variante de Figma una vez (a 1440). El logo, el nombre de la marca y el copyright son los reales; el resto de los textos (contacto, enlaces, sellos) sigue genérico. */
 export const FigmaMatrix: Story = {
   // Dos footers en la misma página (una variante cada uno): el landmark contentinfo y el nav se repiten solo aquí
   parameters: { a11y: { config: { rules: [{ id: 'landmark-no-duplicate-contentinfo', enabled: false }, { id: 'landmark-unique', enabled: false }] } } },
@@ -172,25 +153,25 @@ export const FigmaMatrix: Story = {
       <Footer
         data-figma="Type=Portals"
         type="portals"
-        logo={<BrandLogo />}
+        logo={<Logo type="logo" size="lg" />}
         aboutTitle="Acerca de nosotros:"
         about={ABOUT}
         contact={CONTACT}
         sections={[LEGAL]}
         social={SOCIAL}
         action={ACTION}
-        copyright="Copyright © 2026 - Tu marca"
+        copyright="Copyright © 2026 - Interrapidisimo.com"
         legal="Todos los derechos reservados"
       />
       <Footer
         data-figma="Type=Web"
         type="web"
-        logo={<BrandMark />}
+        logo={<Logo type="icon" size="sm" />}
         sections={WEB_SECTIONS}
         social={SOCIAL}
         badges={<Badges widths={WIDTHS} />}
         action={ACTION}
-        copyright="Copyright © 2026 - Tu marca - Todos los derechos reservados"
+        copyright="Copyright © 2026 - Interrapidisimo.com - Todos los derechos reservados"
       />
     </div>
   ),

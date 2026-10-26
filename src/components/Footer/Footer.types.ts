@@ -39,7 +39,7 @@ export interface FooterSocialLink {
 export interface FooterProps extends Omit<ComponentPropsWithoutRef<'footer'>, 'title' | 'about'> {
   /** Type de Figma. Portals: marca, acerca de y redes arriba. Web: sellos y, en la barra inferior, marca compacta y redes. */
   type?: FooterType;
-  /** Logo. En Portals es la marca completa; en Web, una marca compacta de 32 px junto al copyright. */
+  /** Logo (normalmente `<Logo>`). Portals: `<Logo type="logo" size="lg" />`, que ya trae su padding de 8; Web: `<Logo type="icon" size="sm" />` (32 px) junto al copyright. */
   logo?: ReactNode;
   /** Título del bloque "acerca de" (solo Portals). */
   aboutTitle?: ReactNode;

@@ -34,6 +34,9 @@ const useIsMobile = () =>
     () => false
   );
 
+/** En Figma el texto del copyright es una capa con su propio texto como nombre. */
+const figmaName = (node: ReactNode) => (typeof node === 'string' ? node : undefined);
+
 const has = (node: ReactNode) => node != null && node !== false && node !== '';
 
 function ItemText({ item, children }: { item: FooterItem; children: ReactNode }) {
@@ -147,7 +150,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
     const brand = !web && (has(logo) || has(about) || socialList) && (
       <div className={footerBrandClass}>
         {has(logo) && (
-          <div className="flex w-fit p-ds-space-general-lg" data-figma-part="Logo ">
+          <div className="flex w-fit" data-figma-part="Logo ">
             {logo}
           </div>
         )}
@@ -226,13 +229,21 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                       {logo}
                     </span>
                   )}
-                  {has(copyright) && <p className="m-0 min-w-0">{copyright}</p>}
+                  {has(copyright) && (
+                    <p className="m-0 min-w-0" data-figma-part={figmaName(copyright)}>
+                      {copyright}
+                    </p>
+                  )}
                 </div>
                 {socialList}
               </>
             ) : (
               <>
-                {has(copyright) && <p className="m-0 flex-1">{copyright}</p>}
+                {has(copyright) && (
+                  <p className="m-0 flex-1" data-figma-part={figmaName(copyright)}>
+                    {copyright}
+                  </p>
+                )}
                 {has(legal) && <p className="m-0 flex-1 md:text-right">{legal}</p>}
               </>
             )}
