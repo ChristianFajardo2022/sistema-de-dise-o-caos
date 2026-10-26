@@ -1,7 +1,7 @@
 {
   "name": "Checkbox",
   "component": "Checkbox",
-  "description": "Casilla de selección del sistema de diseño CAOS, fiel al component set Selection de Figma (9545:6413 y 9558:6975). Control de 16×16 con esquina de 6 y contorno de 1.5. Default: solo contorno. Select: relleno con check de 8.05×6. Disabled usa tokens background/field/disabled. Contraste positive para superficies oscuras y negative para claras. Con texto: gap 8, 16/20 Helvetica Neue regular. Usa un input nativo oculto pero accesible: funciona controlado y no controlado, con teclado nativo (Espacio) y foco visible con outline de 2px (agregado, no está en Figma). No tiene estado indeterminado (Figma no lo define).",
+  "description": "Casilla de selección del sistema de diseño CAOS, fiel al component set Selection de Figma (9545:6413 y 9558:6975). Control de 16×16 con esquina de 6 y contorno de 1.5. Default: solo contorno. Select: relleno con check de 8.05×6. Disabled usa tokens background/field/disabled. Contraste positive para superficies oscuras y negative para claras. Con texto: gap 8, 16/20 Helvetica Neue regular. Usa un input nativo oculto pero accesible: funciona controlado y no controlado, con teclado nativo (Espacio) y foco visible con outline de 2px (agregado, no está en Figma). Estado mixto con indeterminate (no está en Figma): fija la propiedad indeterminate del input (el lector anuncia mixto) y dibuja una raya de 8 × 1.5 sobre el relleno de Select; lo usa CheckboxTree.",
   "category": "Form Controls",
   "props": {
     "contrast": {
@@ -13,8 +13,9 @@
     "defaultChecked": { "type": "boolean", "required": false, "description": "Marcado inicial (no controlado)." },
     "disabled": { "type": "boolean", "default": false, "description": "Estados Disabled default y Disabled select." },
     "children": { "type": "ReactNode", "required": false, "description": "Texto junto al control. Sin texto, pasar aria-label." },
+    "indeterminate": { "type": "boolean", "default": false, "description": "Estado mixto (APG Checkbox Mixed-State). El navegador lo quita al pulsar; mientras la prop siga en true se vuelve a fijar." },
     "state": {
-      "type": "'default' | 'select' | 'disabled-default' | 'disabled-select'",
+      "type": "'default' | 'select' | 'disabled-default' | 'disabled-select' | 'indeterminate' | 'disabled-indeterminate'",
       "required": false,
       "description": "Fuerza el aspecto, solo para documentación."
     },
@@ -24,6 +25,7 @@
     { "title": "Con texto", "code": "<Checkbox defaultChecked>Acepto los términos</Checkbox>" },
     { "title": "Controlado", "code": "<Checkbox checked={ok} onChange={(e) => setOk(e.target.checked)}>Recordarme</Checkbox>" },
     { "title": "Sobre superficie clara", "code": "<Checkbox contrast=\"negative\">Opción</Checkbox>" },
-    { "title": "Solo control", "code": "<Checkbox aria-label=\"Seleccionar fila\" />" }
+    { "title": "Solo control", "code": "<Checkbox aria-label=\"Seleccionar fila\" />" },
+    { "title": "Mixto", "code": "<Checkbox indeterminate={algunas} checked={todas} onChange={alternarTodas}>Todas</Checkbox>" }
   ]
 }

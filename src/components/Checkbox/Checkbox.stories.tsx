@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { Checkbox } from './Checkbox';
-import type { CheckboxProps, SelectionContrast, SelectionState } from './Checkbox.types';
+import type { CheckboxProps, CheckboxState, SelectionContrast } from './Checkbox.types';
 
 const meta = {
   title: 'Form Controls/Checkbox',
@@ -17,10 +17,11 @@ const meta = {
     },
     state: {
       control: 'select',
-      options: [undefined, 'default', 'select', 'disabled-default', 'disabled-select'],
+      options: [undefined, 'default', 'select', 'disabled-default', 'disabled-select', 'indeterminate', 'disabled-indeterminate'],
       description: 'State forzado, solo para documentación',
     },
     checked: { control: 'boolean', description: 'Marcado (controlado)' },
+    indeterminate: { control: 'boolean', type: { name: 'boolean' }, description: 'Estado mixto (no está en Figma)' },
     disabled: { control: 'boolean', description: 'Deshabilitado' },
   },
   args: { contrast: 'positive', disabled: false },
@@ -64,7 +65,8 @@ export const Negative: Story = {
   ],
 };
 
-const STATES: SelectionState[] = ['default', 'disabled-default', 'select', 'disabled-select'];
+// Los cuatro de Figma y el mixto (no está en Figma)
+const STATES: CheckboxState[] = ['default', 'disabled-default', 'select', 'disabled-select', 'indeterminate', 'disabled-indeterminate'];
 const CONTRASTS: SelectionContrast[] = ['positive', 'negative'];
 
 /**
@@ -86,7 +88,7 @@ export const StatesMatrix: Story = {
               : 'bg-ds-background-general-white p-6'
           }
         >
-          <div className="grid grid-cols-[auto_repeat(4,auto)] items-center gap-x-8 gap-y-4">
+          <div className="grid grid-cols-[auto_repeat(6,auto)] items-center gap-x-8 gap-y-4">
             <span className="text-xs text-ds-text-neutral-body">{contrast}</span>
             {STATES.map((s) => (
               <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
@@ -138,5 +140,20 @@ export const DisabledTest: Story = {
     await userEvent.click(within(canvasElement).getByText('No disponible'));
     await expect(checkbox).not.toBeChecked();
     await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+
+/** Test: `indeterminate` da el estado mixto real (lo lee el lector) y se vuelve a fijar tras pulsar si sigue en `true`. */
+export const IndeterminateTest: Story = {
+  tags: ['!autodocs'],
+  args: { children: 'Todas las categorías', indeterminate: true, onChange: fn() },
+  play: async ({ args, canvasElement }) => {
+    const checkbox = within(canvasElement).getByRole('checkbox', { name: 'Todas las categorías' }) as HTMLInputElement;
+    await expect(checkbox.indeterminate).toBe(true);
+    await expect(checkbox).toBePartiallyChecked();
+    await userEvent.click(checkbox);
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    // La prop sigue en true: el componente lo vuelve a fijar
+    await expect(checkbox.indeterminate).toBe(true);
   },
 };
