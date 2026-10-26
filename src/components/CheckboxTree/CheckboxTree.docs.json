@@ -1,0 +1,20 @@
+{
+  "name": "CheckboxTree",
+  "component": "CheckboxTree",
+  "description": "Árbol de selección del sistema de diseño CAOS: el tipo \"Selection tree\" del set Atoms de la página Filter de Figma (13874:43337, variante 14015:46215). Casillas anidadas (Checkbox existente) con sangría de 24 y gap 16, donde cada madre refleja a sus hijas: marcada, desmarcada o mixta. Patrón WAI-ARIA APG Checkbox (Mixed-State): inputs nativos, la madre usa la propiedad indeterminate (anunciada como mixta) y aria-controls con sus hijas, y cada rama es un role=group nombrado por la madre. Se prefirió a APG Tree View porque Figma muestra todas las ramas abiertas y sin control de expandir. Teclado: Tab recorre, Espacio alterna; alternar la madre marca o desmarca toda la rama (las hojas deshabilitadas no cambian). El valor es la lista de hojas marcadas. El estado mixto no está dibujado en Figma: lo da Checkbox indeterminate (relleno de Select con una raya de 8 × 1.5).",
+  "category": "Form Controls",
+  "props": {
+    "items": { "type": "CheckboxTreeNode[]", "required": true, "description": "Árbol: { value, label, children?, disabled? }. Los nodos con children son grupos." },
+    "value": { "type": "string[]", "required": false, "description": "Hojas marcadas (controlado)." },
+    "defaultValue": { "type": "string[]", "required": false, "description": "Hojas marcadas al inicio (no controlado)." },
+    "onValueChange": { "type": "(value: string[]) => void", "required": false, "description": "Nueva lista de hojas marcadas, en el orden del árbol." },
+    "contrast": { "type": "'positive' | 'negative'", "default": "'positive'", "description": "Contrast de las casillas." },
+    "disabled": { "type": "boolean", "default": "false", "description": "Deshabilita todo el árbol." },
+    "name": { "type": "string", "required": false, "description": "name de los inputs de las hojas para formularios." },
+    "aria-label": { "type": "string", "required": false, "description": "Nombre del grupo raíz (o aria-labelledby)." }
+  },
+  "examples": [
+    { "title": "No controlado", "code": "<CheckboxTree aria-label=\"Categorías\" items={categorias} defaultValue={['camisas']} />" },
+    { "title": "Controlado", "code": "<CheckboxTree aria-labelledby={tituloId} items={categorias} value={marcadas} onValueChange={setMarcadas} />" }
+  ]
+}

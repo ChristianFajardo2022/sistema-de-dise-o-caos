@@ -1,0 +1,30 @@
+{
+  "name": "FilterPanel",
+  "component": "FilterPanel",
+  "description": "Panel de filtros, fiel al componente suelto Filters de Figma (14014:6050, 416 × 1080; marcos Desktop y Mobile). Encabezado \"Filtros avanzados\" con cerrar, resumen de lo elegido (ChipGroup con chips que se quitan; Figma no lo dibuja y sin filtros no aparece), secciones plegables (FilterSection sobre Accordion On card, todas abiertas por defecto) y acciones Limpiar (Secondary) y Aplicar (Primary). Estado: un objeto por sección, controlado o no (value/defaultValue/onValueChange); Limpiar deja {} y cada sección tiene su Limpiar; Aplicar entrega los valores con onApply y, si es modal, cierra. countFilters(valores) da el total para el badge de FilterButton, y una región role=status anuncia el total. Con modal (por defecto) es un <dialog> abierto con showModal() (pieza interna ModalDialog, placement side): foco atrapado e inerte el resto, Escape y clic en el fondo cierran (solo si el puntero bajó y subió en el fondo: un arrastre desde la superficie no cierra), el documento no se desplaza debajo mientras está abierto y el foco vuelve al botón que lo abrió. Al quitar el último chip del resumen, el foco pasa al encabezado de la sección quitada (o al título del panel). Uso recomendado: editar un borrador (value/onValueChange) que se copia de lo aplicado al abrir y se entrega con onApply; Escape o cerrar descartan el borrador (ver la historia Interactive); en escritorio es un panel lateral derecho y en móvil (< 48rem) una hoja inferior (radios 24, asa, botones apilados, hasta el 90 % del alto). Sin modal es una barra lateral en el flujo de la página.",
+  "category": "Form Controls",
+  "props": {
+    "title": { "type": "ReactNode", "default": "'Filtros avanzados'", "description": "Título del panel." },
+    "value": { "type": "FilterValues", "required": false, "description": "{ [idDeSección]: valor } (controlado)." },
+    "defaultValue": { "type": "FilterValues", "required": false, "description": "Valores iniciales (no controlado)." },
+    "onValueChange": { "type": "(values: FilterValues) => void", "required": false, "description": "Objeto completo en cada cambio." },
+    "onApply": { "type": "(values: FilterValues) => void", "required": false, "description": "Botón Aplicar." },
+    "onClear": { "type": "() => void", "required": false, "description": "Tras Limpiar (los valores quedan en {})." },
+    "applyLabel": { "type": "string", "default": "'Aplicar'", "description": "Texto del botón principal." },
+    "clearLabel": { "type": "string", "default": "'Limpiar'", "description": "Texto del botón secundario." },
+    "modal": { "type": "boolean", "default": "true", "description": "<dialog> modal (panel lateral / hoja inferior) o barra lateral en el flujo." },
+    "open": { "type": "boolean", "required": false, "description": "Abierto (controlado)." },
+    "defaultOpen": { "type": "boolean", "default": "false si es modal, true si no", "description": "Abierto al inicio." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Cerrar, Escape, clic fuera o Aplicar." },
+    "closeLabel": { "type": "string", "default": "'Cerrar filtros'", "description": "Nombre del botón cerrar (sin modal solo aparece con onOpenChange)." },
+    "openSections": { "type": "string[]", "required": false, "description": "Secciones abiertas (controlado)." },
+    "defaultOpenSections": { "type": "string[]", "required": false, "description": "Secciones abiertas al inicio; por defecto todas." },
+    "onOpenSectionsChange": { "type": "(sections: string[]) => void", "required": false, "description": "Plegar o desplegar una sección." },
+    "showSummary": { "type": "boolean", "default": "true", "description": "Resumen de filtros elegidos bajo el título." },
+    "surfaceProps": { "type": "HTMLAttributes<HTMLDivElement>", "required": false, "description": "Atributos de la superficie del panel." }
+  },
+  "examples": [
+    { "title": "Con FilterButton", "code": "<FilterButton count={countFilters(aplicados)} aria-haspopup=\"dialog\" aria-expanded={abierto} onClick={() => setAbierto(true)} />\n<FilterPanel open={abierto} onOpenChange={setAbierto} defaultValue={aplicados} onApply={setAplicados}>\n  <FilterSection id=\"color\" title=\"Color\">{({ value, onValueChange }) => <ChipGroup selectionMode=\"multiple\" aria-label=\"Colores\" value={value ?? []} onValueChange={onValueChange}>…</ChipGroup>}</FilterSection>\n</FilterPanel>" },
+    { "title": "Barra lateral", "code": "<FilterPanel modal={false} value={valores} onValueChange={setValores} onApply={buscar}>…</FilterPanel>" }
+  ]
+}

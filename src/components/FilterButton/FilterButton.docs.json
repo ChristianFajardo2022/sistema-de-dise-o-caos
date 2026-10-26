@@ -1,0 +1,19 @@
+{
+  "name": "FilterButton",
+  "component": "FilterButton",
+  "description": "Botón que abre los filtros, fiel al set Filter button de Figma (14112:4253, Type=Default/Inactive). Escritorio: Badge Number (Info) + Button Tertiary md con chevron-right, gap 8. Móvil: Badge + Button Tertiary de solo ícono (filter). layout=auto elige el marco con matchMedia (< 48rem = móvil). El número del badge describe al botón (aria-describedby: \"Filtros, 3 filtros aplicados\"); el badge lleva aria-hidden para que el conteo no se lea dos veces (la descripción funciona igual con nodos ocultos); con 0 o sin count no se dibuja. Type=Inactive = disabled (botón deshabilitado y badge gris). Para abrir un FilterPanel modal, pasar aria-haspopup=\"dialog\" y aria-expanded.",
+  "category": "Form Controls",
+  "props": {
+    "children": { "type": "ReactNode", "default": "'Filtros'", "description": "Prop Text de Figma. En móvil es el nombre accesible." },
+    "count": { "type": "number | string", "required": false, "description": "Filtros aplicados (Badge Number). Suele salir de countFilters(aplicados)." },
+    "badge": { "type": "boolean", "default": "true", "description": "Prop Badge de Figma." },
+    "countLabel": { "type": "string | (count) => string", "default": "'filtro aplicado' / 'filtros aplicados'", "description": "Texto que sigue al número para lectores de pantalla." },
+    "disabled": { "type": "boolean", "default": "false", "description": "Type=Inactive." },
+    "layout": { "type": "'auto' | 'desktop' | 'mobile'", "default": "'auto'", "description": "Marco de Figma a dibujar." },
+    "rootProps": { "type": "HTMLAttributes<HTMLSpanElement>", "required": false, "description": "Atributos de la raíz; el ref y el resto de props van al botón." }
+  },
+  "examples": [
+    { "title": "Con conteo", "code": "<FilterButton count={countFilters(aplicados)} aria-haspopup=\"dialog\" aria-expanded={abierto} onClick={() => setAbierto(true)} />" },
+    { "title": "Solo ícono", "code": "<FilterButton layout=\"mobile\" count={2} />" }
+  ]
+}

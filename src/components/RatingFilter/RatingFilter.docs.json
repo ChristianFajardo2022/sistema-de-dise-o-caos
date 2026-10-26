@@ -1,0 +1,17 @@
+{
+  "name": "RatingFilter",
+  "component": "RatingFilter",
+  "description": "Filtro por calificación mínima, fiel al set Rating de la página Filter de Figma (13725:72539, Type=Default/1/2/3/4). Slider existente (5 posiciones, pasos de 25 %) y StarRating de 32 repartido a todo el ancho que refleja el valor. Type=Default = sin filtro (value null): pulgar al inicio y ninguna estrella encendida; Type=1…4 = 2…5 estrellas. La primera posición del slider es \"Sin filtro\" (no existe \"1 estrella o más\", toda calificación es ≥ 1): Inicio limpia el filtro con teclado y la primera estrella también. El slider es el control accesible (APG Slider, aria-valuetext \"3 estrellas o más\"); las estrellas se pueden pulsar como atajo con puntero y están ocultas a tecnologías de apoyo.",
+  "category": "Form Controls",
+  "props": {
+    "value": { "type": "number | null", "required": false, "description": "Calificación mínima 2 a 5 (controlado); null = sin filtro (un 1 se trata como null)." },
+    "defaultValue": { "type": "number | null", "default": "null", "description": "Valor inicial (no controlado)." },
+    "onValueChange": { "type": "(value: number | null) => void", "required": false, "description": "Nueva calificación mínima (2 a 5) o null al volver a la primera posición." },
+    "label": { "type": "string", "default": "'Calificación mínima'", "description": "Nombre accesible del slider (o aria-labelledby)." },
+    "disabled": { "type": "boolean", "default": "false", "description": "Deshabilitado." },
+    "name": { "type": "string", "required": false, "description": "Input oculto para formularios." }
+  },
+  "examples": [
+    { "title": "En una sección", "code": "<FilterSection id=\"calificacion\" title=\"Calificación\">{({ value, onValueChange, labelId }) => <RatingFilter aria-labelledby={labelId} value={value ?? null} onValueChange={onValueChange} />}</FilterSection>" }
+  ]
+}

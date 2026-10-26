@@ -1,0 +1,21 @@
+{
+  "name": "FilterTabs",
+  "component": "FilterTabs",
+  "description": "Filtro por categorías, fiel al set Filter tabs de Figma (14033:24874, Type=3/2/1 = pestaña seleccionada). Tabs existente (tres opciones, Md, On canva, pestañas a todo el ancho) y en cada panel una lista de Checkbox con gap 16. Patrón APG Tabs (flechas, Inicio, Fin). La selección es una sola lista con las opciones de todas las pestañas; cada pestaña muestra con su Badge cuántas de las suyas están marcadas.",
+  "category": "Form Controls",
+  "props": {
+    "tabs": { "type": "FilterTabsTab[]", "required": true, "description": "{ value, label, icon?, options: { value, label, disabled? }[], disabled? }." },
+    "value": { "type": "string[]", "required": false, "description": "Opciones marcadas (controlado)." },
+    "defaultValue": { "type": "string[]", "required": false, "description": "Opciones marcadas al inicio." },
+    "onValueChange": { "type": "(value: string[]) => void", "required": false, "description": "Nueva lista, en el orden de las pestañas." },
+    "tab": { "type": "string", "required": false, "description": "Pestaña visible (controlado)." },
+    "defaultTab": { "type": "string", "required": false, "description": "Pestaña visible al inicio." },
+    "onTabChange": { "type": "(tab: string) => void", "required": false, "description": "Cambio de pestaña." },
+    "showCounts": { "type": "boolean", "default": "true", "description": "Badge con las opciones marcadas de cada pestaña." },
+    "contrast": { "type": "'on-canva' | 'on-card'", "default": "'on-canva'", "description": "Contrast de las pestañas." },
+    "aria-label": { "type": "string", "default": "'Categorías'", "description": "Nombre de la lista de pestañas." }
+  },
+  "examples": [
+    { "title": "Uso", "code": "<FilterTabs tabs={pestañas} value={marcadas} onValueChange={setMarcadas} />" }
+  ]
+}

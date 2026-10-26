@@ -1,0 +1,25 @@
+{
+  "name": "FilterSection",
+  "component": "FilterSection",
+  "description": "Sección de filtro: título con badge de conteo, el control y \"Limpiar\". variant card = Card accordion (Atom) On card plegable (patrón APG Accordion, el de las secciones del panel Filters 14014:6050); variant plain = Individual filter de Figma (15489:48186): título Secundary semibold y slot en fila con wrap, como role=group nombrado por el título, sin plegado. El contenido se arma con componentes existentes según los 13 tipos del set Atoms (13874:43337): DatePicker (Rate date), ChipGroup (Chips, Chips colors), Select (Dropdown), NumberPicker + unidad (Weight), RatingFilter (Rating), Switch (Toogles), Checkbox, CheckboxTree (Selection tree), Radio, dos Input con \"a\" (Quantity: rango escrito), Slider de rango con Mín./Máx. (Quantit 2) y FilterTabs (Tabs). children puede ser una función que recibe { id, value, onValueChange, clear, labelId }. Dentro de un FilterPanel el valor vive en el panel; suelta usa value/defaultValue/onValueChange. Al limpiar, el foco pasa al encabezado de la sección.",
+  "category": "Form Controls",
+  "props": {
+    "id": { "type": "string", "required": true, "description": "Clave de la sección en FilterValues." },
+    "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma." },
+    "variant": { "type": "'card' | 'plain'", "default": "'card'", "description": "Tarjeta plegable o Individual filter." },
+    "description": { "type": "ReactNode", "required": false, "description": "Estado bajo el título (solo card)." },
+    "icon": { "type": "boolean", "default": "true", "description": "Avatar con ícono (solo card)." },
+    "iconName": { "type": "IconName", "default": "'folder'", "description": "Ícono del avatar." },
+    "count": { "type": "number", "required": false, "description": "Conteo del badge; por defecto countFilterValue(valor)." },
+    "clearable": { "type": "boolean", "default": "true", "description": "Botón Limpiar cuando hay valor." },
+    "clearLabel": { "type": "string", "default": "'Limpiar'", "description": "Texto del botón; su nombre accesible agrega el título." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6", "default": "3", "description": "Nivel del encabezado." },
+    "value / defaultValue / onValueChange": { "type": "FilterValue", "required": false, "description": "Solo fuera de un FilterPanel." },
+    "defaultOpen": { "type": "boolean", "default": "true", "description": "Solo card fuera de un panel." },
+    "children": { "type": "ReactNode | (field: FilterSectionField) => ReactNode", "required": false, "description": "Slot Container de Figma." }
+  },
+  "examples": [
+    { "title": "Con ChipGroup", "code": "<FilterSection id=\"color\" title=\"Color\">{({ value, onValueChange, labelId }) => <ChipGroup selectionMode=\"multiple\" aria-labelledby={labelId} value={value ?? []} onValueChange={onValueChange}>…</ChipGroup>}</FilterSection>" },
+    { "title": "Individual filter", "code": "<FilterSection variant=\"plain\" id=\"talla\" title=\"Talla\" defaultValue={['m']}>…</FilterSection>" }
+  ]
+}
