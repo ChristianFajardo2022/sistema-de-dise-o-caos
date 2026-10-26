@@ -1,0 +1,30 @@
+{
+  "name": "ContactCard",
+  "component": "ContactCard",
+  "description": "Tarjeta de contacto con acción de llamada o chat del sistema de diseño CAOS, fiel al component set Call/chat card de Figma (18867:20091), Propiedad 1 = More, Communication y External Link (498×82). Es un article nombrado por su título, el nombre de la persona (encabezado h3 por defecto) sobre la superficie interna de las tarjetas (NotchedSurface): con muesca en More y External Link, sin ella en Communication. Avatar de 56 con calificación opcional (Badge ícono + número, \"4,5\" y \"de 5 estrellas\" para lectores), encabezado semibold (title, capa Subtitulo de Figma) y línea corta gris (eyebrow, capa Titulo), que va después del encabezado en el DOM y se ve arriba. La acción de la derecha es la prop variant: more (ButtonCorner Dots en la muesca de 48; abre un DropdownMenu con menuItems), communication (dos Button secundarios de ícono: llamar y chat) o external-link (Button primario de llamada de 48 centrado en una muesca de 54). El texto no pasa por debajo del botón de la esquina. Las acciones van al final del DOM, después del encabezado. Los botones llevan nombre accesible con la persona (Llamar a Ana Pérez, Chatear con Ana Pérez, Más opciones de Ana Pérez) y se pueden reemplazar con callLabel, chatLabel y moreLabel. La prop actions reemplaza todo lo de la derecha. Nombre en inglés: es la tarjeta de un contacto.",
+  "category": "Data Display",
+  "props": {
+    "variant": { "type": "'more' | 'communication' | 'external-link'", "default": "'more'", "description": "Propiedad 1 de Figma: acción de la derecha." },
+    "title": { "type": "ReactNode", "required": true, "description": "Línea principal (el nombre; capa Subtitulo de Figma). Encabezado y nombre accesible del article." },
+    "eyebrow": { "type": "ReactNode", "required": false, "description": "Línea pequeña y gris sobre el nombre (rol; capa Titulo de Figma)." },
+    "personName": { "type": "string", "required": false, "description": "Nombre para los nombres accesibles de las acciones. Por defecto, el title si es texto." },
+    "leading": { "type": "ReactNode", "required": false, "description": "Avatar de 56 a la izquierda (Item card de Figma, marcador interno)." },
+    "rating": { "type": "number", "required": false, "description": "Calificación sobre el avatar (Badge ícono + número), formateada con coma decimal (\"4,5\")." },
+    "ratingLabel": { "type": "string", "default": "'de 5 estrellas'", "description": "Texto para lectores que sigue a la calificación." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "3", "description": "Nivel del encabezado del título; 'none' lo deja como párrafo." },
+    "menuItems": { "type": "ReactNode", "required": false, "description": "more: ítems del menú (DropdownMenuItem)." },
+    "moreLabel": { "type": "string", "required": false, "description": "more: nombre accesible del botón de tres puntos." },
+    "onMoreClick": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "more sin menuItems: clic del botón." },
+    "onCall": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "communication y external-link: clic de llamar." },
+    "callLabel": { "type": "string", "required": false, "description": "Nombre accesible de llamar. Por defecto Llamar a {personName}." },
+    "onChat": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "communication: clic de chat." },
+    "chatLabel": { "type": "string", "required": false, "description": "Nombre accesible de chat. Por defecto Chatear con {personName}." },
+    "actions": { "type": "ReactNode", "required": false, "description": "Reemplaza lo que se dibuja a la derecha (sin muesca)." },
+    "className": { "type": "string", "required": false, "description": "Clases para el article raíz." }
+  },
+  "examples": [
+    { "title": "More", "code": "<ContactCard\n  title=\"Ana Pérez\"\n  eyebrow=\"Diseñadora de producto\"\n  rating={4.5}\n  leading={<Avatar variant=\"photo\" size=\"lg\" src={foto} alt=\"\" />}\n  menuItems={<DropdownMenuItem>Ver perfil</DropdownMenuItem>}\n/>" },
+    { "title": "Communication", "code": "<ContactCard variant=\"communication\" title=\"Ana Pérez\" leading={…} onCall={llamar} onChat={abrirChat} />" },
+    { "title": "External Link", "code": "<ContactCard variant=\"external-link\" title=\"Ana Pérez\" leading={…} onCall={llamar} />" }
+  ]
+}
