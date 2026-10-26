@@ -10,6 +10,12 @@
  * resolviendo las variables en ese modo. Sale de la spec (`modos`), o se infiere de las variables enlazadas, o
  * se fuerza con `--modo`. Variantes con nombre repetido (sets con errores) se emparejan por orden de aparición.
  *
+ * Ámbito por parte (H1): cada texto de Figma se busca dentro del ancestro más cercano de Figma cuyo nombre (o alias)
+ * exista como `data-figma-part` en esa variante; sin ancestro marcado se empareja en toda la variante.
+ * Avisos (no cuentan como diferencia): marco que no cabe en la vista del modo (H2) y familia tipográfica de Figma sin
+ * enlazar a `typography/family/*` (H4, "para diseño"). H3 mide el relleno de formas hoja con variable enlazada y
+ * reporta textos del DOM sin pareja en Figma dentro de una parte marcada.
+ *
  * `--out` escribe comparacion.json/html y capturas en otra carpeta (para no pisar la de otro agente).
  *
  * Lee .qa/figma/componentes/<carpeta>/spec.json (generado por extraer.js), abre la historia
@@ -173,6 +179,7 @@ function inferirModo(variante, spec) {
 // ───────────────────────── medición en la página ─────────────────────────
 /** Se ejecuta en el navegador. Devuelve valores crudos ya normalizados a rgba. */
 function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
+  const pareados = new Set();
   const busca = (x) => x.busca ?? x.nombre;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
@@ -202,6 +209,7 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
   const raiz = [...document.querySelectorAll('[data-figma]')].filter((e) => e.getAttribute('data-figma') === nombre)[k];
   if (!raiz) return null;
 
+  const marcados = (n) => [...(raiz.matches(sel(n)) ? [raiz] : []), ...raiz.querySelectorAll(sel(n))];
   const r = raiz.getBoundingClientRect();
   const cs = getComputedStyle(raiz);
   const radio = (prop, el, csx) => {
@@ -294,6 +302,18 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
     iconos: {},
     conteos: {},
     partesPresentes: [...raiz.querySelectorAll('[data-figma-part]')].map((e) => e.getAttribute('data-figma-part')),
+    // H2: la caja de la raíz frente al ancho de la vista (con el scroll horizontal, que no cambia lo medido)
+    vista: { ancho: document.documentElement.clientWidth, izq: r.left + window.scrollX, der: r.right + window.scrollX },
+    formas: {},
+    sinPareja: [],
+  };
+  // H1: ancestro más cercano de Figma que existe como parte marcada en el DOM de esta variante
+  const alcanceDe = (cadena) => {
+    for (const [k, a] of (cadena || []).entries()) {
+      const els = marcados(a.b);
+      if (els.length && els.length === a.cnt) return { el: els[a.idx], ord: a.ordEn, k, tot: a.tot };
+    }
+    return null;
   };
 
   const primerTexto = (el) => {
@@ -342,7 +362,6 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
       contenido: (campo ? el.value || el.placeholder : el.textContent).trim().slice(0, 40),
     };
   };
-  const marcados = (n) => [...(raiz.matches(sel(n)) ? [raiz] : []), ...raiz.querySelectorAll(sel(n))];
   for (const t of partes.textos) {
     let el = null;
     let todos = marcados(busca(t));
@@ -365,15 +384,87 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
       if (propios.length >= nSpec) todos = propios;
     }
     out.conteos[t.nombre] = todos.length;
+    // H1: candidatos solo dentro del ancestro marcado más cercano (y el ordinal se cuenta dentro de él); si ahí no
+    // hay ninguno se vuelve al comportamiento de toda la variante
+    let ordT = t.ord;
+    const alc = alcanceDe(t.cadena);
+    if (alc) {
+      const dentro = todos.filter((x) => alc.el.contains(x));
+      if (dentro.length) {
+        todos = dentro;
+        ordT = alc.ord;
+      }
+    }
     if (t.parte) {
       // Un nombre puede repetirse en elementos que no son este texto (p. ej. un botón de otra parte llamado
       // igual): para un nodo TEXT solo se emparejan los marcados con texto propio y sin hijos marcados iguales
       const conTexto = todos.filter((x) => primerTexto(x) && !x.querySelector(sel(busca(t))));
-      const e = (conTexto.length >= 1 && conTexto.length < todos.length ? conTexto : todos)[t.ord] || null;
+      const e = (conTexto.length >= 1 && conTexto.length < todos.length ? conTexto : todos)[ordT] || null;
       el = e && (primerTexto(e) || e);
     }
     if (!el && t.primero && todos.length === 0) el = primerTexto(raiz);
-    if (el) out.textos[t.nombre + '#' + t.ord] = medirTexto(el);
+    if (el) {
+      out.textos[t.nombre + '#' + t.ord] = medirTexto(el);
+      pareados.add(el);
+    }
+  }
+  // H3: formas hoja con relleno enlazado a variable. Se buscan, dentro de la parte marcada más cercana, los elementos
+  // visibles del mismo tamaño y se emparejan por orden (como los íconos). Sin parte marcada o sin candidato no se mide.
+  (partes.formas || []).forEach((f, i) => {
+    const alc = alcanceDe(f.cadena);
+    if (!alc) return;
+    const visible = (e) => {
+      const c = getComputedStyle(e);
+      const col = rgba(c.backgroundColor);
+      if (col && col[3] > 0.01) return col;
+      const rel = e instanceof SVGElement && c.fill && c.fill !== 'none' ? rgba(c.fill) : null;
+      return rel && rel[3] > 0.01 ? rel : null;
+    };
+    // Forma marcada con su nombre dentro de la parte: se mide ella (o su primer descendiente con relleno visible)
+    const propias = marcados(f.busca ?? f.nombre).filter((e) => alc.el.contains(e));
+    if (propias.length) {
+      // Solo si el DOM trae tantas como Figma dentro de esa parte (si no, el orden no es comparable)
+      if (propias.length !== f.totNombre[alc.k]) return;
+      const e = propias[f.ordNombre[alc.k] ?? 0] || null;
+      if (!e) return;
+      const col = [e, ...e.querySelectorAll('*')].map(visible).find(Boolean);
+      if (col) out.formas[i] = col;
+      return;
+    }
+    const cand = [];
+    for (const e of alc.el.querySelectorAll('*')) {
+      if (e.hasAttribute('data-icon') || e.closest('[data-icon]')) continue;
+      const b = e.getBoundingClientRect();
+      if (Math.abs(b.width - f.w) > 1.5 || Math.abs(b.height - f.h) > 1.5) continue;
+      const c = getComputedStyle(e);
+      const col = rgba(c.backgroundColor);
+      const rel = col && col[3] > 0.01 ? col : e instanceof SVGElement && c.fill && c.fill !== 'none' ? rgba(c.fill) : null;
+      if (rel && rel[3] > 0.01) cand.push({ e, color: rel });
+    }
+    // Se queda la más interna cuando una envuelve a otra del mismo tamaño
+    const hojas = cand.filter((x) => !cand.some((y) => y !== x && x.e.contains(y.e)));
+    if (hojas.length !== alc.tot) return;
+    const hit = hojas[alc.ord];
+    if (hit) out.formas[i] = hit.color;
+  });
+  // H3: textos del DOM sin pareja en Figma dentro de una parte marcada (que Figma conoce por nombre)
+  {
+    const sabidos = new Set(conocidos);
+    const vistos = new Set();
+    const w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
+    let tn;
+    while ((tn = w.nextNode())) {
+      if (!tn.textContent.trim()) continue;
+      const p = tn.parentElement;
+      if (!p || vistos.has(p) || p.closest('svg, script, style')) continue;
+      vistos.add(p);
+      const b = p.getBoundingClientRect();
+      if (b.width <= 1 || b.height <= 1) continue;
+      if ([...pareados].some((e) => e === p || e.contains(p) || p.contains(e))) continue;
+      const parte = p.closest('[data-figma-part]');
+      if (!parte || parte === raiz || !raiz.contains(parte) || !sabidos.has(parte.getAttribute('data-figma-part'))) continue;
+      out.sinPareja.push({ parte: parte.getAttribute('data-figma-part'), contenido: p.textContent.trim().slice(0, 40) });
+    }
   }
   const svgs = [...raiz.querySelectorAll('svg')];
   // Íconos sin marca propia: se emparejan por cercanía de posición respecto de la raíz (no por orden del DOM)
@@ -460,6 +551,9 @@ function posPrimerTexto(raiz) {
 
 function compararVariante(variante, m, spec, tema, tol, modo) {
   const { lista, num, col, txt } = crearComparacion(tol);
+  // Avisos del informe (no cuentan como diferencia): H2 marco fuera de la vista, H4 tipografía "para diseño"
+  const avisos = [];
+  const diseno = [];
   const R = crearResolvedor(spec, tema, modo);
   const n = variante.arbol;
   const v = n.vars || {};
@@ -596,8 +690,16 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
       continue;
     }
     const fam = seg.familia.toLowerCase();
-    txt(`${pre}font-family`, seg.familia, sb.familia, sb.familia.toLowerCase().includes(fam));
     const vt = t.nodo.vars || {};
+    // H4: una familia de Figma que no está enlazada a `typography/family/*` es un asunto de diseño, no de código
+    const famVar = vt.fontFamily && spec.variables?.[vt.fontFamily];
+    const famEnlazada = vt.fontFamily ? (famVar ? /^typography\/family\//i.test(famVar.nombre || '') : true) : false;
+    const famIgual = sb.familia.toLowerCase().includes(fam);
+    if (!famEnlazada && !famIgual) {
+      diseno.push({ propiedad: `${pre}font-family (sin variable typography/family/*)`, figma: seg.familia, storybook: sb.familia });
+    } else {
+      txt(`${pre}font-family`, seg.familia, sb.familia, famIgual);
+    }
     const tam = R.numDe(seg.tamano, vt.fontSize);
     num(`${pre}font-size`, tam, sb.tamano);
     num(`${pre}font-weight`, R.numDe(seg.peso, vt.fontWeight), sb.peso, 0);
@@ -638,6 +740,28 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
       lista.push({ propiedad: `${pre}variante`, figma: v, storybook: sb.variante ?? '—', ok: sb.variante === v });
     }
   });
+  // H3: relleno de las formas hoja con variable enlazada
+  (m.__formas || []).forEach((f, i) => {
+    const sb = m.formas && m.formas[i];
+    if (!sb) return;
+    const c = R.colorPintura(f.nodo.rellenos);
+    if (c) col(`forma "${f.nombre}" relleno`, c, sb);
+  });
+  // H3: textos del DOM sin pareja en Figma dentro de una parte marcada
+  // (si el texto del DOM se llama igual que un texto de Figma que quedó sin pareja, ya lo cubre su entrada "presente")
+  const sinParNombres = new Set(m.__textos.filter((t) => !m.textos[t.nombre + '#' + t.ord]).map((t) => t.nombre.trim().toLowerCase()));
+  const sinParejaVisibles = (m.sinPareja || []).filter((y) => !sinParNombres.has(y.contenido.trim().toLowerCase()));
+  // H2: el marco no cabe en la vista del modo
+  if (m.vista && (m.vista.der > m.vista.ancho + 0.5 || m.vista.izq < -0.5)) {
+    avisos.push({
+      propiedad: 'marco fuera de la vista',
+      detalle: `vista ${modo} de ${m.vista.ancho} px; el marco va de ${+m.vista.izq.toFixed(1)} a ${+m.vista.der.toFixed(1)} px: la captura y las medidas pueden salir cortadas (revisar el padding de la historia)`,
+    });
+  }
+  // Los textos sin pareja son avisos (sección propia), no diferencias
+  for (const x of sinParejaVisibles) avisos.push({ tipo: 'sin-pareja', propiedad: `parte "${x.parte}"`, detalle: x.contenido });
+  lista.avisos = avisos;
+  lista.diseno = diseno;
   // Nodos de la spec vs elementos marcados con el mismo nombre (solo si hay marcados)
   const enSpec = {};
   for (const x of [...m.__textos, ...m.__iconos]) enSpec[x.nombre] = (enSpec[x.nombre] || 0) + 1;
@@ -679,8 +803,21 @@ function generarHtml(res) {
           const d = v.porTema[t];
           if (!d.encontrada) return `<p class="err"><b>${esc(t)}</b>: no se encontró <code>data-figma="${esc(v.nombre)}"</code></p>`;
           const malas = d.comparaciones.filter((c) => !c.ok);
-          if (!malas.length) return `<p class="ok"><b>${esc(t)}</b>: sin diferencias (${d.comparaciones.length} propiedades)</p>`;
-          return `<table><caption>${esc(t)}</caption><thead><tr><th>Propiedad</th><th>Figma</th><th>Storybook</th></tr></thead><tbody>${malas
+          const av =
+            (d.avisos || []).filter((a) => a.tipo !== 'sin-pareja').map((a) => `<p class="warn"><b>${esc(t)}</b> · aviso: ${esc(a.propiedad)}. ${esc(a.detalle)}</p>`).join('') +
+            ((d.avisos || []).some((a) => a.tipo === 'sin-pareja')
+              ? `<table class="dis"><caption>${esc(t)} · Textos sin pareja en Figma (aviso, no cuenta como diferencia)</caption><thead><tr><th>Parte marcada</th><th>Texto del DOM</th></tr></thead><tbody>${d.avisos
+                  .filter((a) => a.tipo === 'sin-pareja')
+                  .map((a) => `<tr><td>${esc(a.propiedad)}</td><td>${esc(a.detalle)}</td></tr>`)
+                  .join('')}</tbody></table>`
+              : '');
+          const di = (d.diseno || []).length
+            ? `<table class="dis"><caption>${esc(t)} · para diseño (no cuenta como diferencia de código)</caption><thead><tr><th>Propiedad</th><th>Figma</th><th>Storybook</th></tr></thead><tbody>${d.diseno
+                .map((c) => `<tr><td>${esc(c.propiedad)}</td><td>${esc(c.figma)}</td><td>${esc(c.storybook)}</td></tr>`)
+                .join('')}</tbody></table>`
+            : '';
+          if (!malas.length) return `${av}<p class="ok"><b>${esc(t)}</b>: sin diferencias (${d.comparaciones.length} propiedades)</p>${di}`;
+          return `${av}${di}<table><caption>${esc(t)}</caption><thead><tr><th>Propiedad</th><th>Figma</th><th>Storybook</th></tr></thead><tbody>${malas
             .map((c) => `<tr><td>${esc(c.propiedad)}</td><td>${esc(c.figma)}</td><td>${esc(c.storybook)}</td></tr>`)
             .join('')}</tbody></table>`;
         })
@@ -699,8 +836,8 @@ function generarHtml(res) {
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Comparación ${esc(res.carpeta)}</title>
 <style>
-:root{--bg:#fff;--fg:#1d1c1c;--mut:#5e6165;--card:#f0f2f4;--line:#dbdde0;--ok:#016242;--err:#b3261e;--checker:#e8e8e8}
-@media (prefers-color-scheme:dark){:root{--bg:#1d1c1c;--fg:#f0f2f4;--mut:#b0b4ba;--card:#2e3033;--line:#45484c;--ok:#7dd1b5;--err:#ff8a80;--checker:#3a3a3a}}
+:root{--bg:#fff;--fg:#1d1c1c;--mut:#5e6165;--card:#f0f2f4;--line:#dbdde0;--ok:#016242;--err:#b3261e;--warn:#8a5a00;--checker:#e8e8e8}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1c1c;--fg:#f0f2f4;--mut:#b0b4ba;--card:#2e3033;--line:#45484c;--ok:#7dd1b5;--err:#ff8a80;--warn:#f2c14e;--checker:#3a3a3a}}
 body{margin:0;padding:24px 16px;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif}
 main{max-width:1100px;margin:0 auto}h1{margin:0 0 4px}h2{font-size:15px;margin:0 0 8px;font-family:ui-monospace,monospace}
 .sub{color:var(--mut);margin:0 0 16px}.cards{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
@@ -708,7 +845,7 @@ main{max-width:1100px;margin:0 auto}h1{margin:0 0 4px}h2{font-size:15px;margin:0
 section{border-top:1px solid var(--line);padding:16px 0}table{border-collapse:collapse;margin:8px 0}th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
 caption{text-align:left;font-weight:600;padding:4px 0}.fila td{padding:12px}
 .lienzo{background:repeating-conic-gradient(var(--checker) 0 25%,transparent 0 50%) 0 0/12px 12px;padding:8px;display:inline-block;min-width:24px;min-height:24px}
-.lienzo img{display:block;max-width:100%;image-rendering:pixelated}.ok{color:var(--ok)}.err{color:var(--err)}code{font-family:ui-monospace,monospace}
+.lienzo img{display:block;max-width:100%;image-rendering:pixelated}.ok{color:var(--ok)}.err{color:var(--err)}.warn{color:var(--warn)}.dis caption{color:var(--mut)}code{font-family:ui-monospace,monospace}
 </style></head><body><main>
 <h1>Comparación ${esc(res.carpeta)}</h1>
 <p class="sub">${esc(res.story)} · tolerancia ${res.tol}px · ${esc(res.fecha)}</p>
@@ -744,17 +881,32 @@ async function main() {
     aliasCarpeta = JSON.parse(fs.readFileSync(path.join(RAIZ, '.qa', 'figma', 'alias.json'), 'utf8'))[args.carpeta] || {};
   } catch {}
 
+  const R0 = crearResolvedor(spec, 'dark');
   const variantes = spec.variantes.map((v) => {
     const textos = [];
     const iconos = [];
+    const formas = [];
+    // H1/H3: cadena de ancestros (la raíz de la variante no cuenta) con el índice de cada uno entre los de su nombre y
+    // los ordinales de los textos / formas dentro de él
+    const idxAnc = {};
+    const cadenaDe = (ancs, clave) =>
+      ancs.slice().reverse().map((a) => ({ a, clave, ordEn: (a.conteo[clave] = (a.conteo[clave] ?? -1) + 1) }));
+    const esForma = (n) =>
+      ['ELLIPSE', 'RECTANGLE', 'VECTOR', 'POLYGON', 'STAR', 'LINE', 'BOOLEAN_OPERATION'].includes(n.tipo) &&
+      !n.icono &&
+      !(n.hijos || []).some((h) => !h.oculto) &&
+      (n.opacidad ?? 1) === 1;
     let primero = true;
     const ords = {};
     const ordDe = (n) => (ords[n] = (ords[n] ?? -1) + 1);
-    const visitar = (nodo, x, y, anc = []) => {
+    const visitar = (nodo, x, y, anc = [], ancs = []) => {
       if (nodo.oculto) return;
       if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
-        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre), anc });
+        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre), anc, cadena: cadenaDe(ancs, 't:' + nodo.nombre) });
         primero = false;
+      }
+      if (esForma(nodo) && R0.primerSolido(nodo.rellenos)?.var) {
+        formas.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, w: nodo.w, h: nodo.h, cadena: cadenaDe(ancs, `f:${nodo.w}x${nodo.h}`), cadenaNombre: cadenaDe(ancs, `fn:${nodo.nombre}`) });
       }
       if (nodo.icono) {
         const size = nodo.instancia?.variante?.Size;
@@ -762,9 +914,29 @@ async function main() {
       }
       // Nombres de los ancestros (y su alias en código) para H3; la raíz de la variante no cuenta
       const sig = nodo === v.arbol ? anc : [...anc, nodo.nombre, ...(aliasCarpeta[nodo.nombre] ? [aliasCarpeta[nodo.nombre]] : [])];
-      for (const h of nodo.hijos || []) visitar(h, x + (h.x || 0), y + (h.y || 0), sig);
+      let sigAncs = ancs;
+      if (nodo !== v.arbol) {
+        const idx = (idxAnc[nodo.nombre] = (idxAnc[nodo.nombre] ?? -1) + 1);
+        sigAncs = [...ancs, { nombre: nodo.nombre, b: aliasCarpeta[nodo.nombre] ?? nodo.nombre, idx, conteo: {} }];
+      }
+      for (const h of nodo.hijos || []) visitar(h, x + (h.x || 0), y + (h.y || 0), sig, sigAncs);
     };
     visitar(v.arbol, 0, 0);
+    // Total de nodos de Figma por nombre (para saber si el DOM trae las mismas instancias de una parte)
+    const totAnc = {};
+    const contar = (n) => {
+      if (n.oculto) return;
+      if (n !== v.arbol) totAnc[n.nombre] = (totAnc[n.nombre] || 0) + 1;
+      (n.hijos || []).forEach(contar);
+    };
+    contar(v.arbol);
+    const aPlano = (lista) =>
+      lista.forEach((t) => (t.cadena = t.cadena.map(({ a, ordEn, clave }) => ({ n: a.nombre, b: a.b, idx: a.idx, cnt: totAnc[a.nombre], ordEn, tot: a.conteo[clave] }))));
+    aPlano(textos);
+    aPlano(formas);
+    // ordinal de cada forma dentro de su ancestro entre las del mismo nombre (partes marcadas)
+    formas.forEach((f) => (f.ordNombre = f.cadenaNombre.map(({ ordEn }) => ordEn)));
+    formas.forEach((f) => (f.totNombre = f.cadenaNombre.map(({ a, clave }) => a.conteo[clave])));
     const conocidos = new Set();
     const nombrar = (n) => {
       conocidos.add(n.nombre);
@@ -772,7 +944,7 @@ async function main() {
       (n.hijos || []).forEach(nombrar);
     };
     (v.arbol.hijos || []).forEach(nombrar);
-    return { def: v, slug: slugDe(v), textos, iconos, conocidos: [...conocidos] };
+    return { def: v, slug: slugDe(v), textos, iconos, formas, conocidos: [...conocidos] };
   });
 
   // H2: nombres repetidos en la spec (sets con errores): la k-ésima con el mismo nombre se mide contra el k-ésimo
@@ -850,7 +1022,7 @@ async function main() {
             nombre: v.def.nombre,
             k: v.k,
             conocidos: v.conocidos,
-            partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord, anc: t.anc })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos })) },
+            partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord, anc: t.anc, cadena: t.cadena })), formas: v.formas.map((f) => ({ nombre: f.nombre, busca: f.busca, w: f.w, h: f.h, cadena: f.cadena, ordNombre: f.ordNombre, totNombre: f.totNombre })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos })) },
           });
           if (!m) {
             salida[tema] = { encontrada: false, comparaciones: [] };
@@ -859,6 +1031,7 @@ async function main() {
           }
           m.__textos = v.textos;
           m.__iconos = v.iconos;
+          m.__formas = v.formas;
           const comparaciones = compararVariante(v.def, m, spec, tema, tol, v.modo);
           const rel = path.join('capturas', tema, `${v.slug}.png`);
           fs.mkdirSync(path.join(dir, 'capturas', tema), { recursive: true });
@@ -871,7 +1044,7 @@ async function main() {
           sumario.comprobaciones += comparaciones.length;
           sumario.fallos += fallos;
           if (!fallos) sumario.variantesOk++;
-          salida[tema] = { encontrada: true, captura: rel.split(path.sep).join('/'), capturaW: caja ? caja.width : 0, capturaH: caja ? caja.height : 0, comparaciones };
+          salida[tema] = { encontrada: true, captura: rel.split(path.sep).join('/'), capturaW: caja ? caja.width : 0, capturaH: caja ? caja.height : 0, comparaciones, avisos: comparaciones.avisos || [], diseno: comparaciones.diseno || [] };
         }
         await ctx.close();
       }
@@ -895,6 +1068,15 @@ async function main() {
       json.temas[t][v.nombre] = d.encontrada ? d.comparaciones : { faltante: true };
     });
   }
+  // Avisos (H2) y "para diseño" (H4) por tema -> variante; solo si hay
+  for (const clave of ['avisos', 'diseno']) {
+    for (const t of temas) {
+      for (const v of resultado.variantes) {
+        const lst = v.porTema[t][clave];
+        if (lst && lst.length) ((json[clave] ??= {})[t] ??= {})[v.nombre] = lst;
+      }
+    }
+  }
   fs.writeFileSync(path.join(dir, 'comparacion.json'), JSON.stringify(json, null, 2));
   fs.writeFileSync(path.join(dir, 'comparacion.html'), generarHtml(resultado));
 
@@ -909,7 +1091,11 @@ async function main() {
     for (const v of resultado.variantes) {
       const d = v.porTema[t];
       if (!d.encontrada) console.log(`    FALTA  ${v.nombre}`);
-      else for (const c of d.comparaciones.filter((x) => !x.ok)) console.log(`    DIF    ${v.nombre} :: ${c.propiedad}  figma=${c.figma}  storybook=${c.storybook}`);
+      else {
+        for (const c of d.comparaciones.filter((x) => !x.ok)) console.log(`    DIF    ${v.nombre} :: ${c.propiedad}  figma=${c.figma}  storybook=${c.storybook}`);
+        for (const a of d.avisos || []) console.log(a.tipo === 'sin-pareja' ? `    SIN PAREJA EN FIGMA  ${v.nombre} :: ${a.propiedad}: "${a.detalle}"` : `    AVISO  ${v.nombre} :: ${a.propiedad}: ${a.detalle}`);
+        for (const c of d.diseno || []) console.log(`    DISEÑO ${v.nombre} :: ${c.propiedad}  figma=${c.figma}  storybook=${c.storybook}`);
+      }
     }
   }
   console.log(`Informe: ${path.join(dir, 'comparacion.html')}`);
