@@ -1,0 +1,22 @@
+{
+  "name": "EmptyState",
+  "component": "EmptyState",
+  "description": "Estado vacío del sistema de diseño CAOS, fiel al component set \"Empty states\" 12304:6287 de Figma (Type First Use, No Results, Errors & Issues y No Content). Columna centrada con gap space/general/3xl: composición de cuadros de 102 × 107.95 (cuadro de contorno sólido, cuadro de contorno punteado 5/5 y cuadro de 60 con el ícono de 32), título (Prospero semibold, heading/md), descripción (Helvetica Neue regular, body/md) y hasta dos acciones con Button (primary y secondary, tamaño md). Cada tipo trae su ícono (add-circle, search, warning, document) y se puede reemplazar con `icon`. Título, descripción y acciones son opcionales (props Title, Text, Button primary y Button secondary de Figma). Responsive: desde Tablet los botones van en fila con el secundario a la izquierda y el principal a la derecha; en Mobile se apilan a ancho completo con el principal arriba. Accesibilidad: el título es un encabezado real (nivel configurable con `headingLevel`, por defecto h3) y la composición de cuadros es decorativa (aria-hidden). El DOM y la tabulación siguen el orden de Figma Desktop (secundaria y luego principal); en Mobile las acciones se invierten visualmente (principal arriba), de modo que allí el foco recorre de abajo hacia arriba.",
+  "category": "Feedback",
+  "props": {
+    "type": { "type": "'first-use' | 'no-results' | 'errors-issues' | 'no-content'", "default": "'first-use'", "description": "Type de Figma: define el ícono por defecto." },
+    "icon": { "type": "IconName", "required": false, "description": "Ícono de la composición; por defecto el del type." },
+    "title": { "type": "ReactNode", "required": false, "description": "Props Title y Title text de Figma. Sin él no se dibuja." },
+    "description": { "type": "ReactNode", "required": false, "description": "Prop Text de Figma. Sin ella no se dibuja." },
+    "primaryAction": { "type": "EmptyStateAction", "required": false, "description": "Button primary (prop Button primary de Figma): { label, ...atributos de button }." },
+    "secondaryAction": { "type": "EmptyStateAction", "required": false, "description": "Button secondary (prop Button secondary de Figma): { label, ...atributos de button }." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6", "default": "3", "description": "Nivel del encabezado del título." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para la raíz." }
+  },
+  "examples": [
+    { "title": "Primer uso", "code": "<EmptyState type=\"first-use\" title=\"Aún no hay archivos\" description=\"Sube tu primer archivo para verlo aquí.\" primaryAction={{ label: 'Subir archivo', onClick: subir }} />" },
+    { "title": "Sin resultados", "code": "<EmptyState type=\"no-results\" title=\"Sin resultados\" description=\"Prueba con otras palabras.\" primaryAction={{ label: 'Limpiar filtros', onClick: limpiar }} />" },
+    { "title": "Error con dos acciones", "code": "<EmptyState type=\"errors-issues\" title=\"No pudimos cargar los datos\" primaryAction={{ label: 'Reintentar', onClick: reintentar }} secondaryAction={{ label: 'Reportar problema' }} />" },
+    { "title": "Sin contenido", "code": "<EmptyState type=\"no-content\" title=\"Nada por aquí\" description=\"Esta sección todavía no tiene contenido.\" />" }
+  ]
+}
