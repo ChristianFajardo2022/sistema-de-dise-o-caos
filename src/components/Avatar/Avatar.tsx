@@ -39,6 +39,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
       label,
       badge = false,
       badgeLabel,
+      badgeState,
       ringed,
       className,
       ...restProps
@@ -118,7 +119,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
             ))}
         </span>
         {showBadge && (
-          <Badge type="simple" label={badgeLabel} className="absolute right-0 bottom-0" data-figma-part="Badge" />
+          <Badge type="simple" state={badgeState} label={badgeLabel} className="absolute right-0 bottom-0" data-figma-part="Badge" />
         )}
       </span>
     );

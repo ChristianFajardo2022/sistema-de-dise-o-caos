@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
+import type { BadgeState } from '../Badge/Badge.types';
 import type { IconName } from '../Icon/Icon.types';
 
 /**
@@ -61,6 +62,11 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'chil
   badge?: boolean;
   /** Texto sr-only del indicador (p. ej. "En línea"). Sin él, el indicador es decorativo (el color solo no basta). */
   badgeLabel?: string;
+  /**
+   * Color semántico del indicador (`state` del Badge), p. ej. `success` para "en línea". Por defecto el del Badge
+   * (`default`), igual que en Figma.
+   */
+  badgeState?: BadgeState;
   /** Anillo blanco de 0.5 que separa avatares solapados. Lo activa `AvatarGroup`. */
   ringed?: boolean;
   /** Clases adicionales para el elemento raíz. */

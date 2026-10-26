@@ -18,6 +18,7 @@
     "label": { "type": "string", "required": false, "description": "Nombre accesible de user, brand e icon (y sobrescribe el de initials). Sin ningún nombre el avatar es decorativo." },
     "badge": { "type": "boolean", "default": false, "description": "Indicador de estado (Badge simple). Solo initials, user y photo en lg y md, y no en disabled." },
     "badgeLabel": { "type": "string", "required": false, "description": "Texto sr-only del indicador. Sin él el indicador es decorativo." },
+    "badgeState": { "type": "BadgeState", "required": false, "description": "Color semántico del indicador (state del Badge), p. ej. success para en línea. Por defecto el del Badge (default)." },
     "ringed": { "type": "boolean", "required": false, "description": "Anillo blanco de 0.5 entre avatares solapados; lo activa AvatarGroup." }
   },
   "subcomponents": {

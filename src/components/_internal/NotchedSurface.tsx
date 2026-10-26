@@ -1,9 +1,12 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import type { NotchedSurfaceShadow } from './shadows';
 import { cn } from '../../utils/cn';
+import { SOLID_MASK, maskStyle } from './mask';
+import { DROP_SHADOW } from './shadows';
 
 /**
  * Superficie de las tarjetas (marco "Canva" + forma "Subtract" de Figma). Pieza interna: no se exporta desde el paquete.
- * La usan FileCard, InteractiveCard, InformationCard y DataCard.
+ * La usan FileCard, InteractiveCard, InformationCard, DataCard y las tarjetas de la tanda 4B.
  *
  * - Va detrás del contenido (`absolute inset-0 -z-10`): la raíz de la tarjeta queda transparente, como en Figma.
  *   La raíz debe ser `relative isolate`.
@@ -11,7 +14,8 @@ import { cn } from '../../utils/cn';
  * - Colores por variables CSS que pone la tarjeta (así cambian con :hover o :checked sin tocar la geometría):
  *   - `--surface-fill`: relleno.
  *   - `--surface-edge`: trazo interior de 1 px (border/general/lg). Sin él el trazo toma el color del relleno y no se ve.
- * - `notch`: muesca arriba a la derecha donde va el Button corner. `md` = 48 (Button corner de 40), `sm` = 40 (de 32).
+ * - `notch`: muesca arriba a la derecha donde va el Button corner. `md` = 48 (Button corner de 40), `sm` = 40 (de 32),
+ *   `lg` = 54 (un botón de 48 centrado en la muesca).
  *   Geometría de Figma (rectángulo menos un cuadrado de N×N con las esquinas redondeadas a N/2): esquina convexa de N/2
  *   antes de la muesca, curva cóncava de radio N/2 con centro a N/2 del borde derecho y del superior, y esquina convexa
  *   de N/2 al bajar por el borde derecho. Se recorta con una máscara de gradientes (`border-radius` no la hace), así la
@@ -23,14 +27,14 @@ import { cn } from '../../utils/cn';
  *   por `className`.
  * - `fill`: relleno plano sin trazo (p. ej. el Backdrop de la miniatura de FileCard).
  * - `children`: contenido recortado por la silueta (una foto). Con contenido deja de ser `aria-hidden`.
+ * - `bleed`: el contenido llena la silueta entera (sin el trazo de 1 px). Lo usan las fotos de ProductCard y BlogCard.
+ * - `DROP_SHADOW` / `cornerShadowClass`: la misma sombra para el Button corner que va en la muesca.
  */
 
-export type NotchedSurfaceNotch = 'none' | 'sm' | 'md';
-export type NotchedSurfaceShadow = 'none' | 'on-card' | 'on-canva' | 'on-card-on-canva';
+export type NotchedSurfaceNotch = 'none' | 'sm' | 'md' | 'lg';
+export type { NotchedSurfaceShadow } from './shadows';
 
-const NOTCH_SIZE = { sm: 40, md: 48 } as const;
-
-const SOLID = 'linear-gradient(#000,#000)';
+const NOTCH_SIZE = { sm: 40, md: 48, lg: 54 } as const;
 
 /**
  * Máscara de la silueta. `a` = ancho de la muesca desde el borde derecho, `v` = radio de las esquinas convexas
@@ -38,57 +42,44 @@ const SOLID = 'linear-gradient(#000,#000)';
  */
 function notchMask(a: number, v: number): CSSProperties {
   const c = a - v;
-  const layers: [image: string, size: string, position: string][] = [
+  return maskStyle([
     // Todo lo que queda a la izquierda de la muesca
-    [SOLID, `calc(100% - ${a + v}px) 100%`, 'left top'],
+    [SOLID_MASK, `calc(100% - ${a + v}px) 100%`, 'left top'],
     // Todo lo que queda debajo de la muesca
-    [SOLID, `100% calc(100% - ${a + v}px)`, 'left bottom'],
+    [SOLID_MASK, `100% calc(100% - ${a + v}px)`, 'left bottom'],
     // Esquina convexa antes de la muesca
     [`radial-gradient(circle at 0 100%,#000 ${v - 0.5}px,transparent ${v + 0.5}px)`, `${v}px ${v}px`, `right ${a}px top 0`],
-    [SOLID, `${v}px ${a}px`, `right ${a}px top ${v}px`],
+    [SOLID_MASK, `${v}px ${a}px`, `right ${a}px top ${v}px`],
     // Curva cóncava
     [`radial-gradient(circle at 100% 0,transparent ${c - 0.5}px,#000 ${c + 0.5}px)`, `${c}px ${c}px`, `right ${v}px top ${v}px`],
-    [SOLID, `${c}px ${v}px`, `right ${v}px top ${a}px`],
+    [SOLID_MASK, `${c}px ${v}px`, `right ${v}px top ${a}px`],
     // Esquina convexa al bajar por el borde derecho
     [`radial-gradient(circle at 0 100%,#000 ${v - 0.5}px,transparent ${v + 0.5}px)`, `${v}px ${v}px`, `right 0 top ${a}px`],
-  ];
-  const image = layers.map((l) => l[0]).join(',');
-  const size = layers.map((l) => l[1]).join(',');
-  const position = layers.map((l) => l[2]).join(',');
-  return {
-    maskImage: image,
-    WebkitMaskImage: image,
-    maskSize: size,
-    WebkitMaskSize: size,
-    maskPosition: position,
-    WebkitMaskPosition: position,
-    maskRepeat: 'no-repeat',
-    WebkitMaskRepeat: 'no-repeat',
-  };
+  ]);
 }
 
-// drop-shadow no admite spread: se usa el x/y/blur de effect/shadow sm (0 4 12) y md (0 12 32)
-const DROP_SHADOW: Record<NotchedSurfaceShadow, string> = {
-  none: '',
-  'on-card': '[filter:drop-shadow(0_4px_12px_var(--ds-responsive-effect-shadow-sm))]',
-  'on-canva': '[filter:drop-shadow(0_12px_32px_var(--ds-responsive-effect-shadow-md))]',
-  'on-card-on-canva':
-    '[filter:drop-shadow(0_4px_12px_var(--ds-responsive-effect-shadow-sm))_drop-shadow(0_12px_32px_var(--ds-responsive-effect-shadow-md))]',
-};
-
 export interface NotchedSurfaceProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
-  /** Muesca arriba a la derecha: `md` = 48 (Button corner de 40), `sm` = 40 (de 32). Por defecto `none`. */
+  /**
+   * Muesca arriba a la derecha: `md` = 48 (Button corner de 40), `sm` = 40 (de 32), `lg` = 54 (aloja un botón de 48
+   * centrado, a 3 px de los bordes). Por defecto `none`.
+   */
   notch?: NotchedSurfaceNotch;
   /** Sombra de la superficie (effect/shadow sm = on-card, md = on-canva). Por defecto `none`. */
   shadow?: NotchedSurfaceShadow;
   /** Relleno plano sin trazo (valor CSS). Sin él: relleno `--surface-fill` y trazo `--surface-edge`. */
   fill?: string;
+  /**
+   * Contenido a sangre (p. ej. una foto que llena la silueta): sin capa de trazo, el contenido ocupa toda la silueta
+   * (`inset-0`, radio completo y la muesca exterior, no la desplazada 1 px). El relleno es `--surface-fill` si la
+   * tarjeta lo define; si no, transparente. Por defecto `false`.
+   */
+  bleed?: boolean;
   /** Contenido recortado por la silueta (p. ej. una foto). */
   children?: ReactNode;
   'data-figma-part'?: string;
 }
 
-export function NotchedSurface({ notch = 'none', shadow = 'none', fill, children, className, style, ...rest }: NotchedSurfaceProps) {
+export function NotchedSurface({ notch = 'none', shadow = 'none', fill, bleed = false, children, className, style, ...rest }: NotchedSurfaceProps) {
   const a = notch === 'none' ? 0 : NOTCH_SIZE[notch];
   const v = a / 2;
   const notched = a > 0;
@@ -109,7 +100,17 @@ export function NotchedSurface({ notch = 'none', shadow = 'none', fill, children
       )}
       style={style}
     >
-      {fill ? (
+      {bleed ? (
+        <span
+          className={cn(
+            'absolute inset-0 block overflow-hidden rounded-ds-radius-general-2xl bg-(color:--surface-fill,transparent)',
+            boxShadow && (shadow === 'on-canva' || shadow === 'on-card-on-canva') && 'shadow-ds-on-canva'
+          )}
+          style={outerMask}
+        >
+          {children}
+        </span>
+      ) : fill ? (
         <span className="absolute inset-0 block rounded-ds-radius-general-2xl" style={{ ...outerMask, backgroundColor: fill }} />
       ) : (
         // Capa exterior: color del trazo (o del relleno si no hay trazo)

@@ -4,8 +4,8 @@ import { ratingBarRowClasses, ratingBarVariants } from './Rating.variants';
 import { IconStar } from './IconStar';
 import { ProgressBar } from '../ProgressBar';
 import { cn } from '../../utils/cn';
+import { formatCount } from '../../utils/format';
 
-const countFormat = new Intl.NumberFormat('es');
 
 /**
  * Desglose de reseñas por estrellas. Cada fila es un `<li>` con una estrella decorativa y un
@@ -36,7 +36,7 @@ export const RatingBar = forwardRef<HTMLUListElement, RatingBarProps>(
               value={Math.max(row.count, 0)}
               max={total > 0 ? total : 1}
               formatValue={(count, percent) =>
-                display === 'count' ? countFormat.format(count) : `${Math.round(percent)}%`
+                display === 'count' ? formatCount(count) : `${Math.round(percent)}%`
               }
             />
           </li>

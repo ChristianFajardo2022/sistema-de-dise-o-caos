@@ -521,6 +521,7 @@ export const BadgeRulesTest: Story = {
       <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" size="md" data-testid="md" />
       <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" size="sm" data-testid="sm" />
       <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" disabled data-testid="disabled" />
+      <Avatar name="Ana Bernal" badge badgeLabel="En línea" badgeState="success" size="md" data-testid="online" />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -529,5 +530,8 @@ export const BadgeRulesTest: Story = {
     await expect(canvas.getByTestId('md')).toHaveTextContent('Ocupada');
     await expect(canvas.getByTestId('sm')).not.toHaveTextContent('Ocupada');
     await expect(canvas.getByTestId('disabled')).not.toHaveTextContent('Ocupada');
+    // badgeState cambia el color del indicador; sin él queda el de siempre
+    const dot = (id: string) => getComputedStyle(canvas.getByTestId(id).querySelector('[data-figma-part="Badge"] [data-figma-part="Badge"]')!).backgroundColor;
+    await expect(dot('online')).not.toBe(dot('md'));
   },
 };

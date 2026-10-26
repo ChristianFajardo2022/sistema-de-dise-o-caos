@@ -189,9 +189,10 @@ export const NumberPicker = forwardRef<HTMLInputElement, NumberPickerProps>(
               onClick={() => move(-step)}
               data-figma-part="Button"
             >
-              <Icon name="minus" size={20} />
+              <Icon name="minus" size={20} data-figma-part="Icon-sizes" />
             </Button>
             <input
+              data-figma-part="00"
               {...restProps}
               ref={setInputRef}
               id={inputId}
@@ -225,7 +226,7 @@ export const NumberPicker = forwardRef<HTMLInputElement, NumberPickerProps>(
               onClick={() => move(step)}
               data-figma-part="Button"
             >
-              <Icon name="add-2" size={20} />
+              <Icon name="add-2" size={20} data-figma-part="Icon-sizes" />
             </Button>
           </div>
         </FieldRow>

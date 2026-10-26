@@ -3,17 +3,15 @@ import type { NumberRatingProps } from './Rating.types';
 import { numberRatingVariants } from './Rating.variants';
 import { IconStar } from './IconStar';
 import { cn } from '../../utils/cn';
-
-const averageFormat = new Intl.NumberFormat('es', { maximumFractionDigits: 1 });
-const countFormat = new Intl.NumberFormat('es');
+import { RATING_SUFFIX, formatCount, formatRating } from '../../utils/format';
 
 /** Promedio numérico con una estrella y, opcionalmente, el total de reseñas. Se lee como una sola frase. */
 export const NumberRating = forwardRef<HTMLSpanElement, NumberRatingProps>(
   ({ value, total, label, className, ...restProps }, ref) => {
-    const average = averageFormat.format(value);
+    const average = formatRating(value);
     const reviews =
-      total === undefined ? undefined : `${countFormat.format(total)} ${total === 1 ? 'reseña' : 'reseñas'}`;
-    const text = label ?? `${average} de 5 estrellas${reviews ? `, ${reviews}` : ''}`;
+      total === undefined ? undefined : `${formatCount(total)} ${total === 1 ? 'reseña' : 'reseñas'}`;
+    const text = label ?? `${average} ${RATING_SUFFIX}${reviews ? `, ${reviews}` : ''}`;
 
     return (
       <span

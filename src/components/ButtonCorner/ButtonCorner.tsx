@@ -50,10 +50,11 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         content = (
           <span
             aria-hidden="true"
+            data-figma-part="Dots-moreoptions"
             className="inline-flex size-[32px] shrink-0 items-center justify-center rounded-ds-radius-button-full p-ds-space-button-lg"
           >
             <IconSlot>
-              <Icon name="3-dots-more" variant="fill" size={16} />
+              <Icon name="3-dots-more" variant="fill" size={16} data-figma-part="Icon-sizes" />
             </IconSlot>
           </span>
         );
@@ -91,7 +92,12 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         ref={ref}
         type="button"
         aria-pressed={hasPressed ? pressed : undefined}
-        className={cn(buttonCornerVariants({ status, size, stroke, dots: variant === 'dots' }), className)}
+        className={cn(
+          buttonCornerVariants({ status, size, stroke, dots: variant === 'dots' }),
+          // Favorito presionado: el corazón se rellena con el color del trazo (Figma no dibuja el estado; para diseño)
+          variant === 'favorite' && '[&[aria-pressed=true]_svg_path]:fill-current',
+          className
+        )}
         {...restProps}
       >
         {content}

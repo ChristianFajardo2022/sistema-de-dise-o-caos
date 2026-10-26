@@ -3,12 +3,12 @@ import { STAR_RATING_MAX, type IconStarSize, type StarRatingProps } from './Rati
 import { starRatingItemClasses, starRatingVariants } from './Rating.variants';
 import { IconStar } from './IconStar';
 import { cn } from '../../utils/cn';
+import { formatRating } from '../../utils/format';
 
 const STAR_PX = { sm: 20, md: 32 } as const satisfies Record<string, IconStarSize>;
 const STARS = [1, 2, 3, 4, 5] as const;
 
 const clamp = (n: number) => Math.min(Math.max(Number.isFinite(n) ? n : 0, 0), STAR_RATING_MAX);
-const numberFormat = new Intl.NumberFormat('es', { maximumFractionDigits: 1 });
 
 /**
  * Puntaje con estrellas. Dos modos:
@@ -44,7 +44,7 @@ export const StarRating = forwardRef<HTMLDivElement, StarRatingProps>(
     const filled = Math.round(current);
 
     if (!interactive) {
-      const text = label ?? `${numberFormat.format(current)} de ${STAR_RATING_MAX} estrellas`;
+      const text = label ?? `${formatRating(current)} de ${STAR_RATING_MAX} estrellas`;
       return (
         <div
           {...restProps}

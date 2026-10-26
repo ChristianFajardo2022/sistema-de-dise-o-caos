@@ -1,7 +1,7 @@
 {
   "name": "ButtonCorner",
   "component": "ButtonCorner",
-  "description": "Botón circular de esquina del sistema de diseño CAOS, fiel al component set Button corner de Figma (60 variantes, solo estado Default). Type Icon, Dots, Radiobutton, Checkbox y Favorite; Status On canva, On card y Unicolor canva (tokens -unicolor, no cambian con el tema); tamaños md 40 y sm 32; Stroke con borde exterior de 1px. Círculo con radio radius/button/full, padding space/general/xl (md) o lg (sm); Dots usa un botón interno de 32. Checkbox y Radiobutton muestran el control de 16px de Selection (Default Positive) como elemento decorativo. La sombra effect/shadow sm es invisible (alfa 0 en oscuro, casi nula en claro) y no se agrega. Figma no define hover, press, seleccionado ni disabled: no se inventan. Se agregan foco visible (outline de 2px, offset 2, border/field/active), disabled nativo con cursor-not-allowed y aria-pressed opcional (sin cambio de aspecto). Siempre exige aria-label o aria-labelledby.",
+  "description": "Botón circular de esquina del sistema de diseño CAOS, fiel al component set Button corner de Figma (60 variantes, solo estado Default). Type Icon, Dots, Radiobutton, Checkbox y Favorite; Status On canva, On card y Unicolor canva (tokens -unicolor, no cambian con el tema); tamaños md 40 y sm 32; Stroke con borde exterior de 1px. Círculo con radio radius/button/full, padding space/general/xl (md) o lg (sm); Dots usa un botón interno de 32. Checkbox y Radiobutton muestran el control de 16px de Selection (Default Positive) como elemento decorativo. La sombra effect/shadow sm es invisible (alfa 0 en oscuro, casi nula en claro) y no se agrega. Figma no define hover, press, seleccionado ni disabled: no se inventan. Se agregan foco visible (outline de 2px, offset 2, border/field/active), disabled nativo con cursor-not-allowed y aria-pressed opcional (sin cambio de aspecto, salvo Favorite: presionado, el corazón se rellena con el color del trazo, indicador mínimo a confirmar con diseño). Siempre exige aria-label o aria-labelledby.",
   "category": "General Controls",
   "props": {
     "variant": {
@@ -32,7 +32,7 @@
     "pressed": {
       "type": "boolean",
       "required": false,
-      "description": "aria-pressed para checkbox, radiobutton y favorite. Figma no tiene aspecto de seleccionado: solo cambia el atributo."
+      "description": "aria-pressed para checkbox, radiobutton y favorite. Figma no tiene aspecto de seleccionado: solo cambia el atributo; en favorite el corazón se rellena."
     },
     "disabled": {
       "type": "boolean",

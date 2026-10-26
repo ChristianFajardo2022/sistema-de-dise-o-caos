@@ -174,6 +174,9 @@ export const PressedTest: Story = {
   play: async ({ canvasElement }) => {
     const button = within(canvasElement).getByRole('button', { name: 'Quitar de favoritos', pressed: true });
     await expect(button).toHaveAttribute('aria-pressed', 'true');
+    // Favorito presionado: el corazón se rellena (no solo cambia el atributo)
+    const path = button.querySelector('svg path')!;
+    await expect(getComputedStyle(path).fill).not.toBe('none');
   },
 };
 
