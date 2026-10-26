@@ -1,6 +1,12 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import type { RootProps } from '../_internal/types';
 
+/** Presencia de la persona de la conversación. */
+export type ChatCardPresence = 'online' | 'offline';
+
+/** Líneas de la descripción (vista previa del último mensaje). */
+export type ChatCardDescriptionLines = 1 | 2;
+
 export interface ChatCardProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title' | 'children'> {
   /** Prop `Filename` de Figma: nombre de la conversación o la persona. Es el contenido del control y su nombre accesible. */
   title: ReactNode;
@@ -9,12 +15,22 @@ export interface ChatCardProps extends Omit<ButtonHTMLAttributes<HTMLButtonEleme
   /** Avatar de 48 a la izquierda: normalmente `<Avatar variant="photo" size="md" … />`. */
   leading?: ReactNode;
   /**
-   * Indicador de en línea: Badge simple Success abajo a la derecha del avatar (el Badge de `Avatar` no permite elegir el
-   * color y sale morado, no verde como en Figma).
+   * Indicador de presencia abajo a la derecha del avatar: `online` = Badge simple Success (verde), `offline` = Badge
+   * simple Neutral (gris), como las tarjetas desconectadas de la pantalla Chat de Figma. Sin valor no se dibuja.
+   * (El Badge de `Avatar` no permite elegir el color.)
    */
+  presence?: ChatCardPresence;
+  /** @deprecated Usar `presence="online"`. Se mantiene como alias: `online` equivale a `presence="online"`. */
   online?: boolean;
-  /** Texto para lectores del indicador de en línea. Por defecto "En línea". */
+  /** Texto para lectores del indicador en línea. Por defecto "En línea". */
   onlineLabel?: string;
+  /** Texto para lectores del indicador fuera de línea. Por defecto "Fuera de línea". */
+  offlineLabel?: string;
+  /**
+   * Líneas visibles de la descripción antes de cortar con puntos suspensivos. Por defecto 1 (el átomo "Chat card" de
+   * Figma, 18 de alto); la lista de la pantalla Chat usa 2 (36 de alto).
+   */
+  descriptionLines?: ChatCardDescriptionLines;
   /** Hora o fecha del último mensaje (texto pequeño arriba a la derecha). */
   time?: ReactNode;
   /** Mensajes sin leer (Badge número). Sin valor (o el número 0) no se dibuja. */

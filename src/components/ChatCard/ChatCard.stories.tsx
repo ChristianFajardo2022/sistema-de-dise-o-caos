@@ -29,6 +29,18 @@ const meta = {
     time: { control: 'text', type: { name: 'string' }, description: 'Hora del último mensaje' },
     unread: { control: 'text', type: { name: 'string' }, description: 'Mensajes sin leer' },
     selected: { control: 'boolean', type: { name: 'boolean' }, description: 'State=Active de Figma' },
+    presence: {
+      control: 'radio',
+      options: [undefined, 'online', 'offline'],
+      type: { name: 'enum', value: ['online', 'offline'] },
+      description: 'Indicador de presencia sobre el avatar',
+    },
+    descriptionLines: {
+      control: 'radio',
+      options: [1, 2],
+      type: { name: 'enum', value: ['1', '2'] },
+      description: 'Líneas de la descripción (1 = átomo, 2 = lista de la pantalla Chat)',
+    },
   },
   args: {
     title: 'Ana Pérez',
@@ -68,7 +80,8 @@ function ConversationListDemo() {
               description={c.text}
               time={c.time}
               unread={c.unread}
-              online={i === 0}
+              presence={i === 0 ? 'online' : 'offline'}
+              descriptionLines={2}
               selected={active === i}
               leading={avatar(c.photo)}
               onClick={() => setActive(i)}
@@ -125,7 +138,7 @@ function MatrixCards({ figma }: { figma: boolean }) {
           unread="00"
           selected={v.selected}
           leading={avatar('Woman_1')}
-          online
+          presence="online"
         />
       ))}
     </>
@@ -156,8 +169,8 @@ export const SelectionTest: Story = {
   args: { onClick: fn() },
   render: (args) => (
     <div className="flex w-[767px] flex-col gap-4">
-      <ChatCard {...args} title="Ana Pérez" description="Hola" time="20.00" unread="3" leading={avatar()} online selected />
-      <ChatCard title="Hugo García" description="Buenas" leading={avatar('Men_1')} />
+      <ChatCard {...args} title="Ana Pérez" description="Hola" time="20.00" unread="3" leading={avatar()} presence="online" selected />
+      <ChatCard title="Hugo García" description="Buenas" leading={avatar('Men_1')} presence="offline" />
       <ChatCard title="Sara Molina" href="#sara" leading={avatar('Woman_3')} />
     </div>
   ),
@@ -168,6 +181,7 @@ export const SelectionTest: Story = {
     // Una pieza por referencia: en línea, mensaje, hora y no leídos, separados (no "20.003 sin leer")
     await expect(ana).toHaveAccessibleDescription(/^En línea Hola 20\.00 3 sin leer$/);
     await expect(canvas.getByRole('button', { name: 'Hugo García' })).not.toHaveAttribute('aria-current');
+    await expect(canvas.getByRole('button', { name: 'Hugo García' })).toHaveAccessibleDescription(/^Fuera de línea Buenas$/);
     await expect(canvas.getByRole('link', { name: 'Sara Molina' })).toHaveAttribute('href', '#sara');
     await userEvent.click(ana);
     await expect(args.onClick).toHaveBeenCalledTimes(1);

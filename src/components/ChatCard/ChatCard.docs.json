@@ -1,14 +1,17 @@
 {
   "name": "ChatCard",
   "component": "ChatCard",
-  "description": "Tarjeta de conversación del sistema de diseño CAOS, fiel al component set Chat card de Figma (14857:9704), State Default y Active (767×72). Fila con avatar de 48, título, vista previa del último mensaje y, a la derecha, la hora y un Badge de mensajes sin leer. El control es el título: un button o, con href, un enlace, estirado sobre toda la tarjeta (los botones extra de la prop actions quedan por encima con su propio foco). State=Active es la prop selected: expone aria-current en el control y pinta el relleno background/container/select-on-card; el foco con teclado dibuja un outline de 2px en la tarjeta. El estado en línea, la descripción, la hora y los mensajes sin leer forman la descripción accesible del control, cada pieza por separado (\"En línea Hola 20.00 3 sin leer\"). El indicador de en línea es la prop online (Badge simple Success con onlineLabel). El título es el control (button o a), por eso no hay headingLevel. Para una lista de conversaciones, usar ul/li (cada ChatCard en un li), dentro de un nav con nombre si es la navegación de la app. Los botones de la fila de Figma (exportar, editar, seguir) están fuera del cuadro de la variante: son el slot actions.",
+  "description": "Tarjeta de conversación del sistema de diseño CAOS, fiel al component set Chat card de Figma (14857:9704), State Default y Active (767×72). Fila con avatar de 48, título, vista previa del último mensaje y, a la derecha, la hora y un Badge de mensajes sin leer. El control es el título: un button o, con href, un enlace, estirado sobre toda la tarjeta (los botones extra de la prop actions quedan por encima con su propio foco). State=Active es la prop selected: expone aria-current en el control y pinta el relleno background/container/select-on-card; el foco con teclado dibuja un outline de 2px en la tarjeta. El estado en línea, la descripción, la hora y los mensajes sin leer forman la descripción accesible del control, cada pieza por separado (\"En línea Hola 20.00 3 sin leer\"). La presencia es la prop presence: online = Badge simple Success con onlineLabel, offline = Badge simple Neutral (gris, como las tarjetas desconectadas de la pantalla Chat) con offlineLabel; online (boolean) queda como alias deprecado de presence=\"online\". La descripción ocupa una línea (el átomo, 18 de alto) o dos con descriptionLines={2} (la lista de la pantalla Chat, 36 de alto), con puntos suspensivos. El título es el control (button o a), por eso no hay headingLevel. Para una lista de conversaciones, usar ul/li (cada ChatCard en un li), dentro de un nav con nombre si es la navegación de la app. Los botones de la fila de Figma (exportar, editar, seguir) están fuera del cuadro de la variante: son el slot actions.",
   "category": "Data Display",
   "props": {
     "title": { "type": "ReactNode", "required": true, "description": "Prop Filename de Figma. Contenido y nombre accesible del control." },
     "description": { "type": "ReactNode", "required": false, "description": "Prop Status de Figma: último mensaje. Descripción accesible." },
     "leading": { "type": "ReactNode", "required": false, "description": "Avatar de 48 a la izquierda." },
-    "online": { "type": "boolean", "default": "false", "description": "Indicador de en línea (Badge simple Success) sobre el avatar." },
-    "onlineLabel": { "type": "string", "default": "'En línea'", "description": "Texto para lectores del indicador." },
+    "presence": { "type": "'online' | 'offline'", "required": false, "description": "Indicador de presencia sobre el avatar: online = Badge simple Success, offline = Badge simple Neutral. Sin valor no se dibuja." },
+    "online": { "type": "boolean", "default": "false", "description": "Deprecado: alias de presence=\"online\"." },
+    "onlineLabel": { "type": "string", "default": "'En línea'", "description": "Texto para lectores del indicador en línea." },
+    "offlineLabel": { "type": "string", "default": "'Fuera de línea'", "description": "Texto para lectores del indicador fuera de línea." },
+    "descriptionLines": { "type": "1 | 2", "default": "1", "description": "Líneas visibles de la descripción antes de los puntos suspensivos (2 en la lista de la pantalla Chat)." },
     "time": { "type": "ReactNode", "required": false, "description": "Hora del último mensaje." },
     "unread": { "type": "number | string", "required": false, "description": "Mensajes sin leer (Badge número). Con el número 0 o sin valor no se dibuja." },
     "unreadLabel": { "type": "string", "default": "'sin leer'", "description": "Texto para lectores que sigue al número." },
@@ -19,7 +22,7 @@
     "className": { "type": "string", "required": false, "description": "Clases para el elemento raíz." }
   },
   "examples": [
-    { "title": "Conversación seleccionada", "code": "<ChatCard\n  title=\"Ana Pérez\"\n  description=\"Nos vemos mañana\"\n  time=\"20.00\"\n  unread={3}\n  selected\n  online\n  leading={<Avatar variant=\"photo\" size=\"md\" src={foto} alt=\"\" />}\n  onClick={abrirConversacion}\n/>" },
+    { "title": "Conversación seleccionada", "code": "<ChatCard\n  title=\"Ana Pérez\"\n  description=\"Nos vemos mañana\"\n  time=\"20.00\"\n  unread={3}\n  selected\n  presence=\"online\"\n  leading={<Avatar variant=\"photo\" size=\"md\" src={foto} alt=\"\" />}\n  onClick={abrirConversacion}\n/>" },
     { "title": "Como enlace", "code": "<ChatCard title=\"Ana Pérez\" href=\"/chats/ana\" leading={…} />" }
   ]
 }

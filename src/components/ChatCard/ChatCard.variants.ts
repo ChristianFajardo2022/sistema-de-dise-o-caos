@@ -53,9 +53,19 @@ export const chatCardControlVariants = cva(
 
 export const chatCardDescriptionVariants = cva(
   [
-    'm-0 min-w-0 truncate font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
+    'm-0 min-w-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
     'text-ds-primitives-typography-size-md leading-ds-typography-body-line-height-short-md text-ds-text-neutral-gray',
-  ].join(' ')
+  ].join(' '),
+  {
+    variants: {
+      /** Una línea (átomo, 18) o dos (lista de la pantalla Chat, 36) antes de los puntos suspensivos. */
+      lines: {
+        1: 'truncate',
+        2: 'line-clamp-2 break-words',
+      },
+    },
+    defaultVariants: { lines: 1 },
+  }
 );
 
 export const chatCardMetaVariants = cva('flex shrink-0 flex-col items-end justify-center gap-ds-space-general-lg');
