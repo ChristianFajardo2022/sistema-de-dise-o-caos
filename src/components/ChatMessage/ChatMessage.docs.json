@@ -1,0 +1,27 @@
+{
+  "name": "ChatMessage",
+  "component": "ChatMessage",
+  "description": "Mensaje de una conversación, fiel al component set Conversacion (Atom) de Figma (14948:8400), Property 1 Default, Variant2 y Variant3. Fila con avatar de 32 y burbuja de radio completo: incoming (Default) con avatar a la izquierda y burbuja background/acent/secondary (unicolor, texto text/neutral/black-unicolor); outgoing (Variant2 y Variant3) con burbuja background/general/gray-seventh y avatar a la derecha. type=\"audio\" (Variant3) estira la burbuja para un ChatAudioPlayer. Es un li: va dentro de ChatMessageList, que es un ScrollArea con role=\"log\" y aria-live=\"polite\" (los mensajes nuevos se anuncian sin interrumpir y la lista baja sola si ya estaba abajo) y envuelve los mensajes en un ol. El autor y la hora no se dibujan (Figma no los tiene) pero se leen antes del contenido (\"Ana Pérez, 20:14: Hola\"), la hora en un time; el avatar es decorativo.",
+  "category": "Data Display",
+  "props": {
+    "direction": { "type": "'incoming' | 'outgoing'", "default": "'incoming'", "description": "Property 1 de Figma: Default = incoming; Variant2 y Variant3 = outgoing." },
+    "type": { "type": "'text' | 'audio'", "default": "'text'", "description": "audio = Variant3: la burbuja ocupa el ancho libre." },
+    "children": { "type": "ReactNode", "required": true, "description": "Texto del mensaje o un ChatAudioPlayer." },
+    "author": { "type": "string", "required": true, "description": "Autor, solo para lectores de pantalla." },
+    "time": { "type": "string", "required": false, "description": "Hora, solo para lectores (en un time)." },
+    "dateTime": { "type": "string", "required": false, "description": "dateTime ISO del time." },
+    "avatar": { "type": "ReactNode", "required": false, "description": "Avatar photo sm (32), decorativo." },
+    "className": { "type": "string", "required": false, "description": "Clases del li raíz." }
+  },
+  "subcomponents": {
+    "ChatMessageList": {
+      "aria-label": { "type": "string", "required": true, "description": "Nombre del registro (p. ej. \"Mensajes con Ana Pérez\")." },
+      "stickToBottom": { "type": "boolean", "default": "true", "description": "Baja al último mensaje al llegar uno nuevo si la lista ya estaba abajo; también re-ancla si el contenido crece después del render (una imagen que carga)." },
+      "scrollToBottomKey": { "type": "unknown", "required": false, "description": "Al cambiar, baja siempre al final aunque la lista no estuviera abajo. Cambiarlo cuando la persona envía un mensaje (id del último enviado), para que vea lo que envió." },
+      "maxHeight": { "type": "string | number", "required": false, "description": "Alto máximo (de ScrollArea)." }
+    }
+  },
+  "examples": [
+    { "title": "Conversación", "code": "<ChatMessageList aria-label=\"Mensajes con Ana Pérez\" className=\"h-96\">\n  <ChatMessage author=\"Ana Pérez\" time=\"09:12\" avatar={<Avatar variant=\"photo\" size=\"sm\" src={foto} alt=\"\" />}>Hola</ChatMessage>\n  <ChatMessage direction=\"outgoing\" type=\"audio\" author=\"Tú\" time=\"09:13\" avatar={…}>\n    <ChatAudioPlayer duration={42} src={url} />\n  </ChatMessage>\n</ChatMessageList>" }
+  ]
+}

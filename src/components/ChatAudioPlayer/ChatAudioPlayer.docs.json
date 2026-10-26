@@ -1,0 +1,26 @@
+{
+  "name": "ChatAudioPlayer",
+  "component": "ChatAudioPlayer",
+  "description": "Reproductor de un mensaje de audio: el marco Reproductor que repiten Conversacion (Atom) 14948:8400 (Variant3), Audio (Atom) 14894:2745 y la pantalla Chat 14562:57994. No es un set propio de Figma: se mide dentro de ChatMessage y ChatComposer. Button xs solo ícono (secondary o primary) que alterna play/pause y su nombre (\"Reproducir audio\" / \"Pausar audio\"); onda de barras de 3 con separación 3 y alto máximo 26, reproducidas en background/acent/tertiary y las demás en background/general/gray-fifth; duración m:ss en text/neutral/body. La onda es un input type=\"range\" nativo e invisible estirado sobre las barras: flechas (1 s), Inicio/Fin, clic y arrastre, con aria-valuetext \"0:05 de 20:14\" y foco visible sobre la onda (el Slider del sistema no se usa porque su pista y pulgar no se parecen a la onda). Con src maneja un audio interno; sin él es presentación controlada (playing/currentTime) o no controlada.",
+  "category": "Data Display",
+  "props": {
+    "duration": { "type": "number", "required": true, "description": "Duración en segundos (texto de la derecha)." },
+    "currentTime": { "type": "number", "required": false, "description": "Posición en segundos (controlado)." },
+    "defaultCurrentTime": { "type": "number", "default": "0", "description": "Posición inicial (no controlado)." },
+    "onCurrentTimeChange": { "type": "(seconds: number) => void", "required": false, "description": "Al mover la posición o con el avance del audio." },
+    "playing": { "type": "boolean", "required": false, "description": "Reproduciendo (controlado)." },
+    "defaultPlaying": { "type": "boolean", "default": "false", "description": "Reproduciendo al inicio (no controlado)." },
+    "onPlayingChange": { "type": "(playing: boolean) => void", "required": false, "description": "Al pulsar reproducir/pausar o al terminar." },
+    "src": { "type": "string", "required": false, "description": "URL del audio; activa el audio interno." },
+    "waveform": { "type": "readonly number[]", "required": false, "description": "Alturas 0–1 de las barras; por defecto la onda de Figma (179). Si no caben, se reduce a las barras que caben en el ancho (medido con ResizeObserver) para que la parte encendida coincida con la posición." },
+    "buttonVariant": { "type": "'secondary' | 'primary'", "default": "'secondary'", "description": "primary = composer móvil." },
+    "buttonPosition": { "type": "'start' | 'end'", "default": "'start'", "description": "Botón antes o después de la duración." },
+    "playLabel": { "type": "string", "default": "'Reproducir audio'", "description": "Nombre del botón en pausa." },
+    "pauseLabel": { "type": "string", "default": "'Pausar audio'", "description": "Nombre del botón reproduciendo." },
+    "seekLabel": { "type": "string", "default": "'Posición del audio'", "description": "Nombre del control de posición." }
+  },
+  "examples": [
+    { "title": "Con audio real", "code": "<ChatAudioPlayer duration={42} src=\"/audios/nota.mp3\" />" },
+    { "title": "Controlado", "code": "<ChatAudioPlayer duration={30} playing={playing} onPlayingChange={setPlaying} currentTime={t} onCurrentTimeChange={setT} />" }
+  ]
+}

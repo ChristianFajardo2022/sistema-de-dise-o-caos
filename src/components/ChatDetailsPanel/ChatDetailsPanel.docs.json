@@ -1,0 +1,25 @@
+{
+  "name": "ChatDetailsPanel",
+  "component": "ChatDetailsPanel",
+  "description": "Panel lateral de detalle de la conversación, fiel al component set Laterales (Atom) de Figma (14894:12557). Los nombres de Figma están a medias y aquí son vistas: Photo = perfil (avatar, nombre, descripción, filas Documentos y Fotografías y galería), Type4 = riel plegado de 64, Document = documentos, Phot = fotografías, Type6 = documentos con acciones (eliminar, descargar), Type5 = fotografías con acciones. Es un aside con nombre; con collapsible dibuja el botón de plegar (aria-expanded y aria-controls). Se compone con ChatDetailsHeader (Anterior + acciones), ChatDetailsProfile (encabezado con nivel configurable), ChatDetailsLink (ListItem complex con Avatar icon y la acción navegar: el título es un button —o un a con href— estirado sobre la fila, con chevron-right; es un li y va dentro de un ul; compact = solo el ícono, un botón para el riel; el ref apunta al control en los dos modos) y ChatDetailsGrid (ScrollArea con role=region y nombre, siempre presente, y una lista de 2 columnas sin nombre propio para no repetirlo, para FileCard thumbnail o icon). Foco al cambiar de vista: es responsabilidad de quien compone las vistas, porque cambiar de vista desmonta el botón pulsado. Al abrir una vista, el foco va al botón Anterior (backRef de ChatDetailsHeader); al volver, a la ChatDetailsLink de la vista que se cerró (su ref). Ver la historia Interactive y el patrón de la pantalla de chat. Ícono del botón de plegar: diferencia aceptada con Figma. Figma usa chevron-right en los dos estados; el código usa chevron-left plegado (indica hacia dónde se abre) y chevron-right desplegado, y aria-expanded da el estado. Pendiente de confirmar con diseño. children puede ser una función que recibe { collapsed }. Type6 y Type5 traen en Figma un trazo de 1 y Type6 un gap de 32 que las demás vistas no tienen: no son prop (se pasan por className si hace falta).",
+  "category": "Data Display",
+  "props": {
+    "aria-label": { "type": "string", "required": true, "description": "Nombre del aside." },
+    "collapsible": { "type": "boolean", "default": "false", "description": "Botón de plegar arriba." },
+    "collapsed": { "type": "boolean", "required": false, "description": "Plegado (controlado)." },
+    "defaultCollapsed": { "type": "boolean", "default": "false", "description": "Plegado al inicio (no controlado)." },
+    "onCollapsedChange": { "type": "(collapsed: boolean) => void", "required": false, "description": "Al plegar o desplegar." },
+    "collapseLabel": { "type": "string", "default": "'Ocultar detalles'", "description": "Nombre del botón desplegado." },
+    "expandLabel": { "type": "string", "default": "'Mostrar detalles'", "description": "Nombre del botón plegado." },
+    "children": { "type": "ReactNode | ({ collapsed }) => ReactNode", "required": false, "description": "Contenido del panel." }
+  },
+  "subcomponents": {
+    "ChatDetailsHeader": { "onBack": "() => void", "backLabel": "string = 'Anterior'", "backRef": "Ref<HTMLButtonElement> (para dar el foco a Anterior al abrir la vista)", "actions": "ReactNode" },
+    "ChatDetailsProfile": { "avatar": "ReactNode", "name": "ReactNode (requerido)", "description": "ReactNode", "headingLevel": "2-6 = 2" },
+    "ChatDetailsLink": { "icon": "IconName (requerido)", "children": "string (requerido)", "compact": "boolean", "onClick": "(event) => void", "href": "string (solo modo normal: enlace)", "disabled": "boolean", "ref": "el control (button o a)" },
+    "ChatDetailsGrid": { "aria-label": "string (requerido)", "children": "FileCard…" }
+  },
+  "examples": [
+    { "title": "Perfil", "code": "<ChatDetailsPanel aria-label=\"Detalles de la conversación\" collapsible>\n  {({ collapsed }) => collapsed ? <…riel…/> : (\n    <>\n      <ChatDetailsProfile avatar={…} name=\"Ana Pérez\" description=\"Cliente desde 2021\" />\n      <ul className=\"m-0 list-none p-0\">\n        <ChatDetailsLink ref={documentosRef} icon=\"folder\" onClick={verDocumentos}>Documentos</ChatDetailsLink>\n        <ChatDetailsLink ref={fotosRef} icon=\"gallery\" onClick={verFotos}>Fotografías</ChatDetailsLink>\n      </ul>\n      <ChatDetailsGrid aria-label=\"Fotografías\">{fotos.map((f) => <FileCard key={f.id} type=\"thumbnail\" title={f.nombre} src={f.url} selection=\"checkbox\" className=\"size-auto aspect-square w-full\" />)}</ChatDetailsGrid>\n    </>\n  )}\n</ChatDetailsPanel>" }
+  ]
+}

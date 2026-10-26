@@ -1,0 +1,27 @@
+{
+  "name": "ChatComposer",
+  "component": "ChatComposer",
+  "description": "Campo para escribir de la conversación, fiel al component set Audio (Atom) de Figma (14894:2745); pese al nombre de Figma es el composer, no el mensaje de audio. Set con errores: dos variantes se llaman State=State3 y una de ellas (la primera) separa las filas 16 en vez de 32 y pone reproducir a la derecha. Es un form: Enter o el botón Enviar (Button primary send2) llaman a onSend con el texto sin espacios de los extremos (vacío no envía); Shift+Enter hace un salto de línea y Enter no envía mientras un IME compone (también en Safari, donde el Enter que confirma llega con keyCode 229). Enviar queda habilitado con el campo vacío y no hace nada (decisión documentada: no se deshabilita para no sacarlo del orden de tabulación). El textarea tiene una etiqueta sr-only (label, por defecto \"Mensaje\") y crece con el texto hasta 7 líneas con field-sizing: content (mejora progresiva: Firefox no lo soporta y el campo queda en 2 filas con desplazamiento). Grabar (Button secondary con maximize-circle-2, el micrófono de Figma) aparece con onRecord. attachments pone los adjuntos en la fila inferior (State4); audio reemplaza el campo por el audio grabado (State3) y lleva Grabar y Enviar (onSendAudio) a la derecha de la fila inferior. touch usa botones sm e íconos de 20, como el composer móvil de la pantalla Chat. No usa Textarea: el campo de Figma no es el General input (sin label flotante ni borde) sino un recuadro relleno; el relleno de Figma no está enlazado (#45484d) y se usa background/field/surface-secondary.",
+  "category": "Data Display",
+  "props": {
+    "value": { "type": "string", "required": false, "description": "Texto (controlado)." },
+    "defaultValue": { "type": "string", "default": "''", "description": "Texto inicial (no controlado)." },
+    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "En cada cambio." },
+    "onSend": { "type": "(message: string) => void", "required": false, "description": "Enviar (Enter o botón). Sin value controlado, vacía el campo." },
+    "placeholder": { "type": "string", "default": "'Escribe un mensaje...'", "description": "Texto de ayuda." },
+    "label": { "type": "string", "default": "'Mensaje'", "description": "Etiqueta sr-only del campo." },
+    "sendLabel": { "type": "string", "default": "'Enviar mensaje'", "description": "Nombre del botón Enviar." },
+    "onRecord": { "type": "() => void", "required": false, "description": "Dibuja el botón Grabar." },
+    "recordLabel": { "type": "string", "default": "'Grabar audio'", "description": "Nombre del botón Grabar." },
+    "attachments": { "type": "ReactNode", "required": false, "description": "Botones de adjuntos (fila inferior)." },
+    "audio": { "type": "ReactNode", "required": false, "description": "Audio grabado (ChatAudioPlayer) en lugar del campo." },
+    "onSendAudio": { "type": "() => void", "required": false, "description": "Con audio: dibuja Enviar en la fila inferior." },
+    "touch": { "type": "boolean", "default": "false", "description": "Botones grandes (composer móvil)." },
+    "disabled": { "type": "boolean", "default": "false", "description": "Deshabilita campo y botones propios." },
+    "textareaProps": { "type": "TextareaHTMLAttributes", "required": false, "description": "Props extra del textarea. El ref del composer va al textarea y es null mientras hay audio (el campo no se monta)." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<ChatComposer onSend={enviar} onRecord={grabar} />" },
+    { "title": "Con audio grabado", "code": "<ChatComposer attachments={adjuntos} audio={<ChatAudioPlayer duration={9} src={grabacion} />} onRecord={grabar} onSendAudio={enviarAudio} />" }
+  ]
+}
