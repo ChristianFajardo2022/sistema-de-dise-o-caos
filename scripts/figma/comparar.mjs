@@ -106,16 +106,10 @@ function crearResolvedor(spec, tema) {
   return { colorDe, numDe, colorPintura, primerSolido, colorEfecto };
 }
 
-function recorrer(nodo, fn) {
-  // Lo oculto en Figma (y todo lo que cuelga de ahí) no se dibuja: no se mide
-  if (nodo.oculto) return;
-  fn(nodo);
-  (nodo.hijos || []).forEach((h) => recorrer(h, fn));
-}
-
 // ───────────────────────── medición en la página ─────────────────────────
 /** Se ejecuta en el navegador. Devuelve valores crudos ya normalizados a rgba. */
 function medirEnPagina({ nombre, partes }) {
+  const busca = (x) => x.busca ?? x.nombre;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -150,16 +144,24 @@ function medirEnPagina({ nombre, partes }) {
     if (v.endsWith('%')) return (parseFloat(v) / 100) * el.getBoundingClientRect().width;
     return px(v);
   };
-  const sombras = [];
-  if (cs.boxShadow && cs.boxShadow !== 'none') {
-    const partes2 = cs.boxShadow.split(/,(?![^(]*\))/);
-    for (const p of partes2) {
+  // box-shadow computado -> lista. Tailwind v4 compone `--tw-inset-shadow, --tw-inset-ring-shadow,
+  // --tw-ring-offset-shadow, --tw-ring-shadow, --tw-shadow` y el valor trae sombras nulas
+  // (`rgba(0,0,0,0) 0 0 0 0`) antes de la real: no dibujan nada y se descartan (H1).
+  const cajas = (el) => {
+    const css = getComputedStyle(el).boxShadow;
+    const res = [];
+    if (!css || css === 'none') return res;
+    for (const p of css.split(/,(?![^(]*\))/)) {
       const inset = /\binset\b/.test(p);
       const col = /(rgba?\([^)]*\)|color\([^)]*\)|oklch\([^)]*\)|oklab\([^)]*\)|#[0-9a-f]+)/i.exec(p);
       const resto = p.replace(col ? col[0] : '', '').replace('inset', '').trim().split(/\s+/).map(px);
-      sombras.push({ inset, color: rgba(col ? col[0] : null), x: resto[0] || 0, y: resto[1] || 0, blur: resto[2] || 0, spread: resto[3] || 0 });
+      const s = { inset, color: rgba(col ? col[0] : null), x: resto[0] || 0, y: resto[1] || 0, blur: resto[2] || 0, spread: resto[3] || 0 };
+      const nula = s.x === 0 && s.y === 0 && s.blur === 0 && s.spread === 0 && (!s.color || s.color[3] === 0);
+      if (!nula) res.push(s);
     }
-  }
+    return res;
+  };
+  const sombras = cajas(raiz);
   // `filter: drop-shadow(...)` (siluetas con muesca): en la raíz y en la capa de superficie `Canva`.
   // drop-shadow no admite spread; el valor computado trae el color primero.
   const filtros = (el) => {
@@ -183,7 +185,14 @@ function medirEnPagina({ nombre, partes }) {
     return res;
   };
   sombras.push(...filtros(raiz));
-  for (const capa of raiz.querySelectorAll(sel('Canva'))) sombras.push(...filtros(capa).map((f) => ({ ...f, deCanva: true })));
+  // Capa de superficie `Canva`: filter y box-shadow, en la capa (on-card) o en su primer hijo (on-canva) (H2)
+  for (const capa of raiz.querySelectorAll(sel('Canva'))) {
+    // Si la capa ya trae sombra (on-card) se usa esa; la del primer hijo es la variante on-canva y solo cuenta
+    // cuando la capa no tiene ninguna (si no, cada tarjeta mostraría dos sombras)
+    let propias = [...filtros(capa), ...cajas(capa)];
+    if (!propias.length && capa.firstElementChild) propias = cajas(capa.firstElementChild);
+    sombras.push(...propias.map((f) => ({ ...f, deCanva: true })));
+  }
   // Distancia real entre los dos primeros hijos visibles (para gaps negativos de Figma, que en CSS son márgenes)
   const hijosVis = [...raiz.children].filter((h) => h.getBoundingClientRect().height > 0 || h.getBoundingClientRect().width > 0);
   const vertical = cs.flexDirection.startsWith('column') || (cs.display !== 'flex' && cs.display !== 'inline-flex');
@@ -193,6 +202,8 @@ function medirEnPagina({ nombre, partes }) {
     const b = hijosVis[1].getBoundingClientRect();
     gapReal = vertical ? b.top - a.bottom : b.left - a.right;
   }
+  // Hijos absolutos + posición del primer texto respecto de la raíz (H4: gaps negativos de Figma)
+  const hayAbs = [...raiz.children].some((h) => getComputedStyle(h).position === 'absolute');
   const lados = ['Top', 'Right', 'Bottom', 'Left'];
   const borde = {
     grosores: lados.map((l) => px(cs[`border${l}Width`]) * (cs[`border${l}Style`] === 'none' ? 0 : 1)),
@@ -205,6 +216,7 @@ function medirEnPagina({ nombre, partes }) {
       padding: lados.map((l) => px(cs[`padding${l}`])),
       columnGap: px(cs.columnGap),
       gapReal,
+      hayAbs,
       rowGap: px(cs.rowGap),
       radios: ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'].map((c) => radio(`border${c}Radius`, raiz, cs)),
       fondo: rgba(cs.backgroundColor),
@@ -227,6 +239,29 @@ function medirEnPagina({ nombre, partes }) {
     if (el.matches('input:not([type=checkbox]):not([type=radio]), textarea')) return el;
     return el.querySelector('input:not([type=checkbox]):not([type=radio]), textarea');
   };
+  // Primer texto visual (menor y, luego menor x): el orden del DOM no siempre es el orden en que se ve (H4)
+  const primerTextoVisual = (el) => {
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let t, mejor = null, mb = null;
+    while ((t = w.nextNode())) {
+      if (!t.textContent.trim()) continue;
+      const p = t.parentElement;
+      const b = p.getBoundingClientRect();
+      if (!b.width && !b.height) continue;
+      if (!mejor || b.top < mb.top - 0.5 || (Math.abs(b.top - mb.top) <= 0.5 && b.left < mb.left)) {
+        mejor = p;
+        mb = b;
+      }
+    }
+    return mejor || primerTexto(el);
+  };
+  {
+    const pt = primerTextoVisual(raiz);
+    if (pt) {
+      const b = pt.getBoundingClientRect();
+      out.raiz.primerTextoPos = { x: b.left - r.left, y: b.top - r.top };
+    }
+  }
   const medirTexto = (el) => {
     const campo = el.matches('input, textarea');
     // Campo vacío: lo que se ve es el placeholder, con su propio color
@@ -245,12 +280,12 @@ function medirEnPagina({ nombre, partes }) {
   const marcados = (n) => [...(raiz.matches(sel(n)) ? [raiz] : []), ...raiz.querySelectorAll(sel(n))];
   for (const t of partes.textos) {
     let el = null;
-    const todos = marcados(t.nombre);
+    const todos = marcados(busca(t));
     out.conteos[t.nombre] = todos.length;
     if (t.parte) {
       // Un nombre puede repetirse en elementos que no son este texto (p. ej. un botón de otra parte llamado
       // igual): para un nodo TEXT solo se emparejan los marcados con texto propio y sin hijos marcados iguales
-      const conTexto = todos.filter((x) => primerTexto(x) && !x.querySelector(sel(t.nombre)));
+      const conTexto = todos.filter((x) => primerTexto(x) && !x.querySelector(sel(busca(t))));
       const e = (conTexto.length >= 1 && conTexto.length < todos.length ? conTexto : todos)[t.ord] || null;
       el = e && (primerTexto(e) || e);
     }
@@ -258,13 +293,48 @@ function medirEnPagina({ nombre, partes }) {
     if (el) out.textos[t.nombre + '#' + t.ord] = medirTexto(el);
   }
   const svgs = [...raiz.querySelectorAll('svg')];
+  // Íconos sin marca propia: se emparejan por cercanía de posición respecto de la raíz (no por orden del DOM)
+  const libresDe = (ic) =>
+    svgs.filter((x) => {
+      const dueno = x.closest('[data-figma-part]');
+      return !dueno || dueno.getAttribute('data-figma-part') === busca(ic);
+    });
+  // Candidatos de un ícono: los svg de las partes marcadas con su nombre o, si no hay marcadas, los libres
+  const candidatos = (ic) => {
+    const todos = marcados(busca(ic));
+    if (!todos.length) return libresDe(ic);
+    return todos.map((e) => (e.tagName.toLowerCase() === 'svg' ? e : e.querySelector('svg'))).filter(Boolean);
+  };
+  const asignado = new Map();
+  {
+    // Con una sola parte marcada el emparejamiento ya es trivial; con varias (o ninguna) se usa la posición
+    const pend = partes.iconos.map((ic, i) => ({ ic, i })).filter(({ ic }) => marcados(busca(ic)).length !== 1 && ic.pos);
+    const pares = [];
+    for (const { ic, i } of pend) {
+      for (const sv of candidatos(ic)) {
+        const b = sv.getBoundingClientRect();
+        pares.push({ i, sv, d: Math.hypot(b.left - r.left - ic.pos.x, b.top - r.top - ic.pos.y) });
+      }
+    }
+    pares.sort((a, b) => a.d - b.d);
+    const usados = new Set();
+    for (const p of pares) {
+      if (asignado.has(p.i) || usados.has(p.sv)) continue;
+      asignado.set(p.i, p.sv);
+      usados.add(p.sv);
+    }
+  }
   partes.iconos.forEach((ic, i) => {
     let svg = null;
-    const todos = marcados(ic.nombre);
+    const todos = marcados(busca(ic));
     out.conteos[ic.nombre] = todos.length;
     const e = todos[ic.ord];
-    if (e) svg = e.tagName.toLowerCase() === 'svg' ? e : e.querySelector('svg');
-    if (!svg && todos.length === 0) svg = svgs[i] || null;
+    if (asignado.has(i)) svg = asignado.get(i);
+    else if (e) svg = e.tagName.toLowerCase() === 'svg' ? e : e.querySelector('svg');
+    if (!svg && todos.length === 0) {
+      // Respaldo por posición (H3: se ignoran los svg que viven dentro de otra parte marcada con otro nombre)
+      svg = asignado.get(i) || libresDe(ic)[i] || null;
+    }
     if (!svg) return;
     const b = svg.getBoundingClientRect();
     const c = getComputedStyle(svg);
@@ -288,6 +358,21 @@ function crearComparacion(tol) {
   };
   const txt = (prop, figma, sb, ok) => lista.push({ propiedad: prop, figma, storybook: sb, ok });
   return { lista, num, col, txt };
+}
+
+/** Posición {x,y} del primer nodo de texto visible respecto de la raíz (suma de x/y de los ancestros). */
+function posPrimerTexto(raiz) {
+  // El primero en orden visual (menor y, luego menor x), igual que en la página
+  let mejor = null;
+  const buscar = (nodo, x, y) => {
+    if (nodo.oculto) return;
+    if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
+      if (!mejor || y < mejor.y - 0.5 || (Math.abs(y - mejor.y) <= 0.5 && x < mejor.x)) mejor = { x, y };
+    }
+    for (const h of nodo.hijos || []) buscar(h, x + (h.x || 0), y + (h.y || 0));
+  };
+  buscar(raiz, 0, 0);
+  return mejor;
 }
 
 function compararVariante(variante, m, spec, tema, tol) {
@@ -316,12 +401,29 @@ function compararVariante(variante, m, spec, tema, tol) {
       const gap = R.numDe(lay.gap, v.itemSpacing);
       // Un gap negativo no existe en CSS (se resuelve con margen negativo): se mide la distancia real entre hermanos
       const medido = gap < 0 && rz.gapReal != null ? rz.gapReal : lay.modo === 'VERTICAL' ? rz.rowGap : rz.columnGap;
-      num(lay.modo === 'VERTICAL' ? 'gap (row-gap)' : 'gap (column-gap)', gap, medido);
+      const pos = gap < 0 && rz.hayAbs && rz.primerTextoPos ? posPrimerTexto(n) : null;
+      if (pos) {
+        // Gap negativo con hijos absolutos: en Figma el aire va por fuera de la caja y en código dentro (padding),
+        // así que la distancia entre cajas no es comparable; se compara dónde queda el primer texto (H4)
+        const eje = lay.modo === 'VERTICAL' ? 'y' : 'x';
+        num(`posición ${eje} del primer texto (gap negativo ${gap})`, pos[eje], rz.primerTextoPos[eje]);
+      } else num(lay.modo === 'VERTICAL' ? 'gap (row-gap)' : 'gap (column-gap)', gap, medido);
     }
   }
 
   // radio
-  if (n.radio !== undefined) {
+  // Raíz de Figma sin relleno ni trazo: el radio no se ve ahí (vive en un hijo) y el código lo necesita en la raíz
+  // para recortar la sombra; no se compara (H5)
+  // Solo se omite cuando Figma da radio 0 y el código tiene radio (si Figma pide un radio, se sigue comparando).
+  const sinCuerpo =
+    !R.primerSolido(n.rellenos) &&
+    !(n.trazos && n.trazos.length) &&
+    (n.hijos || []).some((h) => !h.oculto) &&
+    [].concat(n.radio ?? 0).every((x) => x === 0) &&
+    rz.radios.some((x) => x > 0);
+  if (n.radio !== undefined && sinCuerpo) {
+    lista.push({ propiedad: 'border-radius (raíz sin relleno ni trazo)', figma: 'no se compara', storybook: +rz.radios[0].toFixed(3), ok: true });
+  } else if (n.radio !== undefined) {
     const esquinas = ['topLeftRadius', 'topRightRadius', 'bottomRightRadius', 'bottomLeftRadius'];
     const nombres = ['sup-izq', 'sup-der', 'inf-der', 'inf-izq'];
     const valores = Array.isArray(n.radio) ? n.radio : [n.radio, n.radio, n.radio, n.radio];
@@ -553,23 +655,31 @@ async function main() {
   const slugDe = (v) =>
     v.png ? path.basename(v.png, path.extname(v.png)) : v.nombre.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
+  // Mapa opcional de alias (fuera del repo): nombre de capa en Figma -> data-figma-part en código
+  let aliasCarpeta = {};
+  try {
+    aliasCarpeta = JSON.parse(fs.readFileSync(path.join(RAIZ, '.qa', 'figma', 'alias.json'), 'utf8'))[args.carpeta] || {};
+  } catch {}
+
   const variantes = spec.variantes.map((v) => {
     const textos = [];
     const iconos = [];
     let primero = true;
     const ords = {};
     const ordDe = (n) => (ords[n] = (ords[n] ?? -1) + 1);
-    recorrer(v.arbol, (nodo) => {
+    const visitar = (nodo, x, y) => {
       if (nodo.oculto) return;
       if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
-        textos.push({ nombre: nodo.nombre, nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre) });
+        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre) });
         primero = false;
       }
       if (nodo.icono) {
         const size = nodo.instancia?.variante?.Size;
-        iconos.push({ nombre: nodo.nombre, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined });
+        iconos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], pos: { x, y }, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined });
       }
-    });
+      for (const h of nodo.hijos || []) visitar(h, x + (h.x || 0), y + (h.y || 0));
+    };
+    visitar(v.arbol, 0, 0);
     return { def: v, slug: slugDe(v), textos, iconos };
   });
 
@@ -620,7 +730,7 @@ async function main() {
         const salida = resultado.variantes[i].porTema;
         const m = await page.evaluate(medirEnPagina, {
           nombre: v.def.nombre,
-          partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, parte: t.parte, primero: t.primero, ord: t.ord })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, ord: x.ord })) },
+          partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos })) },
         });
         if (!m) {
           salida[tema] = { encontrada: false, comparaciones: [] };
