@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+import { TOP_LAYER_CLASS, TOP_LAYER_MAX_WIDTH } from '../_internal/overlay';
 
 /**
  * CAOS Design System — DatePicker Variants
@@ -48,7 +49,7 @@ export const datePickerButtonVariants = cva(
 export const datePickerPanelVariants = cva('m-0 border-0 bg-transparent p-0 overflow-visible', {
   variants: {
     placement: {
-      popover: 'max-w-[calc(100vw-2*0.5rem)] [inset:auto]',
+      popover: `${TOP_LAYER_CLASS} ${TOP_LAYER_MAX_WIDTH}`,
       inline: 'absolute right-0 top-full z-10 mt-ds-space-general-lg max-w-[calc(100vw-2*0.5rem)]',
     },
   },

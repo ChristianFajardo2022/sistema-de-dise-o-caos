@@ -9,6 +9,7 @@ import { dropdownMenuItemIconVariants, dropdownMenuItemTextVariants, dropdownMen
 import type { DropdownMenuItemState } from '../DropdownMenu/DropdownMenu.types';
 import { FIELD_ICON_SLOT, FieldLabel, FieldMessage, FieldRow, joinIds, useField } from '../Field';
 import { Icon } from '../Icon';
+import { TOP_LAYER_CLASS, TOP_LAYER_MAX_WIDTH } from '../_internal/overlay';
 import { useAnchoredPosition } from '../../utils/anchoredPosition';
 import { cn } from '../../utils/cn';
 import { useMergedRefs } from '../../utils/refs';
@@ -447,7 +448,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           <div
             ref={popoverRef}
             popover="manual"
-            className="m-0 max-w-[calc(100vw-2*0.5rem)] overflow-visible border-0 bg-transparent p-0 [inset:auto]"
+            className={`${TOP_LAYER_CLASS} ${TOP_LAYER_MAX_WIDTH}`}
           >
             {listbox}
           </div>

@@ -31,3 +31,29 @@ export function maskStyle(layers: MaskLayer[], subtractFirst = false): CSSProper
   }
   return style;
 }
+
+/**
+ * Máscara de la silueta. `a` = ancho y alto de la muesca desde la esquina superior derecha, `v` = radio de las esquinas
+ * convexas, `c` = radio de la curva cóncava (por defecto `a - v`: la curva va de un tramo convexo al otro sin tramos
+ * rectos, la geometría de `radius="2xl"`). Con `c < a - v` quedan tramos rectos entre las curvas.
+ */
+export function notchMask(a: number, v: number, c = a - v): CSSProperties {
+  const k = a - c;
+  // Tramo recto del fondo de la muesca entre la curva cóncava y la esquina convexa del borde derecho
+  const flat = a - v - c;
+  return maskStyle([
+    // Todo lo que queda a la izquierda de la muesca
+    [SOLID_MASK, `calc(100% - ${a + v}px) 100%`, 'left top'],
+    // Todo lo que queda debajo de la muesca
+    [SOLID_MASK, `100% calc(100% - ${a + v}px)`, 'left bottom'],
+    // Esquina convexa antes de la muesca
+    [`radial-gradient(circle at 0 100%,#000 ${v - 0.5}px,transparent ${v + 0.5}px)`, `${v}px ${v}px`, `right ${a}px top 0`],
+    [SOLID_MASK, `${v}px ${a}px`, `right ${a}px top ${v}px`],
+    // Curva cóncava
+    [`radial-gradient(circle at 100% 0,transparent ${c - 0.5}px,#000 ${c + 0.5}px)`, `${c}px ${c}px`, `right ${k}px top ${k}px`],
+    [SOLID_MASK, `${c}px ${v}px`, `right ${k}px top ${a}px`],
+    ...(flat > 0 ? [[SOLID_MASK, `${flat}px ${v}px`, `right ${v}px top ${a}px`] as MaskLayer] : []),
+    // Esquina convexa al bajar por el borde derecho
+    [`radial-gradient(circle at 0 100%,#000 ${v - 0.5}px,transparent ${v + 0.5}px)`, `${v}px ${v}px`, `right 0 top ${a}px`],
+  ]);
+}

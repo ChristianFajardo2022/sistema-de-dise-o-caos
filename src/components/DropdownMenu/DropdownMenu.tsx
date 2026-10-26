@@ -3,6 +3,7 @@ import type { KeyboardEvent, ReactElement, Ref, SyntheticEvent } from 'react';
 import { DropdownMenuContext } from './DropdownMenu.context';
 import type { DropdownMenuProps, DropdownMenuTriggerProps } from './DropdownMenu.types';
 import { DropdownMenuPanel } from './DropdownMenuPanel';
+import { TOP_LAYER_CLASS, TOP_LAYER_MAX_WIDTH } from '../_internal/overlay';
 import { useAnchoredPosition } from '../../utils/anchoredPosition';
 import { assignRef } from '../../utils/refs';
 
@@ -245,7 +246,7 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
           onBeforeToggle={handleBeforeToggle}
           onToggle={handleToggle}
           onKeyDown={handlePanelKeyDown}
-          className="m-0 max-w-[calc(100vw-2*0.5rem)] overflow-visible border-0 bg-transparent p-0 [inset:auto]"
+          className={`${TOP_LAYER_CLASS} ${TOP_LAYER_MAX_WIDTH}`}
         >
           <DropdownMenuContext.Provider value={context}>
             <DropdownMenuPanel {...panelProps} type={type} mode={mode}>
