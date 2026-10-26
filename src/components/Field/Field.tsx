@@ -3,6 +3,7 @@ import type { FieldMessageData } from './Field.types';
 import { FIELD_FOCUS_RING, FIELD_ICON_SLOT } from './Field.utils';
 import { inputLabelVariants } from '../Input/Input.variants';
 import { Icon } from '../Icon';
+import { Tooltip } from '../Tooltip/Tooltip';
 import { NotificationText } from '../NotificationText';
 import type { NotificationTextProps } from '../NotificationText/NotificationText.types';
 import { cn } from '../../utils/cn';
@@ -16,7 +17,8 @@ import { cn } from '../../utils/cn';
  * - `FieldMessage`: el mensaje con NotificationText dentro de **una** región viva `aria-live="polite"` siempre montada
  *   (vacía no ocupa sitio ni suma gap). Ningún control usa `role="alert"`: el error se anuncia por la región y se lee
  *   con `aria-describedby` al volver al campo.
- * - `FieldTooltip`: el texto sr-only (lo referencia `aria-describedby` del control) y el botón del ícono de información.
+ * - `FieldTooltip`: el texto sr-only (lo referencia `aria-describedby` del control) y el botón del ícono de información,
+ *   que abre el texto en un Tooltip en modo toggletip (clic, toque, Enter o Espacio; Escape o clic fuera lo cierran).
  * - `FieldRow`: fila del campo + tooltip.
  * - `FieldLabel`: label flotante de Input (`inputLabelVariants`) con el sufijo " | Opcional".
  * - El marco es `inputFieldVariants` (Input): alto, padding y radio se ajustan con `className` (cn() resuelve el
@@ -51,26 +53,30 @@ export interface FieldTooltipProps {
   icon?: ReactNode;
 }
 
-/** Ícono de información fuera del campo: el texto queda sr-only para `aria-describedby` y como nombre del botón. */
+/**
+ * Ícono de información fuera del campo: el texto queda sr-only para `aria-describedby` y como nombre del botón, y se ve
+ * en un toggletip (el texto solo vive ahí: con hover no bastaría en táctil ni con teclado).
+ */
 export function FieldTooltip({ id, text, disabled = false, icon }: FieldTooltipProps) {
   return (
     <>
       <span id={id} className="sr-only">
         {text}
       </span>
-      <button
-        type="button"
-        aria-label={text}
-        title={text}
-        className={cn(
-          FIELD_ICON_SLOT,
-          'cursor-help rounded-sm border-0 bg-transparent p-0',
-          FIELD_FOCUS_RING,
-          disabled ? '[--ico:var(--color-ds-icon-general-disabled-positive)]' : '[--ico:var(--color-ds-icon-general-white)]'
-        )}
-      >
-        {icon ?? <Icon name="info-circle" size={16} variant="fill" />}
-      </button>
+      <Tooltip mode="toggletip" content={text}>
+        <button
+          type="button"
+          aria-label={text}
+          className={cn(
+            FIELD_ICON_SLOT,
+            'cursor-help rounded-sm border-0 bg-transparent p-0',
+            FIELD_FOCUS_RING,
+            disabled ? '[--ico:var(--color-ds-icon-general-disabled-positive)]' : '[--ico:var(--color-ds-icon-general-white)]'
+          )}
+        >
+          {icon ?? <Icon name="info-circle" size={16} variant="fill" />}
+        </button>
+      </Tooltip>
     </>
   );
 }

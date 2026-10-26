@@ -35,6 +35,9 @@ export default defineConfig({
         ],
         test: {
           name: 'storybook',
+          // El primer test de cada archivo absorbe la carga en frío del archivo (8–14 s con la máquina cargada): el
+          // límite por defecto del modo navegador (15 s) se quedaba corto
+          testTimeout: 30_000,
           browser: {
             enabled: true,
             headless: true,

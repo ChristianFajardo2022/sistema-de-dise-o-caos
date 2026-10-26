@@ -1,0 +1,40 @@
+{
+  "name": "Popover",
+  "component": "Popover",
+  "description": "Popover del sistema de diseño CAOS, fiel al set \"Tooltip\" de Figma (11112:6700): 8 posiciones de flecha (Type) × Photo yes/no. Panel de 305 con padding 16, radio 24 (0 en la esquina de la flecha), título Prospero semibold con ícono info-circle, texto, contador \"1 de 2\" y dos botones (Button xs tertiary y secondary, unicolor); con Photo, un bloque de medios (slot media, gap space/button/2xl con el texto) recortado por la silueta de radio 16 con la muesca del botón cerrar (Button corner md); lo de dentro es interactivo. En Figma se llama Tooltip, pero tiene botones y paginación, así que no es un tooltip: es un diálogo no modal anclado (role=\"dialog\" con aria-labelledby al título y aria-describedby al texto). Al abrir, el foco pasa al panel; Escape, el clic fuera, el botón cerrar o terminar el recorrido lo cierran y el foco vuelve a quien lo tenía al abrir. No atrapa el foco. Con step/totalSteps/onStepChange arma un recorrido paso a paso (Anterior / Siguiente / Finalizar) que puede señalar un elemento distinto en cada paso (anchor). Va en la capa superior (popover=\"auto\"); pasa al lado o la alineación opuestos si no cabe y la flecha se reubica para seguir apuntando al ancla. La superficie es unicolor (oscura en los dos temas): el contenido del panel usa siempre los tokens de Dark (data-theme=\"dark\"), también los botones y avatares del bloque de medios. Con otro panel de la capa superior abierto dentro (p. ej. el \"+N\" de un AvatarGroup), Escape cierra solo ese. Controlado: open debe seguir a onOpenChange; si el padre mantiene open cuando el usuario cierra, el panel se vuelve a abrir. Pasa actions, un recorrido o media con botón cerrar: sin ellos no hay un control visible para cerrarlo (con lector de pantalla en móvil no hay Escape) y en desarrollo se avisa por consola.",
+  "category": "Overlays",
+  "props": {
+    "trigger": { "type": "ReactElement", "required": false, "description": "Botón disparador. Recibe popovertarget, aria-expanded, aria-controls y aria-haspopup=\"dialog\"." },
+    "anchor": { "type": "HTMLElement | RefObject<HTMLElement | null> | null", "required": false, "description": "Ancla sin disparador (p. ej. el elemento de cada paso de un recorrido). Se controla con open/onOpenChange." },
+    "open": { "type": "boolean", "required": false, "description": "Abierto (controlado). Debe seguir a onOpenChange; si no acepta un cierre, el panel se vuelve a abrir." },
+    "defaultOpen": { "type": "boolean", "default": "false", "description": "Abierto al montar (no controlado)." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Se llama al abrir o cerrar." },
+    "arrow": { "type": "'top-left' | 'top-right' | 'middle-left' | 'middle-right' | 'bottom-left' | 'bottom-right' | 'center-top' | 'center-bottom'", "default": "'top-left'", "description": "Type de Figma: dónde está la flecha. El panel aparece del lado opuesto del ancla (top-left = debajo y hacia la derecha)." },
+    "title": { "type": "ReactNode", "required": false, "description": "Text title de Figma. Nombra el diálogo; sin título, pasar aria-label." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "2", "description": "Nivel del título." },
+    "icon": { "type": "boolean", "required": false, "description": "Icon de Figma. Por defecto true sin media y false con media, como en Figma." },
+    "children": { "type": "ReactNode", "required": false, "description": "Text de Figma: describe el diálogo." },
+    "media": { "type": "ReactNode", "required": false, "description": "Photo=yes: bloque de medios (en Figma, una captura de AvatarGroup + Button; aquí se arma con los componentes)." },
+    "closeButton": { "type": "boolean", "default": "true", "description": "Botón cerrar en la muesca del bloque de medios (solo con media)." },
+    "closeLabel": { "type": "string", "default": "'Cerrar'", "description": "Nombre accesible del botón cerrar." },
+    "page": { "type": "ReactNode", "required": false, "description": "Page de Figma: contador. Con step y totalSteps se arma solo." },
+    "actions": { "type": "ReactNode", "required": false, "description": "Actions de Figma: botones del pie. Reemplaza los del recorrido." },
+    "step": { "type": "number", "required": false, "description": "Paso actual del recorrido (desde 1)." },
+    "totalSteps": { "type": "number", "required": false, "description": "Total de pasos." },
+    "onStepChange": { "type": "(step: number) => void", "required": false, "description": "Cambio de paso. Activa los botones Anterior / Siguiente / Finalizar." },
+    "onFinish": { "type": "() => void", "required": false, "description": "Al pulsar Finalizar; después el panel se cierra." },
+    "formatStep": { "type": "(step: number, total: number) => ReactNode", "default": "'1 de 2'", "description": "Texto del contador." },
+    "previousLabel": { "type": "string", "default": "'Anterior'", "description": "Texto del botón Anterior." },
+    "nextLabel": { "type": "string", "default": "'Siguiente'", "description": "Texto del botón Siguiente." },
+    "finishLabel": { "type": "string", "default": "'Finalizar'", "description": "Texto del botón del último paso." },
+    "className": { "type": "string", "required": false, "description": "Clases del panel. El ref y el resto de props nativas también van al panel (role=\"dialog\")." }
+  },
+  "subcomponents": {
+    "PopoverPanel": "Dibujo del panel sin comportamiento (arrow, title, children, media, onClose, page, actions). Sin rol: Popover le pone role=\"dialog\"."
+  },
+  "examples": [
+    { "title": "Con disparador", "code": "<Popover\n  title=\"Nuevo panel de pedidos\"\n  trigger={<Button variant=\"secondary\" size=\"sm\">Ver novedades</Button>}\n  actions={<Button variant=\"secondary\" contrast=\"low\" size=\"xs\" unicolor>Entendido</Button>}\n>\n  Desde aquí ves el estado de cada pedido.\n</Popover>" },
+    { "title": "Recorrido", "code": "<Popover\n  anchor={targets[step - 1]}\n  open={open}\n  onOpenChange={setOpen}\n  arrow=\"center-top\"\n  title={steps[step - 1].title}\n  step={step}\n  totalSteps={steps.length}\n  onStepChange={setStep}\n>\n  {steps[step - 1].text}\n</Popover>" },
+    { "title": "Con medios", "code": "<Popover title=\"Tu equipo\" media={<><AvatarGroup aria-label=\"Participantes\">…</AvatarGroup><Button size=\"xs\">Unirme</Button></>} trigger={…}>…</Popover>" }
+  ]
+}
