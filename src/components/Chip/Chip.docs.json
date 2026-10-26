@@ -1,0 +1,34 @@
+{
+  "name": "Chip",
+  "component": "Chip",
+  "description": "Chip del sistema de diseño CAOS, fiel a los component sets Chips (id 9347:46000: Type Primary / Primary avatar / Primary color / Primary box × State Default / Hover / Focus / Select / Inactive) y Chips plus (id 15236:72238, el \"+N\"; el set tiene errores en Figma: cuatro variantes comparten el nombre State=Default, Size=lg). Cápsula con ícono de reloj, texto 12 y botón de quitar; Type cambia el adorno de la izquierda (ícono, avatar de 24 o punto de color de 24) y Primary box es la versión rectangular (radio 16) cuyo texto se parte en varias líneas. Default es un chip sin relleno con trazo de 0.5: el texto es blanco, por eso en la captura de Figma sobre fondo claro parece vacío (no es un placeholder). Select es el chip marcado, Inactive equivale a disabled. Semántica: sin acción es un span; con onClick es un botón; con selected/defaultSelected/onSelectedChange es un botón de alternancia (aria-pressed). Toda la cápsula (con su padding) es el área de clic del cuerpo; Quitar es un botón aparte \"Quitar <texto>\" (no anidado, de 24 × 24 por encima del cuerpo), y Supr/Retroceso sobre el cuerpo hacen lo mismo: en single y multiple es la única forma de quitar con teclado (el botón Quitar no es parada de tabulación). Al quitar, el foco pasa al chip vecino; si era el último, al \"+N\" o al propio grupo; en un chip suelto, el consumidor mueve el foco (onRemove recibe el evento). ChipGroup agrupa: single = radiogroup (role=radio, una parada de tabulación, flechas mueven y seleccionan), multiple = toolbar de botones de alternancia (patrón APG Toolbar: una parada de tabulación, flechas mueven el foco), none = group de chips independientes; con max el resto se resume en ChipPlus (\"+N\"), que abre un DropdownMenu con casillas (multiple), radios (single) o, en none, una lista solo informativa (o ítems de menú con la acción de los chips que tengan onClick; los que tienen onRemove no se ocultan). La prop state solo fuerza el aspecto en documentación.",
+  "category": "Data Display",
+  "props": {
+    "type": { "type": "'primary' | 'primary-avatar' | 'primary-color' | 'primary-box'", "default": "'primary'", "description": "Type de Figma." },
+    "children": { "type": "ReactNode", "required": false, "description": "Prop Text de Figma: texto del chip." },
+    "label": { "type": "string", "required": false, "description": "Texto plano para el nombre del botón de quitar cuando children no es un string." },
+    "icon": { "type": "boolean", "default": "true", "description": "Prop Icon de Figma (primary y primary-box)." },
+    "iconName": { "type": "IconName", "default": "'clock'", "description": "Ícono de la biblioteca CAOS, 14px relleno." },
+    "avatar": { "type": "ReactElement", "required": false, "description": "Avatar de primary-avatar; el chip lo pasa a xs, a disabled si está inactivo y lo marca decorativo." },
+    "color": { "type": "'purple' | 'green' | 'yellow' | 'red' | 'blue'", "default": "'purple'", "description": "Color del punto de primary-color." },
+    "colorLabel": { "type": "string", "required": false, "description": "Texto sr-only con el significado del color; sin él el punto es decorativo." },
+    "close": { "type": "boolean", "default": "onRemove !== undefined", "description": "Prop Close de Figma: muestra el botón de quitar." },
+    "onRemove": { "type": "(event) => void", "required": false, "description": "Se activa al quitar (botón o Supr/Retroceso). Recibe el evento (clic o tecla). Dentro de un ChipGroup el foco pasa al vecino; en un chip suelto, muévelo tú." },
+    "removeLabel": { "type": "string", "required": false, "description": "Nombre accesible del botón de quitar. Por defecto \"Quitar <texto>\"." },
+    "value": { "type": "string", "required": false, "description": "Identificador dentro de un ChipGroup." },
+    "selected": { "type": "boolean", "required": false, "description": "Seleccionado (controlado); vuelve el chip un botón de alternancia." },
+    "defaultSelected": { "type": "boolean", "required": false, "description": "Seleccionado al inicio (no controlado)." },
+    "onSelectedChange": { "type": "(selected: boolean) => void", "required": false, "description": "Cambia la selección." },
+    "state": { "type": "'default' | 'hover' | 'focus' | 'select' | 'inactive'", "required": false, "description": "Solo para documentación: fuerza el aspecto de un estado." },
+    "disabled": { "type": "boolean", "default": "false", "description": "Inactive: deshabilita cuerpo y botón de quitar." },
+    "rootProps": { "type": "HTMLAttributes<HTMLSpanElement>", "required": false, "description": "Atributos de la cápsula (raíz), p. ej. data-*." },
+    "className": { "type": "string", "required": false, "description": "Clases de la cápsula. ref y el resto de props nativas van al cuerpo del chip." }
+  },
+  "examples": [
+    { "title": "Chip informativo quitable", "code": "<Chip onRemove={() => quitar(id)}>Frágil</Chip>" },
+    { "title": "Alternancia", "code": "<Chip defaultSelected onSelectedChange={setActivo}>Con garantía</Chip>" },
+    { "title": "Con avatar", "code": "<Chip type=\"primary-avatar\" avatar={<Avatar variant=\"initials\" name=\"Ana Pérez\" />}>Ana Pérez</Chip>" },
+    { "title": "Selección única", "code": "<ChipGroup aria-label=\"Tamaño\" selectionMode=\"single\" defaultValue={['m']}><Chip value=\"s\" icon={false}>Pequeño</Chip><Chip value=\"m\" icon={false}>Mediano</Chip></ChipGroup>" },
+    { "title": "Con desbordamiento (+N)", "code": "<ChipGroup aria-label=\"Ciudades\" selectionMode=\"multiple\" max={3}>…</ChipGroup>" }
+  ]
+}
