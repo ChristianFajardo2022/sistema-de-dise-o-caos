@@ -396,6 +396,8 @@ import {
   shoppingCartIcon,
   facebookIcon,
   instagram2Icon,
+  facebookCircleIcon,
+  instagramLineIcon,
   tiktokIcon,
   cloudIcon,
   sunIcon,
@@ -408,7 +410,7 @@ import {
   rowVerticalIcon,
 } from './icons.generated';
 
-/** Nombres de todos los íconos de la biblioteca (405) */
+/** Nombres de todos los íconos de la biblioteca (407) */
 export type IconName =
   | "ac"
   | "add"
@@ -805,6 +807,8 @@ export type IconName =
   | "shopping-cart"
   | "facebook"
   | "instagram-2"
+  | "facebook-circle"
+  | "instagram-line"
   | "tiktok"
   | "cloud"
   | "sun"
@@ -817,7 +821,7 @@ export type IconName =
   | "row-vertical"
 ;
 
-/** Registro completo: importarlo arrastra los 405 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
+/** Registro completo: importarlo arrastra los 407 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
 export const caosIcons: Record<IconName, CaosIconData> = {
   "ac": acIcon,
   "add": addIcon,
@@ -1214,6 +1218,8 @@ export const caosIcons: Record<IconName, CaosIconData> = {
   "shopping-cart": shoppingCartIcon,
   "facebook": facebookIcon,
   "instagram-2": instagram2Icon,
+  "facebook-circle": facebookCircleIcon,
+  "instagram-line": instagramLineIcon,
   "tiktok": tiktokIcon,
   "cloud": cloudIcon,
   "sun": sunIcon,
@@ -1623,6 +1629,8 @@ export const caosIconCategories: Record<IconName, string> = {
   "shopping-cart": "Shop",
   "facebook": "Brand",
   "instagram-2": "Brand",
+  "facebook-circle": "Brand",
+  "instagram-line": "Brand",
   "tiktok": "Brand",
   "cloud": "Weather",
   "sun": "Weather",
