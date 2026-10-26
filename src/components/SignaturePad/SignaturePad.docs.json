@@ -1,0 +1,32 @@
+{
+  "name": "SignaturePad",
+  "component": "SignaturePad",
+  "description": "Área de firma manuscrita del sistema de diseño CAOS, fiel al component set Firm (17805:32039) de Figma: Position Horizontal / Vertical × Propiedad 1 Default / Filled (Filled es simplemente que haya trazos). Un <canvas> con Pointer Events (puntero, mouse o dedo), touch-action: none, trazo suave (curvas por puntos medios) y escala por devicePixelRatio. Horizontal es una tarjeta de 178 de alto con el texto guía \"Dibuja tu firma aquí\" y, abajo a la derecha, los íconos deshacer (rotate-left) y borrar (trash); el ícono maximizar de Figma existe pero va oculto (maximizable). Vertical es la pantalla de celular con la interfaz girada −90°: columnas de íconos, firma, línea con cerrar y CTA con nombre y documento del firmante, Cancelar y Crear firma. El valor son trazos normalizados (0–1) y no una imagen, así que sobrevive a cambios de tamaño y de tema; toDataURL del ref (o strokesToDataURL) los convierte en imagen con el color y fondo que se pida, porque el trazo en pantalla usa el color del tema. ACCESIBILIDAD: dibujar no tiene equivalente por teclado. El canvas es role=\"img\" con nombre que da el estado (\"Firma vacía\" / \"Firma registrada\"), descrito por el texto guía, y una región role=status anuncia \"Firma registrada\" / \"Firma borrada\". Deshacer, borrar, maximizar y cerrar son botones nativos con nombre y foco visible. La alternativa la ofrece quien compone la pantalla (WCAG 2.1.1, 2.5.1): un campo para escribir el nombre y generar una firma tipográfica, o un medio distinto (cargar imagen, firma en otro canal). Documéntalo junto al componente en cada flujo. Los íconos de acción son blancos (icon/general/white) con firma y se apagan (aria-disabled) sin ella, con text/neutral/disabled-positive: el mismo gris de Figma en Dark y legible en Light (Figma usa #f0f2f4 sobre #f6f8f9, contraste de 1,1:1). El foco con outline de 2px y disabled (opacidad) se agregan: no están en Figma.",
+  "category": "Form Controls",
+  "props": {
+    "orientation": { "type": "'horizontal' | 'vertical'", "default": "'horizontal'", "description": "Position de Figma." },
+    "value": { "type": "SignatureValue", "required": false, "description": "Trazos (controlado): lista de trazos, cada uno una lista de puntos [x, y] entre 0 y 1. Usar con onValueChange." },
+    "defaultValue": { "type": "SignatureValue", "required": false, "description": "Trazos iniciales (no controlado)." },
+    "onValueChange": { "type": "(value: SignatureValue) => void", "required": false, "description": "Con la lista completa al terminar un trazo, al deshacer y al borrar." },
+    "disabled": { "type": "boolean", "default": false, "description": "No se puede dibujar ni borrar; atenuado (no existe en Figma)." },
+    "strokeWidth": { "type": "number", "default": 2.5, "description": "Grosor del trazo en px." },
+    "labels": { "type": "SignaturePadLabels", "required": false, "description": "Textos de la interfaz y nombres accesibles (placeholder, empty, signed, cleared, undo, clear, maximize, close, cancel, create). Español neutro por defecto." },
+    "signerName": { "type": "string", "required": false, "description": "Solo vertical: nombre del firmante (Name de Figma)." },
+    "signerId": { "type": "string", "required": false, "description": "Solo vertical: documento del firmante (cc de Figma)." },
+    "maximizable": { "type": "boolean", "default": false, "description": "Muestra el botón de maximizar (Maximize de Figma, apagado por defecto)." },
+    "onMaximize": { "type": "() => void", "required": false, "description": "Al pulsar maximizar." },
+    "onClose": { "type": "() => void", "required": false, "description": "Solo vertical: botón cerrar de la columna." },
+    "onCancel": { "type": "() => void", "required": false, "description": "Solo vertical: botón Cancelar." },
+    "onCreate": { "type": "(value: SignatureValue) => void", "required": false, "description": "Solo vertical: botón Crear firma, con los trazos." },
+    "requireSignature": { "type": "boolean", "default": true, "description": "Solo vertical: Crear firma inactivo mientras no haya firma." },
+    "ref": { "type": "Ref<SignaturePadHandle>", "required": false, "description": "Métodos: clear(), undo(), isEmpty(), getValue(), toDataURL(options?) (null si está vacía) y element (la raíz). No es el elemento DOM." },
+    "className": { "type": "string", "required": false, "description": "Clases para la raíz; el resto de props nativas también van a la raíz." }
+  },
+  "examples": [
+    { "title": "Horizontal", "code": "<SignaturePad onValueChange={setFirma} />" },
+    { "title": "Exportar como imagen", "code": "const ref = useRef<SignaturePadHandle>(null);\n<SignaturePad ref={ref} />\nconst png = ref.current?.toDataURL({ strokeColor: '#000', background: '#fff' });" },
+    { "title": "Vertical con firmante", "code": "<SignaturePad orientation=\"vertical\" signerName=\"Ana Pérez\" signerId=\"1.000.000.000\" onCreate={guardar} onCancel={cerrar} onClose={cerrar} />" },
+    { "title": "Controlado", "code": "<SignaturePad value={trazos} onValueChange={setTrazos} />" },
+    { "title": "Alternativa por teclado (quien compone)", "code": "<Input label=\"O escribe tu nombre\" value={nombre} onChange={...} />" }
+  ]
+}
