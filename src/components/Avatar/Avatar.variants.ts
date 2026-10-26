@@ -6,8 +6,8 @@ import { cva } from 'class-variance-authority';
  * Fuente: component sets de Figma de la carpeta Avatar.
  * - Avatar (Type Text/Photo/Brand/Icon, 56): envoltorio de los átomos; en código es `variant`.
  * - Avatar colors (Type Names/User × Size xs/sm/md/lg × Color): círculo con dimention/avatar/*
- *   (24, 32, 48, 56), radio radius/button/full, texto Helvetica regular (md y lg: typography/button/size/md,
- *   sm y xs: typography/button/size/sm). Color: fondo background/*-secondary, texto text/* e ícono icon/*.
+ *   (24, 32, 48, 56), radio radius/button/full, texto Helvetica (md y lg: typography/button/size/md en regular,
+ *   sm y xs: typography/button/size/sm en medium 500). Color: fondo background/*-secondary, texto text/* e ícono icon/*.
  *   Disabled: background/general/disabled-high-contrast, text/neutral/disabled-negative, icon/general/disabled-negative.
  * - Avatar photo (Size xs-lg): círculo con la imagen; Disabled = imagen en grises.
  * - Avatar brand / Avatar icon (Contrast × State × Size): píldora con fondo background/icon/{low,high}-contrast
@@ -61,20 +61,20 @@ export const avatarCircleVariants = cva(
   }
 );
 
-/** Iniciales: Helvetica regular; sm y xs usan el tamaño de botón sm. */
+/**
+ * Iniciales: Helvetica. md y lg: tamaño de botón md (14) en regular (400). sm y xs: tamaño de botón sm (12) en peso
+ * medium (500), como los sets Avatar colors, Avatar group y Avatar plus de Figma (valor literal: no hay token
+ * typography/weight/medium en tokens.css; fonts.css sirve el archivo Medium para 500).
+ */
 export const avatarTextVariants = cva(
-  [
-    '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
-    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
-    'whitespace-nowrap uppercase',
-  ].join(' '),
+  ['[font-family:var(--ds-primitives-typography-family-primary),sans-serif]', 'whitespace-nowrap uppercase'].join(' '),
   {
     variants: {
       size: {
-        xs: 'text-ds-typography-button-size-sm',
-        sm: 'text-ds-typography-button-size-sm',
-        md: 'text-ds-typography-button-size-md',
-        lg: 'text-ds-typography-button-size-md',
+        xs: 'text-ds-typography-button-size-sm font-medium',
+        sm: 'text-ds-typography-button-size-sm font-medium',
+        md: 'text-ds-typography-button-size-md [font-weight:var(--ds-primitives-typography-weight-regular)]',
+        lg: 'text-ds-typography-button-size-md [font-weight:var(--ds-primitives-typography-weight-regular)]',
       },
     },
     defaultVariants: { size: 'lg' },
