@@ -45,6 +45,7 @@ export * from './components/InlineField';
 export * from './components/Input';
 export * from './components/InteractiveCard';
 export * from './components/ListItem';
+export * from './components/Logo';
 export * from './components/NotificationText';
 export * from './components/NumberPicker';
 export * from './components/PhoneInput';

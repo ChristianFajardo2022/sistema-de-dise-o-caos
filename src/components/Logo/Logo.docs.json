@@ -1,0 +1,18 @@
+{
+  "name": "Logo",
+  "component": "Logo",
+  "description": "Logo de la marca del sistema de diseño CAOS, fiel al component set Logo de Figma (12946:2771, 8 variantes: Type × Size). Type: logo (símbolo + nombre) o icon (solo el símbolo). Size: xs, sm, md, lg (alto 24, 32, 48, 56; el logo mide 87, 101, 131 y 158 de ancho; las medidas incluyen el padding del componente de Figma). Es un <svg> con los vectores exportados de Figma; los rellenos son currentColor y el color lo da el token background/logo/default (Dark #fefefe, Light #000000), que cambia solo con el tema. Semántica: role=\"img\" con nombre accesible (por defecto el nombre de la marca tal como se lee en el logo, \"Inter Rapidísimo\"; se puede cambiar con title). Con decorative se marca aria-hidden y pierde el rol, para cuando el nombre ya está escrito al lado. No es interactivo: si va dentro de un enlace, el nombre del enlace sale del title. Categoría Data Display: es una imagen de marca de solo lectura, sin controles; el repo no tiene una categoría de identidad.",
+  "category": "Data Display",
+  "props": {
+    "type": { "type": "'logo' | 'icon'", "default": "'logo'", "description": "Type de Figma: marca completa o solo el símbolo." },
+    "size": { "type": "'xs' | 'sm' | 'md' | 'lg'", "default": "'lg'", "description": "Size de Figma. Fija el ancho y el alto del SVG." },
+    "title": { "type": "string", "default": "'Inter Rapidísimo'", "description": "Nombre accesible (aria-label con role img)." },
+    "decorative": { "type": "boolean", "default": "false", "description": "aria-hidden y sin rol, para cuando el nombre de la marca ya está en el texto contiguo." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para el svg raíz. El resto de props nativas y el ref van al svg." }
+  },
+  "examples": [
+    { "title": "Logo completo", "code": "<Logo type=\"logo\" size=\"lg\" />" },
+    { "title": "Solo símbolo en la barra inferior", "code": "<Logo type=\"icon\" size=\"sm\" />" },
+    { "title": "Decorativo junto al nombre", "code": "<span><Logo type=\"icon\" size=\"xs\" decorative /> Inter Rapidísimo</span>" }
+  ]
+}
