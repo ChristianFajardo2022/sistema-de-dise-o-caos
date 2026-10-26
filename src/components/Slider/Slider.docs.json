@@ -1,0 +1,29 @@
+{
+  "name": "Slider",
+  "component": "Slider",
+  "description": "Slider del sistema de diseño CAOS, fiel al component set Slide bar (13839:56628) de Figma: Type Simple / Simple number / Range / Range number × Porcentage. Pista de 4 de alto en background/general/gray-sixth con el tramo seleccionado en background/general/gray-secondary (en Simple, del inicio al pulgar; en Range, entre los dos pulgares). Pulgar blanco con contorno border/general/gray-fourth: 16 en Simple, 8 en Range y 22 con el valor adentro (10/14) cuando showValue está activo. Un número en value/defaultValue da un pulgar; un par [a, b], un rango con dos pulgares que no se cruzan. Patrones APG Slider y Multi-thumb slider: role=slider con aria-valuenow/min/max (en rango, los límites de cada pulgar son el valor del otro) y aria-valuetext con formatValue; flechas mueven un paso, RePág/AvPág una décima parte del rango, Inicio/Fin a los extremos. Puntero: arrastre con captura y clic en la pista (mueve el pulgar más cercano; con los dos pulgares juntos, el del lado hacia el que se arrastra). De derecha a izquierda (dir=\"rtl\" en la raíz o un ancestro) la pista, el arrastre y las flechas se invierten. Nombre accesible con aria-label o aria-labelledby: Figma no dibuja etiqueta, así que el slider no la tiene (a diferencia de Input o Select, aquí no hay prop label); en un formulario, la etiqueta visible va fuera y se enlaza con aria-labelledby. Área táctil de 24 px o más aunque el pulgar se vea más chico, foco visible con outline de 2px (agregado, no está en Figma). Disabled (no existe en Figma) se atenúa con opacidad y sale del orden de tabulación. El ref apunta al primer pulgar; className y las demás props van a la raíz.",
+  "category": "Form Controls",
+  "props": {
+    "min": { "type": "number", "default": 0, "description": "Valor mínimo." },
+    "max": { "type": "number", "default": 100, "description": "Valor máximo." },
+    "step": { "type": "number", "default": 1, "description": "Paso entre valores. RePág/AvPág saltan una décima parte del rango (al menos un paso)." },
+    "value": { "type": "number | [number, number]", "required": false, "description": "Valor controlado. Usar con onValueChange." },
+    "defaultValue": { "type": "number | [number, number]", "required": false, "description": "Valor inicial (no controlado). Un par convierte el slider en rango; sin valor, Simple arranca en min y Range en [min, max]." },
+    "onValueChange": { "type": "(value) => void", "required": false, "description": "Se llama en cada cambio, con un número o con el par." },
+    "onValueCommit": { "type": "(value) => void", "required": false, "description": "Se llama al soltar el puntero o con cada tecla que cambia el valor." },
+    "showValue": { "type": "boolean", "default": false, "description": "Muestra el valor dentro del pulgar (Type Simple number / Range number)." },
+    "formatValue": { "type": "(value: number) => string", "required": false, "description": "Formato del texto del pulgar y de aria-valuetext." },
+    "disabled": { "type": "boolean", "default": false, "description": "No responde a puntero ni teclado; aria-disabled y tabindex -1; los inputs ocultos no se envían." },
+    "aria-label": { "type": "string", "required": false, "description": "Nombre accesible (este o aria-labelledby es obligatorio). En Simple nombra al pulgar; en Range nombra al grupo (role=group)." },
+    "aria-labelledby": { "type": "string", "required": false, "description": "Id de una etiqueta visible que nombra al slider (al pulgar en Simple, al grupo en Range)." },
+    "thumbLabels": { "type": "[string, string]", "default": "['Mínimo', 'Máximo']", "description": "Nombres de cada pulgar en Range." },
+    "name": { "type": "string", "required": false, "description": "Nombre para formularios: un input type=hidden por pulgar (en Range, dos con el mismo nombre; FormData.getAll)." },
+    "aria-describedby": { "type": "string", "required": false, "description": "Va a cada pulgar." }
+  },
+  "examples": [
+    { "title": "Simple", "code": "<Slider aria-label=\"Volumen\" defaultValue={40} />" },
+    { "title": "Con el valor en el pulgar", "code": "<Slider aria-label=\"Brillo\" defaultValue={60} showValue />" },
+    { "title": "Rango controlado", "code": "<Slider aria-label=\"Precio\" min={0} max={1000000} step={10000} value={precio} onValueChange={setPrecio} formatValue={(v) => `$${v}`} />" },
+    { "title": "En un formulario", "code": "<Slider aria-label=\"Edad\" name=\"edad\" defaultValue={[25, 40]} thumbLabels={['Edad mínima', 'Edad máxima']} />" }
+  ]
+}
