@@ -1,0 +1,27 @@
+{
+  "name": "FileDropzone",
+  "component": "FileDropzone",
+  "description": "Área para soltar o elegir archivos del sistema de diseño CAOS, fiel al component set \"Input file upload (Atom)\" 11438:5774 de Figma (State Default, Hover, Disabled y Focus). Columna centrada con trazo punteado 8/8 de radius/field/lg (24), ícono attach-circle de 32, título con la acción en color de enlace (\"Selecciona tu archivo\") y, debajo, los tipos admitidos y el tamaño máximo. Hover agrega el relleno background/field/active-opacity-secondary y el trazo border/field/active; Focus usa ese trazo; Disabled usa los tokens de disabled. Usa un `<input type=\"file\">` real dentro de un `<label>` raíz: clic, Enter y Espacio abren el selector nativo y también se pueden arrastrar y soltar archivos (al arrastrar toma el aspecto Hover). Tipos (`accept`, misma sintaxis que el atributo nativo: extensiones, MIME o comodines) y tamaño (`maxSize`, en bytes) se validan al elegir y al soltar; los textos \"PDF, JPG.\" y \"Máx. 23 GB\" salen de esas props si no se pasan. Los archivos descartados (tipo, tamaño o más de uno sin `multiple`) llegan en `onFilesRejected` y se anuncian en una región aria-live. Accesibilidad: el nombre del input es el título más la acción, la descripción son los tipos y el tamaño, el foco con teclado se ve en la raíz (aspecto Focus) y el trazo punteado es decorativo. El `ref` apunta al input; `className` y `rootProps` a la raíz (label). El componente no guarda archivos: la lista la lleva quien lo usa (ver FileUpload).",
+  "category": "Form Controls",
+  "props": {
+    "accept": { "type": "string", "required": false, "description": "Tipos admitidos, sintaxis de accept (.pdf, application/pdf, image/*)." },
+    "maxSize": { "type": "number", "required": false, "description": "Tamaño máximo por archivo en bytes." },
+    "multiple": { "type": "boolean", "default": false, "description": "Permite varios archivos; sin él se toma el primero." },
+    "disabled": { "type": "boolean", "default": false, "description": "State Disabled de Figma." },
+    "state": { "type": "'default' | 'hover' | 'focus' | 'disabled'", "required": false, "description": "Fuerza el aspecto, solo para documentación." },
+    "title": { "type": "ReactNode", "default": "'Selecciona tu'", "description": "Capa Heading de Figma." },
+    "actionText": { "type": "ReactNode", "default": "'archivo'", "description": "Texto en color de enlace tras el título." },
+    "specifications": { "type": "ReactNode", "required": false, "description": "Capa Specifications; por defecto sale de accept." },
+    "maxSizeLabel": { "type": "ReactNode", "required": false, "description": "Capa \"Máx. 23 GB\"; por defecto sale de maxSize." },
+    "onFilesSelected": { "type": "(files: File[]) => void", "required": false, "description": "Archivos válidos al elegirlos o soltarlos." },
+    "onFilesRejected": { "type": "(rejections: FileRejection[]) => void", "required": false, "description": "Archivos descartados y su motivo (type, size o count)." },
+    "rejectionMessage": { "type": "(rejections: FileRejection[]) => string", "required": false, "description": "Texto anunciado a lectores de pantalla al descartar archivos." },
+    "rootProps": { "type": "FileDropzoneRootProps", "required": false, "description": "Atributos de la raíz (label): data-*, id, style, ref." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para la raíz." }
+  },
+  "examples": [
+    { "title": "Un archivo", "code": "<FileDropzone accept=\".pdf,.jpg\" maxSize={25 * 1024 ** 2} onFilesSelected={(files) => subir(files[0])} />" },
+    { "title": "Varias imágenes", "code": "<FileDropzone multiple accept=\"image/*\" maxSize={5 * 1024 ** 2} title=\"Arrastra tus imágenes o\" actionText=\"elígelas\" onFilesSelected={agregar} onFilesRejected={avisar} />" },
+    { "title": "Deshabilitado", "code": "<FileDropzone disabled />" }
+  ]
+}

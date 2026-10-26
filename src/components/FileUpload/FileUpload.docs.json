@@ -1,0 +1,24 @@
+{
+  "name": "FileUpload",
+  "component": "FileUpload",
+  "description": "Carga de archivos completa del sistema de diseño CAOS, fiel al component set \"File upload (suelto)\" 11592:8647 de Figma: un FileDropzone (Input file upload) y, debajo con gap space/general/2xl (16), el slot Container con un FileUploadItem (File card con Avatar icon, Button tertiary y Progress bar) por archivo, separados por space/general/lg (8). Es una composición: no sube ni guarda archivos. Quien la usa recibe los archivos válidos en `onFilesSelected`, hace la carga y describe el avance en `items`. Aporta lo que la composición suelta no resuelve: la lista es una `ul` nombrada (`listLabel`, por defecto \"Archivos\"), las acciones Eliminar, Reintentar y Descargar llegan con el `id` del archivo, y al eliminar uno el foco vuelve al área para soltar. Sin archivos la lista no se dibuja (prop File card de Figma). Los props del área para soltar (`accept`, `maxSize`, `multiple`, `disabled`, `title`, `actionText`, `specifications`, `maxSizeLabel`, `onFilesSelected`, `onFilesRejected`, `rejectionMessage`) se pasan directos; el resto va en `dropzoneProps`. El `ref` apunta al input de archivo; `className` y los atributos nativos, a la raíz.",
+  "category": "Form Controls",
+  "props": {
+    "items": { "type": "FileUploadEntry[]", "default": "[]", "description": "Archivos de la lista: { id, name, status, progress, message, icon }." },
+    "onRemove": { "type": "(id: string) => void", "required": false, "description": "Botón Eliminar de cada archivo; el foco vuelve al área para soltar." },
+    "onRetry": { "type": "(id: string) => void", "required": false, "description": "Botón Reintentar (loading-error y alert)." },
+    "onDownload": { "type": "(id: string) => void", "required": false, "description": "Botón Descargar (complete y error)." },
+    "listLabel": { "type": "string", "default": "'Archivos'", "description": "Nombre accesible de la lista." },
+    "accept": { "type": "string", "required": false, "description": "Tipos admitidos (del FileDropzone)." },
+    "maxSize": { "type": "number", "required": false, "description": "Tamaño máximo por archivo en bytes (del FileDropzone)." },
+    "multiple": { "type": "boolean", "default": false, "description": "Varios archivos (del FileDropzone)." },
+    "disabled": { "type": "boolean", "default": false, "description": "Deshabilita el área para soltar." },
+    "onFilesSelected": { "type": "(files: File[]) => void", "required": false, "description": "Archivos válidos al elegirlos o soltarlos." },
+    "onFilesRejected": { "type": "(rejections: FileRejection[]) => void", "required": false, "description": "Archivos descartados y su motivo." },
+    "dropzoneProps": { "type": "Omit<FileDropzoneProps, ...>", "required": false, "description": "Resto de props del FileDropzone (name, id, aria-*, rootProps)." }
+  },
+  "examples": [
+    { "title": "Con carga controlada", "code": "<FileUpload accept=\".pdf\" multiple items={archivos} onFilesSelected={iniciarCarga} onRemove={quitar} onRetry={reintentar} />" },
+    { "title": "Sin archivos", "code": "<FileUpload items={[]} maxSize={25 * 1024 ** 2} />" }
+  ]
+}
