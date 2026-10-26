@@ -1,0 +1,29 @@
+{
+  "name": "BlogCard",
+  "component": "BlogCard",
+  "description": "Tarjeta de blog del sistema de diseño CAOS, según el component set Cards de Figma (17080:14028), Propiedad 1 = Blog card × Propiedad 2 = Blog vertical / Blog horizontal (prop orientation). vertical (344 de ancho): foto de 272 recortada por la superficie interna común con muesca de 48 y el Button corner md en ella, franja inferior con el autor (Avatar xs + nombre) y etiquetas sobre un velo blanco con desenfoque, y debajo fecha, título 20/24, resumen 14/18 y un \"Leer más\" con aspecto de Button terciario. horizontal (497×266): foto a la izquierda con etiquetas arriba y autor abajo; a la derecha fecha, título 14/18, resumen 12/18 y \"Leer más\" xs. Accesibilidad: article nombrado por su título (h3 por defecto); hay un único enlace (href) que se estira sobre toda la tarjeta con ::after, con el foco dibujado en la silueta; la fecha va en <time dateTime>. El Button corner es parte visual del enlace (aria-hidden; el clic llega al enlace) . Con linkLabel, el enlace es ese \"Leer más\" visible (aspecto de Button terciario), nombrado \"título Leer más\" para control por voz, y el título queda como texto del encabezado; sin linkLabel el enlace es el título. Así no hay controles anidados ni enlaces repetidos. Lo que va sobre la foto (franja del autor, etiquetas de horizontal) usa siempre los tokens de Dark (la foto no cambia con el tema) y un velo opaco bajo el texto; título y resumen de horizontal van sobre la página con text/neutral/heading y text/neutral/gray. action pone en la muesca un control propio (p. ej. ButtonCorner favorite \"Guardar …\") por encima del enlace y después de él en el orden de tabulación. Las etiquetas deben ser no interactivas. Imagen por src (sin ella, marcador neutro); el avatar del autor es decorativo si el nombre está visible.",
+  "category": "Data Display",
+  "props": {
+    "orientation": { "type": "'vertical' | 'horizontal'", "default": "'vertical'", "description": "Propiedad 2 de Figma." },
+    "title": { "type": "ReactNode", "required": true, "description": "Título: encabezado, texto del enlace principal y nombre del article." },
+    "href": { "type": "string", "required": true, "description": "Destino del artículo; el enlace cubre toda la tarjeta." },
+    "linkProps": { "type": "AnchorHTMLAttributes", "required": false, "description": "Props extra del enlace (target, rel, onClick…)." },
+    "description": { "type": "ReactNode", "required": false, "description": "Resumen." },
+    "date": { "type": "ReactNode", "required": false, "description": "Fecha visible con ícono de calendario." },
+    "dateTime": { "type": "string", "required": false, "description": "Fecha máquina para <time dateTime>." },
+    "src": { "type": "string", "required": false, "description": "Imagen del artículo. Sin ella, marcador neutro." },
+    "alt": { "type": "string", "default": "''", "description": "Texto alternativo; vacío = decorativa." },
+    "author": { "type": "ReactNode", "required": false, "description": "Nombre del autor en la franja de la foto." },
+    "authorAvatar": { "type": "ReactNode", "required": false, "description": "Avatar del autor (Avatar photo xs), a la izquierda del nombre." },
+    "tags": { "type": "ReactNode", "required": false, "description": "Etiquetas no interactivas (Tag): junto al autor en vertical, arriba de la foto en horizontal." },
+    "linkLabel": { "type": "ReactNode", "required": false, "description": "Texto con aspecto de Button terciario (\"Leer más\"). Es el enlace principal, nombrado con el título + este texto." },
+    "action": { "type": "ReactNode", "required": false, "description": "Solo vertical: control propio en la muesca, con nombre accesible propio. Sin él, la muesca muestra la flecha (parte del enlace)." },
+    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "3", "description": "Nivel del encabezado del título." },
+    "className": { "type": "string", "required": false, "description": "Clases para el article raíz." }
+  },
+  "examples": [
+    { "title": "Vertical", "code": "<BlogCard\n  href=\"/blog/empaques\"\n  title=\"Cinco ideas para empacar mejor\"\n  description=\"Materiales, tamaños y trucos…\"\n  date=\"7 feb 2024\"\n  dateTime=\"2024-02-07\"\n  src={foto}\n  author=\"Ana Pérez\"\n  authorAvatar={<Avatar variant=\"photo\" size=\"xs\" src={retrato} />}\n  tags={<Tag>Logística</Tag>}\n  linkLabel=\"Leer más\"\n/>" },
+    { "title": "Horizontal", "code": "<BlogCard orientation=\"horizontal\" href=\"/blog/empaques\" title=\"Cinco ideas para empacar mejor\" tags={<Tag iconLeft={false}>Logística</Tag>} author=\"Ana Pérez\" />" },
+    { "title": "Con acción en la muesca", "code": "<BlogCard href=\"/blog/empaques\" title=\"Cinco ideas…\" action={<ButtonCorner variant=\"favorite\" aria-label=\"Guardar Cinco ideas…\" />} />" }
+  ]
+}
