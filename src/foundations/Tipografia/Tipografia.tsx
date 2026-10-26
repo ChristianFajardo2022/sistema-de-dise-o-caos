@@ -374,8 +374,8 @@ function Definicion(): ReactNode {
                 Programa tu recogida sin salir de casa
               </span>
               <span className="max-w-[48ch] text-ds-primitives-typography-size-lg leading-normal text-ds-text-neutral-body">
-                Asignamos el mensajero más cercano para gestionar tu paquete en minutos. Rastrea cada paso del
-                recorrido desde tu aplicación.
+                Elige el horario que prefieras y te avisamos cuando todo esté listo. Sigue cada paso del
+                proceso desde tu aplicación.
               </span>
             </div>
           </DocFigure>

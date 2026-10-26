@@ -375,8 +375,8 @@ function ProfileMock({ good }: { good: boolean }) {
 
 /** Tarjeta de evento: con Auto Layout (columna con gaps de tokens) o con elementos separados a mano */
 function EventMock({ good }: { good: boolean }) {
-  const title = <span className="text-ds-primitives-typography-size-xl font-semibold text-ds-text-neutral-heading">Homenaje a los que mueven a Colombia</span>;
-  const body = <span className="text-ds-primitives-typography-size-sm text-ds-text-neutral-body">En el Día del Mensajero, queremos reconocer la labor incansable de cada miembro de nuestro equipo.</span>;
+  const title = <span className="text-ds-primitives-typography-size-xl font-semibold text-ds-text-neutral-heading">Reconocimiento a nuestro equipo</span>;
+  const body = <span className="text-ds-primitives-typography-size-sm text-ds-text-neutral-body">En nuestro aniversario, queremos reconocer la labor incansable de cada miembro de nuestro equipo.</span>;
   const meta = (
     <>
       <span className="text-ds-primitives-typography-size-sm text-ds-text-neutral-body">Octubre 27, 2026</span>
