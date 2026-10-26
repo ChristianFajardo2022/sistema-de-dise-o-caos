@@ -1,4 +1,4 @@
-import type { LiHTMLAttributes, ReactNode } from 'react';
+import type { LiHTMLAttributes, MouseEvent, ReactNode, Ref } from 'react';
 
 /**
  * Type de Figma. `complex` = avatar o ícono, título con categoría y descripción debajo.
@@ -43,6 +43,17 @@ export interface ListItemProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 'ti
   menu?: ReactNode;
   /** Nombre accesible del botón de tres puntos y del menú. Por defecto "Más opciones de" + título. */
   menuLabel?: string;
+  /**
+   * Acción "navegar" (fila que abre otra vista, p. ej. "Documentos" del panel de un chat): el título pasa a ser un
+   * `<button>` estirado sobre toda la fila y se dibuja la flecha `chevron-right` de 20 al final (decorativa). Con `href`
+   * el control es un enlace `<a>`. No combinar con `selectable` ni `menu` en el mismo ítem (el clic en la fila sería
+   * ambiguo); `onEdit`/`onDelete` sí, quedan por encima con su propio foco.
+   */
+  onNavigate?: (event: MouseEvent<HTMLElement>) => void;
+  /** Destino de la acción "navegar": el título es un `<a href>` estirado sobre la fila (ver `onNavigate`). */
+  href?: string;
+  /** Ref al control de navegación (`<button>` o `<a>`), p. ej. para devolverle el foco al volver de la vista que abre. */
+  controlRef?: Ref<HTMLElement>;
   /** State Disabled de Figma: todo el ítem inactivo (checkbox, botones y menú deshabilitados; el `li` no lleva `aria-disabled`). */
   disabled?: boolean;
   /** Clases adicionales para el `<li>` raíz. */

@@ -259,3 +259,39 @@ export const DisabledTest: Story = {
     await expect(document.body).toHaveFocus();
   },
 };
+
+/** Acción "navegar": la fila entera abre otra vista; el título es el botón (o enlace con `href`) y lleva la flecha. */
+export const Navigation: Story = {
+  args: { selectable: false, description: undefined, category: undefined, leading: folder, title: 'Documentos', onNavigate: fn() },
+};
+
+/** Test: con `onNavigate` el título es un botón con su nombre, el clic en cualquier parte de la fila navega y la flecha es decorativa. */
+export const NavigationTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { ownList: true },
+  args: { selectable: false, description: undefined, category: undefined, leading: folder, title: 'Documentos', onNavigate: fn() },
+  render: (args) => (
+    <ul role="list" className="m-0 w-96 list-none p-0">
+      <ListItem {...args} />
+      <ListItem title="Fotografías" leading={folder} href="#fotos" />
+    </ul>
+  ),
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Documentos' });
+    await expect(button).toHaveAttribute('data-list-control');
+    await expect(canvas.getByRole('link', { name: 'Fotografías' })).toHaveAttribute('href', '#fotos');
+    // Clic sobre el borde derecho de la fila (fuera del texto): lo recibe el área estirada del título
+    const row = button.closest('li')!;
+    const box = row.getBoundingClientRect();
+    const hit = document.elementFromPoint(box.right - 60, box.top + box.height / 2);
+    await expect(hit === button || button.contains(hit)).toBe(true);
+    await userEvent.click(button);
+    await expect(args.onNavigate).toHaveBeenCalledTimes(1);
+    // La flecha no se anuncia
+    const chevron = row.querySelector('[data-figma-part="Actions Block"] [aria-hidden="true"]');
+    await expect(chevron).not.toBeNull();
+    await userEvent.tab();
+    await expect(canvas.getByRole('link', { name: 'Fotografías' })).toHaveFocus();
+  },
+};

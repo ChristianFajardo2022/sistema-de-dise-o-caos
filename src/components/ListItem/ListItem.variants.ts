@@ -117,3 +117,24 @@ export const listItemDividerClass =
 
 /** `Actions Block`: botones de ícono y menú, gap space/general/md (4). */
 export const listItemActionsClass = 'ml-auto flex shrink-0 items-center gap-ds-space-general-md';
+
+/**
+ * Ítem navegable (`onNavigate` / `href`): la fila entera es el área de clic del título (pseudo-elemento estirado), con
+ * el hover de las filas sobre canva (background/container/hover-on-canva) y el foco de teclado dibujado en la fila.
+ */
+export const listItemNavigableClass = [
+  'relative isolate transition-colors duration-300 ease-out motion-reduce:transition-none',
+  'hover:bg-ds-background-container-hover-on-canva',
+  'has-[[data-list-control]:focus-visible]:outline-2 has-[[data-list-control]:focus-visible]:outline-offset-2',
+  'has-[[data-list-control]:focus-visible]:outline-solid has-[[data-list-control]:focus-visible]:outline-ds-border-field-active',
+].join(' ');
+
+/** Control de navegación: el título como `<button>`/`<a>` sin estilo propio, estirado sobre la fila. */
+export const listItemControlClass = [
+  'm-0 cursor-pointer appearance-none border-0 bg-transparent p-0 text-left no-underline outline-none',
+  "after:absolute after:inset-0 after:z-0 after:content-['']",
+  'disabled:cursor-not-allowed aria-disabled:cursor-not-allowed',
+].join(' ');
+
+/** Flecha `chevron-right` de 20 en un hueco de 32 (Button tertiary xs de Figma), decorativa. */
+export const listItemChevronClass = 'inline-flex size-8 shrink-0 items-center justify-center text-ds-icon-button-tertiary-default';

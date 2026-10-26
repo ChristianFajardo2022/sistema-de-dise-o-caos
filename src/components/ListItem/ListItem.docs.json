@@ -19,6 +19,9 @@
     "deleteLabel": { "type": "string", "required": false, "description": "Nombre accesible del botón eliminar. Por defecto 'Eliminar' + título." },
     "menu": { "type": "ReactNode", "required": false, "description": "DropdownMenuItem del menú de tres puntos. Si se pasa, se dibuja el Dots." },
     "menuLabel": { "type": "string", "required": false, "description": "Nombre accesible del Dots y del menú. Por defecto 'Más opciones de' + título." },
+    "onNavigate": { "type": "(event: MouseEvent<HTMLElement>) => void", "required": false, "description": "Acción navegar (\"List (Atom) Complex\" con chevron-right en el panel de un chat): el título es un button estirado sobre toda la fila y se dibuja chevron-right de 20 al final (aria-hidden). No combinar con selectable ni menu; onEdit/onDelete quedan por encima con su foco." },
+    "href": { "type": "string", "required": false, "description": "Como onNavigate, pero el título es un enlace <a href>." },
+    "controlRef": { "type": "Ref<HTMLElement>", "required": false, "description": "Ref al control de navegación (button o a), p. ej. para devolverle el foco al volver de la vista que abre." },
     "disabled": { "type": "boolean", "default": false, "description": "State Disabled de Figma: checkbox, botones y menú deshabilitados (el li no lleva aria-disabled)." },
     "className": { "type": "string", "required": false, "description": "Clases adicionales para el li. El resto de props nativas y el ref van al li." }
   },
@@ -26,6 +29,7 @@
     { "title": "Complex con acciones", "code": "<ul role=\"list\">\n  <ListItem\n    title=\"Informe trimestral\"\n    category=\"Documento\"\n    description=\"Actualizado hoy\"\n    leading={<Avatar variant=\"icon\" size=\"sm\" label=\"Carpeta\" />}\n    selectable\n    onEdit={editar}\n    onDelete={eliminar}\n    menu={<DropdownMenuItem type=\"icon\" icon=\"add-circle\">Duplicar</DropdownMenuItem>}\n  />\n</ul>" },
     { "title": "Simple", "code": "<ListItem variant=\"simple\" title=\"Nombre\" description=\"Descripción\" onEdit={editar} />" },
     { "title": "Selección controlada", "code": "<ListItem title=\"Fila\" selectable selected={on} onSelectedChange={setOn} />" },
+    { "title": "Navegar", "code": "<ListItem title=\"Documentos\" leading={<Avatar variant=\"icon\" size=\"sm\" icon=\"folder\" />} onNavigate={abrirDocumentos} />" },
     { "title": "Grupo de avatares", "code": "<ListItem title=\"Equipo\" leading={<AvatarGroup size=\"sm\"><Avatar name=\"Ana Pérez\" /></AvatarGroup>} />" }
   ]
 }
