@@ -1,0 +1,146 @@
+{
+  "name": "ProductCard",
+  "component": "ProductCard",
+  "description": "Tarjeta de producto del sistema de diseño CAOS, fiel al component set Card producto de Figma (15863:66763), 337×413. Foto recortada por la silueta con muesca (NotchedSurface) y Button corner Favorite arriba a la derecha; abajo, sobre un velo oscuro opaco bajo el texto (≥ 4,5:1 con cualquier foto), el nombre, el precio y la calificación (Number rating). State Hover = la tarjeta se expande con hover, foco dentro o en pantallas táctiles y muestra la descripción, \"Agregar al carrito\" y una acción secundaria opcional; plegadas siguen en el árbol de accesibilidad y en el orden de tabulación. State \"+\" = el producto ya está en el carrito: con `quantity` de 1 o más el botón se cambia por el selector de cantidad (NumberPicker); al quitar la última unidad vuelve el botón. El foco pasa de uno al otro. Favorito es un toggle con aria-pressed; el precio se anuncia como \"Precio: …\" y la calificación como texto (\"4,5 de 5 estrellas\"). Con `href`, el título es un enlace estirado que cubre la tarjeta y los controles quedan encima, sin anidarse. El bloque de texto usa siempre los tokens del modo Dark (el velo no cambia con el tema). Orden de tabulación: título (con `href`), \"Agregar al carrito\" o el selector de cantidad, la acción secundaria y, al final, el favorito (se ve arriba a la derecha pero va último en el DOM: la acción principal primero). Con `state=\"default\"` las partes plegadas se muestran si reciben el foco.",
+  "category": "Data Display",
+  "props": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "Nombre del producto (capa Filename). Una línea. Nombra las acciones."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Descripción corta (capa Status); visible al expandirse."
+    },
+    "price": {
+      "type": "string",
+      "required": true,
+      "description": "Precio ya formateado (\"$129.999\")."
+    },
+    "rating": {
+      "type": "number",
+      "required": false,
+      "description": "Promedio de 0 a 5 (Number rating)."
+    },
+    "ratingCount": {
+      "type": "number",
+      "required": false,
+      "description": "Total de reseñas; solo se anuncia."
+    },
+    "src": {
+      "type": "string",
+      "required": true,
+      "description": "Foto del producto."
+    },
+    "alt": {
+      "type": "string",
+      "default": "''",
+      "description": "Texto alternativo; vacío por defecto porque el título nombra el producto."
+    },
+    "href": {
+      "type": "string",
+      "required": false,
+      "description": "Enlace a la ficha: enlace estirado sobre el título."
+    },
+    "headingLevel": {
+      "type": "2 | 3 | 4 | 5 | 6 | 'none'",
+      "default": "3",
+      "description": "Nivel del encabezado del título."
+    },
+    "quantity": {
+      "type": "number",
+      "required": false,
+      "description": "Cantidad en el carrito (controlada). Con 1 o más, State \"+\" (selector de cantidad)."
+    },
+    "defaultQuantity": {
+      "type": "number",
+      "default": "0",
+      "description": "Cantidad inicial (no controlada)."
+    },
+    "onQuantityChange": {
+      "type": "(quantity: number) => void",
+      "required": false,
+      "description": "1 al agregar, la del selector después, 0 al quitar la última unidad."
+    },
+    "maxQuantity": {
+      "type": "number",
+      "required": false,
+      "description": "Máximo del selector."
+    },
+    "onAddToCart": {
+      "type": "MouseEventHandler<HTMLButtonElement>",
+      "required": false,
+      "description": "Clic en \"Agregar al carrito\". preventDefault evita pasar a cantidad 1."
+    },
+    "addToCartText": {
+      "type": "string",
+      "default": "'Agregar al carrito'",
+      "description": "Texto visible del botón."
+    },
+    "addToCartLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre accesible. Por defecto \"Agregar al carrito: <título>\" (empieza por el texto visible)."
+    },
+    "quantityLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre del selector. Por defecto \"Cantidad de <título>\"."
+    },
+    "action": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Acción secundaria junto a Agregar (en Figma, Button secondary sm solo ícono `edit`), con su propio nombre accesible."
+    },
+    "favorite": {
+      "type": "boolean",
+      "required": false,
+      "description": "Favorito (controlado)."
+    },
+    "defaultFavorite": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Favorito inicial (no controlado)."
+    },
+    "onFavoriteChange": {
+      "type": "(favorite: boolean) => void",
+      "required": false,
+      "description": "Nuevo valor del toggle de favorito."
+    },
+    "favoriteLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre del toggle. Por defecto \"Agregar <título> a favoritos\"."
+    },
+    "favoriteButtonProps": {
+      "type": "ButtonHTMLAttributes<HTMLButtonElement>",
+      "required": false,
+      "description": "Props extra del botón de favorito."
+    },
+    "state": {
+      "type": "'default' | 'hover'",
+      "required": false,
+      "description": "Fuerza el aspecto Default (plegado) o Hover (expandido), solo para documentación."
+    }
+  },
+  "examples": [
+    {
+      "title": "Básica",
+      "code": "<ProductCard title=\"Audífonos inalámbricos\" price=\"$129.999\" rating={4.5} src={foto} />"
+    },
+    {
+      "title": "Carrito controlado",
+      "code": "<ProductCard title=\"Audífonos inalámbricos\" price=\"$129.999\" src={foto} quantity={qty} onQuantityChange={setQty} />"
+    },
+    {
+      "title": "Con enlace a la ficha",
+      "code": "<ProductCard href=\"/productos/audifonos\" title=\"Audífonos inalámbricos\" price=\"$129.999\" src={foto} />"
+    },
+    {
+      "title": "Con acción secundaria",
+      "code": "<ProductCard title=\"Audífonos\" price=\"$129.999\" src={foto} action={<Button variant=\"secondary\" size=\"sm\" iconOnly aria-label=\"Personalizar Audífonos\"><Icon name=\"edit\" size={20} /></Button>} />"
+    }
+  ]
+}
