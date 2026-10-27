@@ -55,9 +55,9 @@ export const checkboxControlVariants = cva(controlBase, {
         '[--ring:var(--color-ds-background-field-active-slow-contrast)] text-ds-icon-general-default',
         'peer-checked:[--ring:var(--color-ds-background-field-active-slow-contrast)] peer-checked:bg-ds-background-field-active-slow-contrast',
         'peer-indeterminate:[--ring:var(--color-ds-background-field-active-slow-contrast)] peer-indeterminate:bg-ds-background-field-active-slow-contrast',
-        'peer-disabled:[--ring:var(--color-ds-background-field-disabled)]',
-        'peer-checked:peer-disabled:[--ring:var(--color-ds-background-field-disabled)] peer-checked:peer-disabled:bg-ds-background-field-disabled',
-        'peer-indeterminate:peer-disabled:[--ring:var(--color-ds-background-field-disabled)] peer-indeterminate:peer-disabled:bg-ds-background-field-disabled',
+        'peer-disabled:[--ring:var(--color-ds-background-field-disabled-negative)]',
+        'peer-checked:peer-disabled:[--ring:var(--color-ds-background-field-disabled-negative)] peer-checked:peer-disabled:bg-ds-background-field-disabled-negative',
+        'peer-indeterminate:peer-disabled:[--ring:var(--color-ds-background-field-disabled-negative)] peer-indeterminate:peer-disabled:bg-ds-background-field-disabled-negative',
         // Disabled select / mixto: el check y la raya son negros en ambos contrastes
         'peer-checked:peer-disabled:text-ds-icon-general-black peer-indeterminate:peer-disabled:text-ds-icon-general-black',
       ],

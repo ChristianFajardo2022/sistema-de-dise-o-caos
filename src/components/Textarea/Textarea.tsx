@@ -7,8 +7,8 @@ import { useMergedRefs } from '../../utils/refs';
 import { FieldLabel, FieldMessage, FieldRow, useField } from '../Field';
 import { inputFieldVariants } from '../Input';
 
-/** Espacio vertical que ocupan el label y su separación sobre la primera línea (21) más el pie (1). */
-const PAD_Y = 22;
+/** Espacio vertical que ocupan el label y su separación sobre la primera línea (20); sin pie. */
+const PAD_Y = 20;
 const LINE = 'var(--ds-responsive-typography-field-line-height-sm)';
 
 const supportsFieldSizing = () =>
@@ -101,7 +101,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           <div
             className={cn(
               inputFieldVariants({ variant: 'text', state: visualState }),
-              // Alto según el contenido y padding vertical 1 menos (el bloque de texto mide 41 con la primera línea)
+              // Alto según el contenido y padding vertical 1 menos (el bloque de texto mide 38 con la primera línea)
               'h-auto py-[calc(var(--ds-responsive-space-field-sm)-1px)] flex-col items-stretch [--input-field-gap:var(--ds-responsive-space-general-2xl)]'
             )}
           >

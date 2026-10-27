@@ -291,7 +291,7 @@ export const TimePicker = forwardRef<HTMLInputElement, TimePickerProps>(
                         className="peer sr-only"
                       />
                       <span
-                        data-figma-part="Label"
+                        data-figma-part={p}
                         className={cn(inputFieldVariants({ variant: 'text', state: periodState }), timePickerPeriodVariants(), isDisabled && 'cursor-not-allowed')}
                       >
                         {p}

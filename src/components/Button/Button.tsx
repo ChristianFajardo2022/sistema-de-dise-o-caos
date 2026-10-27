@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import type { ReactNode } from 'react';
-import type { ButtonProps, ButtonState } from './Button.types';
+import type { ButtonProps, ButtonSize, ButtonState, ButtonVariant } from './Button.types';
 import { buttonVariants } from './Button.variants';
 import { cn } from '../../utils/cn';
 
@@ -45,13 +45,23 @@ function LoadDots() {
   );
 }
 
-/** Slot de ícono: 20×20 y color por token del estado (--btn-icon). En px: no hay token de 20 y la raíz no siempre mide 16px. */
-function IconSlot({ children }: { children: ReactNode }) {
+/**
+ * Medida del ícono según Figma (Icon-sizes): con texto 20 en md y sm y 14 en xs; Icon-single 20 en md y sm y 16 en xs
+ * (primary y secondary), o 24 y 20 en tertiary. En px: no hay token de estas medidas y la raíz no siempre mide 16px.
+ */
+function iconSizeClass(size: ButtonSize, variant: ButtonVariant, iconOnly: boolean) {
+  if (!iconOnly) return size === 'xs' ? 'size-[14px]' : 'size-[20px]';
+  if (variant === 'tertiary') return size === 'xs' ? 'size-[20px]' : 'size-[24px]';
+  return size === 'xs' ? 'size-[16px]' : 'size-[20px]';
+}
+
+/** Slot de ícono: tamaño de `iconSizeClass` y color por token del estado (--btn-icon). */
+function IconSlot({ children, sizeClass }: { children: ReactNode; sizeClass: string }) {
   return (
     <span
       data-slot="icon"
       aria-hidden="true"
-      className="inline-flex size-[20px] shrink-0 items-center justify-center text-(color:--btn-icon) [&>svg]:size-full"
+      className={cn('inline-flex shrink-0 items-center justify-center text-(color:--btn-icon) [&>svg]:size-full', sizeClass)}
     >
       {children}
     </span>
@@ -184,12 +194,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           )}
         >
           {iconOnly ? (
-            icon && <IconSlot>{icon}</IconSlot>
+            icon && <IconSlot sizeClass={iconSizeClass(size, variant, true)}>{icon}</IconSlot>
           ) : (
             <>
-              {leftIcon && <IconSlot>{leftIcon}</IconSlot>}
+              {leftIcon && <IconSlot sizeClass={iconSizeClass(size, variant, false)}>{leftIcon}</IconSlot>}
               {children && <span className="pb-ds-space-button-sm">{children}</span>}
-              {rightIcon && <IconSlot>{rightIcon}</IconSlot>}
+              {rightIcon && <IconSlot sizeClass={iconSizeClass(size, variant, false)}>{rightIcon}</IconSlot>}
             </>
           )}
         </span>

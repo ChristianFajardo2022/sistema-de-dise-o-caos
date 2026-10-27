@@ -98,7 +98,7 @@ interface RangeFieldProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * Campo desplegable del encabezado de `range` ("Input general/Dropdown": etiqueta, valor y chevron).
- * Abierto (Active/Focus en Figma) lleva el chevron de 16; cerrado, el de 12 (Input general/Dropdown/Default).
+ * El chevron mide 16 abierto y cerrado (Input general/Dropdown/Default).
  */
 const RangeField = forwardRef<HTMLButtonElement, RangeFieldProps>(({ label, value, active, className, ...rest }, ref) => (
   <button ref={ref} type="button" className={cn(rangeFieldVariants({ active }), className)} {...rest}>
@@ -118,7 +118,7 @@ const RangeField = forwardRef<HTMLButtonElement, RangeFieldProps>(({ label, valu
     </span>
     <Icon
       name="chevron-down"
-      size={active ? 16 : 12}
+      size={16}
       variant="line"
       aria-hidden="true"
       data-figma-part="Icon Right"

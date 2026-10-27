@@ -11,7 +11,7 @@ import { cva } from 'class-variance-authority';
  * - Unicolor: solo secondary y tertiary sin icon-single.
  * - Size: md 56 · sm 48 · xs 32. Padding X 24/24/16, padding Y 8, min-width 92 en md y sm.
  * - State: default · hover · focus · press · inactive · delete · load (tertiary sin load).
- * - Tipografía: Helvetica Neue (typography/family/Primary), peso 400,
+ * - Tipografía: Helvetica Neue (typography/family/Primary), peso Semibold (600),
  *   typography/button/size/md-uniform (14px fijo en todos los breakpoints), interlineado 100 %.
  * - Sin anillo de foco ni escala al presionar: cada estado usa sus propios tokens.
  *
@@ -90,6 +90,19 @@ export const buttonVariants = cva(
         size: 'xs',
         iconOnly: false,
         class: 'px-ds-space-button-2xl py-ds-space-button-lg',
+      },
+      // Secondary: el trazo de Figma es interior y no suma al ancho; el borde de CSS sí, así que se descuenta del padding
+      {
+        variant: 'secondary',
+        size: ['md', 'sm'],
+        iconOnly: false,
+        class: 'px-[calc(var(--ds-responsive-space-button-4xl)-var(--ds-primitives-stroke-lg))]',
+      },
+      {
+        variant: 'secondary',
+        size: 'xs',
+        iconOnly: false,
+        class: 'px-[calc(var(--ds-responsive-space-button-2xl)-var(--ds-primitives-stroke-lg))]',
       },
       {
         variant: 'tertiary',

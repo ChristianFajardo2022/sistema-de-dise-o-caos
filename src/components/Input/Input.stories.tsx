@@ -165,6 +165,62 @@ export const StatesMatrix: Story = {
   ),
 };
 
+const FIGMA_TYPES: { figma: string; variant: InputVariant }[] = [
+  { figma: 'Text', variant: 'text' },
+  { figma: 'Password', variant: 'password' },
+  { figma: 'Search', variant: 'search' },
+  { figma: 'Search header', variant: 'search-header' },
+];
+const FIGMA_STATES: { figma: string; state: InputState; helper?: boolean }[] = [
+  { figma: 'Default', state: 'default' },
+  { figma: 'Filled', state: 'filled' },
+  { figma: 'Active/Focus', state: 'active' },
+  { figma: 'Burnt-In', state: 'burnt-in' },
+  { figma: 'Disabled', state: 'disabled' },
+  { figma: 'Error', state: 'error' },
+  { figma: 'Success', state: 'success' },
+  { figma: 'Helper text', state: 'filled', helper: true },
+];
+
+/**
+ * Los tipos Text, Password, Search y Search header de `input/general-input` × 8 estados, con `data-figma` = nombre exacto.
+ * Los otros tipos del set (Code, Coment, Dropdown, Multiple, Number, Time picker) son componentes aparte con su propia
+ * matriz; aquí el comparador los marca como FALTA. `Type=Search, State=Default` aparece dos veces en Figma: se dibuja una.
+ */
+export const FigmaMatrix: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <div className="bg-ds-background-general-black p-6">
+      <div className="grid grid-cols-[auto_repeat(4,minmax(240px,1fr))] items-start gap-x-6 gap-y-6">
+        <span />
+        {FIGMA_TYPES.map((t) => (
+          <span key={t.figma} className="text-xs text-ds-text-neutral-body">{t.figma}</span>
+        ))}
+        {FIGMA_STATES.map((st) => (
+          <div key={st.figma} className="contents">
+            <span className="pt-4 text-xs text-ds-text-neutral-body">{st.figma}</span>
+            {FIGMA_TYPES.map((t) => (
+              <Input
+                key={t.figma}
+                fullWidth
+                variant={t.variant}
+                state={st.state}
+                label="Label"
+                placeholder="Placeholder"
+                defaultValue={st.state === 'filled' ? 'Valor' : undefined}
+                errorText={st.state === 'error' ? 'Error text' : undefined}
+                successText={st.state === 'success' ? 'Success text' : undefined}
+                helperText={st.helper ? 'Helper text' : undefined}
+                rootProps={{ 'data-figma': `Type=${t.figma}, State=${st.figma}` }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  ),
+};
+
 /** Test: escribir actualiza el valor y el label sigue asociado */
 export const TypingTest: Story = {
   tags: ['!autodocs'],

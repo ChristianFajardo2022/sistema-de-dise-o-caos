@@ -118,6 +118,55 @@ export const StatesMatrix: Story = {
   ),
 };
 
+const FIGMA_STATES: { figma: string; state: RadioState }[] = [
+  { figma: 'Default', state: 'default' },
+  { figma: 'Disabled Default', state: 'disabled-default' },
+  { figma: 'Select', state: 'select' },
+  { figma: 'Disabled Select', state: 'disabled-select' },
+];
+
+function FigmaRadioMatrix({ withText }: { withText: boolean }) {
+  return (
+    <div className="flex flex-col gap-4">
+      {CONTRASTS.map((contrast) => (
+        <div
+          key={contrast}
+          className={contrast === 'positive' ? 'bg-ds-background-general-black p-6' : 'bg-ds-background-general-white p-6'}
+        >
+          <div className="grid grid-cols-[repeat(4,auto)] items-center gap-x-8 gap-y-4">
+            {FIGMA_STATES.map((s) => (
+              <div
+                key={s.figma}
+                className="inline-flex w-fit"
+                data-figma={`Type=Radio button, State=${s.figma}, Contrast=${contrast === 'positive' ? 'Positive' : 'Negative'}`}
+              >
+                <Radio contrast={contrast} state={s.state} aria-label={`Radio button ${contrast} ${s.figma}`}>
+                  {withText ? <span data-figma-part="Text description">Text description</span> : undefined}
+                </Radio>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Solo las 8 variantes `Type=Radio button` de `selection/selection-1` (sin texto). Las 8 de Checkbox del mismo set
+ * están en `Form Controls/Checkbox` (`FigmaMatrix`): aquí el comparador las marca como FALTA, es esperable.
+ */
+export const FigmaMatrix: Story = {
+  parameters: { layout: 'padded' },
+  render: () => <FigmaRadioMatrix withText={false} />,
+};
+
+/** Solo las 8 variantes `Type=Radio button` de `selection/selection-2` (con `Text description`). */
+export const FigmaMatrixText: Story = {
+  parameters: { layout: 'padded' },
+  render: () => <FigmaRadioMatrix withText />,
+};
+
 /** Test: las flechas mueven la selección, solo uno queda marcado y disabled se omite */
 export const ArrowKeysTest: Story = {
   tags: ['!autodocs'],

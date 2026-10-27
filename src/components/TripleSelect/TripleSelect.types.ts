@@ -3,7 +3,7 @@ import type { FieldRootProps } from '../Field/Field.types';
 import type { InputState } from '../Input/Input.types';
 import type { SelectOptionData } from '../Select/Select.types';
 
-/** State de Figma (Type=Triple de "General input"), el mismo de Input. Solo para forzar el aspecto en documentación. */
+/** State de Figma (Type=Multiple de "General input"), el mismo de Input. Solo para forzar el aspecto en documentación. */
 export type TripleSelectState = InputState;
 
 /** Una de las tres secciones: un `Select` sin marco propio. */

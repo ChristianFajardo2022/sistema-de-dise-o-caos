@@ -68,6 +68,19 @@ export const StatesMatrix: Story = {
   ),
 };
 
+/** Los 5 estados de `button/button-link` (Icon right activo, como el defecto de Figma), con `data-figma` = nombre exacto. */
+export const FigmaMatrix: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-8 bg-ds-background-general-black p-6">
+      {STATES.map((s) => (
+        <ButtonLink key={s} href="#" state={s} iconRight data-figma={`State=${s.charAt(0).toUpperCase() + s.slice(1)}`}>
+          Button
+        </ButtonLink>
+      ))}
+    </div>
+  ),
+};
+
 /** Test: rol link con href y nombre accesible */
 export const LinkRoleTest: Story = {
   tags: ['!autodocs'],

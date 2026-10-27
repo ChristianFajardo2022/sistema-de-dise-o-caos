@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import type { ButtonLinkProps, ButtonLinkState } from './ButtonLink.types';
 import { buttonLinkVariants } from './ButtonLink.variants';
-import { ExportIcon } from '../../icons/ExportIcon';
+import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
 export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
@@ -45,7 +45,7 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
             aria-hidden="true"
             className="inline-flex size-[12px] shrink-0 items-center justify-center text-(color:--link-icon) [&>svg]:size-full"
           >
-            {icon ?? <ExportIcon />}
+            {icon ?? <Icon name="export2" variant="line" size={12} />}
           </span>
         )}
       </a>

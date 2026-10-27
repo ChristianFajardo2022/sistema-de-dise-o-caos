@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority';
 /**
  * CAOS Design System — TripleSelect Variants
  *
- * Fuente: tipo "Triple" del component set "General input" de Figma (7856:1485, 8 estados, ancho 496, alto 56 y 82
+ * Fuente: tipo "Multiple" (antes Triple) del component set "General input" de Figma (7856:1485, 8 estados, ancho 496, alto 56 y 82
  * con mensaje). Un solo recuadro con tres secciones iguales separadas por una línea de 40.
  *
  * Reutiliza sin copiar la base de Input (`inputFieldVariants`: recuadro 56, padding 8/12, radio field/md, borde de 1 y

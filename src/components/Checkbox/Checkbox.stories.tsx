@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { Checkbox } from './Checkbox';
-import type { CheckboxProps, CheckboxState, SelectionContrast } from './Checkbox.types';
+import { Radio } from '../Radio';
+import type { CheckboxProps, CheckboxState, SelectionContrast, SelectionState } from './Checkbox.types';
 
 const meta = {
   title: 'Form Controls/Checkbox',
@@ -106,6 +107,71 @@ export const StatesMatrix: Story = {
       ))}
     </div>
   ),
+};
+
+const FIGMA_STATES: { figma: string; state: SelectionState }[] = [
+  { figma: 'Default', state: 'default' },
+  { figma: 'Disabled Default', state: 'disabled-default' },
+  { figma: 'Select', state: 'select' },
+  { figma: 'Disabled Select', state: 'disabled-select' },
+];
+
+/**
+ * Los sets `selection/selection-1` (solo el control, 16×16) y `selection/selection-2` (control + `Text description`):
+ * ambos traen Checkbox y Radio button × State × Contrast (16 variantes). Positive va sobre `background/general/black`
+ * y Negative sobre `background/general/white`. El `data-figma` va en un contenedor, porque el input nativo está oculto.
+ */
+function FigmaSelectionMatrix({ withText }: { withText: boolean }) {
+  return (
+    <div className="flex flex-col gap-4">
+      {CONTRASTS.map((contrast) => (
+        <div
+          key={contrast}
+          className={contrast === 'positive' ? 'bg-ds-background-general-black p-6' : 'bg-ds-background-general-white p-6'}
+        >
+          <div className="grid grid-cols-[auto_repeat(4,auto)] items-center gap-x-8 gap-y-4">
+            <span className="text-xs text-ds-text-neutral-body">{contrast}</span>
+            {FIGMA_STATES.map((s) => (
+              <span key={s.figma} className="text-xs text-ds-text-neutral-body">{s.figma}</span>
+            ))}
+            {(['Checkbox', 'Radio button'] as const).map((type) => (
+              <div key={type} className="contents">
+                <span className="text-xs text-ds-text-neutral-body">{type}</span>
+                {FIGMA_STATES.map((s) => {
+                  const Control = type === 'Checkbox' ? Checkbox : Radio;
+                  return (
+                    <div
+                      key={s.figma}
+                      className="inline-flex w-fit"
+                      data-figma={`Type=${type}, State=${s.figma}, Contrast=${cap(contrast)}`}
+                    >
+                      <Control contrast={contrast} state={s.state} aria-label={`${type} ${contrast} ${s.figma}`}>
+                        {withText ? <span data-figma-part="Text description">Text description</span> : undefined}
+                      </Control>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** `selection/selection-1`: Checkbox y Radio button sin texto (16 variantes). */
+export const FigmaMatrix: Story = {
+  parameters: { layout: 'padded' },
+  render: () => <FigmaSelectionMatrix withText={false} />,
+};
+
+/** `selection/selection-2`: Checkbox y Radio button con `Text description` (16 variantes). */
+export const FigmaMatrixText: Story = {
+  parameters: { layout: 'padded' },
+  render: () => <FigmaSelectionMatrix withText />,
 };
 
 /** Test: clic y Espacio alternan checked y llaman onChange; el label está asociado */

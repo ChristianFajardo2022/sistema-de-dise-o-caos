@@ -7,7 +7,7 @@ import { cva } from 'class-variance-authority';
  *
  * - Alto 32: padding Y 8 (space/button/lg) + línea de 16 (dimention/button/container/xs). Padding X 0.
  * - Gap 4 entre texto e ícono (gap/button/internal-margin-md).
- * - Texto: Helvetica Neue 400, 14px fijo (md-uniform, igual que Button), subrayado sólido 6 %.
+ * - Texto: Helvetica Neue Semibold (600), 14px fijo (md-uniform, igual que Button), subrayado sólido 6 %.
  * - Ícono de 12px (Icon-sizes 12) con color por token del estado (--link-icon).
  * - State: default · hover · focus · press · inactive. Sin anillo de foco: cada estado usa sus tokens.
  *

@@ -124,7 +124,7 @@ const FIGMA_FIELDS: TripleSelectFields = [0, 1, 2].map((i) => ({
   ],
 })) as unknown as TripleSelectFields;
 
-/** Los 8 estados de Figma (Type=Triple), cada uno una vez, sobre la superficie del tema. Usa los textos de muestra de Figma. */
+/** Los 8 estados de Figma (Type=Multiple), cada uno una vez, sobre la superficie del tema. Usa los textos de muestra de Figma. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (
@@ -135,7 +135,7 @@ export const FigmaMatrix: Story = {
             <div key={figma} className="flex items-start gap-8">
               <span className="w-32 shrink-0 pt-4 text-xs text-ds-text-neutral-body">{figma}</span>
               <TripleSelect
-                data-figma={`Type=Triple, State=${figma}`}
+                data-figma={`Type=Multiple, State=${figma}`}
                 label={`Triple ${figma}`}
                 fields={FIGMA_FIELDS}
                 {...props}
