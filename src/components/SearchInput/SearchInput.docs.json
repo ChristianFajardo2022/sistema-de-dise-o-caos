@@ -1,0 +1,39 @@
+{
+  "name": "SearchInput",
+  "component": "SearchInput",
+  "description": "Barra de búsqueda del sistema de diseño CAOS, fiel al component set \"Search input (Avance)\" de Figma (19830:28839, 8 variantes de State). Barra de 64 de alto, radio 16, padding 12/12/12/24 y gap 16: selector de categoría opcional (texto + chevron-down, un DropdownMenu), separador de 0.5, campo de 40 y botón de búsqueda (Button tertiary xs con ícono). Con el foco abre debajo (8, mismo ancho, capa superior) un panel con palabras clave, \"Búsquedas recientes\" y \"Popular ahora\" (chips Tag neutral md) y una papelera por sección. Patrón WAI-ARIA APG Combobox con autocompletado de lista: el input type=search con role combobox conserva el foco y recorre las opciones de las tres secciones (un listbox cada una) con aria-activedescendant. Teclado: Flecha abajo/arriba abren y recorren (pasado el extremo vuelven al texto), Alt + Flecha abajo solo abre, Enter elige la opción activa o busca lo escrito, Esc cierra y, cerrado, borra el texto, Tab sigue al botón de búsqueda y a las papeleras. El panel se cierra cuando el foco sale del campo, del botón y del panel. Estados Default, Filled, Active/Focus, Burnt-In (readOnly), Disabled, Error, Confirmation (successText) y Helper text (borde de información). Figma no dibuja label: el label es texto solo para lectores de pantalla. Las sugerencias no se filtran solas: las da quien usa el componente.",
+  "category": "Form Controls",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Nombre accesible del campo (label sr-only)." },
+    "placeholder": { "type": "string", "required": false, "description": "Prop Placeholder de Figma. No sustituye al label." },
+    "value": { "type": "string", "required": false, "description": "Texto buscado (controlado)." },
+    "defaultValue": { "type": "string", "default": "''", "description": "Texto inicial (no controlado)." },
+    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Cambia el texto: al escribir, al elegir una sugerencia o al borrar con Esc." },
+    "onSearch": { "type": "(query: string, category?: string) => void", "required": false, "description": "Enter sin sugerencia activa, el botón de búsqueda o elegir una sugerencia. category es undefined sin categorías." },
+    "categories": { "type": "{ value: string; label: string; disabled?: boolean }[]", "required": false, "description": "Categorías del selector (\"Label ▾\" de Figma). Sin ellas no se dibujan el selector ni el separador." },
+    "category": { "type": "string", "required": false, "description": "Categoría elegida (controlado)." },
+    "defaultCategory": { "type": "string", "required": false, "description": "Categoría inicial (no controlado). Por defecto la primera." },
+    "onCategoryChange": { "type": "(category: string) => void", "required": false, "description": "Cambia la categoría." },
+    "suggestions": { "type": "{ keywords?: SearchInputSuggestion[]; recent?: SearchInputSuggestion[]; popular?: SearchInputSuggestion[] }", "required": false, "description": "Contenido del panel. SearchInputSuggestion = string | { value, label? }. Una sección vacía no se dibuja; sin ninguna, el panel no abre." },
+    "onSuggestionSelect": { "type": "(value: string, section: 'keywords' | 'recent' | 'popular') => void", "required": false, "description": "Se elige una sugerencia; después se llama onSearch con ese texto." },
+    "onClearRecent": { "type": "() => void", "required": false, "description": "Dibuja la papelera de \"Búsquedas recientes\". El foco vuelve al campo antes de llamarla." },
+    "onClearPopular": { "type": "() => void", "required": false, "description": "Dibuja la papelera de \"Popular ahora\"." },
+    "labels": { "type": "Partial<SearchInputLabels>", "required": false, "description": "Textos: search (\"Buscar\"), category (\"Categoría\"), suggestions (\"Sugerencias\"), recent, popular, clearRecent y clearPopular." },
+    "open": { "type": "boolean", "required": false, "description": "Panel abierto (controlado). Sin sugerencias, deshabilitado o de solo lectura no abre." },
+    "defaultOpen": { "type": "boolean", "default": false, "description": "Panel abierto al montar (no controlado)." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Se llama al abrir o cerrar el panel." },
+    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda (aria-describedby); el trazo pasa a border/semantic/information." },
+    "errorText": { "type": "string", "required": false, "description": "Mensaje de error; marca aria-invalid. Prioridad: error > éxito > ayuda." },
+    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito (State=Confirmation)." },
+    "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled: campo, selector y botón deshabilitados." },
+    "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In: el texto se enfoca y se lee; no abre el panel ni busca." },
+    "state": { "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success' | 'helper'", "required": false, "description": "Fuerza el aspecto, solo para documentación. active dibuja el panel abierto en el flujo." },
+    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz; el ref y los atributos nativos (name, autoFocus…) van al input. Para un landmark de búsqueda, pasar rootProps={{ role: 'search' }}." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<SearchInput label=\"Buscar en el sitio\" placeholder=\"Buscar\" onSearch={(q) => buscar(q)} />" },
+    { "title": "Con categorías", "code": "<SearchInput label=\"Buscar\" categories={[{ value: 'todo', label: 'Todo' }, { value: 'ayuda', label: 'Ayuda' }]} onSearch={(q, categoria) => buscar(q, categoria)} />" },
+    { "title": "Con sugerencias", "code": "<SearchInput\n  label=\"Buscar\"\n  value={q}\n  onValueChange={setQ}\n  suggestions={{ keywords: filtrar(q), recent: recientes, popular: populares }}\n  onClearRecent={() => setRecientes([])}\n  onSearch={buscar}\n/>" },
+    { "title": "Con error", "code": "<SearchInput label=\"Buscar\" errorText=\"Sin resultados\" />" }
+  ]
+}
