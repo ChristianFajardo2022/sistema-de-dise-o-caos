@@ -10,10 +10,10 @@ import { cva } from 'class-variance-authority';
  *   sm y xs: typography/button/size/sm en medium 500). Color: fondo background/*-secondary, texto text/* e ícono icon/*.
  *   Disabled: background/container/disabled-on-card, text/neutral/disabled-negative, icon/general/disabled-negative.
  * - Avatar photo (Size xs-lg): círculo con la imagen; Disabled = imagen en grises.
- * - Avatar brand / Avatar icon (Contrast × State × Size): píldora con fondo background/icon/{low,high}-contrast
- *   y radio radius/general/full. Figma: 56 (padding space/general/xl o 2xl), 48 (lg o xl), 32 (md o lg).
- *   Brand: logo de 32 (56 y 48) o 24 (32), color background/logo/default; Icon: 24 o 16 con icon/general/white.
- *   Disabled: el logo y el ícono pasan a icon/general/disabled-positive; el fondo no cambia.
+ * - Avatar brand / Avatar icon (Contrast × State × Size): píldora con fondo background/icon/* y radio
+ *   radius/general/full (detalle en avatarPillVariants). Brand: logo de 32 (56 y 48) o 24 (32), color
+ *   background/logo/default. Icon: ícono de 24, color icon/general/default . Disabled (brand) e Inactive (icon):
+ *   el logo y el ícono pasan a icon/general/disabled-positive.
  * - Indicador: Badge simple de 12 en la esquina inferior derecha (lg y md).
  * - Anillo del grupo: trazo border/general/white-unicolor de border/general/md (0.5) hacia dentro.
  */
@@ -62,19 +62,22 @@ export const avatarCircleVariants = cva(
 );
 
 /**
- * Iniciales: Helvetica. md y lg: tamaño de botón md (14) en regular (400). sm y xs: tamaño de botón sm (12) en peso
- * medium (500), como los sets Avatar colors, Avatar group y Avatar plus de Figma (valor literal: no hay token
- * typography/weight/medium en tokens.css; fonts.css sirve el archivo Medium para 500).
+ * Iniciales: Helvetica, peso typography/weight/Semibold (600) en todos los tamaños. md y lg: tamaño de botón md (14);
+ * sm y xs: tamaño de botón sm (12).
  */
 export const avatarTextVariants = cva(
-  ['[font-family:var(--ds-primitives-typography-family-primary),sans-serif]', 'whitespace-nowrap uppercase'].join(' '),
+  [
+    '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
+    '[font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    'whitespace-nowrap uppercase',
+  ].join(' '),
   {
     variants: {
       size: {
-        xs: 'text-ds-typography-button-size-sm font-medium',
-        sm: 'text-ds-typography-button-size-sm font-medium',
-        md: 'text-ds-typography-button-size-md [font-weight:var(--ds-primitives-typography-weight-regular)]',
-        lg: 'text-ds-typography-button-size-md [font-weight:var(--ds-primitives-typography-weight-regular)]',
+        xs: 'text-ds-typography-button-size-sm',
+        sm: 'text-ds-typography-button-size-sm',
+        md: 'text-ds-typography-button-size-md',
+        lg: 'text-ds-typography-button-size-md',
       },
     },
     defaultVariants: { size: 'lg' },
@@ -125,7 +128,22 @@ export const avatarUserBodyVariants = cva('absolute rounded-full', {
   defaultVariants: { size: 'lg', tone: 'purple' },
 });
 
-/** Píldora de brand e icon: la raíz del avatar. El padding (y por tanto el recuadro interior) depende del tamaño. */
+/** Fondos de la píldora (Figma: background/icon/{default,hover,select}-{on-canva,on-card}). */
+const ON_CANVA_DEFAULT = 'bg-ds-background-icon-default-on-canva';
+const ON_CARD_DEFAULT = 'bg-ds-background-icon-default-on-card';
+const ON_CANVA_HOVER = 'bg-ds-background-icon-hover-on-canva';
+const ON_CANVA_SELECT = 'bg-ds-background-icon-select-on-canva';
+const ON_CARD_HOVER = 'bg-ds-background-icon-hover-on-card';
+const ON_CARD_SELECT = 'bg-ds-background-icon-select-on-card';
+const ON_CARD_INACTIVE = 'bg-ds-background-icon-low-unicolor';
+
+/**
+ * Píldora de brand e icon: la raíz del avatar. El padding (y por tanto el recuadro interior) depende del tamaño.
+ * Icon (set "Avatar icon", Contrast × Size × State): 56 / 48 / 40 con ícono de 24 y padding 16 / 12 / 8
+ * (Figma md / sm / xs = aquí lg / md / sm). `xs` (24, ícono de 16) no existe en Figma y se conserva derivado.
+ * Brand (set "Avatar brand"): State Default o Disabled; en Figma su On Canva usa el fondo "on-card" del set Icon y su
+ * On Card el "on-canva".
+ */
 export const avatarPillVariants = cva(
   'relative box-border inline-flex shrink-0 items-center justify-center align-middle select-none gap-2.5 rounded-ds-radius-general-full',
   {
@@ -137,26 +155,34 @@ export const avatarPillVariants = cva(
         md: 'size-ds-dimention-avatar-md',
         lg: 'size-ds-dimention-avatar-lg',
       },
-      contrast: {
-        'on-canva': 'bg-ds-background-icon-low-contrast',
-        'on-card': 'bg-ds-background-icon-high-contrast',
-      },
-      disabled: {
-        true: 'text-ds-icon-general-disabled-positive',
-        false: '',
-      },
+      contrast: { 'on-canva': '', 'on-card': '' },
+      state: { default: '', hover: '', select: '', inactive: '' },
     },
     compoundVariants: [
       { variant: 'brand', size: 'sm', class: 'p-ds-space-general-md' },
       { variant: 'brand', size: 'md', class: 'p-ds-space-general-lg' },
       { variant: 'brand', size: 'lg', class: 'p-ds-space-general-xl' },
-      { variant: 'icon', size: 'sm', class: 'p-ds-space-general-lg' },
+      { variant: 'icon', size: 'xs', class: 'p-ds-space-general-md' },
+      { variant: 'icon', size: 'sm', class: 'size-10 p-ds-space-general-lg' },
       { variant: 'icon', size: 'md', class: 'p-ds-space-general-xl' },
       { variant: 'icon', size: 'lg', class: 'p-ds-space-general-2xl' },
-      { variant: 'brand', disabled: false, class: 'text-ds-background-logo-default' },
-      { variant: 'icon', disabled: false, class: 'text-ds-icon-general-white' },
+      // Colores del glifo
+      { variant: 'brand', state: ['default', 'hover', 'select'], class: 'text-ds-background-logo-default' },
+      { variant: 'icon', state: ['default', 'hover', 'select'], class: 'text-ds-icon-general-default' },
+      { state: 'inactive', class: 'text-ds-icon-general-disabled-positive' },
+      // Brand: solo Default / Disabled; el fondo no cambia
+      { variant: 'brand', contrast: 'on-canva', class: ON_CARD_DEFAULT },
+      { variant: 'brand', contrast: 'on-card', class: ON_CANVA_DEFAULT },
+      // Icon
+      { variant: 'icon', contrast: 'on-canva', state: ['default', 'inactive'], class: ON_CANVA_DEFAULT },
+      { variant: 'icon', contrast: 'on-canva', state: 'hover', class: ON_CANVA_HOVER },
+      { variant: 'icon', contrast: 'on-canva', state: 'select', class: ON_CANVA_SELECT },
+      { variant: 'icon', contrast: 'on-card', state: 'default', class: ON_CARD_DEFAULT },
+      { variant: 'icon', contrast: 'on-card', state: 'hover', class: ON_CARD_HOVER },
+      { variant: 'icon', contrast: 'on-card', state: 'select', class: ON_CARD_SELECT },
+      { variant: 'icon', contrast: 'on-card', state: 'inactive', class: ON_CARD_INACTIVE },
     ],
-    defaultVariants: { variant: 'brand', size: 'lg', contrast: 'on-canva', disabled: false },
+    defaultVariants: { variant: 'brand', size: 'lg', contrast: 'on-canva', state: 'default' },
   }
 );
 
@@ -200,11 +226,11 @@ export const avatarPlusButtonVariants = cva(
   }
 );
 
-/** Texto del "+N": 14 regular (button/size/md) con padding inferior space/general/sm (marco "Frame" de Figma). */
+/** Texto del "+N": 14 semibold (button/size/md, typography/weight/Semibold) con padding inferior space/general/sm (marco "Frame" de Figma). */
 export const avatarPlusTextVariants = cva(
   [
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
-    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+    '[font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'pb-ds-space-general-sm whitespace-nowrap',
   ].join(' '),
   {

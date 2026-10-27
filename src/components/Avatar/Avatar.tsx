@@ -30,6 +30,9 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
       color = 'purple',
       contrast = 'on-canva',
       disabled = false,
+      inactive = false,
+      selected = false,
+      state: stateProp = 'default',
       name,
       alt,
       src,
@@ -52,6 +55,8 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
     const accessibleName = label ?? (variant === 'photo' ? alt : name);
 
     if (variant === 'brand' || variant === 'icon') {
+      // `disabled` es el alias antiguo de `inactive`
+      const state = inactive || disabled ? 'inactive' : selected ? 'select' : stateProp;
       return (
         <span
           {...restProps}
@@ -59,7 +64,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
           role={accessibleName ? 'img' : undefined}
           aria-label={accessibleName}
           aria-hidden={accessibleName ? undefined : true}
-          className={cn(avatarPillVariants({ variant, size, contrast, disabled }), withRing && avatarRingClass, className)}
+          className={cn(avatarPillVariants({ variant, size, contrast, state: variant === 'brand' && state !== 'inactive' ? 'default' : state }), withRing && avatarRingClass, className)}
         >
           {variant === 'brand' ? (
             <span className={avatarLogoVariants({ size })} data-figma-part="Icon Right">
@@ -68,9 +73,9 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
           ) : (
             <Icon
               name={icon}
-              size={size === 'lg' || size === 'md' ? 24 : 16}
+              size={size === 'xs' ? 16 : 24}
               variant="fill"
-              data-figma-part="Icon Right"
+              data-figma-part="Icon-sizes"
             />
           )}
         </span>

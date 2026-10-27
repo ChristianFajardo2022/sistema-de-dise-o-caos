@@ -4,7 +4,8 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import { Avatar } from './Avatar';
 import { AvatarGroup } from './AvatarGroup';
 import { AvatarPlus } from './AvatarPlus';
-import type { AvatarColor, AvatarContrast, AvatarSize, AvatarVariant } from './Avatar.types';
+import { DropdownMenu, DropdownMenuItem } from '../DropdownMenu';
+import type { AvatarColor, AvatarContrast, AvatarSize, AvatarState, AvatarVariant } from './Avatar.types';
 import { PhotoSample, SampleLogo } from './Avatar.samples';
 import { PHOTO_SRC, SAMPLE_PHOTO_SRC } from './Avatar.sample-data';
 import type { PhotoName } from './Avatar.sample-data';
@@ -50,6 +51,15 @@ const meta = {
       description: 'Contrast de brand e icon',
     },
     disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Aspecto Disabled (solo visual)' },
+    inactive: { control: 'boolean', type: { name: 'boolean' }, description: 'State Inactive de icon (Disabled de brand)' },
+    selected: { control: 'boolean', type: { name: 'boolean' }, description: 'State Select de icon' },
+    state: {
+      name: 'state',
+      control: 'radio',
+      options: ['default', 'hover', 'select', 'inactive'],
+      type: { name: 'enum', value: ['default', 'hover', 'select', 'inactive'] },
+      description: 'Fuerza el State de icon (solo documentación)',
+    },
     badge: { control: 'boolean', type: { name: 'boolean' }, description: 'Indicador de estado (lg y md)' },
     name: { control: 'text', type: { name: 'string' }, description: 'Nombre completo: iniciales y nombre accesible' },
     alt: { control: 'text', type: { name: 'string' }, description: 'Texto alternativo de photo' },
@@ -214,8 +224,11 @@ export const FigmaMatrixAvatar: Story = {
         <div data-figma="Type=Text" className="inline-flex gap-2.5">
           <Avatar variant="initials" size="lg" badge name="Hugo García" badgeLabel="En línea" />
         </div>
+        <div data-figma="Type=User" className="inline-flex gap-2.5">
+          <Avatar variant="user" size="lg" badge label="Hugo García" badgeLabel="En línea" />
+        </div>
         <div data-figma="Type=Icon" className="inline-flex gap-2.5">
-          <Avatar variant="icon" size="lg" label="Carpeta" />
+          <Avatar variant="icon" size="lg" contrast="on-card" label="Carpeta" />
         </div>
       </div>
     </Frame>
@@ -279,14 +292,15 @@ export const FigmaMatrixAvatarPhoto: Story = {
   ),
 };
 
-function PillMatrix({ variant }: { variant: 'brand' | 'icon' }) {
-  const surfaces: { contrast: AvatarContrast; figma: string; bg: string }[] = [
-    { contrast: 'on-canva', figma: 'On Canva', bg: 'bg-ds-background-container-default-on-canva' },
-    { contrast: 'on-card', figma: 'On Card', bg: 'bg-ds-background-container-default-on-card' },
-  ];
+const SURFACES: { contrast: AvatarContrast; figma: string; bg: string }[] = [
+  { contrast: 'on-canva', figma: 'On Canva', bg: 'bg-ds-background-container-default-on-canva' },
+  { contrast: 'on-card', figma: 'On Card', bg: 'bg-ds-background-container-default-on-card' },
+];
+
+function BrandMatrix() {
   return (
     <div className="flex flex-col">
-      {surfaces.map((sf) => (
+      {SURFACES.map((sf) => (
         <div key={sf.contrast} className={`${sf.bg} flex flex-col gap-4 p-6`}>
           <span className={LABEL}>{sf.figma}</span>
           {[false, true].map((disabled) => (
@@ -295,13 +309,61 @@ function PillMatrix({ variant }: { variant: 'brand' | 'icon' }) {
               {SIZES_PILL.map((s) => (
                 <Avatar
                   key={s.size}
-                  variant={variant}
+                  variant="brand"
                   size={s.size}
                   contrast={sf.contrast}
-                  disabled={disabled}
-                  label={variant === 'brand' ? 'Marca de ejemplo' : 'Carpeta'}
-                  logo={variant === 'brand' ? <SampleLogo /> : undefined}
+                  inactive={disabled}
+                  label="Marca de ejemplo"
+                  logo={<SampleLogo />}
                   data-figma={`Contrast=${sf.figma}, State=${disabled ? 'Disabled' : 'Default'}, Size=${s.figma}`}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Avatar icon: Figma nombra md, sm y xs a lo que aquí es lg, md y sm (56, 48 y 40). */
+const ICON_SIZES: { size: AvatarSize; figma: string }[] = [
+  { size: 'lg', figma: 'md' },
+  { size: 'md', figma: 'sm' },
+  { size: 'sm', figma: 'xs' },
+];
+const ICON_STATES: { state: AvatarState; figma: string }[] = [
+  { state: 'default', figma: 'Default' },
+  { state: 'hover', figma: 'Hover' },
+  { state: 'select', figma: 'Select' },
+  { state: 'inactive', figma: 'Inactive' },
+];
+const ICON_SURFACES: { contrast: AvatarContrast; figma: string; bg: string }[] = [
+  { contrast: 'on-canva', figma: 'On canva', bg: 'bg-ds-background-container-default-on-canva' },
+  { contrast: 'on-card', figma: 'On card', bg: 'bg-ds-background-container-default-on-card' },
+];
+
+function IconMatrix() {
+  return (
+    <div className="flex flex-col">
+      {ICON_SURFACES.map((sf) => (
+        <div key={sf.contrast} className={`${sf.bg} flex flex-col gap-4 p-6`}>
+          <span className={LABEL}>{sf.figma}</span>
+          {ICON_STATES.map((st) => (
+            <div key={st.state} className="flex items-center gap-8">
+              <span className={`${LABEL} w-16`}>{st.figma}</span>
+              {ICON_SIZES.map((s) => (
+                <Avatar
+                  key={s.size}
+                  variant="icon"
+                  size={s.size}
+                  contrast={sf.contrast}
+                  // Select e Inactive también existen como props propias; aquí se fuerza por `state`
+                  state={st.state === 'inactive' ? undefined : st.state}
+                  inactive={st.state === 'inactive'}
+                  selected={st.state === 'select'}
+                  label="Carpeta"
+                  data-figma={`Contrast=${sf.figma}, Size=${s.figma}, State=${st.figma}`}
                 />
               ))}
             </div>
@@ -315,26 +377,57 @@ function PillMatrix({ variant }: { variant: 'brand' | 'icon' }) {
 /** Set "Avatar brand": Contrast × State × Size (12). Una superficie por Contrast. */
 export const FigmaMatrixAvatarBrand: Story = {
   parameters: { layout: 'padded' },
-  render: () => <PillMatrix variant="brand" />,
+  render: () => <BrandMatrix />,
 };
 
-/** Set "Avatar icon": Contrast × State × Size (12). Una superficie por Contrast. */
+/** Set "Avatar icon": Contrast × Size × State (24). Una superficie por Contrast. */
 export const FigmaMatrixAvatarIcon: Story = {
   parameters: { layout: 'padded' },
-  render: () => <PillMatrix variant="icon" />,
+  render: () => <IconMatrix />,
 };
 
-/** Set "Avatar plus": Default y Hover. El menú de Hover (Dropdown) llega en otro grupo. */
+/**
+ * Set "Avatar plus": Default y Hover. En Hover Figma muestra abierto el Dropdown menu (Simple, Item=Avatar) con los
+ * avatares ocultos; aquí es el mismo `DropdownMenu` que usa `AvatarGroup`, abierto al cargar.
+ */
 export const FigmaMatrixAvatarPlus: Story = {
   parameters: { layout: 'padded' },
   render: () => (
     <Frame>
-      <div className="flex items-start gap-8">
+      <div className="flex min-h-48 items-start gap-8 pl-52">
         <div data-figma="State=Default, Size=lg" className="inline-flex gap-2.5">
           <AvatarPlus count={2} />
         </div>
         <div data-figma="State=Hover, Size=lg" className="inline-flex gap-2">
-          <AvatarPlus count={2} state="hover" />
+          <DropdownMenu
+            mode="list"
+            aria-label="Personas ocultas"
+            defaultOpen
+            trigger={<AvatarPlus count={2} state="hover" />}
+          >
+            <DropdownMenuItem
+              type="avatar"
+              avatar={
+                <span aria-hidden="true" className="inline-flex">
+                  <Avatar variant="photo" size="xs" alt="Hugo García">
+                    <PhotoSample name="Woman_1" />
+                  </Avatar>
+                </span>
+              }
+            >
+              Hugo García
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              type="avatar"
+              avatar={
+                <span aria-hidden="true" className="inline-flex">
+                  <Avatar variant="initials" size="xs" name="Ana Chávez" />
+                </span>
+              }
+            >
+              Ana Chávez
+            </DropdownMenuItem>
+          </DropdownMenu>
         </div>
       </div>
     </Frame>

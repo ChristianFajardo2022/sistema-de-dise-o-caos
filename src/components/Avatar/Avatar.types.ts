@@ -10,16 +10,27 @@ export type AvatarVariant = 'initials' | 'user' | 'photo' | 'brand' | 'icon';
 
 /**
  * Tamaño. Se nombra por el diámetro: xs 24, sm 32, md 48, lg 56 (tokens dimention/avatar/*).
- * Figma nombra distinto los átomos brand e icon (md = 56, sm = 48, xs = 32): aquí siguen la misma escala
- * que el resto. El xs de brand e icon (24) no existe en Figma y se deriva de la misma regla.
+ * Figma nombra distinto los átomos brand (md = 56, sm = 48, xs = 32) e icon (md = 56, sm = 48, xs = 40): aquí siguen
+ * la misma escala que el resto. Excepción: en `icon`, `sm` mide 40 (el xs de Figma, con ícono de 24).
+ * El xs de brand e icon (24) no existe en Figma y se deriva de la misma regla.
  */
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg';
 
 /** Color de las variantes `initials` y `user` (Color de Figma). El gris deshabilitado sale de `disabled`. */
 export type AvatarColor = 'purple' | 'yellow' | 'blue' | 'green' | 'red';
 
-/** Contrast de Figma para `brand` e `icon`: sobre el lienzo (On Canva) o sobre una tarjeta (On Card). */
+/**
+ * Contrast de Figma para `brand` e `icon`: sobre el lienzo (On Canva) o sobre una tarjeta (On Card).
+ * Ojo: en Figma el fondo de `brand` está cruzado respecto al de `icon` (On Canva de brand = fondo "on-card" de icon).
+ */
 export type AvatarContrast = 'on-canva' | 'on-card';
+
+/**
+ * State de Figma del avatar `icon` (set "Avatar icon"): Default, Hover, Select e Inactive.
+ * El avatar no es interactivo: `hover` solo fuerza el aspecto (documentación; en uso real lo dibuja quien lo vuelve
+ * interactivo). `select` e `inactive` también tienen props propias (`selected`, `inactive`).
+ */
+export type AvatarState = 'default' | 'hover' | 'select' | 'inactive';
 
 export interface AvatarProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   /** Type de Figma. Por defecto `initials`. */
@@ -30,8 +41,20 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'chil
   color?: AvatarColor;
   /** Contrast de `brand` e `icon`. Por defecto `on-canva`. */
   contrast?: AvatarContrast;
-  /** Aspecto Disabled de Figma (solo visual: el avatar no es interactivo). En `photo` pasa la imagen a grises. */
+  /**
+   * Aspecto Disabled de Figma (solo visual: el avatar no es interactivo). En `photo` pasa la imagen a grises.
+   * En `icon` es un alias de `inactive` (nombre del State en el set actual de Figma): migrar a `inactive`.
+   */
   disabled?: boolean;
+  /** State Inactive de Figma para `icon` (y Disabled de `brand`): glifo en gris, el fondo no cambia. Equivale a `disabled`. */
+  inactive?: boolean;
+  /** State Select de Figma para `icon`. Se ignora si `inactive` o `disabled`. */
+  selected?: boolean;
+  /**
+   * Fuerza el State de `icon` para documentación (Hover no tiene CSS propio: el avatar no es interactivo).
+   * `inactive` y `selected` tienen prioridad. Por defecto `default`.
+   */
+  state?: AvatarState;
   /**
    * Nombre completo de la persona. En `initials` se reduce a iniciales ("Hugo García" -> "HG")
    * y es además el nombre accesible. En `user` es el nombre accesible.
