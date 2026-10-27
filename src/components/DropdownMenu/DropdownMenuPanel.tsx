@@ -49,7 +49,7 @@ export const DropdownMenuPanel = forwardRef<HTMLDivElement, DropdownMenuPanelPro
         <div {...restProps} ref={ref} className={cn(dropdownMenuPanelVariants({ type }), className)}>
           {type === 'search' && (
             <Input
-              variant="search"
+              variant="search-header"
               label={searchLabel}
               fullWidth
               leftIcon={<Icon name="search" size={16} variant="line" aria-hidden="true" data-figma-part="Icon Search" />}

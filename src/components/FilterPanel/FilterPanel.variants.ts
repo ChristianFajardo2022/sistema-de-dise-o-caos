@@ -82,8 +82,8 @@ export const filterSectionPlainHeaderClass = 'flex items-center gap-ds-space-gen
 
 export const filterSectionPlainTitleClass = [
   'm-0 min-w-0 font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
-  // Figma heading/xs (14/18): en tokens.css ese valor es heading-sm (heading-xs resuelve 12/16)
-  'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading',
+  // Figma heading/xs (12/16)
+  'text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs text-ds-text-neutral-heading',
 ].join(' ');
 
 /** Slot Container de "Individual filter": fila con wrap. */

@@ -106,7 +106,7 @@ export const ListItem = forwardRef<HTMLLIElement, ListItemProps>(
       <li
         {...restProps}
         ref={ref}
-        className={cn(listItemVariants({ disabled }), navigable && listItemNavigableClass, className)}
+        className={cn(listItemVariants({ variant, disabled }), navigable && listItemNavigableClass, className)}
       >
         <div data-figma-part="Desktop" className={listItemRowVariants({ variant })}>
           {selectable && (

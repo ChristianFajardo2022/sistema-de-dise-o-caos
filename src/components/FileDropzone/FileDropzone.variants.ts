@@ -84,12 +84,12 @@ export const fileDropzoneActionVariants = cva(headingBase, {
 
 export const fileDropzoneSpecsVariants = cva(infoBase, {
   variants: {
-    disabled: { true: 'text-ds-text-field-disabled-positive', false: 'text-ds-text-neutral-gray' },
+    disabled: { true: 'text-ds-text-field-disabled-positive', false: 'text-ds-text-neutral-body' },
   },
   defaultVariants: { disabled: false },
 });
 
-export const fileDropzoneMaxVariants = cva(infoBase, {
+export const fileDropzoneMaxVariants = cva(`${infoBase} [font-weight:var(--ds-primitives-typography-weight-semibold)]`, {
   variants: {
     disabled: { true: 'text-ds-text-neutral-disabled-negative', false: 'text-ds-text-neutral-white' },
   },

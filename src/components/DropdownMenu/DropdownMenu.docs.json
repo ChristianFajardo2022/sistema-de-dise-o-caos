@@ -22,7 +22,7 @@
     "listProps": { "type": "HTMLAttributes & { ref?, role?: 'menu' | 'listbox' }", "required": false, "description": "Solo en DropdownMenuPanel: atributos del área de ítems. Con role listbox sirve de lista de opciones (Select)." }
   },
   "itemProps": {
-    "type": { "type": "'simple' | 'icon' | 'checkbox' | 'radio' | 'avatar'", "default": "'simple'", "description": "Type del ítem de Figma (simple con Icono=true es icon)." },
+    "type": { "type": "'simple' | 'icon' | 'checkbox' | 'radio' | 'avatar' | 'dropdown'", "default": "'simple'", "description": "Type del ítem de Figma (simple con Icono=true es icon; dropdown = texto + chevron-down)." },
     "icon": { "type": "IconName", "default": "'add-circle'", "description": "Ícono de type=icon." },
     "avatar": { "type": "ReactNode", "required": false, "description": "Avatar de type=avatar, p. ej. <Avatar variant=\"photo\" size=\"xs\" … />." },
     "checked / defaultChecked / onCheckedChange": { "type": "boolean / boolean / (checked) => void", "required": false, "description": "Marcado de checkbox y radio." },

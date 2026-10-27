@@ -14,7 +14,7 @@ import { cva } from 'class-variance-authority';
  * text/neutral/disabled-positive, centrado en una franja de 76.
  *
  * Vertical (376 × 812): la interfaz horizontal girada −90° dentro de una pantalla de celular, sin relleno; padding
- * space/container/default (24; no existe en tokens.css, se usa `p-6`) y space/general/5xl (40) a la izquierda, gap 10. Cuatro columnas de izquierda a derecha:
+ * space/container/on-canva (32) arriba, abajo y a la derecha, y space/general/5xl (40) a la izquierda, gap 10. Cuatro columnas de izquierda a derecha:
  * íconos (24), firma (174), línea con "close" (28; línea de 1 en border/general/default-on-card) y CTA (56: bloque nombre/documento
  * 16/20 en text/neutral/white y los botones Cancelar y Crear firma, gap space/general/xl (12)). Las columnas giradas miden
  * con container query units (cqh/cqw) para ocupar su largo real.
@@ -35,7 +35,7 @@ export const signaturePadRootVariants = cva(
         ].join(' '),
         vertical: [
           'h-203 w-94 max-w-full flex-row gap-2.5',
-          'py-6 pr-6 pl-ds-space-general-5xl',
+          'py-ds-space-container-on-canva pr-ds-space-container-on-canva pl-ds-space-general-5xl',
         ].join(' '),
       },
       disabled: { true: 'opacity-50', false: '' },

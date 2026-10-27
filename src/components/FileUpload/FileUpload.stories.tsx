@@ -82,7 +82,7 @@ export const FigmaMatrix: Story = {
           maxSizeLabel="Máx. 23 GB"
           items={[{ id: '1', name: 'Nombre del archivo ', status: 'loading', progress: 25, message: 'Estado' }]}
           onRemove={() => {}}
-          data-figma="File upload"
+          data-figma="File upload complex"
         />
       </div>
     </div>

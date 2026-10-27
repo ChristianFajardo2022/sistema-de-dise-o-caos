@@ -19,9 +19,9 @@ export type DropdownMenuSide = 'bottom' | 'top';
 
 /**
  * Type del set "Dropdown list" de Figma (el ítem).
- * `simple` = solo texto, `icon` = ícono + texto (el "Simple" con Icono=true), `checkbox`, `radio` (RadioButton) y `avatar`.
+ * `simple` = solo texto, `icon` = ícono + texto (el "Simple" con Icono=true), `checkbox`, `radio` (RadioButton), `avatar` y `dropdown` ("List Item Dropdown": texto + `chevron-down` a la derecha).
  */
-export type DropdownMenuItemType = 'simple' | 'icon' | 'checkbox' | 'radio' | 'avatar';
+export type DropdownMenuItemType = 'simple' | 'icon' | 'checkbox' | 'radio' | 'avatar' | 'dropdown';
 
 /** State del ítem de Figma. Solo fuerza el aspecto (documentación); en uso normal sale de CSS, `selected`, `checked` y `disabled`. */
 export type DropdownMenuItemState = 'default' | 'hover' | 'select' | 'disabled';

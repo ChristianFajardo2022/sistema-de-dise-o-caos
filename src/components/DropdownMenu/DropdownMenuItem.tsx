@@ -88,6 +88,16 @@ export const DropdownMenuItem = forwardRef<HTMLElement, DropdownMenuItemProps>(
         <span data-figma-part="Text item" className={dropdownMenuItemTextVariants()}>
           {children}
         </span>
+        {type === 'dropdown' && (
+          <Icon
+            name="chevron-down"
+            size={16}
+            variant="fill"
+            aria-hidden="true"
+            data-figma-part="Icon-sizes"
+            className={dropdownMenuItemIconVariants({ disabled: isDisabled })}
+          />
+        )}
       </>
     );
 

@@ -227,6 +227,7 @@ const LIST_TYPES: { figma: string; type: DropdownMenuItemType }[] = [
   { figma: 'List Item RadioButton', type: 'radio' },
   { figma: 'List Item Avatar', type: 'avatar' },
   { figma: 'List Item simple', type: 'icon' },
+  { figma: 'List Item Dropdown', type: 'dropdown' },
 ];
 const LIST_STATES: { figma: string; state: DropdownMenuItemState }[] = [
   { figma: 'Default', state: 'default' },

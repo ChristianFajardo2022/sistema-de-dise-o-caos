@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
  * Fuente: component set "List (Atom)" de Figma (12174:13893): Type (Simple, Complex) × State (Default, Disabled).
  * El marco `Desktop` y el `Mobile` (oculto en Figma) se resuelven con una sola estructura y container queries.
  *
- * - Raíz: padding space/general/lg (8) lateral y space/general/2xl (16) arriba y abajo; borde superior de
+ * - Raíz: padding space/general/lg (8) lateral y arriba y abajo space/general/2xl (16) en complex o space/general/xl (12) en simple; borde superior de
  *   border/general/lg (1) en border/general/default-on-canva. El trazo de Figma es INSIDE y no suma alto: se dibuja
  *   con un box-shadow inset (no ocupa espacio, así que el padding y el alto coinciden con Figma). Es el contenedor de consulta (`@container`): el layout vive en el hijo.
  * - Desktop (contenedor >= 18rem de contenido, lo que mide la fila con avatar, texto y dos botones; no el corte de viewport de 48rem, que no aplica a un container query): una fila, gap 16 (complex) u 8 (simple).
@@ -15,12 +15,13 @@ import { cva } from 'class-variance-authority';
  * - Disabled: textos en text/neutral/disabled-*; los controles se deshabilitan por su propia API.
  */
 export const listItemVariants = cva(
-  '@container list-none bg-transparent [box-shadow:inset_0_var(--ds-responsive-border-general-lg)_0_0_var(--color-ds-border-general-default-on-canva)] px-ds-space-general-lg py-ds-space-general-2xl',
+  '@container list-none bg-transparent [box-shadow:inset_0_var(--ds-responsive-border-general-lg)_0_0_var(--color-ds-border-general-default-on-canva)] px-ds-space-general-lg',
   {
     variants: {
+      variant: { complex: 'py-ds-space-general-2xl', simple: 'py-ds-space-general-xl' },
       disabled: { true: 'cursor-not-allowed', false: '' },
     },
-    defaultVariants: { disabled: false },
+    defaultVariants: { variant: 'complex', disabled: false },
   }
 );
 
@@ -51,12 +52,9 @@ export const listItemHeadClass =
 
 const fontPrimary = 'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]';
 
-/**
- * `Filename`: Prospero semibold 14/18. Figma enlaza typography/heading/size/xs (alias de size/md = 14), pero en
- * tokens.css ese token vale 12: se usan los primitivos size/md y line-height/lg, que sí dan 14/18.
- */
+/** `Filename`: Prospero semibold, typography/heading/size/xs (12/16). */
 export const listItemTitleVariants = cva(
-  'min-w-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)] text-(length:--ds-primitives-typography-size-md) leading-(--ds-primitives-typography-line-height-lg)',
+  'min-w-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)] text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs',
   {
     variants: {
       variant: {
@@ -75,7 +73,7 @@ export const listItemTitleVariants = cva(
 );
 
 /**
- * `Status` de la descripción: complex 14/18; simple 16/20 en body. La variable de Figma se llama
+ * `Status` de la descripción: 14/18 en Desktop (complex y simple); el simple pasa a 16/20 solo en Mobile. La variable de Figma se llama
  * "text/neutral/gray 2" pero resuelve a G07/G11, que en tokens.css es `text-neutral-gray`
  * (`gray-2` no cumple el contraste en light).
  */
@@ -86,7 +84,7 @@ export const listItemDescriptionVariants = cva(
       variant: {
         complex: 'text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md',
         simple:
-          'min-w-0 text-ds-typography-body-size-lg leading-ds-typography-body-line-height-short-lg @2xs:flex-1',
+          'min-w-0 text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md @max-2xs:text-ds-typography-body-size-lg @max-2xs:leading-ds-typography-body-line-height-short-lg @2xs:flex-1',
       },
       disabled: { true: '', false: '' },
     },
