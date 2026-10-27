@@ -1,0 +1,32 @@
+{
+  "name": "FileUploadSimple",
+  "component": "FileUploadSimple",
+  "description": "Carga de un solo archivo del sistema de diseño CAOS, fiel a los component sets File upload simple-2 (21407:3920: props de texto Format, Size, Title y Document; Type Default/Uploading × State Default/Loaded) y File upload simple (21412:4523: Default, Hover, Focus, Upload e Inactive × Default y Loaded, con Alert opcional). Recuadro de 304 con trazo punteado border/field/disabled: en `idle` es un FileDropzone reutilizado tal cual; en `uploading` muestra, dentro del recuadro, el progreso (ProgressBar linear-text) y el botón eliminar rojo (ButtonCorner sm con ícono trash en icon/semantic/error-firts), con los textos apagados; en `loaded` muestra el ícono tick-circle, el nombre del archivo, el enlace \"volver a cargar\" y el tamaño. FileDropzone no se usa en `uploading` ni `loaded` porque su recuadro no admite contenido propio (ícono fijo, sin barra ni acciones): ahí se dibuja un recuadro gemelo con los mismos tokens. No sube nada: `onFileChange` entrega el archivo y quien lo usa controla `status` y `progress`. Sin `status`, elegir un archivo pasa a `loaded` y eliminar vuelve a `idle`. Accesibilidad: input de archivo nativo (teclado y selector), progreso con role=progressbar nombrado por el archivo, región role=status que anuncia inicio y final de la carga y los archivos descartados, foco que pasa al control que sustituye al que desaparece, y foco visible. El `ref` apunta al input activo.",
+  "category": "Form Controls",
+  "props": {
+    "accept": { "type": "string", "required": false, "description": "Tipos admitidos (sintaxis de accept nativo); se valida también al soltar." },
+    "maxSize": { "type": "number", "required": false, "description": "Tamaño máximo en bytes." },
+    "title": { "type": "ReactNode", "default": "'Selecciona tu'", "description": "Prop Title de Figma." },
+    "actionText": { "type": "ReactNode", "default": "'archivo'", "description": "Prop Document de Figma (texto en color de enlace)." },
+    "formatsText": { "type": "ReactNode", "required": false, "description": "Prop Format de Figma. Por defecto sale de accept." },
+    "sizeText": { "type": "ReactNode", "required": false, "description": "Prop Size de Figma. Por defecto sale de maxSize." },
+    "file": { "type": "{ name: string; size?: number } | null", "required": false, "description": "Archivo actual (controlado)." },
+    "defaultFile": { "type": "{ name: string; size?: number } | null", "default": "null", "description": "Archivo inicial (no controlado)." },
+    "onFileChange": { "type": "(file: File | null) => void", "required": false, "description": "Archivo válido elegido o soltado; null al eliminar." },
+    "status": { "type": "'idle' | 'uploading' | 'loaded' | 'error'", "required": false, "description": "Type + State de Figma (controlado). Error mantiene el aspecto de reposo; el motivo va en alert." },
+    "defaultStatus": { "type": "'idle' | 'uploading' | 'loaded' | 'error'", "required": false, "description": "Estado inicial; por defecto idle, o loaded con defaultFile." },
+    "progress": { "type": "number", "default": 0, "description": "Progreso 0-100 en uploading." },
+    "onRemove": { "type": "() => void", "required": false, "description": "Botón eliminar del progreso (cancela la carga)." },
+    "onReplace": { "type": "(file: File) => void", "required": false, "description": "Archivo nuevo que reemplaza al cargado." },
+    "onFilesRejected": { "type": "(rejections: FileRejection[]) => void", "required": false, "description": "Archivos descartados y su motivo." },
+    "disabled": { "type": "boolean", "default": false, "description": "State=Inactive." },
+    "state": { "type": "'default' | 'hover' | 'focus' | 'disabled'", "required": false, "description": "Solo documentación: fuerza el aspecto Hover, Focus o Inactive. En uso real sale del puntero, el foco y disabled." },
+    "alert": { "type": "AlertProps | null", "required": false, "description": "Prop Alert de Figma: mensaje bajo el recuadro." },
+    "replaceText": { "type": "string", "default": "'volver a cargar'", "description": "Texto del enlace del estado cargado." },
+    "removeLabel": { "type": "string", "required": false, "description": "Nombre accesible del botón eliminar. Por defecto \"Eliminar <archivo>\"." }
+  },
+  "examples": [
+    { "title": "Carga controlada", "code": "<FileUploadSimple accept=\".pdf,.jpg\" maxSize={25 * 1024 ** 2} status={status} progress={progress} file={file} onFileChange={iniciarCarga} onRemove={cancelar} />" },
+    { "title": "Con mensaje de error", "code": "<FileUploadSimple status=\"error\" alert={{ type: 'error', title: 'No se pudo cargar' }} />" }
+  ]
+}
