@@ -27,9 +27,9 @@ export const buttonVariants = cva(
     'cursor-pointer select-none whitespace-nowrap outline-none',
     'transition-[background-color,border-color,color] duration-300 ease-out',
     'disabled:cursor-not-allowed',
-    // Button/Button-md-600: Helvetica Neue, peso 400, 14px fijo (md-uniform, no el responsive), tracking 0
+    // Button/Button-md-600: Helvetica Neue, peso Semibold (600 = archivo Medium en fonts.css), 14px fijo (md-uniform, no el responsive), tracking 0
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
-    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+    '[font-weight:var(--ds-primitives-typography-weight-semibold)]',
     // leading-none va después del tamaño: tailwind-merge descarta un leading anterior a un text-size
     'text-(length:--ds-responsive-typography-button-size-md-uniform) leading-none',
     'tracking-normal',

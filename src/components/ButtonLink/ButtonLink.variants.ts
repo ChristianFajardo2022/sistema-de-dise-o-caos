@@ -20,7 +20,7 @@ export const buttonLinkVariants = cva(
     'cursor-pointer select-none whitespace-nowrap no-underline outline-none',
     'transition-colors duration-300 ease-out',
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
-    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+    '[font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-(length:--ds-responsive-typography-button-size-md-uniform) leading-none',
     'tracking-normal',
   ].join(' '),
