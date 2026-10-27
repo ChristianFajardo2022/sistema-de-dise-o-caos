@@ -1,0 +1,20 @@
+{
+  "name": "ButtonMenu",
+  "component": "ButtonMenu",
+  "description": "Botón de la navegación principal, fiel al component set Button menu (Atom) de Figma (12419:5959): texto de 14 en gris que se aclara hasta blanco (Regular; Semibold en Focus y Press/select), sin fondo ni trazo, con ícono opcional a la izquierda y chevron opcional a la derecha. Es un componente propio (ningún Button ni ButtonLink usa los tokens text/button/menu/* e icon/button/menu/*). Sin href es un botón que abre un submenú y expone aria-expanded (abierto se pinta en Press/select); con href es un enlace y la sección actual lleva aria-current=\"page\". Inactive es disabled.",
+  "category": "Navigation",
+  "props": {
+    "children": { "type": "ReactNode", "required": false, "description": "Text de Figma." },
+    "iconLeft": { "type": "IconName", "required": false, "description": "Icon-left de Figma: ícono de la biblioteca CAOS antes del texto." },
+    "iconRight": { "type": "boolean", "default": false, "description": "Icon-rigth de Figma: chevron hacia abajo. Úsalo si el botón abre un submenú." },
+    "selected": { "type": "boolean", "default": false, "description": "Sección actual: Press/select y aria-current." },
+    "href": { "type": "string", "required": false, "description": "Con href es un enlace <a>; sin él, un <button>." },
+    "disabled": { "type": "boolean", "default": false, "description": "State Inactive." },
+    "state": { "type": "'default' | 'hover' | 'focus' | 'press' | 'inactive'", "required": false, "description": "Fuerza el aspecto de un State (solo documentación)." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales." }
+  },
+  "examples": [
+    { "title": "Con submenú", "code": "<ButtonMenu iconRight aria-expanded={open} aria-controls=\"submenu\" onClick={toggle}>Servicios</ButtonMenu>" },
+    { "title": "Enlace de la sección actual", "code": "<ButtonMenu href=\"/inicio\" selected>Inicio</ButtonMenu>" }
+  ]
+}

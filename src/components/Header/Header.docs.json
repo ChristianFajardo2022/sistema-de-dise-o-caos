@@ -1,0 +1,40 @@
+{
+  "name": "Header",
+  "component": "Header",
+  "description": "Cabecera del producto, fiel a los component sets Header desktop (13448:29988, Type Default y Menu list1 a 6, 1440×96) y Header mobile (13520:81850, Type Default y Menu list, 376×72) de Figma. Escritorio: Logo, navegación con submenús en banda bajo la barra (ButtonMenu, patrón disclosure con aria-expanded; la lista sigue a su botón en el orden de Tab y Escape, el clic fuera o el foco que sale de la navegación la cierran), buscador (Input search-header), campana con panel de notificaciones simple o complejo y menú de perfil (AvatarMenu). Móvil: botón de menú (IconMenu) que despliega una hoja con el buscador y los enlaces (justo después del botón en el orden de Tab; Escape la cierra y devuelve el foco al botón); campana y avatar en la barra. layout=\"auto\" cambia en 64rem. Landmarks: header (banner), nav con nombre, search; aria-current=\"page\" en la sección actual. La campana abre el NotificationPanel (popup) en una capa superior anclada; Escape y el clic fuera cierran y el foco vuelve a la campana. El panel y el menú de perfil quedan montados en su capa cerrada (conservan filtro, pestaña y desplazamiento). Barra de estado del celular (Status Bar): decorativa, no forma parte del componente.",
+  "category": "Navigation",
+  "props": {
+    "layout": { "type": "'auto' | 'desktop' | 'mobile'", "default": "'auto'", "description": "Header desktop, Header mobile o según el ancho (64rem)." },
+    "logo": { "type": "ReactNode", "required": false, "description": "Logo de Figma. Por defecto Logo icon sm." },
+    "homeHref": { "type": "string", "required": false, "description": "Convierte el logo en un enlace de inicio." },
+    "homeLabel": { "type": "string", "default": "'Inicio'", "description": "Nombre accesible del enlace del logo." },
+    "items": { "type": "HeaderNavItem[]", "required": false, "description": "Menu list de Figma: secciones con enlace directo o submenú (items)." },
+    "navLabel": { "type": "string", "default": "'Navegación principal'", "description": "Nombre del nav." },
+    "openItem": { "type": "string | null", "required": false, "description": "Escritorio: sección con el submenú abierto (controlado)." },
+    "defaultOpenItem": { "type": "string | null", "default": "null", "description": "Escritorio: sección abierta al montar." },
+    "onOpenItemChange": { "type": "(id: string | null) => void", "required": false, "description": "Cambia la sección abierta." },
+    "search": { "type": "boolean", "default": true, "description": "Searcher de Figma." },
+    "searchLabel": { "type": "string", "default": "'Buscar'", "description": "Label del buscador." },
+    "searchProps": { "type": "InputProps", "required": false, "description": "Props del input del buscador." },
+    "onSearch": { "type": "(value: string) => void", "required": false, "description": "Se envía el buscador." },
+    "notificationPanel": { "type": "ReactElement<NotificationPanelProps>", "required": false, "description": "El NotificationPanel que abre la campana (simple o complex). Sin él no hay campana." },
+    "notificationCount": { "type": "number", "required": false, "description": "No leídas en la campana." },
+    "notificationsOpen": { "type": "boolean", "required": false, "description": "Panel de notificaciones abierto (controlado)." },
+    "defaultNotificationsOpen": { "type": "boolean", "default": false, "description": "Panel de notificaciones abierto al montar." },
+    "onNotificationsOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Cambia el panel de notificaciones." },
+    "user": { "type": "{ name: string; email?: string }", "required": false, "description": "Persona de la sesión (avatar con menú de perfil; el botón se llama \"<iniciales>, menú de perfil de <name>\")." },
+    "profileMenu": { "type": "ReactNode", "required": false, "description": "DropdownMenuItem del menú de perfil." },
+    "onLogout": { "type": "() => void", "required": false, "description": "Cerrar sesión." },
+    "logoutLabel": { "type": "string", "default": "'Cerrar sesión'", "description": "Texto del ítem de cierre de sesión." },
+    "actions": { "type": "ReactNode", "required": false, "description": "Botones al final (Buttons de Figma)." },
+    "menuOpen": { "type": "boolean", "required": false, "description": "Móvil: menú desplegable abierto (controlado)." },
+    "defaultMenuOpen": { "type": "boolean", "default": false, "description": "Móvil: menú abierto al montar." },
+    "onMenuOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Móvil: cambia el menú." },
+    "openMenuLabel": { "type": "string", "default": "'Abrir menú'", "description": "Móvil: nombre del botón con el menú cerrado." },
+    "closeMenuLabel": { "type": "string", "default": "'Cerrar menú'", "description": "Móvil: nombre del botón con el menú abierto." },
+    "menuClassName": { "type": "string", "required": false, "description": "Móvil: clases del menú desplegable (p. ej. para fijar su alto)." }
+  },
+  "examples": [
+    { "title": "Cabecera completa", "code": "<Header items={items} homeHref=\"/\" notificationPanel={<NotificationPanel>{...}</NotificationPanel>} notificationCount={2} user={{ name: 'Ana Pérez', email: 'ana@ejemplo.com' }} onLogout={logout} />" }
+  ]
+}

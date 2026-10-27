@@ -1,0 +1,24 @@
+{
+  "name": "AvatarMenu",
+  "component": "AvatarMenu",
+  "description": "Avatar que abre el menú de perfil, fiel al component set Avatar+dropdown (Atom) de Figma (12537:1567): Type Default (solo el avatar de 48) y Type Dropdown (la tarjeta Profile card debajo, con el ancho de su contenido y padding space/container/on-canva, a 8, alineada a su borde derecho, con el avatar de 24, nombre, correo, divisor, los ítems del slot List items y Cerrar sesión). Es una composición de Avatar, DropdownMenuItem y el divisor de las notificaciones, no un átomo nuevo; no usa DropdownMenu porque su panel es otra superficie y solo admite ítems. El nombre del botón empieza con las iniciales visibles (\"HG, menú de perfil de Hugo García\", WCAG 2.5.3). Patrón WAI-ARIA Menu Button: aria-haspopup=\"menu\", aria-expanded y aria-controls; al abrir, el foco va al primer ítem; flechas, Inicio y Fin; Tab cierra; Escape y el clic fuera cierran y el foco vuelve al botón. Capa superior nativa (popover) colocada con useAnchoredPosition.",
+  "category": "Navigation",
+  "props": {
+    "name": { "type": "string", "required": true, "description": "Nombre de la persona: iniciales, tarjeta y nombre accesible del botón." },
+    "email": { "type": "string", "required": false, "description": "Email or cargo de Figma." },
+    "avatar": { "type": "ReactNode", "required": false, "description": "Avatar del botón (decorativo). Por defecto las iniciales de name." },
+    "size": { "type": "'sm' | 'md'", "default": "'md'", "description": "Diámetro del avatar: 32 o 48." },
+    "children": { "type": "ReactNode", "required": false, "description": "Slot List items: DropdownMenuItem de modo menú." },
+    "onLogout": { "type": "() => void", "required": false, "description": "Acción de Cerrar sesión. Sin ella no se dibuja el ítem." },
+    "logoutLabel": { "type": "string", "default": "'Cerrar sesión'", "description": "Texto del ítem de cierre de sesión." },
+    "label": { "type": "string", "default": "'<iniciales>, menú de perfil de <name>'", "description": "Nombre accesible del botón. Por defecto empieza con las iniciales visibles del avatar (WCAG 2.5.3); con un avatar propio sin texto, 'Menú de perfil de <name>'. Si lo cambias y el botón muestra texto, empieza con ese texto." },
+    "menuLabel": { "type": "string", "default": "'Menú de perfil'", "description": "Nombre accesible del menú." },
+    "open": { "type": "boolean", "required": false, "description": "Abierto (controlado): el Type Dropdown." },
+    "defaultOpen": { "type": "boolean", "default": false, "description": "Abierto al montar." },
+    "onOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Se llama al abrir o cerrar." },
+    "rootProps": { "type": "AvatarMenuRootProps", "required": false, "description": "Atributos del contenedor." }
+  },
+  "examples": [
+    { "title": "Con ítems y cierre de sesión", "code": "<AvatarMenu name=\"Ana Pérez\" email=\"ana@ejemplo.com\" onLogout={logout}><DropdownMenuItem>Mi perfil</DropdownMenuItem></AvatarMenu>" }
+  ]
+}

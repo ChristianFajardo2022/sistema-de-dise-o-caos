@@ -1,0 +1,14 @@
+{
+  "name": "IconMenu",
+  "component": "IconMenu",
+  "description": "Ícono del botón de menú, fiel al component set Icon menu (Atom) de Figma (13616:14074): tres rayas de 24 en un marco de 32 con trazo de 1.5 (border/general/xl) en border/general/white. Property 1: 1 = menu (tres rayas), 2 = half (fotograma intermedio con las rayas de arriba y abajo inclinadas 15°), 3 = close (X). Es un dibujo propio y no un Icon de la biblioteca porque gira sus rayas con transición entre estados. Decorativo por defecto (aria-hidden): el nombre lo da el botón que lo contiene.",
+  "category": "Navigation",
+  "props": {
+    "variant": { "type": "'menu' | 'half' | 'close'", "default": "'menu'", "description": "Property 1 de Figma (1, 2, 3)." },
+    "aria-label": { "type": "string", "required": false, "description": "Nombre accesible. Sin él es decorativo." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para el svg." }
+  },
+  "examples": [
+    { "title": "Botón de menú", "code": "<button aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} onClick={toggle}><IconMenu variant={open ? 'close' : 'menu'} /></button>" }
+  ]
+}
