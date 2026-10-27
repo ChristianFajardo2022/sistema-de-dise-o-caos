@@ -4,13 +4,16 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import { ButtonCorner } from './ButtonCorner';
 import type {
   ButtonCornerBaseProps,
+  ButtonCornerContrast,
   ButtonCornerSize,
-  ButtonCornerStatus,
+  ButtonCornerState,
   ButtonCornerVariant,
 } from './ButtonCorner.types';
+import { cornerShadowClass } from '../_internal/shadows';
 
 const VARIANTS: ButtonCornerVariant[] = ['icon', 'dots', 'radiobutton', 'checkbox', 'favorite'];
-const STATUSES: ButtonCornerStatus[] = ['on-canva', 'on-card', 'unicolor-canva'];
+const CONTRASTS: ButtonCornerContrast[] = ['on-canva', 'on-card', 'unicolor-canva'];
+const STATES: ButtonCornerState[] = ['default', 'hover', 'select'];
 const SIZES: ButtonCornerSize[] = ['sm', 'md'];
 
 const LABELS: Record<ButtonCornerVariant, string> = {
@@ -43,11 +46,24 @@ const meta: Meta<ButtonCornerArgs> = {
       options: VARIANTS,
       description: 'Type: contenido del botón',
     },
-    status: {
-      type: { name: 'enum', value: STATUSES },
+    contrast: {
+      type: { name: 'enum', value: CONTRASTS },
       control: 'select',
-      options: STATUSES,
-      description: 'Status: relleno. Unicolor canva no cambia con el tema.',
+      options: CONTRASTS,
+      description: 'Contrast: relleno según la superficie. Unicolor canva no cambia con el tema.',
+    },
+    state: {
+      type: { name: 'enum', value: STATES },
+      control: 'radio',
+      options: STATES,
+      description:
+        'Solo documentación: fuerza Hover o Select. En uso real el hover es CSS y Select sale de pressed o aria-expanded. Unicolor no tiene Hover ni Select.',
+    },
+    status: {
+      type: { name: 'enum', value: CONTRASTS },
+      control: false,
+      description: 'Obsoleto: alias de contrast.',
+      table: { disable: true },
     },
     size: {
       type: { name: 'enum', value: SIZES },
@@ -58,12 +74,12 @@ const meta: Meta<ButtonCornerArgs> = {
     stroke: {
       type: { name: 'boolean' },
       control: 'boolean',
-      description: 'Stroke: borde exterior de 1px',
+      description: 'Stroke: trazo de 1px',
     },
     pressed: {
       type: { name: 'boolean' },
       control: 'boolean',
-      description: 'aria-pressed (checkbox, radiobutton y favorite). No cambia el aspecto.',
+      description: 'aria-pressed (checkbox, radiobutton y favorite): aspecto Select; en favorite, corazón relleno.',
     },
     disabled: {
       type: { name: 'boolean' },
@@ -78,7 +94,8 @@ const meta: Meta<ButtonCornerArgs> = {
   },
   args: {
     variant: 'icon',
-    status: 'on-canva',
+    contrast: 'on-canva',
+    state: 'default',
     size: 'md',
     stroke: false,
     disabled: false,
@@ -108,21 +125,21 @@ export const Radiobutton: Story = {
 };
 
 export const UnicolorCanva: Story = {
-  args: { status: 'unicolor-canva', stroke: true },
+  args: { contrast: 'unicolor-canva', stroke: true },
   decorators: [OnDarkSurface],
 };
 
-/** Matriz Type × Status × Size × Stroke: las 60 variantes del component set. */
+/** Matriz Type × Contrast × Size × Stroke en reposo (más estados en FigmaMatrix). */
 export const StatesMatrix: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
-      {STATUSES.map((status) => (
+      {CONTRASTS.map((contrast) => (
         <div
-          key={status}
+          key={contrast}
           // Superficie N01 fija: el relleno de On canva coincide con el fondo del tema y no se vería
           className="bg-ds-primitives-color-primary-n01 p-4"
         >
-          <p className="mb-3 text-xs text-ds-primitives-color-primary-b01">{status}</p>
+          <p className="mb-3 text-xs text-ds-primitives-color-primary-b01">{contrast}</p>
           <div className="grid grid-cols-[auto_repeat(5,auto)] items-center justify-start gap-x-6 gap-y-4">
             <span />
             {VARIANTS.map((v) => (
@@ -138,7 +155,7 @@ export const StatesMatrix: Story = {
                     <div key={v} className="p-[2px]">
                       <ButtonCorner
                         variant={v}
-                        status={status}
+                        contrast={contrast}
                         size={size}
                         stroke={stroke}
                         aria-label={LABELS[v]}
@@ -148,6 +165,101 @@ export const StatesMatrix: Story = {
                 </div>
               ))
             )}
+          </div>
+        </div>
+      ))}
+    </div>
+  ),
+};
+
+const FIGMA_TYPE: Record<ButtonCornerVariant, string> = {
+  icon: 'Icon',
+  dots: 'Dots',
+  radiobutton: 'Radiobutton',
+  checkbox: 'Checkbox',
+  favorite: 'Favorite',
+};
+const FIGMA_CONTRAST: Record<ButtonCornerContrast, string> = {
+  'on-canva': 'On canva',
+  'on-card': 'On card',
+  'unicolor-canva': 'Unicolor canva',
+};
+const FIGMA_STATE: Record<ButtonCornerState, string> = { default: 'Default', hover: 'Hover', select: 'Select' };
+
+/** Las 65 combinaciones del set: Hover y Select solo existen en md, On canva y On card */
+const FIGMA_ROWS: { contrast: ButtonCornerContrast; state: ButtonCornerState; size: ButtonCornerSize; stroke: boolean }[] = [
+  { contrast: 'on-canva', state: 'default', size: 'md', stroke: false },
+  { contrast: 'on-canva', state: 'hover', size: 'md', stroke: true },
+  { contrast: 'on-canva', state: 'select', size: 'md', stroke: true },
+  { contrast: 'on-card', state: 'default', size: 'md', stroke: false },
+  { contrast: 'on-card', state: 'hover', size: 'md', stroke: true },
+  { contrast: 'on-card', state: 'select', size: 'md', stroke: false },
+  { contrast: 'unicolor-canva', state: 'default', size: 'md', stroke: true },
+  { contrast: 'on-canva', state: 'default', size: 'sm', stroke: false },
+  { contrast: 'on-canva', state: 'default', size: 'sm', stroke: true },
+  { contrast: 'on-card', state: 'default', size: 'sm', stroke: false },
+  { contrast: 'on-card', state: 'default', size: 'sm', stroke: true },
+  { contrast: 'unicolor-canva', state: 'default', size: 'sm', stroke: false },
+  { contrast: 'unicolor-canva', state: 'default', size: 'sm', stroke: true },
+];
+
+/** Superficie de cada Contrast: la del tema, la de tarjeta y N01 fijo para Unicolor (va sobre foto o color) */
+const SURFACE: Record<ButtonCornerContrast, string> = {
+  'on-canva': 'bg-ds-background-general-black',
+  'on-card': 'bg-ds-background-container-default-on-card',
+  'unicolor-canva': 'bg-ds-primitives-color-primary-n01',
+};
+
+const figmaName = (v: ButtonCornerVariant, r: (typeof FIGMA_ROWS)[number]) =>
+  `Type=${FIGMA_TYPE[v]}, Contrast=${FIGMA_CONTRAST[r.contrast]}, State=${FIGMA_STATE[r.state]}, Size=${r.size}, Stroke=${r.stroke ? 'Yes' : 'No'}`;
+
+/**
+ * Las 65 variantes del component set, una vez cada una, con `data-figma` = nombre de Figma (para el comparador).
+ * La sombra effect/shadow sm la pone quien coloca el botón (`cornerShadowClass`); aquí se aplica para medirla.
+ * En On card, el relleno Default coincide con la superficie de tarjeta: que se funda es esperable.
+ */
+export const FigmaMatrix: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      {CONTRASTS.map((contrast) => (
+        <div key={contrast} className={`${SURFACE[contrast]} p-4`}>
+          <p
+            className={
+              contrast === 'unicolor-canva'
+                ? 'mb-3 text-ds-typography-body-size-xs text-ds-primitives-color-primary-b01'
+                : 'mb-3 text-ds-typography-body-size-xs text-ds-text-neutral-body'
+            }
+          >
+            Contrast={FIGMA_CONTRAST[contrast]}
+          </p>
+          <div className="grid grid-cols-[auto_repeat(5,auto)] items-center justify-start gap-x-6 gap-y-4">
+            {FIGMA_ROWS.filter((r) => r.contrast === contrast).map((r) => (
+              <div key={`${r.state}-${r.size}-${r.stroke}`} className="contents">
+                <span
+                  className={
+                    contrast === 'unicolor-canva'
+                      ? 'text-ds-typography-body-size-xs text-ds-primitives-color-primary-b01'
+                      : 'text-ds-typography-body-size-xs text-ds-text-neutral-body'
+                  }
+                >
+                  {FIGMA_STATE[r.state]} · {r.size} · Stroke {r.stroke ? 'Yes' : 'No'}
+                </span>
+                {VARIANTS.map((v) => (
+                  <div key={v} className="p-[2px]">
+                    <ButtonCorner
+                      variant={v}
+                      contrast={r.contrast}
+                      state={r.state}
+                      size={r.size}
+                      stroke={r.stroke}
+                      aria-label={LABELS[v]}
+                      className={cornerShadowClass}
+                      data-figma={figmaName(v, r)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       ))}
@@ -192,5 +304,32 @@ export const KeyboardTest: Story = {
     await expect(args.onClick).toHaveBeenCalledTimes(1);
     await userEvent.keyboard(' ');
     await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
+};
+
+/** Test: Select real con aria-pressed (y aria-expanded) igual al forzado con state="select"; status sigue como alias */
+export const SelectStateTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div className="flex gap-4">
+      <ButtonCorner variant="checkbox" contrast="on-card" pressed aria-label="Real" />
+      <ButtonCorner variant="checkbox" contrast="on-card" state="select" aria-label="Forzado" />
+      <ButtonCorner variant="dots" contrast="on-card" aria-expanded aria-label="Menú abierto" />
+      <ButtonCorner variant="checkbox" contrast="on-card" aria-label="Reposo" />
+      <ButtonCorner variant="checkbox" status="on-card" aria-label="Alias" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const bg = (name: string) => getComputedStyle(c.getByRole('button', { name })).backgroundColor;
+    const shadow = (name: string) => getComputedStyle(c.getByRole('button', { name })).boxShadow;
+    await expect(c.getByRole('button', { name: 'Real', pressed: true })).toBeInTheDocument();
+    await expect(bg('Real')).toBe(bg('Forzado'));
+    await expect(shadow('Real')).toBe(shadow('Forzado'));
+    await expect(bg('Menú abierto')).toBe(bg('Forzado'));
+    await expect(shadow('Reposo')).toBe('none');
+    // state="select" solo cambia el aspecto: no inventa aria-pressed
+    await expect(c.getByRole('button', { name: 'Forzado' })).not.toHaveAttribute('aria-pressed');
+    await expect(bg('Alias')).toBe(bg('Reposo'));
   },
 };

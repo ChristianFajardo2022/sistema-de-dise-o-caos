@@ -207,7 +207,7 @@ export function CodeOtpScreen({
       {modal && (
         <ButtonCorner
           variant="icon"
-          status="on-canva"
+          contrast="on-canva"
           size="md"
           aria-label="Cerrar"
           onClick={onClose}

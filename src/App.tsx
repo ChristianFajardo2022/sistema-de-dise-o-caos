@@ -328,19 +328,19 @@ export function App() {
         <Section title="Button corner">
           <Block title="Types" note="Icon, Dots, Radiobutton, Checkbox y Favorite (md 40 · sm 32). Sobre tarjeta usan On card. Radiobutton, Checkbox y Favorite alternan aria-pressed al hacer clic; el aspecto no cambia porque Figma no define estado seleccionado.">
             <div className="flex flex-wrap items-center gap-ds-space-general-xl">
-              <ButtonCorner variant="icon" status="on-card" aria-label="Abrir detalle" />
-              <ButtonCorner variant="dots" status="on-card" aria-label="Más opciones" />
-              <ButtonCorner variant="radiobutton" status="on-card" aria-label="Elegir" pressed={cornerPressed.radiobutton} onClick={() => toggleCorner('radiobutton')} />
-              <ButtonCorner variant="checkbox" status="on-card" aria-label="Seleccionar" pressed={cornerPressed.checkbox} onClick={() => toggleCorner('checkbox')} />
-              <ButtonCorner variant="favorite" status="on-card" aria-label="Agregar a favoritos" pressed={cornerPressed.favorite} onClick={() => toggleCorner('favorite')} />
-              <ButtonCorner variant="icon" status="on-card" size="sm" stroke aria-label="Abrir detalle" />
+              <ButtonCorner variant="icon" contrast="on-card" aria-label="Abrir detalle" />
+              <ButtonCorner variant="dots" contrast="on-card" aria-label="Más opciones" />
+              <ButtonCorner variant="radiobutton" contrast="on-card" aria-label="Elegir" pressed={cornerPressed.radiobutton} onClick={() => toggleCorner('radiobutton')} />
+              <ButtonCorner variant="checkbox" contrast="on-card" aria-label="Seleccionar" pressed={cornerPressed.checkbox} onClick={() => toggleCorner('checkbox')} />
+              <ButtonCorner variant="favorite" contrast="on-card" aria-label="Agregar a favoritos" pressed={cornerPressed.favorite} onClick={() => toggleCorner('favorite')} />
+              <ButtonCorner variant="icon" contrast="on-card" size="sm" stroke aria-label="Abrir detalle" />
             </div>
           </Block>
           <Block title="Unicolor canva" note="Sobre foto o color: no cambia con el tema.">
             <div className={`${darkSurface} flex flex-wrap items-center gap-ds-space-general-xl`}>
-              <ButtonCorner variant="icon" status="unicolor-canva" aria-label="Abrir detalle" />
-              <ButtonCorner variant="dots" status="unicolor-canva" stroke aria-label="Más opciones" />
-              <ButtonCorner variant="favorite" status="unicolor-canva" aria-label="Agregar a favoritos" />
+              <ButtonCorner variant="icon" contrast="unicolor-canva" aria-label="Abrir detalle" />
+              <ButtonCorner variant="dots" contrast="unicolor-canva" stroke aria-label="Más opciones" />
+              <ButtonCorner variant="favorite" contrast="unicolor-canva" aria-label="Agregar a favoritos" />
             </div>
           </Block>
         </Section>

@@ -1,21 +1,65 @@
 import { cva } from 'class-variance-authority';
+import type { ButtonCornerContrast, ButtonCornerSize, ButtonCornerState } from './ButtonCorner.types';
 
 /**
  * CAOS Design System — ButtonCorner Variants
  *
- * Fuente: component set "Button corner" de Figma (60 variantes, solo estado Default).
+ * Fuente: component set "Button corner" de Figma (65 variantes: Type × Contrast × State × Size × Stroke).
  *
  * - Círculo de 40 (md) o 32 (sm), radio radius/button/full.
  * - Padding: md space/general/xl (12), sm space/general/lg (8). Dots: md space/general/md (4) y sm 0,
  *   con un botón interno de 32 (ver ButtonCorner.tsx).
- * - Relleno por Status: default-on-canva, default-on-card o hover-unicolor.
- * - Stroke=Yes: borde exterior de border/general/lg (1px) en gray-fifth (gray-fifth-unicolor en Unicolor).
- *   Se dibuja con box-shadow para no cambiar las medidas, como el trazo OUTSIDE de Figma.
- * - Sombra effect/shadow sm: alfa 0 en oscuro y ~8-16 % de G06 sobre blanco en claro (invisible); no se agrega.
- * - Figma no define hover, press, seleccionado ni disabled: no se inventan.
+ * - Relleno por Contrast: default-on-canva, default-on-card o hover-unicolor.
+ * - Stroke=Yes: trazo border/general/md (1px) en border/general/default-on-card (gray-fifth-unicolor en Unicolor).
+ * - Hover (solo On canva / On card): background/container/hover-on-* y trazo border/general/lg (1.5px)
+ *   en border/general/hover-on-*. Select: background/container/select-on-* y trazo border/general/md (1px)
+ *   en border/general/select-on-*. Unicolor canva no tiene Hover ni Select en Figma.
+ * - Los trazos van con box-shadow inset (Chrome redondea border-width y así no cambian las medidas).
+ * - Hover real solo en `<button>` habilitado (`:enabled`), para que las piezas decorativas que reutilizan
+ *   estas clases en un `<span>` no reaccionen. Select real con `aria-pressed="true"` o `aria-expanded="true"`.
+ * - Sombra effect/shadow sm (0 4 12): la pone quien coloca el botón en la muesca (`cornerShadowClass`).
  * - Foco con teclado: no existe en Figma; se agrega un outline de 2px (WCAG 2.4.7).
  */
-export const buttonCornerVariants = cva(
+
+// Clases escritas completas (Tailwind no ve clases armadas en tiempo de ejecución).
+const strokeRest = {
+  surface: '[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-default-on-card)]',
+  unicolor: '[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-gray-fifth-unicolor)]',
+};
+
+/** Clases de Hover y Select forzadas (prop `state`) por superficie */
+const forced = {
+  'on-canva': {
+    hover: 'bg-ds-background-container-hover-on-canva [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-hover-on-canva)]',
+    select: 'bg-ds-background-container-select-on-canva [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-select-on-canva)]',
+  },
+  'on-card': {
+    hover: 'bg-ds-background-container-hover-on-card [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-hover-on-card)]',
+    select: 'bg-ds-background-container-select-on-card [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-select-on-card)]',
+  },
+};
+
+/** State=Default: hover real (sin pisar Select) y Select ligado a aria-pressed / aria-expanded */
+const interactive = {
+  'on-canva': [
+    'hover:[&:enabled:not([aria-pressed=true]):not([aria-expanded=true])]:bg-ds-background-container-hover-on-canva',
+    'hover:[&:enabled:not([aria-pressed=true]):not([aria-expanded=true])]:[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-hover-on-canva)]',
+    'aria-pressed:bg-ds-background-container-select-on-canva',
+    'aria-pressed:[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-select-on-canva)]',
+    'aria-expanded:bg-ds-background-container-select-on-canva',
+    'aria-expanded:[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-select-on-canva)]',
+  ].join(' '),
+  'on-card': [
+    'hover:[&:enabled:not([aria-pressed=true]):not([aria-expanded=true])]:bg-ds-background-container-hover-on-card',
+    'hover:[&:enabled:not([aria-pressed=true]):not([aria-expanded=true])]:[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-hover-on-card)]',
+    'aria-pressed:bg-ds-background-container-select-on-card',
+    'aria-pressed:[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-select-on-card)]',
+    'aria-expanded:bg-ds-background-container-select-on-card',
+    'aria-expanded:[box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-select-on-card)]',
+  ].join(' '),
+};
+
+const buttonCornerCva = cva(
   [
     'box-border inline-flex shrink-0 items-center justify-center appearance-none border-0',
     'rounded-ds-radius-button-full cursor-pointer disabled:cursor-not-allowed',
@@ -23,11 +67,12 @@ export const buttonCornerVariants = cva(
   ].join(' '),
   {
     variants: {
-      status: {
+      contrast: {
         'on-canva': 'bg-ds-background-container-default-on-canva text-ds-icon-general-default',
         'on-card': 'bg-ds-background-container-default-on-card text-ds-icon-general-default',
         'unicolor-canva': 'bg-ds-background-container-hover-unicolor text-ds-icon-general-default-unicolor',
       },
+      state: { default: '', hover: '', select: '' },
       size: {
         md: 'size-[40px]',
         sm: 'size-[32px]',
@@ -40,28 +85,53 @@ export const buttonCornerVariants = cva(
       { size: 'md', dots: true, className: 'p-ds-space-general-md' },
       { size: 'sm', dots: false, className: 'p-ds-space-general-lg' },
       { size: 'sm', dots: true, className: 'p-ds-space-general-xs' },
-      {
-        stroke: true,
-        status: ['on-canva', 'on-card'],
-        className:
-          '[box-shadow:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-card)]',
-      },
-      {
-        stroke: true,
-        status: 'unicolor-canva',
-        className:
-          '[box-shadow:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-fifth-unicolor)]',
-      },
+      { stroke: true, contrast: ['on-canva', 'on-card'], className: strokeRest.surface },
+      { stroke: true, contrast: 'unicolor-canva', className: strokeRest.unicolor },
+      // Los estados van después del trazo de reposo para reemplazarlo (cn deja la última clase de box-shadow)
+      { state: 'default', contrast: 'on-canva', className: interactive['on-canva'] },
+      { state: 'default', contrast: 'on-card', className: interactive['on-card'] },
+      { state: 'hover', contrast: 'on-canva', className: forced['on-canva'].hover },
+      { state: 'hover', contrast: 'on-card', className: forced['on-card'].hover },
+      { state: 'select', contrast: 'on-canva', className: forced['on-canva'].select },
+      { state: 'select', contrast: 'on-card', className: forced['on-card'].select },
     ],
-    defaultVariants: { status: 'on-canva', size: 'md', dots: false, stroke: false },
+    defaultVariants: { contrast: 'on-canva', state: 'default', size: 'md', dots: false, stroke: false },
   }
 );
+
+export interface ButtonCornerVariantOptions {
+  contrast?: ButtonCornerContrast;
+  /** @deprecated Usa `contrast`. */
+  status?: ButtonCornerContrast;
+  state?: ButtonCornerState;
+  size?: ButtonCornerSize;
+  dots?: boolean;
+  stroke?: boolean;
+}
+
+/** Clases del círculo. Acepta `status` (deprecado) como alias de `contrast`. */
+export function buttonCornerVariants({ contrast, status, ...rest }: ButtonCornerVariantOptions = {}) {
+  return buttonCornerCva({ contrast: contrast ?? status, ...rest });
+}
 
 /** Favorite: el trazo usa border/general/gray-secondary (white-unicolor en Unicolor), no el color de ícono */
 export const buttonCornerFavoriteColor = {
   'on-canva': 'text-ds-border-general-gray-secondary',
   'on-card': 'text-ds-border-general-gray-secondary',
   'unicolor-canva': 'text-ds-border-general-white-unicolor',
+} as const;
+
+/**
+ * Favorite presionado (Favorite (Atom) variante 3): corazón relleno con icon/general/default
+ * (default-unicolor en Unicolor) y sin trazo.
+ */
+export const buttonCornerFavoritePressed = {
+  'on-canva':
+    '[&[aria-pressed=true]_[data-slot=icon]]:text-ds-icon-general-default [&[aria-pressed=true]_svg_path]:fill-current [&[aria-pressed=true]_svg_path]:stroke-transparent',
+  'on-card':
+    '[&[aria-pressed=true]_[data-slot=icon]]:text-ds-icon-general-default [&[aria-pressed=true]_svg_path]:fill-current [&[aria-pressed=true]_svg_path]:stroke-transparent',
+  'unicolor-canva':
+    '[&[aria-pressed=true]_[data-slot=icon]]:text-ds-icon-general-default-unicolor [&[aria-pressed=true]_svg_path]:fill-current [&[aria-pressed=true]_svg_path]:stroke-transparent',
 } as const;
 
 /** Checkbox y Radiobutton en Unicolor: el contorno del control pasa a icon/general/white-unicolor */

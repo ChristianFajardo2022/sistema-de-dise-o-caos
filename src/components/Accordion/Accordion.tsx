@@ -219,7 +219,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
         <ButtonCorner
           variant="icon"
           size="sm"
-          status={contrast}
+          contrast={contrast}
           aria-label={open ? 'Contraer' : 'Expandir'}
           aria-hidden="true"
           tabIndex={-1}

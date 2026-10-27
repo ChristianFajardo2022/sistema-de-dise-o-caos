@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { ButtonCornerProps } from './ButtonCorner.types';
 import {
   buttonCornerFavoriteColor,
+  buttonCornerFavoritePressed,
   buttonCornerUnicolorRing,
   buttonCornerVariants,
 } from './ButtonCorner.variants';
@@ -14,9 +15,14 @@ import { FavoriteIcon } from '../../icons/FavoriteIcon';
 import { cn } from '../../utils/cn';
 
 /** Slot de ícono de 16×16: el SVG lo llena y hereda el color del slot */
-function IconSlot({ className, children }: { className?: string; children?: ReactNode }) {
+function IconSlot({
+  className,
+  children,
+  ...rest
+}: { className?: string; children?: ReactNode; 'data-figma-part'?: string }) {
   return (
     <span
+      {...rest}
       data-slot="icon"
       aria-hidden="true"
       className={cn('inline-flex size-[16px] shrink-0 items-center justify-center [&>svg]:size-full', className)}
@@ -30,7 +36,9 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
   (
     {
       variant = 'icon',
-      status = 'on-canva',
+      contrast: contrastProp,
+      status,
+      state = 'default',
       size = 'md',
       stroke = false,
       icon,
@@ -40,7 +48,9 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
     },
     ref
   ) => {
-    const unicolor = status === 'unicolor-canva';
+    // `status` es el nombre viejo de Contrast (deprecado); si llegan los dos, manda `contrast`
+    const contrast = contrastProp ?? status ?? 'on-canva';
+    const unicolor = contrast === 'unicolor-canva';
     const hasPressed = variant === 'checkbox' || variant === 'radiobutton' || variant === 'favorite';
 
     let content: ReactNode;
@@ -61,7 +71,7 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         break;
       case 'favorite':
         content = (
-          <IconSlot className={buttonCornerFavoriteColor[status]}>
+          <IconSlot className={buttonCornerFavoriteColor[contrast]} data-figma-part="Favorite (Atom)">
             <FavoriteIcon />
           </IconSlot>
         );
@@ -71,6 +81,7 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         content = (
           <span
             aria-hidden="true"
+            data-figma-part="Selection"
             className={cn(checkboxControlVariants({ contrast: 'positive' }), unicolor && buttonCornerUnicolorRing)}
           />
         );
@@ -79,12 +90,17 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         content = (
           <span
             aria-hidden="true"
+            data-figma-part="Selection"
             className={cn(radioControlVariants({ contrast: 'positive' }), unicolor && buttonCornerUnicolorRing)}
           />
         );
         break;
       default:
-        content = <IconSlot>{icon ?? <Icon name="arrow-diagonal-right" variant="line" size={16} />}</IconSlot>;
+        content = (
+          <IconSlot data-figma-part="Icon-sizes">
+            {icon ?? <Icon name="arrow-diagonal-right" variant="line" size={16} />}
+          </IconSlot>
+        );
     }
 
     return (
@@ -93,9 +109,9 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         type="button"
         aria-pressed={hasPressed ? pressed : undefined}
         className={cn(
-          buttonCornerVariants({ status, size, stroke, dots: variant === 'dots' }),
-          // Favorito presionado: el corazón se rellena con el color del trazo (Figma no dibuja el estado; para diseño)
-          variant === 'favorite' && '[&[aria-pressed=true]_svg_path]:fill-current',
+          buttonCornerVariants({ contrast, state, size, stroke, dots: variant === 'dots' }),
+          // Favorito presionado: corazón relleno con icon/general/default (Favorite (Atom) variante 3)
+          variant === 'favorite' && buttonCornerFavoritePressed[contrast],
           className
         )}
         {...restProps}

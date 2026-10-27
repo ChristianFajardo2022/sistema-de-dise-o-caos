@@ -102,7 +102,7 @@ function BackButton() {
   return (
     <ButtonCorner
       variant="icon"
-      status="on-canva"
+      contrast="on-canva"
       size="md"
       aria-label="Volver"
       className="size-11 px-ds-space-general-xl py-ds-space-general-lg [&_[data-slot=icon]]:size-5"
