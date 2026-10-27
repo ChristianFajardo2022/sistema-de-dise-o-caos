@@ -30,6 +30,7 @@
     "ref": { "type": "Ref<HTMLButtonElement>", "required": false, "description": "Apunta al botón combobox (para enfocar). className y el resto de props van al elemento raíz." },
     "open": { "type": "boolean", "required": false, "description": "Lista abierta (controlado). Deshabilitado o de solo lectura no abre." },
     "defaultOpen": { "type": "boolean", "required": false, "description": "Lista abierta al montar (no controlado)." },
+    "chevronProps": { "type": "FieldChevronProps", "required": false, "description": "Atributos del chevron (data-*, className). Los compuestos nombran la parte de Figma con data-figma-part (por defecto Icon Right; TripleSelect usa Icon 1, 2 y 3)." },
     "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." }
   },
   "examples": [

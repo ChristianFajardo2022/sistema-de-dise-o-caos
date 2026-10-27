@@ -86,6 +86,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       maxHeight = '20rem',
       className,
       rootProps,
+      chevronProps,
       'aria-describedby': ariaDescribedBy,
       ...restProps
     },
@@ -409,7 +410,14 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           {/* Valor para el formulario y "peer" del label: vacío = :placeholder-shown, el label descansa dentro */}
           <input hidden readOnly tabIndex={-1} name={name} value={value ?? ''} placeholder=" " disabled={isDisabled} className="peer" />
           {/* Mide el label flotante para que un contenedor con ancho automático (p. ej. el prefijo de PhoneInput) no lo corte */}
-          <span aria-hidden="true" className="invisible block h-0 overflow-hidden whitespace-nowrap text-ds-typography-field-size-xs">
+          {/* Sin valor el label descansa dentro en 14 (sm): se mide en ese tamaño para que no se trunque */}
+          <span
+            aria-hidden="true"
+            className={cn(
+              'invisible block h-0 overflow-hidden whitespace-nowrap',
+              hasValue ? 'text-ds-typography-field-size-xs' : 'text-ds-typography-field-size-sm'
+            )}
+          >
             {label}
             {optional && ' | Opcional'}
           </span>
@@ -417,7 +425,12 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             {label}
           </FieldLabel>
         </div>
-        <span data-figma-part="Icon Right" aria-hidden="true" className={FIELD_ICON_SLOT}>
+        <span
+          data-figma-part="Icon Right"
+          aria-hidden="true"
+          {...chevronProps}
+          className={cn(FIELD_ICON_SLOT, chevronProps?.className)}
+        >
           <Icon name="chevron-down" size={16} variant="line" />
         </span>
       </div>

@@ -74,6 +74,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
       optional = false,
       name,
       id,
+      autoComplete = 'tel-national',
       disabled = false,
       readOnly = false,
       required = false,
@@ -179,7 +180,7 @@ export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
               placeholder={placeholder}
               type="tel"
               inputMode="tel"
-              autoComplete="tel-national"
+              autoComplete={autoComplete}
               value={shown}
               onChange={handleChange}
               disabled={isDisabled}

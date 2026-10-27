@@ -111,6 +111,7 @@ export const TripleSelect = forwardRef<HTMLButtonElement, TripleSelectProps>(
                   readOnly={isReadOnly}
                   required={required}
                   aria-describedby={describedBy}
+                  chevronProps={{ 'data-figma-part': `Icon ${index + 1}` }}
                   className="min-w-0 flex-1"
                 />
               </FieldSlot>

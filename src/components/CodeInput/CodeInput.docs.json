@@ -14,6 +14,7 @@
     "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda (State=Helper text)." },
     "errorText": { "type": "string", "required": false, "description": "Mensaje de error; marca aria-invalid. Tiene prioridad." },
     "successText": { "type": "string", "required": false, "description": "Mensaje de éxito (State=Success)." },
+    "confirmed": { "type": "boolean", "default": "false", "required": false, "description": "Marca el código como confirmado (casillas en éxito) sin necesidad de mensaje. Un error tiene prioridad." },
     "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
     "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In (solo lectura)." },
     "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del ancho (por defecto 320px, como Input)." },

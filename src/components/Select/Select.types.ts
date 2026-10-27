@@ -42,6 +42,9 @@ export interface SelectOptionProps {
   icon?: IconName;
 }
 
+/** Atributos del chevron de un campo (un `<span>`). */
+export type FieldChevronProps = HTMLAttributes<HTMLSpanElement> & { [K in `data-${string}`]?: string | number | boolean };
+
 export interface SelectProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'defaultValue' | 'onChange' | 'id' | 'placeholder'> {
   /** Texto del label flotante (obligatorio): es el nombre accesible del combobox y de la lista. */
@@ -101,6 +104,11 @@ export interface SelectProps
   maxHeight?: string | number;
   /** Clases del elemento raíz. */
   className?: string;
+  /**
+   * Atributos del chevron (`data-*`, `className`…). Sirve a los compuestos para nombrar la parte de Figma
+   * (`data-figma-part`, por defecto `Icon Right`; TripleSelect usa `Icon 1`, `Icon 2` e `Icon 3`).
+   */
+  chevronProps?: FieldChevronProps;
   /** Atributos para la raíz (`data-*`, `style`, `ref`…); se suman al resto de props, que también van a la raíz. */
   rootProps?: FieldRootProps;
 }

@@ -29,6 +29,7 @@ export const CodeInput = forwardRef<HTMLInputElement, CodeInputProps>(
       helperText,
       errorText,
       successText,
+      confirmed = false,
       tooltip,
       disabled = false,
       readOnly = false,
@@ -49,7 +50,9 @@ export const CodeInput = forwardRef<HTMLInputElement, CodeInputProps>(
     ref
   ) => {
     const base = useField({ id, helperText, errorText, successText, tooltip, state, disabled, readOnly });
-    const { ids, message, isDisabled, isReadOnly, isError, isSuccess } = base;
+    const { ids, message, isDisabled, isReadOnly, isError } = base;
+    // Éxito: `confirmed`, `successText` o `state="success"` (el error siempre gana)
+    const isSuccess = !isError && (base.isSuccess || confirmed);
     const baseId = ids.control;
 
     const isControlled = value !== undefined;

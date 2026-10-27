@@ -32,6 +32,8 @@ export interface CodeInputProps
   errorText?: string;
   /** Mensaje de éxito (State=Success). */
   successText?: string;
+  /** Marca el código como confirmado (casillas con aspecto de éxito) sin necesidad de mensaje. Un error tiene prioridad. */
+  confirmed?: boolean;
   /** Texto de ayuda en un ícono de información a la derecha de las casillas. */
   tooltip?: string;
   /** Obligatorio: `required` nativo en cada casilla (el navegador señala la primera vacía). */

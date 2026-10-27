@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes, InputHTMLAttributes } from 'react';
 import type { InputState } from '../Input/Input.types';
 import type { FieldRootProps } from '../Field/Field.types';
 
@@ -17,7 +17,7 @@ export interface PhoneInputCountry {
 }
 
 export interface PhoneInputProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'id' | 'placeholder'> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'id' | 'placeholder' | 'autoComplete'> {
   /** Label flotante del campo de número (obligatorio). También da nombre al grupo. */
   label: string;
   /** Label del campo de prefijo; es su nombre accesible. Por defecto `Indicativo`. */
@@ -62,6 +62,8 @@ export interface PhoneInputProps
   optional?: boolean;
   /** Nombre del campo en el formulario: un input oculto envía `+<indicativo><número>` (E.164). */
   name?: string;
+  /** Token `autocomplete` del campo de número. Por defecto `tel-national` (el indicativo va en el selector); use `tel` si el campo debe recibir el número completo. */
+  autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete'];
   /** Id del campo de número (si no, se genera). */
   id?: string;
   /** Deshabilitado: no se enfoca ni se envía. */

@@ -1,7 +1,7 @@
 {
   "name": "PhoneInput",
   "component": "PhoneInput",
-  "description": "Campo de teléfono con indicativo, fiel al Type=Number del component set General input de Figma (7856:1485): un campo de prefijo con chevron (83 de ancho) y un campo de número a la derecha, con un mensaje común debajo. Compone Select (prefijo, lista alineada bajo todo el control con anchorRef) e Input (número), sin copiar su base visual. Accesibilidad: role=group con nombre, prefijo con nombre Indicativo (patrón APG Select-Only Combobox, teclado completo), número con type=tel, inputMode=tel y autoComplete=tel-national asociado a su label, y el mensaje de ayuda, error o éxito descrito por aria-describedby en ambos campos. El valor del número son solo dígitos (agrupación opcional al mostrar); con name, un input oculto envía +<indicativo><número> (E.164). Estados Default, Filled, Active/Focus, Burnt-In (readOnly), Disabled, Error, Success y Helper text.",
+  "description": "Campo de teléfono con indicativo, fiel al Type=Number del component set General input de Figma (7856:1485): un campo de prefijo con chevron (83 de ancho) y un campo de número a la derecha, con un mensaje común debajo. Compone Select (prefijo, lista alineada bajo todo el control con anchorRef) e Input (número), sin copiar su base visual. Accesibilidad: role=group con nombre, prefijo con nombre Indicativo (patrón APG Select-Only Combobox, teclado completo), número con type=tel, inputMode=tel y autoComplete configurable (por defecto tel-national) asociado a su label, y el mensaje de ayuda, error o éxito descrito por aria-describedby en ambos campos. El valor del número son solo dígitos (agrupación opcional al mostrar); con name, un input oculto envía +<indicativo><número> (E.164). Estados Default, Filled, Active/Focus, Burnt-In (readOnly), Disabled, Error, Success y Helper text.",
   "category": "Form Controls",
   "props": {
     "label": { "type": "string", "required": true, "description": "Label del número; también el nombre del grupo." },
@@ -21,6 +21,7 @@
     "successText": { "type": "string", "required": false, "description": "Mensaje de éxito." },
     "optional": { "type": "boolean", "default": false, "description": "Agrega \" | Opcional\" a los labels." },
     "name": { "type": "string", "required": false, "description": "Nombre en el formulario: un input oculto envía +<indicativo><número> (E.164), vacío sin número." },
+    "autoComplete": { "type": "string", "default": "'tel-national'", "required": false, "description": "Token autocomplete del campo de número. Use tel si debe recibir el número completo." },
     "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
     "readOnly": { "type": "boolean", "default": false, "description": "Estado Burnt-In." },
     "required": { "type": "boolean", "default": false, "description": "Número obligatorio (required nativo)." },
