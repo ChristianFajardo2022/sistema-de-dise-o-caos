@@ -80,7 +80,7 @@ export const featureCardDateVariants = cva(
   {
     variants: {
       variant: {
-        photo: 'text-ds-text-neutral-white [&_[data-slot=date-icon]]:text-ds-icon-general-white',
+        photo: 'text-ds-text-neutral-white [&_[data-slot=date-icon]]:text-ds-icon-general-default',
         surface: 'text-ds-text-neutral-body [&_[data-slot=date-icon]]:text-ds-icon-general-gray-high-contrast',
       },
     },

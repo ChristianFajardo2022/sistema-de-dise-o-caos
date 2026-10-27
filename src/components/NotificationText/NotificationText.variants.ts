@@ -27,7 +27,7 @@ export const notificationTextVariants = cva(
         error: 'text-ds-text-semantic-error-secondary [--msg-ico:var(--color-ds-icon-semantic-error-firts)]',
         helper: 'text-ds-text-semantic-information-secondary [--msg-ico:var(--color-ds-icon-semantic-information-secondary)]',
         confirmation: 'text-ds-text-semantic-success-secondary [--msg-ico:var(--color-ds-icon-semantic-success-secondary)]',
-        information: 'text-ds-text-neutral-white [--msg-ico:var(--color-ds-icon-general-white)]',
+        information: 'text-ds-text-neutral-white [--msg-ico:var(--color-ds-icon-general-default)]',
       },
     },
     defaultVariants: { state: 'helper' },

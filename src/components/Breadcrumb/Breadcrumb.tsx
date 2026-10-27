@@ -37,7 +37,7 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
 
     const content = (
       <>
-        {home && <Icon name="home1" size={16} variant="fill" className="text-ds-icon-general-white" data-figma-part="Icon-sizes" />}
+        {home && <Icon name="home1" size={16} variant="fill" className="text-ds-icon-general-default" data-figma-part="Icon-sizes" />}
         {home && !hasText && <span className="sr-only">{homeLabel}</span>}
         {hasText && (
           <span className={breadcrumbTextVariants({ truncate })} title={title} data-figma-part="Text">
@@ -70,7 +70,7 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
           size={14}
           variant="line"
           className={cn(
-            'text-ds-icon-general-white',
+            'text-ds-icon-general-default',
             chevron === false && 'hidden',
             chevron === undefined && 'group-last/item:hidden'
           )}

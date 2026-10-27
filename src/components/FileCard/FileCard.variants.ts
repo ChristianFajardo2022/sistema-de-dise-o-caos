@@ -61,7 +61,7 @@ export const fileCardStateVariants = cva('', {
         '[--fc-text-ring:transparent]',
         '[--fc-corner-bg:var(--color-ds-background-container-default-on-card)]',
         '[--fc-corner-ring:0_0_0_0_transparent]',
-        '[--fc-avatar:var(--color-ds-background-icon-high-contrast)]',
+        '[--fc-avatar:var(--color-ds-background-icon-default-on-card)]',
       ],
     },
     {
@@ -94,7 +94,7 @@ export const fileCardStateVariants = cva('', {
         '[--surface-fill:var(--color-ds-background-container-default-on-card)]',
         '[--fc-corner-bg:var(--color-ds-background-container-default-on-card)]',
         '[--fc-corner-ring:0_0_0_0_transparent]',
-        '[--fc-avatar:var(--color-ds-background-icon-high-contrast)]',
+        '[--fc-avatar:var(--color-ds-background-icon-default-on-card)]',
       ],
     },
     {
@@ -105,7 +105,7 @@ export const fileCardStateVariants = cva('', {
         'hover:not-has-checked:[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
         'hover:not-has-checked:[--fc-corner-bg:var(--color-ds-background-container-hover-on-canva)]',
         'hover:not-has-checked:[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-card)]',
-        'hover:not-has-checked:[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
+        'hover:not-has-checked:[--fc-avatar:var(--color-ds-background-icon-default-on-canva)]',
         'has-checked:[--surface-fill:var(--color-ds-background-container-select-on-card)]',
         'has-checked:[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
       ],
@@ -118,7 +118,7 @@ export const fileCardStateVariants = cva('', {
         '[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
         '[--fc-corner-bg:var(--color-ds-background-container-hover-on-canva)]',
         '[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-card)]',
-        '[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
+        '[--fc-avatar:var(--color-ds-background-icon-default-on-canva)]',
       ],
     },
     {
@@ -137,7 +137,7 @@ export const fileCardStateVariants = cva('', {
         '[--surface-fill:var(--color-ds-background-container-default-on-card)]',
         '[--fc-corner-bg:var(--color-ds-background-container-default-on-card)]',
         '[--fc-corner-ring:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-canva)]',
-        '[--fc-avatar:var(--color-ds-background-icon-high-contrast)]',
+        '[--fc-avatar:var(--color-ds-background-icon-default-on-card)]',
       ],
     },
     {
@@ -146,9 +146,9 @@ export const fileCardStateVariants = cva('', {
       class: [
         'hover:not-has-checked:[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
         'hover:not-has-checked:[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
-        'hover:[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
+        'hover:[--fc-avatar:var(--color-ds-background-icon-default-on-canva)]',
         'has-checked:[--surface-fill:var(--color-ds-background-container-select-on-canva)]',
-        'has-checked:[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
+        'has-checked:[--fc-avatar:var(--color-ds-background-icon-default-on-canva)]',
       ],
     },
     {
@@ -157,7 +157,7 @@ export const fileCardStateVariants = cva('', {
       class: [
         '[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
         '[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
-        '[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
+        '[--fc-avatar:var(--color-ds-background-icon-default-on-canva)]',
       ],
     },
     {
@@ -165,7 +165,7 @@ export const fileCardStateVariants = cva('', {
       state: 'select',
       class: [
         '[--surface-fill:var(--color-ds-background-container-select-on-canva)]',
-        '[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
+        '[--fc-avatar:var(--color-ds-background-icon-default-on-canva)]',
       ],
     },
   ],

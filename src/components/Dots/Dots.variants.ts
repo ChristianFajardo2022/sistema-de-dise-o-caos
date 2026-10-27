@@ -47,7 +47,7 @@ export const dotsVariants = cva(
     },
     compoundVariants: [
       // Figma pinta Size=xs Default con icon/general/white; md y sm usan icon/button/tertiary/default
-      { size: 'xs', state: 'default', class: 'text-ds-icon-general-white' },
+      { size: 'xs', state: 'default', class: 'text-ds-icon-general-default' },
     ],
     defaultVariants: { size: 'md', state: 'default' },
   }

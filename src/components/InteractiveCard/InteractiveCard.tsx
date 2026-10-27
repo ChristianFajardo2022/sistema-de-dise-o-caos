@@ -265,7 +265,7 @@ export const InteractiveCardHeader = forwardRef<HTMLDivElement, InteractiveCardH
                     size={16}
                     variant="line"
                     data-figma-part="Icon-sizes"
-                    className="shrink-0 text-ds-icon-general-white"
+                    className="shrink-0 text-ds-icon-general-default"
                   />
                 )}
               </span>
@@ -362,7 +362,7 @@ export const InteractiveCardStat = forwardRef<HTMLDivElement, InteractiveCardSta
             {value}
           </span>
           {icon && (
-            <Icon name={icon} size={16} variant="line" data-figma-part="Icon-sizes" className="shrink-0 text-ds-icon-general-white" />
+            <Icon name={icon} size={16} variant="line" data-figma-part="Icon-sizes" className="shrink-0 text-ds-icon-general-default" />
           )}
         </span>
       </div>

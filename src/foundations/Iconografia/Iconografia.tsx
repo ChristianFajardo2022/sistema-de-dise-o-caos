@@ -398,7 +398,7 @@ function SafetyRow({ label, rows, name }: { label: string; rows: { icon: number;
 /** Estilos de color de la página de Figma: token de ícono y nombre del estilo */
 const COLOR_TOKENS: { style: string; token: string }[] = [
   { style: 'Monocromático · negro', token: '--color-ds-icon-general-black-unicolor' },
-  { style: 'Monocromático · blanco', token: '--color-ds-icon-general-white-unicolor' },
+  { style: 'Monocromático · blanco', token: '--color-ds-icon-general-default-unicolor' },
   { style: 'Cromático · acento', token: '--color-ds-icon-acent-firts' },
   { style: 'Semántico · correcto', token: '--color-ds-icon-semantic-success-firts' },
   { style: 'Semántico · error', token: '--color-ds-icon-semantic-error-firts' },
@@ -557,7 +557,7 @@ function Valores(): ReactNode {
             <div className="flex flex-col items-center gap-ds-space-general-lg">
               <span className="text-ds-primitives-typography-size-md text-ds-text-neutral-gray">Monocromático</span>
               <div className="flex gap-ds-space-general-lg">
-                <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva bg-ds-primitives-color-primary-g13 text-ds-icon-general-white-unicolor">
+                <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva bg-ds-primitives-color-primary-g13 text-ds-icon-general-default-unicolor">
                   <Icon name="airplane" size={48} variant="line" />
                 </span>
                 <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-primitives-color-primary-b01 text-ds-icon-general-black-unicolor">

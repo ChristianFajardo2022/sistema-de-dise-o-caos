@@ -23,7 +23,7 @@ import type { DocAnatomyPart, DocCardContent, DocGalleryItem, DocInline, DocPrac
 
 /** Texto del cuerpo con el marcado en línea permitido (`strong`, `code`, `em`). */
 const inline =
-  '[&_strong]:font-ds-primitives-typography-weight-semibold [&_strong]:text-ds-text-neutral-heading [&_code]:rounded-ds-radius-general-sm [&_code]:bg-ds-background-icon-low-contrast [&_code]:px-ds-space-general-md [&_code]:font-mono [&_code]:text-[0.92em] [&_code]:text-ds-text-neutral-heading';
+  '[&_strong]:font-ds-primitives-typography-weight-semibold [&_strong]:text-ds-text-neutral-heading [&_code]:rounded-ds-radius-general-sm [&_code]:bg-ds-background-icon-default-on-canva [&_code]:px-ds-space-general-md [&_code]:font-mono [&_code]:text-[0.92em] [&_code]:text-ds-text-neutral-heading';
 
 const body = cn(
   'm-0 font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-md leading-ds-primitives-typography-line-height-xl text-ds-text-neutral-body text-pretty',
@@ -58,7 +58,7 @@ export function DocHeader({ icon, name, summary, tabs }: DocHeaderProps) {
         <div className="flex flex-col items-center gap-ds-primitives-space-4xl text-center">
           <span
             aria-hidden="true"
-            className="flex rounded-ds-radius-general-lg bg-ds-background-container-default-on-canva p-ds-space-general-2xl text-ds-icon-general-white shadow-ds-on-canva-md"
+            className="flex rounded-ds-radius-general-lg bg-ds-background-container-default-on-canva p-ds-space-general-2xl text-ds-icon-general-default shadow-ds-on-canva-md"
           >
             <Icon name={icon} size={32} variant="line" />
           </span>
@@ -475,7 +475,7 @@ export function DocPractices({ items }: { items: DocPractice[] }) {
 /** Etiqueta pequeña para anotar un ejemplo (Figma "Etiqueta": radio completo, background/icon/low-contrast). */
 export function DocTag({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex rounded-ds-radius-general-full bg-ds-background-icon-low-contrast px-ds-space-general-lg py-ds-space-general-md font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm leading-ds-primitives-typography-line-height-sm font-ds-primitives-typography-weight-semibold text-ds-text-neutral-body">
+    <span className="inline-flex rounded-ds-radius-general-full bg-ds-background-icon-default-on-canva px-ds-space-general-lg py-ds-space-general-md font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm leading-ds-primitives-typography-line-height-sm font-ds-primitives-typography-weight-semibold text-ds-text-neutral-body">
       {children}
     </span>
   );

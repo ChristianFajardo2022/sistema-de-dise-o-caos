@@ -71,7 +71,7 @@ export function FieldTooltip({ id, text, disabled = false, icon }: FieldTooltipP
             FIELD_ICON_SLOT,
             'cursor-help rounded-sm border-0 bg-transparent p-0',
             FIELD_FOCUS_RING,
-            disabled ? '[--ico:var(--color-ds-icon-general-disabled-positive)]' : '[--ico:var(--color-ds-icon-general-white)]'
+            disabled ? '[--ico:var(--color-ds-icon-general-disabled-positive)]' : '[--ico:var(--color-ds-icon-general-default)]'
           )}
         >
           {icon ?? <Icon name="info-circle" size={16} variant="fill" />}

@@ -46,7 +46,7 @@ export const signaturePadRootVariants = cva(
 
 /** Lienzo: ocupa toda el área de dibujo; `touch-action: none` evita que el dedo desplace la página al firmar. */
 export const signaturePadCanvasVariants = cva(
-  'absolute inset-0 size-full touch-none text-ds-icon-general-white',
+  'absolute inset-0 size-full touch-none text-ds-icon-general-default',
   {
     variants: {
       orientation: { horizontal: 'rounded-[inherit]', vertical: '' },
@@ -75,7 +75,7 @@ export const signaturePadPlaceholderVariants = cva(
 export const signaturePadIconButtonVariants = cva(
   [
     'pointer-events-auto inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-ds-radius-general-xs border-0 bg-transparent p-0',
-    'text-ds-icon-general-white',
+    'text-ds-icon-general-default',
     'outline-offset-2 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
     "relative before:absolute before:-inset-2 before:content-['']", // área táctil de 40 px (WCAG 2.5.8)
     // Sin firma (o deshabilitado) los íconos de acción se apagan, como en Figma Default

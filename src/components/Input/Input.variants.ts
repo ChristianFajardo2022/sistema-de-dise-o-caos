@@ -46,17 +46,17 @@ export const inputFieldVariants = cva(
         default: [
           'border-(--input-border,var(--color-ds-border-field-default)) focus-within:border-ds-border-field-active',
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
-          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-default)]',
         ],
         filled: [
           'border-(--input-border,var(--color-ds-border-field-default)) focus-within:border-ds-border-field-active',
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
-          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-default)]',
         ],
         active: [
           'border-ds-border-field-active',
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
-          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-default)]',
         ],
         'burnt-in': [
           'border-ds-border-field-default bg-ds-background-field-burnt-in',
@@ -73,13 +73,13 @@ export const inputFieldVariants = cva(
           'border-ds-border-semantic-error',
           FOCUS_RING_WITHIN,
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-semantic-error-secondary)]',
-          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-default)]',
         ],
         success: [
           'border-ds-border-semantic-success',
           FOCUS_RING_WITHIN,
           '[--lbl-in:var(--color-ds-text-field-label)] [--lbl-up:var(--color-ds-text-semantic-success-secondary)]',
-          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-white)]',
+          '[--val:var(--color-ds-text-field-placeholder)] [--ico:var(--color-ds-icon-general-default)]',
         ],
       },
     },

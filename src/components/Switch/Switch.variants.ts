@@ -52,7 +52,7 @@ export const switchTrackVariants = cva(
 export const switchThumbVariants = cva(
   [
     'block shrink-0 rounded-ds-radius-button-full',
-    'bg-ds-icon-general-white-unicolor group-data-disabled:bg-ds-icon-general-disabled-negative',
+    'bg-ds-icon-general-default-unicolor group-data-disabled:bg-ds-icon-general-disabled-negative',
   ].join(' '),
   {
     variants: {

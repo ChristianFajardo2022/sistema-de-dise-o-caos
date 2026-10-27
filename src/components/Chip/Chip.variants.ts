@@ -25,7 +25,7 @@ export const chipVariants = cva(
     'group/chip relative box-border inline-flex max-w-full shrink-0 align-middle select-none',
     'gap-ds-gap-button-internal-margin-md',
     '[--chip-bg:transparent] [--chip-stroke:var(--color-ds-border-general-gray-fourth)]',
-    '[--chip-fg:var(--color-ds-text-neutral-white)] [--chip-ic:var(--color-ds-icon-general-white)]',
+    '[--chip-fg:var(--color-ds-text-neutral-white)] [--chip-ic:var(--color-ds-icon-general-default)]',
     'bg-(color:--chip-bg) text-(color:--chip-fg)',
     'shadow-[inset_0_0_0_var(--ds-responsive-border-general-md)_var(--chip-stroke)]',
     'text-ds-typography-button-size-sm',
@@ -149,7 +149,7 @@ export const chipDotVariants = cva('box-border size-6 shrink-0 rounded-full', {
  * encima del área estirada del cuerpo.
  */
 export const chipCloseVariants = cva(
-  'relative z-10 -m-[5px] box-border inline-flex shrink-0 appearance-none items-center justify-center rounded-full border-0 bg-transparent p-[5px] text-ds-icon-general-white outline-none disabled:cursor-not-allowed enabled:cursor-pointer focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
+  'relative z-10 -m-[5px] box-border inline-flex shrink-0 appearance-none items-center justify-center rounded-full border-0 bg-transparent p-[5px] text-ds-icon-general-default outline-none disabled:cursor-not-allowed enabled:cursor-pointer focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
   { variants: { type: { primary: '', 'primary-avatar': '', 'primary-color': '', 'primary-box': 'self-start' } } }
 );
 

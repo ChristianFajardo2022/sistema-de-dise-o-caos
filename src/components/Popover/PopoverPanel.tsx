@@ -86,7 +86,7 @@ export const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                       name="info-circle"
                       size={20}
                       variant="fill"
-                      className="shrink-0 text-ds-icon-general-white-unicolor"
+                      className="shrink-0 text-ds-icon-general-default-unicolor"
                       data-figma-part="Icon-sizes"
                     />
                   )}

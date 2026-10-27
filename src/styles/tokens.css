@@ -1,6 +1,6 @@
 /* Tailwind CSS v4.
  * GENERADO por scripts/gen-tokens.py (`npm run build:tokens`) desde tokens/variables-principal.json. No editar a mano.
- * 625 variables del sistema.
+ * 629 variables del sistema.
  * Tema predeterminado: Dark.
  * Responsive: Mobile base, Tablet 48rem, Desktop 64rem.
  * Los breakpoints son una decisión de implementación web.
@@ -198,22 +198,22 @@
     --color-ds-background-tertiary-tertiary: var(--color-ds-primitives-color-secondary-a03);
     --color-ds-icon-acent-secondary: var(--color-ds-primitives-color-tertiary-m03);
     --color-ds-icon-tertiary-blue: var(--color-ds-primitives-color-secondary-a03);
-    --color-ds-icon-general-white: var(--color-ds-primitives-color-primary-b01);
+    --color-ds-icon-general-default: var(--color-ds-primitives-color-primary-b01);
     --color-ds-icon-general-black: var(--color-ds-primitives-color-primary-g13);
     --color-ds-icon-general-gray-low-contrast: var(--color-ds-primitives-color-primary-g11);
     --color-ds-icon-general-disabled-positive: var(--color-ds-primitives-color-primary-g11);
-    --color-ds-icon-semantic-success-tertiary: var(--ds-external-confirmation-v06);
+    --color-ds-icon-semantic-success-tertiary: var(--color-ds-primitives-color-confirmation-v06);
     --color-ds-icon-semantic-alert-tertiary: var(--color-ds-primitives-color-alert-y06);
-    --color-ds-icon-semantic-error-tertiary: var(--ds-external-error-r06);
+    --color-ds-icon-semantic-error-tertiary: var(--color-ds-primitives-color-error-r06);
     --color-ds-icon-semantic-information-tertiary: var(--color-ds-primitives-color-information-ai06);
     --color-ds-icon-acent-tertiary: var(--color-ds-primitives-color-tertiary-m06);
     --color-ds-background-container-disabled-on-canva: var(--color-ds-primitives-color-primary-g11);
     --color-ds-text-neutral-white: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-neutral-black: var(--color-ds-primitives-color-primary-g14);
     --color-ds-text-neutral-disabled-positive: var(--color-ds-primitives-color-primary-g10);
-    --color-ds-text-semantic-success: var(--ds-external-confirmation-v06);
+    --color-ds-text-semantic-success: var(--color-ds-primitives-color-confirmation-v06);
     --color-ds-text-semantic-alert: var(--color-ds-primitives-color-alert-y06);
-    --color-ds-text-semantic-error: var(--ds-external-error-r06);
+    --color-ds-text-semantic-error: var(--color-ds-primitives-color-error-r06);
     --color-ds-text-semantic-information: var(--color-ds-primitives-color-information-ai06);
     --color-ds-background-semantic-success-fourth: var(--color-ds-primitives-color-confirmation-v04);
     --color-ds-text-link-hover: var(--color-ds-primitives-color-secondary-a04);
@@ -262,7 +262,7 @@
     --color-ds-background-general-gray-secondary-unicolor: var(--color-ds-primitives-color-primary-g05);
     --color-ds-text-neutral-white-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-acent-secondary: var(--color-ds-primitives-color-tertiary-m06);
-    --color-ds-icon-general-white-unicolor: var(--color-ds-primitives-color-primary-b01);
+    --color-ds-icon-general-default-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-border-button-primary-focus-press: var(--color-ds-primitives-color-primary-g08);
     --color-ds-border-button-primary-default: var(--color-ds-primitives-color-primary-g10);
     --color-ds-border-button-secondary-low-load: var(--color-ds-primitives-color-primary-g08);
@@ -319,7 +319,7 @@
     --color-ds-icon-button-link-default: var(--color-ds-primitives-color-secondary-a03);
     --color-ds-background-field-disabled: var(--color-ds-primitives-color-primary-g11);
     --color-ds-text-neutral-heading: var(--color-ds-primitives-color-primary-b01);
-    --color-ds-text-neutral-body: var(--color-ds-primitives-color-primary-g08);
+    --color-ds-text-neutral-body: var(--color-ds-primitives-color-primary-g06);
     --color-ds-text-neutral-gray: var(--color-ds-primitives-color-primary-g07);
     --color-ds-background-field-surface: var(--color-ds-primitives-color-primary-g14);
     --color-ds-text-neutral-gray-2: var(--color-ds-primitives-color-primary-g08);
@@ -374,7 +374,7 @@
     --color-ds-background-container-default-on-canva: var(--color-ds-primitives-color-primary-g14);
     --color-ds-background-container-default-unicolor: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-icon-low-unicolor: var(--color-ds-primitives-color-primary-g13);
-    --color-ds-background-icon-low-contrast: var(--color-ds-primitives-color-primary-g13);
+    --color-ds-background-icon-default-on-card: var(--color-ds-primitives-color-primary-g12);
     --color-ds-background-general-white-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-icon-general-black-unicolor: var(--color-ds-primitives-color-primary-g13);
     --color-ds-text-acent-firts: var(--color-ds-primitives-color-tertiary-m02);
@@ -390,7 +390,7 @@
     --color-ds-text-button-secondary-high-delete: var(--color-ds-primitives-color-error-r04);
     --color-ds-icon-button-tertiary-delete: var(--color-ds-primitives-color-error-r03);
     --color-ds-text-button-tertiary-delete: var(--color-ds-primitives-color-error-r03);
-    --color-ds-background-icon-high-contrast: var(--color-ds-primitives-color-primary-g12);
+    --color-ds-background-icon-default-on-canva: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-acent-secondary-opacity: color-mix(in srgb, var(--color-ds-primitives-color-tertiary-m02) 30%, transparent);
     --color-ds-background-general-black: var(--color-ds-primitives-color-primary-g14);
     --color-ds-background-general-black-unicolor: var(--color-ds-primitives-color-primary-g14);
@@ -484,6 +484,10 @@
     --color-ds-border-general-select-on-canva: var(--color-ds-primitives-color-primary-g10);
     --color-ds-border-general-select-on-card: var(--color-ds-primitives-color-primary-g09);
     --color-ds-background-degrade-image-default: color-mix(in srgb, var(--color-ds-primitives-color-primary-n01) 20%, transparent);
+    --color-ds-background-icon-hover-on-canva: var(--color-ds-primitives-color-primary-g11);
+    --color-ds-background-icon-hover-on-card: var(--color-ds-primitives-color-primary-g11);
+    --color-ds-background-icon-select-on-canva: var(--color-ds-primitives-color-primary-g12);
+    --color-ds-background-icon-select-on-card: var(--color-ds-primitives-color-primary-g11);
   }
   :where(.light, [data-theme="light"]) {
     color-scheme: light;
@@ -513,7 +517,7 @@
     --color-ds-background-tertiary-tertiary: var(--color-ds-primitives-color-secondary-a03);
     --color-ds-icon-acent-secondary: var(--color-ds-primitives-color-tertiary-m03);
     --color-ds-icon-tertiary-blue: var(--color-ds-primitives-color-secondary-a03);
-    --color-ds-icon-general-white: var(--color-ds-primitives-color-primary-g13);
+    --color-ds-icon-general-default: var(--color-ds-primitives-color-primary-g13);
     --color-ds-icon-general-black: var(--color-ds-primitives-color-primary-b01);
     --color-ds-icon-general-gray-low-contrast: var(--color-ds-primitives-color-primary-g06);
     --color-ds-icon-general-disabled-positive: var(--color-ds-primitives-color-primary-g10);
@@ -577,7 +581,7 @@
     --color-ds-background-general-gray-secondary-unicolor: var(--color-ds-primitives-color-primary-g05);
     --color-ds-text-neutral-white-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-acent-secondary: var(--color-ds-primitives-color-tertiary-m06);
-    --color-ds-icon-general-white-unicolor: var(--color-ds-primitives-color-primary-b01);
+    --color-ds-icon-general-default-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-border-button-primary-focus-press: var(--color-ds-primitives-color-primary-g08);
     --color-ds-border-button-primary-default: var(--color-ds-primitives-color-primary-g10);
     --color-ds-border-button-secondary-low-load: var(--color-ds-primitives-color-primary-g10);
@@ -634,7 +638,7 @@
     --color-ds-icon-button-link-default: var(--color-ds-primitives-color-secondary-a04);
     --color-ds-background-field-disabled: var(--color-ds-primitives-color-primary-g08);
     --color-ds-text-neutral-heading: var(--color-ds-primitives-color-primary-g14);
-    --color-ds-text-neutral-body: var(--color-ds-primitives-color-primary-g10);
+    --color-ds-text-neutral-body: var(--color-ds-primitives-color-primary-g12);
     --color-ds-text-neutral-gray: var(--color-ds-primitives-color-primary-g11);
     --color-ds-background-field-surface: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-neutral-gray-2: var(--color-ds-primitives-color-primary-g10);
@@ -689,7 +693,7 @@
     --color-ds-background-container-default-on-canva: var(--color-ds-primitives-color-primary-b01);
     --color-ds-background-container-default-unicolor: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-icon-low-unicolor: var(--color-ds-primitives-color-primary-g13);
-    --color-ds-background-icon-low-contrast: var(--color-ds-primitives-color-primary-g03);
+    --color-ds-background-icon-default-on-card: var(--color-ds-primitives-color-primary-g04);
     --color-ds-background-general-white-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-icon-general-black-unicolor: var(--color-ds-primitives-color-primary-g12);
     --color-ds-text-acent-firts: var(--color-ds-primitives-color-tertiary-m06);
@@ -705,7 +709,7 @@
     --color-ds-text-button-secondary-high-delete: var(--color-ds-primitives-color-error-r05);
     --color-ds-icon-button-tertiary-delete: var(--color-ds-primitives-color-error-r04);
     --color-ds-text-button-tertiary-delete: var(--color-ds-primitives-color-error-r04);
-    --color-ds-background-icon-high-contrast: var(--color-ds-primitives-color-primary-b01);
+    --color-ds-background-icon-default-on-canva: var(--color-ds-primitives-color-primary-g03);
     --color-ds-background-acent-secondary-opacity: color-mix(in srgb, var(--color-ds-primitives-color-tertiary-m02) 30%, transparent);
     --color-ds-background-general-black: var(--color-ds-primitives-color-primary-b01);
     --color-ds-background-general-black-unicolor: var(--color-ds-primitives-color-primary-g14);
@@ -795,10 +799,14 @@
     --color-ds-background-effect-shadow-shadow-on-canva-sm-tablet: color-mix(in srgb, var(--color-ds-primitives-color-primary-g09) 60%, transparent);
     --color-ds-background-effect-shadow-shadow-on-canva-sm-desktop: color-mix(in srgb, var(--color-ds-primitives-color-primary-g09) 20%, transparent);
     --color-ds-border-general-hover-on-canva: var(--color-ds-primitives-color-primary-g04);
-    --color-ds-border-general-hover-on-card: #dcced6;
+    --color-ds-border-general-hover-on-card: var(--color-ds-primitives-color-primary-g07);
     --color-ds-border-general-select-on-canva: var(--color-ds-primitives-color-primary-g05);
     --color-ds-border-general-select-on-card: var(--color-ds-primitives-color-primary-g05);
     --color-ds-background-degrade-image-default: color-mix(in srgb, var(--color-ds-primitives-color-primary-g03) 30%, transparent);
+    --color-ds-background-icon-hover-on-canva: var(--color-ds-primitives-color-primary-g04);
+    --color-ds-background-icon-hover-on-card: var(--color-ds-primitives-color-primary-g05);
+    --color-ds-background-icon-select-on-canva: var(--color-ds-primitives-color-primary-g04);
+    --color-ds-background-icon-select-on-card: var(--color-ds-primitives-color-primary-g05);
   }
   :root, :where(.light, .dark, [data-theme="light"], [data-theme="dark"]) {
     --ds-responsive-space-button-3xl: var(--ds-primitives-space-2xl);
@@ -1311,7 +1319,7 @@
   --color-ds-background-tertiary-tertiary: var(--color-ds-background-tertiary-tertiary);
   --color-ds-icon-acent-secondary: var(--color-ds-icon-acent-secondary);
   --color-ds-icon-tertiary-blue: var(--color-ds-icon-tertiary-blue);
-  --color-ds-icon-general-white: var(--color-ds-icon-general-white);
+  --color-ds-icon-general-default: var(--color-ds-icon-general-default);
   --color-ds-icon-general-black: var(--color-ds-icon-general-black);
   --color-ds-icon-general-gray-low-contrast: var(--color-ds-icon-general-gray-low-contrast);
   --color-ds-icon-general-disabled-positive: var(--color-ds-icon-general-disabled-positive);
@@ -1375,7 +1383,7 @@
   --color-ds-background-general-gray-secondary-unicolor: var(--color-ds-background-general-gray-secondary-unicolor);
   --color-ds-text-neutral-white-unicolor: var(--color-ds-text-neutral-white-unicolor);
   --color-ds-text-acent-secondary: var(--color-ds-text-acent-secondary);
-  --color-ds-icon-general-white-unicolor: var(--color-ds-icon-general-white-unicolor);
+  --color-ds-icon-general-default-unicolor: var(--color-ds-icon-general-default-unicolor);
   --color-ds-border-button-primary-focus-press: var(--color-ds-border-button-primary-focus-press);
   --color-ds-border-button-primary-default: var(--color-ds-border-button-primary-default);
   --color-ds-border-button-secondary-low-load: var(--color-ds-border-button-secondary-low-load);
@@ -1503,7 +1511,7 @@
   --color-ds-background-container-default-on-canva: var(--color-ds-background-container-default-on-canva);
   --color-ds-background-container-default-unicolor: var(--color-ds-background-container-default-unicolor);
   --color-ds-background-icon-low-unicolor: var(--color-ds-background-icon-low-unicolor);
-  --color-ds-background-icon-low-contrast: var(--color-ds-background-icon-low-contrast);
+  --color-ds-background-icon-default-on-card: var(--color-ds-background-icon-default-on-card);
   --color-ds-background-general-white-unicolor: var(--color-ds-background-general-white-unicolor);
   --color-ds-icon-general-black-unicolor: var(--color-ds-icon-general-black-unicolor);
   --color-ds-text-acent-firts: var(--color-ds-text-acent-firts);
@@ -1519,7 +1527,7 @@
   --color-ds-text-button-secondary-high-delete: var(--color-ds-text-button-secondary-high-delete);
   --color-ds-icon-button-tertiary-delete: var(--color-ds-icon-button-tertiary-delete);
   --color-ds-text-button-tertiary-delete: var(--color-ds-text-button-tertiary-delete);
-  --color-ds-background-icon-high-contrast: var(--color-ds-background-icon-high-contrast);
+  --color-ds-background-icon-default-on-canva: var(--color-ds-background-icon-default-on-canva);
   --color-ds-background-acent-secondary-opacity: var(--color-ds-background-acent-secondary-opacity);
   --spacing-ds-dimention-icono-m: var(--ds-responsive-dimention-icono-m);
   --color-ds-background-general-black: var(--color-ds-background-general-black);
@@ -1672,6 +1680,10 @@
   --color-ds-border-general-select-on-canva: var(--color-ds-border-general-select-on-canva);
   --color-ds-border-general-select-on-card: var(--color-ds-border-general-select-on-card);
   --color-ds-background-degrade-image-default: var(--color-ds-background-degrade-image-default);
+  --color-ds-background-icon-hover-on-canva: var(--color-ds-background-icon-hover-on-canva);
+  --color-ds-background-icon-hover-on-card: var(--color-ds-background-icon-hover-on-card);
+  --color-ds-background-icon-select-on-canva: var(--color-ds-background-icon-select-on-canva);
+  --color-ds-background-icon-select-on-card: var(--color-ds-background-icon-select-on-card);
   --color-ds-effect-shadow-on-card: var(--color-ds-responsive-effect-shadow-on-card);
   --color-ds-effect-shadow-on-canva-md: var(--color-ds-responsive-effect-shadow-on-canva-md);
   --color-ds-effect-shadow-on-canva-sm: var(--color-ds-responsive-effect-shadow-on-canva-sm);

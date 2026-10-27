@@ -24,9 +24,9 @@ export const buttonCornerVariants = cva(
   {
     variants: {
       status: {
-        'on-canva': 'bg-ds-background-container-default-on-canva text-ds-icon-general-white',
-        'on-card': 'bg-ds-background-container-default-on-card text-ds-icon-general-white',
-        'unicolor-canva': 'bg-ds-background-container-hover-unicolor text-ds-icon-general-white-unicolor',
+        'on-canva': 'bg-ds-background-container-default-on-canva text-ds-icon-general-default',
+        'on-card': 'bg-ds-background-container-default-on-card text-ds-icon-general-default',
+        'unicolor-canva': 'bg-ds-background-container-hover-unicolor text-ds-icon-general-default-unicolor',
       },
       size: {
         md: 'size-[40px]',
@@ -65,4 +65,4 @@ export const buttonCornerFavoriteColor = {
 } as const;
 
 /** Checkbox y Radiobutton en Unicolor: el contorno del control pasa a icon/general/white-unicolor */
-export const buttonCornerUnicolorRing = '[--ring:var(--color-ds-icon-general-white-unicolor)]';
+export const buttonCornerUnicolorRing = '[--ring:var(--color-ds-icon-general-default-unicolor)]';

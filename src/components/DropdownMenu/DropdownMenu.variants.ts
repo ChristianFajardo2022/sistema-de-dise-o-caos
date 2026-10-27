@@ -102,7 +102,7 @@ export const dropdownMenuItemIconVariants = cva('shrink-0', {
   variants: {
     disabled: {
       true: 'text-ds-icon-general-disabled-positive',
-      false: 'text-ds-icon-general-white',
+      false: 'text-ds-icon-general-default',
     },
   },
   defaultVariants: { disabled: false },

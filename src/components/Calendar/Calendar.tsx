@@ -80,7 +80,7 @@ function NavButton({
       onClick={onClick}
       // Figma sobrescribe el color del chevron con icon/general/white (en claro, G13 y no el negro del botón).
       // Solo en reposo: hover e inactivo siguen con los tokens del botón
-      className={disabled ? undefined : '[--btn-icon:var(--color-ds-icon-general-white)]'}
+      className={disabled ? undefined : '[--btn-icon:var(--color-ds-icon-general-default)]'}
     >
       {/* El slot de Button dibuja el ícono a 20: el contenedor de 16 lo fija al tamaño de Figma (icon-single xs) */}
       <span data-figma-part="Icon-sizes" className="inline-flex size-4 items-center justify-center">
@@ -122,7 +122,7 @@ const RangeField = forwardRef<HTMLButtonElement, RangeFieldProps>(({ label, valu
       variant="line"
       aria-hidden="true"
       data-figma-part="Icon Right"
-      className="shrink-0 text-ds-icon-general-white"
+      className="shrink-0 text-ds-icon-general-default"
     />
   </button>
 ));

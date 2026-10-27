@@ -110,7 +110,7 @@ export const tabVariants = cva(
 );
 
 /** Ícono de la pestaña: icon/general/white; deshabilitada, icon/general/disabled-negative. */
-export const tabIconClass = 'shrink-0 text-ds-icon-general-white group-disabled:text-ds-icon-general-disabled-negative';
+export const tabIconClass = 'shrink-0 text-ds-icon-general-default group-disabled:text-ds-icon-general-disabled-negative';
 
 /** Texto de la pestaña (frame "Text-button"). */
 export const tabLabelClass =

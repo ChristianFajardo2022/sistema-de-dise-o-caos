@@ -52,7 +52,7 @@ export const checkboxControlVariants = cva(controlBase, {
         'peer-indeterminate:peer-disabled:[--ring:var(--color-ds-background-field-disabled)] peer-indeterminate:peer-disabled:bg-ds-background-field-disabled',
       ],
       negative: [
-        '[--ring:var(--color-ds-background-field-active-slow-contrast)] text-ds-icon-general-white',
+        '[--ring:var(--color-ds-background-field-active-slow-contrast)] text-ds-icon-general-default',
         'peer-checked:[--ring:var(--color-ds-background-field-active-slow-contrast)] peer-checked:bg-ds-background-field-active-slow-contrast',
         'peer-indeterminate:[--ring:var(--color-ds-background-field-active-slow-contrast)] peer-indeterminate:bg-ds-background-field-active-slow-contrast',
         'peer-disabled:[--ring:var(--color-ds-background-field-disabled)]',

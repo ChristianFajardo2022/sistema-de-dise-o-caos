@@ -67,14 +67,14 @@ export const badgeDotVariants = cva('block size-3 rounded-full', {
 export const badgeIconVariants = cva('', {
   variants: {
     state: {
-      default: 'text-ds-icon-general-white-unicolor',
+      default: 'text-ds-icon-general-default-unicolor',
       success: 'text-ds-icon-semantic-success-tertiary',
       alert: 'text-ds-icon-semantic-alert-tertiary',
-      error: 'text-ds-icon-general-white-unicolor',
+      error: 'text-ds-icon-general-default-unicolor',
       info: 'text-ds-icon-semantic-information-tertiary',
-      neutral: 'text-ds-icon-general-white',
+      neutral: 'text-ds-icon-general-default',
       negative: 'text-ds-icon-general-black',
-      positive: 'text-ds-icon-general-white',
+      positive: 'text-ds-icon-general-default',
       inactive: 'text-ds-icon-general-disabled-positive',
     },
   },

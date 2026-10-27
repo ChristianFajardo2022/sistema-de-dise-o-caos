@@ -7,8 +7,8 @@ import { Icon } from '../Icon';
 import { Logo } from '../Logo';
 
 const SOCIAL: FooterSocialLink[] = [
-  { name: 'Facebook', href: '#facebook', icon: <Icon name="facebook-circle" size={24} className="text-ds-icon-general-white" /> },
-  { name: 'Instagram', href: '#instagram', icon: <Icon name="instagram-line" size={24} className="text-ds-icon-general-white" /> },
+  { name: 'Facebook', href: '#facebook', icon: <Icon name="facebook-circle" size={24} className="text-ds-icon-general-default" /> },
+  { name: 'Instagram', href: '#instagram', icon: <Icon name="instagram-line" size={24} className="text-ds-icon-general-default" /> },
 ];
 
 const CONTACT: FooterSection = {
@@ -70,7 +70,7 @@ function Badges({ widths, mobile = false }: { widths: number[]; mobile?: boolean
           role="img"
           aria-label={`Sello ${i + 1}`}
           style={{ width: mobile ? Math.round(w * 0.75) : w }}
-          className={`flex items-center justify-center rounded-sm border border-current text-[10px] text-ds-icon-general-white ${mobile ? 'h-6' : 'h-8'}`}
+          className={`flex items-center justify-center rounded-sm border border-current text-[10px] text-ds-icon-general-default ${mobile ? 'h-6' : 'h-8'}`}
         >
           {w > 40 ? `Sello ${i + 1}` : ''}
         </span>

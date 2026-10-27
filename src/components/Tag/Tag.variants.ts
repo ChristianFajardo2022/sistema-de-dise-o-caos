@@ -30,13 +30,13 @@ export const tagVariants = cva(
     variants: {
       type: {
         default:
-          'light:[--tag-bg-focus:var(--color-ds-background-acent-secondary)] [--tag-bg:var(--color-ds-background-acent-secondary)] [--tag-bg-hover:var(--color-ds-background-acent-firts)] [--tag-bg-press:var(--color-ds-background-acent-tertiary)] [--tag-fg:var(--color-ds-text-acent-secondary)] [--tag-fg-press:var(--color-ds-text-neutral-white-unicolor)] [--tag-ic:var(--color-ds-icon-acent-tertiary)] [--tag-ic-press:var(--color-ds-icon-general-white-unicolor)]',
+          'light:[--tag-bg-focus:var(--color-ds-background-acent-secondary)] [--tag-bg:var(--color-ds-background-acent-secondary)] [--tag-bg-hover:var(--color-ds-background-acent-firts)] [--tag-bg-press:var(--color-ds-background-acent-tertiary)] [--tag-fg:var(--color-ds-text-acent-secondary)] [--tag-fg-press:var(--color-ds-text-neutral-white-unicolor)] [--tag-ic:var(--color-ds-icon-acent-tertiary)] [--tag-ic-press:var(--color-ds-icon-general-default-unicolor)]',
         success:
           '[--tag-bg:var(--color-ds-background-semantic-success-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-success-firts)] [--tag-bg-press:var(--color-ds-background-semantic-success-tertiary)] [--tag-fg:var(--color-ds-text-semantic-success)] [--tag-fg-press:var(--color-ds-text-semantic-success)] [--tag-ic:var(--color-ds-icon-semantic-success-tertiary)] [--tag-ic-press:var(--color-ds-icon-semantic-success-tertiary)]',
         alert:
           '[--tag-bg:var(--color-ds-background-semantic-alert-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-alert-firts)] [--tag-bg-press:var(--color-ds-background-semantic-alert-tertiary)] [--tag-fg:var(--color-ds-text-semantic-alert)] [--tag-fg-press:var(--color-ds-text-semantic-alert)] [--tag-ic:var(--color-ds-icon-semantic-alert-tertiary)] [--tag-ic-press:var(--color-ds-icon-semantic-alert-tertiary)]',
         error:
-          '[--tag-bg:var(--color-ds-background-semantic-error-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-error-firts)] [--tag-bg-press:var(--color-ds-background-semantic-error-tertiary)] [--tag-fg:var(--color-ds-text-semantic-error)] [--tag-fg-press:var(--color-ds-text-neutral-white-unicolor)] [--tag-ic:var(--color-ds-icon-semantic-error-tertiary)] [--tag-ic-press:var(--color-ds-icon-general-white-unicolor)]',
+          '[--tag-bg:var(--color-ds-background-semantic-error-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-error-firts)] [--tag-bg-press:var(--color-ds-background-semantic-error-tertiary)] [--tag-fg:var(--color-ds-text-semantic-error)] [--tag-fg-press:var(--color-ds-text-neutral-white-unicolor)] [--tag-ic:var(--color-ds-icon-semantic-error-tertiary)] [--tag-ic-press:var(--color-ds-icon-general-default-unicolor)]',
         info:
           '[--tag-bg:var(--color-ds-background-semantic-information-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-information-firts)] [--tag-bg-press:var(--color-ds-background-semantic-information-tertiary)] [--tag-fg:var(--color-ds-text-semantic-information)] [--tag-fg-press:var(--color-ds-text-semantic-information)] [--tag-ic:var(--color-ds-icon-semantic-information-tertiary)] [--tag-ic-press:var(--color-ds-icon-semantic-information-tertiary)]',
         neutral: '',
@@ -77,7 +77,7 @@ export const tagVariants = cva(
         type: 'neutral',
         size: 'sm',
         class:
-          '[--tag-bg:var(--color-ds-background-general-gray-firts)] [--tag-bg-hover:var(--color-ds-background-general-gray-tertiary)] [--tag-bg-press:var(--color-ds-background-general-gray-fifth)] [--tag-fg:var(--color-ds-text-neutral-black)] [--tag-fg-press:var(--color-ds-text-neutral-white)] [--tag-ic:var(--color-ds-icon-general-black)] [--tag-ic-press:var(--color-ds-icon-general-white)]',
+          '[--tag-bg:var(--color-ds-background-general-gray-firts)] [--tag-bg-hover:var(--color-ds-background-general-gray-tertiary)] [--tag-bg-press:var(--color-ds-background-general-gray-fifth)] [--tag-fg:var(--color-ds-text-neutral-black)] [--tag-fg-press:var(--color-ds-text-neutral-white)] [--tag-ic:var(--color-ds-icon-general-black)] [--tag-ic-press:var(--color-ds-icon-general-default)]',
       },
     ],
     defaultVariants: { type: 'default', size: 'md', state: 'default', interactive: false },

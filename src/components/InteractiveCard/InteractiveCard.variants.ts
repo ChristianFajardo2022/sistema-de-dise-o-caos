@@ -100,7 +100,7 @@ export const interactiveCardCornerClass =
 export const interactiveCardCornerSlotClass = 'absolute top-0 right-0 z-[1] flex';
 
 /** Avatar del encabezado: On Card cuando la tarjeta está seleccionada. */
-export const interactiveCardAvatarCheckedClass = 'group-has-[[data-card-control]:checked]/card:bg-ds-background-icon-high-contrast';
+export const interactiveCardAvatarCheckedClass = 'group-has-[[data-card-control]:checked]/card:bg-ds-background-icon-default-on-card';
 
 const semibold = '[font-weight:var(--ds-primitives-typography-weight-semibold)]';
 const regular = '[font-weight:var(--ds-primitives-typography-weight-regular)]';
