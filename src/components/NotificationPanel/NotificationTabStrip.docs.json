@@ -1,0 +1,34 @@
+{
+  "name": "NotificationTabStrip",
+  "component": "NotificationTabStrip",
+  "description": "Fila de pestañas del panel complejo: el TabList con, opcionalmente, un botón de desplazamiento a cada lado (Left chevron tab y Right chevron tab de Figma). Va dentro de un Tabs, que fija Size y Contrast. Los botones de desplazamiento son un atajo para puntero: van aria-hidden y fuera del orden de Tab, porque con teclado las flechas del tablist ya desplazan. Las pestañas de solo ícono (sin label) necesitan aria-label.",
+  "category": "Overlays",
+  "props": {
+    "tabs": {
+      "type": "NotificationPanelTab[]",
+      "required": true,
+      "description": "Pestañas (value, label, icon, badge, badgeLabel, aria-label)."
+    },
+    "aria-label": {
+      "type": "string",
+      "default": "'Categorías de notificaciones'",
+      "description": "Nombre accesible de la lista de pestañas."
+    },
+    "scrollButtons": {
+      "type": "boolean",
+      "default": false,
+      "description": "Dibuja los botones de desplazamiento."
+    },
+    "scrollLabels": {
+      "type": "{ previous: string; next: string }",
+      "default": "{ previous: 'Pestañas anteriores', next: 'Pestañas siguientes' }",
+      "description": "Títulos de los botones de desplazamiento."
+    }
+  },
+  "examples": [
+    {
+      "title": "En una pantalla",
+      "code": "<Tabs size=\"md\" value={tab} onValueChange={setTab}>\n  <NotificationTabStrip tabs={tabs} scrollButtons />\n</Tabs>"
+    }
+  ]
+}

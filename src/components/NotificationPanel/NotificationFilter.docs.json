@@ -1,0 +1,39 @@
+{
+  "name": "NotificationFilter",
+  "component": "NotificationFilter",
+  "description": "Filtro \"Todas\" / \"No leídos\" del panel de notificaciones: dos Chip (sin ícono) en un ChipGroup de selección única (role=\"radiogroup\": una parada de Tab y las flechas mueven y seleccionan). No filtra nada por sí solo: avisa del cambio con onValueChange. Controlado o no controlado.",
+  "category": "Overlays",
+  "props": {
+    "value": {
+      "type": "'all' | 'unread'",
+      "required": false,
+      "description": "Filtro activo (controlado)."
+    },
+    "defaultValue": {
+      "type": "'all' | 'unread'",
+      "default": "'all'",
+      "description": "Filtro al inicio."
+    },
+    "onValueChange": {
+      "type": "(value) => void",
+      "required": false,
+      "description": "Cambia el filtro."
+    },
+    "labels": {
+      "type": "{ all: ReactNode; unread: ReactNode }",
+      "default": "{ all: 'Todas', unread: 'No leídos' }",
+      "description": "Textos de los chips."
+    },
+    "aria-label": {
+      "type": "string",
+      "default": "'Filtrar notificaciones'",
+      "description": "Nombre accesible del grupo."
+    }
+  },
+  "examples": [
+    {
+      "title": "En una pantalla móvil",
+      "code": "<NotificationFilter value={filter} onValueChange={setFilter} />"
+    }
+  ]
+}

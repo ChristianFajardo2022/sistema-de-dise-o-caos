@@ -1,0 +1,153 @@
+{
+  "name": "NotificationPanel",
+  "component": "NotificationPanel",
+  "description": "Panel de notificaciones, fiel a los component sets Simple notifications (12602:6152) y Complex notifications (15302:8832) de Figma (el marco Profile card de 400). Encabezado con título, filtro \"Todas\" / \"No leídos\" (ChipGroup de selección única) y, en complex, el botón de ajustes; en complex, pestañas (Tabs sm on-card con contador); divisor; y la lista dentro de un ScrollArea. Sin notificaciones muestra el EmptyState (ícono document en simple y notification en complex). Por defecto es una región (section) nombrada por su título. Con popup (se abre desde NotificationBell) es role=\"dialog\" no modal con aria-modal=\"false\": el foco pasa al panel al abrir y vuelve a quien lo tenía al cerrar, y Escape llama a onOpenChange(false); el clic fuera y la posición los resuelve quien lo abre (el Header, un Popover…). open={false} no dibuja nada. La lista es ul role=\"list\" con nombre; sus hijos son <li> (NotificationItem, NotificationCard, NotificationGroup y NotificationPanelHeading). Al eliminar una notificación el foco pasa a la vecina o, si era la última, al panel. El panel no filtra ni agrupa: recibe children ya listos y avisa de los cambios de filtro y de pestaña.",
+  "category": "Overlays",
+  "props": {
+    "variant": {
+      "type": "'simple' | 'complex'",
+      "default": "'simple'",
+      "description": "Type de Figma."
+    },
+    "title": {
+      "type": "ReactNode",
+      "default": "'Notificaciones'",
+      "description": "Texto del encabezado."
+    },
+    "headingLevel": {
+      "type": "2 | 3 | 4 | 5 | 6",
+      "default": 2,
+      "description": "Nivel del encabezado."
+    },
+    "filter": {
+      "type": "'all' | 'unread'",
+      "required": false,
+      "description": "Filtro activo (controlado)."
+    },
+    "defaultFilter": {
+      "type": "'all' | 'unread'",
+      "default": "'all'",
+      "description": "Filtro al inicio."
+    },
+    "onFilterChange": {
+      "type": "(filter) => void",
+      "required": false,
+      "description": "Cambia el filtro."
+    },
+    "filterLabels": {
+      "type": "{ all: ReactNode; unread: ReactNode }",
+      "default": "{ all: 'Todas', unread: 'No leídos' }",
+      "description": "Textos de los chips."
+    },
+    "filterLabel": {
+      "type": "string",
+      "default": "'Filtrar notificaciones'",
+      "description": "Nombre accesible del grupo de chips."
+    },
+    "onSettingsClick": {
+      "type": "() => void",
+      "required": false,
+      "description": "Solo complex: botón de ajustes junto a los chips."
+    },
+    "settingsLabel": {
+      "type": "string",
+      "default": "'Ajustes de notificaciones'",
+      "description": "Nombre accesible del botón de ajustes."
+    },
+    "tabs": {
+      "type": "NotificationPanelTab[]",
+      "required": false,
+      "description": "Solo complex: pestañas. Cada una es un NotificationPanelTab: value (string, obligatorio), label (ReactNode, texto de la pestaña), icon (IconName, ícono antes del texto), badge (ReactNode, contador después del texto), badgeLabel (string, texto para lectores que sigue al contador) y aria-label (string, nombre de una pestaña de solo ícono)."
+    },
+    "tab": {
+      "type": "string",
+      "required": false,
+      "description": "Pestaña activa (controlada)."
+    },
+    "defaultTab": {
+      "type": "string",
+      "required": false,
+      "description": "Pestaña al inicio. Por defecto la primera."
+    },
+    "onTabChange": {
+      "type": "(tab: string) => void",
+      "required": false,
+      "description": "Cambia la pestaña."
+    },
+    "tabsLabel": {
+      "type": "string",
+      "default": "'Categorías de notificaciones'",
+      "description": "Nombre accesible de la lista de pestañas."
+    },
+    "tabScrollButtons": {
+      "type": "boolean",
+      "default": false,
+      "description": "Left y Right chevron tab de Figma: botones de desplazamiento (aria-hidden, solo puntero)."
+    },
+    "children": {
+      "type": "ReactNode | ((tab) => ReactNode)",
+      "required": false,
+      "description": "Los <li> de la lista; con pestañas, puede ser una función de la pestaña activa."
+    },
+    "empty": {
+      "type": "boolean",
+      "default": false,
+      "description": "Estado vacío en lugar de la lista."
+    },
+    "emptyDescription": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto del estado vacío."
+    },
+    "emptyTitle": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Título opcional del estado vacío (Figma no lo dibuja)."
+    },
+    "listLabel": {
+      "type": "string",
+      "default": "'Lista de notificaciones'",
+      "description": "Nombre accesible de la lista."
+    },
+    "listMaxHeight": {
+      "type": "string | number",
+      "default": "'24rem'",
+      "description": "Alto máximo de la lista antes de desplazar."
+    },
+    "popup": {
+      "type": "boolean",
+      "default": false,
+      "description": "role=\"dialog\" no modal, con foco al abrir y de vuelta al cerrar."
+    },
+    "open": {
+      "type": "boolean",
+      "default": true,
+      "description": "Visible. Con false no se dibuja."
+    },
+    "onOpenChange": {
+      "type": "(open: boolean) => void",
+      "required": false,
+      "description": "Recibe false con Escape en un panel popup."
+    },
+    "rootProps": {
+      "type": "NotificationRootProps",
+      "required": false,
+      "description": "Atributos del <li> raíz (data-*, id…)."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases para la raíz. ref y el resto de props van a la raíz."
+    }
+  },
+  "examples": [
+    {
+      "title": "Desde la campana",
+      "code": "<NotificationBell size=\"sm\" count={2} open={open} aria-controls=\"notifications\" aria-haspopup=\"dialog\" onClick={() => setOpen(!open)} />\n<NotificationPanel id=\"notifications\" popup open={open} onOpenChange={setOpen}>\n  <NotificationItem title=\"Factura lista\" description=\"Descárgala hoy.\" unread />\n</NotificationPanel>"
+    },
+    {
+      "title": "Complejo con secciones",
+      "code": "<NotificationPanel variant=\"complex\" tabs={tabs}>\n  <NotificationPanelHeading>Hoy</NotificationPanelHeading>\n  <NotificationCard title=\"Factura 1042\" unread />\n</NotificationPanel>"
+    }
+  ]
+}

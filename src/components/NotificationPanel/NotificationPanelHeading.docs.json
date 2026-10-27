@@ -1,0 +1,24 @@
+{
+  "name": "NotificationPanelHeading",
+  "component": "NotificationPanelHeading",
+  "description": "Título de sección dentro de la lista del NotificationPanel (\"Hoy\", \"Ayer\"): un <li> con un encabezado (h3 por defecto; h2 si la pantalla ya tiene un h1), para que la lista siga siendo válida y los lectores encuentren las secciones por encabezados.",
+  "category": "Overlays",
+  "props": {
+    "children": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Texto de la sección."
+    },
+    "headingLevel": {
+      "type": "2 | 3 | 4 | 5 | 6",
+      "default": 3,
+      "description": "Nivel del encabezado."
+    }
+  },
+  "examples": [
+    {
+      "title": "Secciones",
+      "code": "<NotificationPanelHeading>Hoy</NotificationPanelHeading>"
+    }
+  ]
+}

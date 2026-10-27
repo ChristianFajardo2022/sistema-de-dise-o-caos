@@ -1,0 +1,21 @@
+{
+  "name": "Spinner",
+  "component": "Spinner",
+  "description": "Indicador de carga del sistema de diseño CAOS, fiel a los component sets Spinner (11262:916, 2 variantes: Type) y Spinner button (11309:1208, 6 variantes: Type × Size) de Figma. variant=\"ring\" es el Spinner: marco de dimention/icono/M (56; 48 en Mobile) con dos anillos de trazo 1.5 hacia dentro, el exterior llena el marco y el interior mide dimention/icono/S; uno es border/general/white y el otro border/general/gray-secondary, y Type 1 y 2 los intercambian. variant=\"dots\" es el Spinner button: tres puntos de 8 (size md, caja de 24) o de 6 (sm, caja de 16) con fondo background/general/white; Type 1, 2 y 3 rotan su posición. tone=\"current\" hereda currentColor para usarlo dentro de controles con otro color. Accesibilidad: por defecto es role=\"status\" con nombre \"Cargando\" (prop label); con decorative pasa a aria-hidden, para usarlo dentro de un control que ya anuncia el estado (p. ej. un botón con aria-busy). Con prefers-reduced-motion el giro se sustituye por un pulso suave: el indicador no desaparece. animated=false deja el fotograma estático de Figma.",
+  "category": "Feedback",
+  "props": {
+    "variant": { "type": "'ring' | 'dots'", "default": "'ring'", "description": "ring = set Spinner; dots = set Spinner button." },
+    "type": { "type": "'1' | '2' | '3'", "default": "'1'", "description": "Type de Figma: fotograma inicial. ring admite 1 y 2; dots admite 1, 2 y 3." },
+    "size": { "type": "'md' | 'sm'", "default": "'md'", "description": "Size de Figma (M o S). Solo aplica a dots." },
+    "tone": { "type": "'default' | 'current'", "default": "'default'", "description": "default usa los tokens de Figma; current hereda el color del texto." },
+    "label": { "type": "string", "default": "'Cargando'", "description": "Nombre accesible del indicador." },
+    "decorative": { "type": "boolean", "default": "false", "description": "Oculta el spinner a lectores de pantalla (aria-hidden)." },
+    "animated": { "type": "boolean", "default": "true", "description": "Anima el indicador; con reduced-motion se usa un pulso más lento." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para el span raíz. El resto de props nativas y el ref van al span." }
+  },
+  "examples": [
+    { "title": "Spinner", "code": "<Spinner label=\"Cargando resultados\" />" },
+    { "title": "Spinner button", "code": "<Spinner variant=\"dots\" size=\"sm\" />" },
+    { "title": "Dentro de un botón", "code": "<button aria-busy=\"true\"><Spinner variant=\"dots\" size=\"sm\" tone=\"current\" decorative /> Guardando</button>" }
+  ]
+}

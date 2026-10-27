@@ -1,0 +1,62 @@
+{
+  "name": "NotificationItem",
+  "component": "NotificationItem",
+  "description": "Fila de notificación de texto, fiel al component set Text notification (Atom) de Figma (12571:4812), Type Default y Active (333×58.5). Título (16/20; medium si no está leída), descripción 14/18 y, si no está leída, un punto verde (Badge simple Success) al final de la fila con el texto \"No leída\" para lectores de pantalla. Trazo inferior de 0.5 en border/general/default-on-card. Es un <li>: va en una lista (ul con role=\"list\", como la del NotificationPanel). Es interactiva solo con href (el título es un enlace) u onClick (el título es un botón); el control se estira sobre toda la fila y la descripción accesible lleva \"No leída\" y la descripción. Sin acción es informativa (el título es un párrafo). No confundir con NotificationText, que son los mensajes de ayuda o error de los campos de formulario.",
+  "category": "Data Display",
+  "props": {
+    "title": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Prop Notification de Figma. Nombre accesible del control."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Prop Description de Figma."
+    },
+    "unread": {
+      "type": "boolean",
+      "default": false,
+      "description": "Type=Active de Figma: no leída (título medium y punto verde)."
+    },
+    "unreadLabel": {
+      "type": "string",
+      "default": "'No leída'",
+      "description": "Texto para lectores del punto."
+    },
+    "href": {
+      "type": "string",
+      "required": false,
+      "description": "Con href el título es un enlace."
+    },
+    "type": {
+      "type": "'button' | 'submit' | 'reset'",
+      "default": "'button'",
+      "description": "Tipo del botón cuando el título es un <button>."
+    },
+    "rootProps": {
+      "type": "NotificationRootProps",
+      "required": false,
+      "description": "Atributos del <li> raíz (data-*, id…)."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases para el <li> raíz. ref y el resto de props van al control del título."
+    }
+  },
+  "examples": [
+    {
+      "title": "Abre la notificación",
+      "code": "<NotificationItem title=\"Factura lista\" description=\"Descárgala hoy.\" unread onClick={abrir} />"
+    },
+    {
+      "title": "Como enlace",
+      "code": "<NotificationItem title=\"Nueva factura\" href=\"/facturas/1042\" />"
+    },
+    {
+      "title": "En una lista",
+      "code": "<ul role=\"list\"><NotificationItem title=\"Aviso\" description=\"Mantenimiento programado.\" unread /></ul>"
+    }
+  ]
+}

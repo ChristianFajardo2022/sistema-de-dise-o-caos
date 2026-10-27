@@ -1,0 +1,79 @@
+{
+  "name": "NotificationGroupItem",
+  "component": "NotificationGroupItem",
+  "description": "Fila del desplegable de un NotificationGroup, fiel al component set Dropdown group notification (Atom) de Figma (14914:1288), Type Default y Eliminate × State Unread y Read (316×77). Hora (12/16, con el punto verde antes si no está leída) y descripción 14/20: regular si está leída, semibold si no. Trazos superior e inferior de 0.5. Es un <li>. Interactiva solo con href u onClick (la descripción es el control, estirado sobre la fila; la hora y \"No leída\" son su descripción accesible). onDelete, revealed y el foco al eliminar funcionan como en NotificationCard.",
+  "category": "Data Display",
+  "props": {
+    "description": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Prop Description de Figma. Nombre accesible del control."
+    },
+    "time": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Prop Time de Figma."
+    },
+    "unread": {
+      "type": "boolean",
+      "default": false,
+      "description": "State=Unread de Figma."
+    },
+    "unreadLabel": {
+      "type": "string",
+      "default": "'No leída'",
+      "description": "Texto para lectores del punto."
+    },
+    "href": {
+      "type": "string",
+      "required": false,
+      "description": "Con href la descripción es un enlace."
+    },
+    "onDelete": {
+      "type": "() => void",
+      "required": false,
+      "description": "Elimina la fila; dibuja el botón eliminar."
+    },
+    "deleteLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre accesible del botón eliminar."
+    },
+    "revealed": {
+      "type": "boolean",
+      "required": false,
+      "description": "Type=Eliminate de Figma (controlado)."
+    },
+    "defaultRevealed": {
+      "type": "boolean",
+      "required": false,
+      "description": "El botón eliminar está a la vista al inicio (no controlado)."
+    },
+    "onRevealedChange": {
+      "type": "(revealed: boolean) => void",
+      "required": false,
+      "description": "Se llama al deslizar la fila para mostrar u ocultar el botón eliminar."
+    },
+    "rootProps": {
+      "type": "NotificationRootProps",
+      "required": false,
+      "description": "Atributos del <li> raíz (data-*, id…)."
+    },
+    "contentProps": {
+      "type": "NotificationContentProps",
+      "required": false,
+      "description": "Atributos del bloque visual (marco Content de Figma)."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases para el <li> raíz."
+    }
+  },
+  "examples": [
+    {
+      "title": "Fila que abre la notificación",
+      "code": "<NotificationGroupItem time=\"Hace 22 min\" description=\"Cambiaste tu contraseña.\" unread onClick={abrir} />"
+    }
+  ]
+}

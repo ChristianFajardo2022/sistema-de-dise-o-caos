@@ -1,0 +1,58 @@
+{
+  "name": "NotificationBell",
+  "component": "NotificationBell",
+  "description": "Botón de campana con contador de no leídas, fiel al component set Icon button+badge (Atom) de Figma (12978:19007), Type Default y Icon+badge (32×32) y al botón de 48 de los paneles. Es un Button secondary low de solo ícono (ícono notification) con un Badge número Error en la esquina inferior derecha. El nombre accesible incluye la cantidad (\"Notificaciones, 3 sin leer\"; \"más de 99 sin leer\" si pasa del máximo) y el Badge visible es decorativo. Si abre el panel de notificaciones, open expone aria-expanded y pinta el botón en Press; aria-controls y aria-haspopup se pasan como props del botón (con el panel como diálogo no modal, aria-haspopup=\"dialog\").",
+  "category": "General Controls",
+  "props": {
+    "count": {
+      "type": "number",
+      "default": 0,
+      "description": "Notificaciones sin leer. Con 0 es el Type Default (sin contador)."
+    },
+    "max": {
+      "type": "number",
+      "default": 99,
+      "description": "Máximo del contador; por encima se lee \"99+\"."
+    },
+    "size": {
+      "type": "'xs' | 'sm' | 'md'",
+      "default": "'xs'",
+      "description": "Size del Button de Figma: 32, 48 o 56."
+    },
+    "label": {
+      "type": "string",
+      "default": "'Notificaciones'",
+      "description": "Nombre accesible base."
+    },
+    "unreadLabel": {
+      "type": "string",
+      "default": "'sin leer'",
+      "description": "Texto que sigue a la cantidad en el nombre accesible."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "El panel que abre está a la vista: aria-expanded y aspecto Press."
+    },
+    "rootProps": {
+      "type": "NotificationBellRootProps",
+      "required": false,
+      "description": "Atributos del contenedor. ref, aria-controls y el resto de props van al botón."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases para el contenedor."
+    }
+  },
+  "examples": [
+    {
+      "title": "Con contador",
+      "code": "<NotificationBell count={3} />"
+    },
+    {
+      "title": "Abre un panel",
+      "code": "<NotificationBell size=\"sm\" count={unread} open={open} aria-controls=\"notifications-panel\" aria-haspopup=\"dialog\" onClick={() => setOpen(!open)} />"
+    }
+  ]
+}
