@@ -3,23 +3,22 @@ import { cva } from 'class-variance-authority';
 /**
  * CAOS Design System — ProfileCard Variants
  *
- * Fuente: component set "Profile card" de Figma (12995:3291), Type Standar vertical / Standar horizontal / Full / Hero /
- * Qualification. Las cuatro comparten piezas (avatar con Badge de calificación, nombre, datos separados por "·",
+ * Fuente: component set "Profile card" de Figma (12995:3291), Type Standar vertical / Standar horizontal / Full /
+ * Qualification (`Full / Hero` pasó a `Full`; en el código `hero` es alias de `full`). Las cuatro comparten piezas (avatar con Badge de calificación, nombre, datos separados por "·",
  * etiquetas, descripción, acciones y contadores), así que es un solo componente con `layout`; la fila de estrellas
  * de Qualification es contenido (`stars`).
  *
- * - Standar vertical (352×330) y horizontal (352×278): raíz transparente, padding 16 (space/container/second-level,
- *   que tokens.css no tiene: space/general/2xl) y gap 32 (space/general/4xl). Superficie Subtract en
+ * - Standar vertical (352×330) y horizontal (352×278): raíz transparente, padding 24 (space/container/on-card) y gap 32 (space/general/4xl). Superficie Subtract en
  *   background/container/default-on-card, radius/general/2xl (24), sin trazo ni sombra, con muesca de 48 para el
  *   Button corner md (40) arriba a la derecha: `NotchedSurface notch="md"`. El Button corner (Checkbox, On canva) usa
  *   background/container/hover-on-canva en la instancia. En horizontal el bloque de nombre deja 56 a la derecha para
  *   no pasar bajo el Button corner.
- * - Full / Hero (ancho fluido × 188): raíz con effect/shadow sm y el marco Desktop con background/container/default-on-canva,
- *   radio 24, padding 24 (space/container/default → space/general/3xl) y gap 24. Fila 1: avatar brand, texto, acciones
+ * - Full (ancho fluido × 210): raíz con effect/shadow sm y el marco Desktop con background/container/default-on-canva,
+ *   radio 24, padding 32 (space/container/on-canva) y gap 24. Fila 1: avatar brand, texto, acciones
  *   (Icon buttons, ocultas por defecto) y Dots-moreoptions sm (48), gap 16. Fila 2: etiquetas y contadores, gap 8.
  *   Bajo 42rem de contenedor: versión Mobile (avatar y acciones arriba, texto con nombre 20/24 y etiquetas debajo,
  *   contadores a todo el ancho).
- * - Qualification (314×422): centrada, superficie default-on-canva con radio 24 y effect/shadow sm, padding y gap 24.
+ * - Qualification (321×438): centrada, superficie default-on-canva con radio 24 y effect/shadow sm, padding 32 (on-canva) y gap 24.
  * - Texto: nombre Prospero semibold heading/size/sm de Figma (16/20; en tokens.css es heading md), recortado a una línea
  *   en un cuadro de 18; datos 12/16 y descripción 14/18 en "text/neutral/gray 2" de Figma (G07), que en tokens.css es
  *   text/neutral/gray. Cifras de los contadores heading/size/md de Figma (20/24; en tokens.css heading lg).
@@ -35,11 +34,11 @@ const primary =
 export const profileCardVariants = cva('relative isolate box-border min-w-0 text-left', {
   variants: {
     layout: {
-      vertical: 'flex w-full flex-col gap-ds-space-general-4xl p-ds-space-general-2xl',
-      horizontal: 'flex w-full flex-row items-start gap-ds-space-general-4xl p-ds-space-general-2xl',
+      vertical: 'flex w-full flex-col gap-ds-space-general-4xl p-ds-space-container-on-card',
+      horizontal: 'flex w-full flex-row items-start gap-ds-space-general-4xl p-ds-space-container-on-card',
       hero: '@container flex w-full flex-col rounded-ds-radius-general-2xl shadow-ds-on-card',
       centered: [
-        'flex w-full flex-col items-center gap-ds-space-general-3xl p-ds-space-general-3xl text-center',
+        'flex w-full flex-col items-center gap-ds-space-general-3xl p-ds-space-container-on-canva text-center',
         'rounded-ds-radius-general-2xl bg-ds-background-container-default-on-canva shadow-ds-on-card',
       ].join(' '),
     },
@@ -47,9 +46,9 @@ export const profileCardVariants = cva('relative isolate box-border min-w-0 text
   defaultVariants: { layout: 'vertical' },
 });
 
-/** Hero: marco Desktop de Figma (relleno, radio, padding 24 y gap 24). */
+/** Full: marco Desktop de Figma (relleno, radio, padding 32 y gap 24). */
 export const profileCardHeroFrameClass =
-  'flex min-w-0 flex-col gap-ds-space-general-3xl rounded-ds-radius-general-2xl bg-ds-background-container-default-on-canva p-ds-space-general-3xl';
+  'flex min-w-0 flex-col gap-ds-space-general-3xl rounded-ds-radius-general-2xl bg-ds-background-container-default-on-canva p-ds-space-container-on-canva';
 
 /** Hero, fila 1: avatar, texto, acciones y más opciones. En Mobile el texto baja a su propia línea. */
 export const profileCardHeroHeadClass = [

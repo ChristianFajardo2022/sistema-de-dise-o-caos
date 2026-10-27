@@ -6,12 +6,15 @@ import type { FileUploadItemProps, FileUploadStatus } from './FileUploadItem.typ
 
 const STATUSES: FileUploadStatus[] = ['loading', 'complete', 'error', 'loading-error', 'alert'];
 
-/** Nombre de cada variante de Figma y los textos que trae. */
+/**
+ * Nombre de cada variante de Figma y los textos que trae. Figma las llama `Charging` y `Charging error` (en el código
+ * son `loading` y `loading-error`).
+ */
 const FIGMA: Record<FileUploadStatus, { figma: string; message: string }> = {
-  loading: { figma: 'State=Loading', message: 'Estado' },
+  loading: { figma: 'State=Charging', message: 'Estado' },
   complete: { figma: 'State=Complete', message: 'Estado' },
   error: { figma: 'State=Error', message: 'Error' },
-  'loading-error': { figma: 'State=Loading error', message: 'Error de carga' },
+  'loading-error': { figma: 'State=Charging error', message: 'Error de carga' },
   alert: { figma: 'State=Alert', message: 'Estado' },
 };
 

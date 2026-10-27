@@ -8,6 +8,8 @@ import {
   informationCardFooterRowVariants,
   informationCardFooterStartVariants,
   informationCardFooterVariants,
+  informationCardImageClass,
+  informationCardSimpleTitleVariants,
   informationCardHeaderVariants,
   informationCardSubtitleVariants,
   informationCardTagsVariants,
@@ -28,6 +30,8 @@ const has = (node: unknown) => node != null && node !== false;
 export const InformationCard = forwardRef<HTMLElement, InformationCardProps>(
   (
     {
+      variant = 'default',
+      image = false,
       title,
       subtitle,
       description,
@@ -70,6 +74,30 @@ export const InformationCard = forwardRef<HTMLElement, InformationCardProps>(
       </div>
     );
 
+    const imageNode = image ? <span aria-hidden="true" data-figma-part="Image" className={informationCardImageClass} /> : null;
+
+    if (variant === 'simple') {
+      return (
+        <article
+          {...rest}
+          ref={ref}
+          aria-labelledby={rest['aria-labelledby'] ?? titleId}
+          className={cn(informationCardVariants({ variant }), className)}
+        >
+          <NotchedSurface shadow="on-card-on-canva" />
+          {imageNode}
+          <Heading id={titleId} data-figma-part="Filename" className={informationCardSimpleTitleVariants()}>
+            {title}
+          </Heading>
+          {has(description) && (
+            <p data-figma-part="Status" className={informationCardDescriptionVariants()}>
+              {description}
+            </p>
+          )}
+        </article>
+      );
+    }
+
     return (
       <article
         {...rest}
@@ -78,6 +106,7 @@ export const InformationCard = forwardRef<HTMLElement, InformationCardProps>(
         className={cn(informationCardVariants(), className)}
       >
         <NotchedSurface shadow="on-card-on-canva" />
+        {imageNode}
         {hasHeader && (
           <div data-figma-part="Container" className={informationCardHeaderVariants({ hasLeading: has(leading) })}>
             {leading}

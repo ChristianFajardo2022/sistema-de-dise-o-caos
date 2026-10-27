@@ -86,7 +86,7 @@ export const FileCard = forwardRef<HTMLDivElement, FileCardProps>(
         <span
           data-figma-part="Button corner "
           className={cn(
-            buttonCornerVariants({ status: 'on-card', size: cornerSize }),
+            buttonCornerVariants({ contrast: 'on-card', size: cornerSize }),
             fileCardCornerClass,
             type === 'photo' && fileCardPhotoCornerShadowClass,
             isThumbnail && fileCardThumbnailCornerClass,
@@ -113,7 +113,7 @@ export const FileCard = forwardRef<HTMLDivElement, FileCardProps>(
         <ButtonCorner
           {...moreButtonProps}
           variant="dots"
-          status="on-card"
+          contrast="on-card"
           size={cornerSize}
           aria-label={actionName(moreLabel, 'Más opciones de')}
           aria-describedby={describedBy}

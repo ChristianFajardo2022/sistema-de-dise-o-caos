@@ -164,7 +164,7 @@ export const InteractiveCard = forwardRef<HTMLInputElement, InteractiveCardProps
             <>
               <div data-figma-part="Container" className="flex min-h-12 min-w-0 flex-1 items-center gap-ds-space-general-2xl">
                 {leading === undefined ? (
-                  <Avatar data-figma-part="Avatar" variant="icon" size="sm" contrast="on-card" icon={icon} disabled={isDisabled} />
+                  <Avatar data-figma-part="Avatar" variant="icon" size="sm" contrast="on-card" icon={icon} inactive={isDisabled} />
                 ) : (
                   leading
                 )}
@@ -220,7 +220,7 @@ export const InteractiveCardHeader = forwardRef<HTMLDivElement, InteractiveCardH
             size="lg"
             contrast={disabled ? 'on-card' : 'on-canva'}
             icon={icon}
-            disabled={disabled}
+            inactive={disabled}
             className={interactiveCardAvatarCheckedClass}
           />
         ) : (

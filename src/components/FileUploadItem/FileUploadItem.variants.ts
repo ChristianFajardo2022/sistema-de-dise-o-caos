@@ -6,12 +6,12 @@ import { cva } from 'class-variance-authority';
  * Fuente: component set "File card" 11557:17694 de la página Card de Figma (State Loading, Complete, Error,
  * Loading error y Alert).
  *
- * - Raíz: columna, padding 16 (space/container/second-level -> space/general/2xl), gap 16 (gap/general/xl ->
+ * - Raíz: columna, padding 24 (space/container/on-card), gap 16 (gap/general/xl ->
  *   space/general/2xl), radius/general/2xl (24), relleno background/container/default-on-card. Ancho fluido (287.6 en Figma);
  *   alto 108 con barra y 70 sin ella.
  * - Fila: grupo (Avatar icon de 32 + textos, gap 8 space/general/lg) y acciones (Button tertiary xs solo ícono, gap 0
  *   gap/general/xs), gap 16.
- * - Nombre: Helvetica regular 14/18 (typography/size/md, field/line-height/sm) text/neutral/heading, una línea.
+ * - Nombre: Helvetica semibold 14/18 (typography/size/md, field/line-height/sm) text/neutral/heading, una línea.
  * - Estado: Helvetica Neue regular 14/20 (body/md, body/line-height-large/md): success-secondary en Loading y Complete,
  *   error-secondary en Error y Loading error, alert-secondary en Alert.
  * - Ícono del Avatar: folder (blanco) en Loading; tick-circle icon/semantic/success-firts; close-circle error-firts;
@@ -19,7 +19,7 @@ import { cva } from 'class-variance-authority';
  * - Barra: Progress bar Linear text, Success en Loading y Alert en Alert.
  */
 export const fileUploadItemVariants = cva(
-  'box-border flex w-full flex-col gap-ds-space-general-2xl rounded-ds-radius-general-2xl bg-ds-background-container-default-on-card p-ds-space-general-2xl text-left'
+  'box-border flex w-full flex-col gap-ds-space-general-2xl rounded-ds-radius-general-2xl bg-ds-background-container-default-on-card p-ds-space-container-on-card text-left'
 );
 
 export const fileUploadRowClass = 'flex min-w-0 items-center gap-ds-space-general-2xl';
@@ -29,7 +29,7 @@ export const fileUploadActionsClass = 'flex shrink-0 items-center gap-0';
 
 export const fileUploadNameClass = [
   'm-0 min-w-0 truncate',
-  'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
+  'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-primitives-typography-size-md leading-ds-typography-field-line-height-sm text-ds-text-neutral-heading',
 ].join(' ');
 

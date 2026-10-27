@@ -11,15 +11,16 @@ import { Icon } from '../Icon';
 import { IconStar } from '../Rating';
 import { Tag } from '../Tag';
 
-const LAYOUT_OPTIONS = ['vertical', 'horizontal', 'hero', 'centered'] as const satisfies readonly ProfileCardLayout[];
+const LAYOUT_OPTIONS = ['vertical', 'horizontal', 'full', 'centered'] as const satisfies readonly ProfileCardLayout[];
 const HEADING_OPTIONS = [2, 3, 4, 5, 6, 'none'] as const;
 
 /** Ancho de Figma por disposición (hero es fluido). */
 const WIDTH: Record<ProfileCardLayout, string> = {
   vertical: 'w-full max-w-[352px]',
   horizontal: 'w-full max-w-[352px]',
+  full: 'w-full',
   hero: 'w-full',
-  centered: 'w-full max-w-[314px]',
+  centered: 'w-full max-w-[321px]',
 };
 
 const meta = {
@@ -95,8 +96,8 @@ export const Interactive: Story = {
       {...args}
       leading={photo()}
       tags={realTags}
-      stats={args.layout === 'hero' || args.layout === 'centered' ? realStats : undefined}
-      onMoreClick={args.layout === 'hero' ? () => {} : undefined}
+      stats={args.layout === 'full' || args.layout === 'centered' ? realStats : undefined}
+      onMoreClick={args.layout === 'full' ? () => {} : undefined}
       actions={
         <Button variant={args.layout === 'vertical' || args.layout === 'horizontal' ? 'secondary' : 'primary'} size="sm" aria-label="Contactar a Ana Pérez">
           Contactar
@@ -155,7 +156,7 @@ export const Horizontal: Story = {
  */
 export const Hero: Story = {
   args: {
-    layout: 'hero',
+    layout: 'full',
     title: 'Librería Central',
     subtitle: ['Libros y papelería', 'Cali'],
     description: 'Libros nuevos y usados, pedidos especiales y envío a todo el país.',
@@ -312,7 +313,7 @@ function MatrixCards({ figma }: { figma: boolean }) {
             }
           />
         </div>
-        <div className="w-[314px]">
+        <div className="w-[321px]">
           <ProfileCard
             data-figma={d('Type=Qualification')}
             {...FIGMA}
@@ -332,9 +333,9 @@ function MatrixCards({ figma }: { figma: boolean }) {
       </div>
       <div className="w-[1534px]">
         <ProfileCard
-          data-figma={d('Type=Full / Hero')}
+          data-figma={d('Type=Full')}
           {...FIGMA}
-          layout="hero"
+          layout="full"
           leading={brand}
           description={FIGMA_SHOP}
           tags={figmaTags}

@@ -215,7 +215,10 @@ async function clickAt(el: Element) {
 
 /** Las 8 variantes del set 13219:38332 con los textos de Figma (la Complex Default no lleva el segundo encabezado). */
 function MatrixCard({ variant, state, figma }: { variant: InteractiveCardVariant; state: InteractiveCardState; figma: boolean }) {
-  const name = `Type=${cap(variant)}, State=${cap(state)}`;
+  const name =
+    variant === 'simple' && state === 'default'
+      ? 'Type=Interactive card, State=Interactive card'
+      : `Type=${cap(variant)}, State=${cap(state)}`;
   const disabled = state === 'inactive';
   return (
     <InteractiveCard

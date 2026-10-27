@@ -14,7 +14,7 @@ import { cva } from 'class-variance-authority';
  *   `shadow-ds-on-canva-md`, con el spread −2 de Figma) · Select select-on-card +
  *   trazo interior de 1 (border/general/lg) en border/general/default-on-card · Inactive default-on-card y textos
  *   text/neutral/disabled-positive.
- * - Complex: columna, padding space/container/default (24/24/20 → space/general/3xl), gap space/general/3xl (24).
+ * - Complex: columna, padding space/container/on-canva (32), gap space/general/3xl (24).
  *   Grupo "Content" con gap space/general/2xl (16). Silueta con muesca de 48 y Button corner md (40) arriba a la derecha.
  *   Default background/container/default-on-canva · Hover + trazo de 1 en border/general/default-on-card (y Button corner
  *   con trazo) · Select background/general/gray-seventh + trazo en border/general/gray-tertiary (Button corner On card
@@ -25,7 +25,7 @@ import { cva } from 'class-variance-authority';
  *   (`[data-card-control]`) y `data-disabled`. Seleccionada manda sobre hover; deshabilitada no tiene hover.
  * - Encabezado: Figma pone un padding derecho de 56 (space/general/6xl) al bloque de texto que hace desbordar el subtítulo
  *   destacado sobre su ícono; no se replica (el texto usa el ancho libre hasta las etiquetas).
- * - Tipografía: Figma enlaza heading/size/xs, sm y md (14/18, 16/20, 20/24), que en tokens.css son heading sm, md y lg.
+ * - Tipografía: Figma enlaza heading/size/xs, sm y md (12/16, 16/20, 20/24), que en tokens.css son heading xs, md y lg.
  * - Foco con teclado: anillo de 2px alrededor de la tarjeta (no está en Figma), a `--ring-gap` (4) del borde. En simple
  *   se apaga el anillo propio del Radio para que no se vean dos.
  * - Controles internos: los que llevan `data-card-action` (Button corner, acciones de `InteractiveCardList`) quedan sobre
@@ -60,7 +60,7 @@ export const interactiveCardVariants = cva(
           'has-[[data-card-control]:checked]:[--surface-edge:var(--color-ds-border-general-default-on-card)]',
         ].join(' '),
         complex: [
-          'w-full flex-col justify-center gap-ds-space-general-3xl p-ds-space-general-3xl',
+          'w-full flex-col justify-center gap-ds-space-general-3xl p-ds-space-container-on-canva',
           '[--surface-fill:var(--color-ds-background-container-default-on-canva)]',
           // Button corner: On canva sin trazo
           '[--corner-bg:var(--color-ds-background-container-default-on-canva)] [--corner-ring:transparent]',
@@ -115,8 +115,8 @@ export const interactiveCardTextVariants = cva('m-0 min-w-0', {
       'title-sm': `${secondary} text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md`,
       /** heading/size/md de Figma (20/24): título del encabezado de la Complex */
       'title-md': `${secondary} text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg`,
-      /** heading/size/xs de Figma (14/18): término de los pares título/descripción */
-      'title-xs': `${secondary} text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm`,
+      /** heading/size/xs de Figma (12/16): término de los pares título/descripción */
+      'title-xs': `${secondary} text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs`,
       /** body/md 14/20 */
       body: `${primary} text-ds-typography-body-size-md leading-ds-typography-body-line-height-large-md`,
       /** size/md 14 con line-height-short/md 18: descripción */

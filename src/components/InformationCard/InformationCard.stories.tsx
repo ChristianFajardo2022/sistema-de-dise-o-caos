@@ -33,6 +33,8 @@ const meta = {
     title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
     subtitle: { control: 'text', type: { name: 'string' }, description: 'Prop Subtitle de Figma' },
     description: { control: 'text', type: { name: 'string' }, description: 'Prop Description de Figma' },
+    variant: { control: 'radio', options: ['default', 'simple'], type: { name: 'enum', value: ['default', 'simple'] }, description: 'Type de Figma: default = Option 1-3, simple = Type=Simple' },
+    image: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Image de Figma: rejilla de puntos de fondo' },
     tagsPosition: {
       control: 'radio',
       options: TAGS_POSITION_OPTIONS,
@@ -202,6 +204,11 @@ export const Option3: Story = {
   ),
 };
 
+/** Type=Simple: título arriba, descripción abajo y, con `image`, la rejilla de puntos de fondo. */
+export const Simple: Story = {
+  args: { variant: 'simple', image: true, title: 'Aquí va un título', description: 'Lorem ipsum dolor sit amet consectetur. Lobortis orci sed dolor nisi massa laoreet in hendrerit.' },
+};
+
 /** Solo lo mínimo: título y descripción. */
 export const Minimal: Story = {};
 
@@ -228,7 +235,9 @@ function MatrixCards({ figma }: { figma: boolean }) {
         }
         footer={<People />}
         actions={<Actions figma />}
-      />
+      >
+        <ItemList figma />
+      </InformationCard>
       <InformationCard
         data-figma={figma ? 'Type=Option 2' : undefined}
         {...FIGMA_TEXT}
@@ -273,6 +282,13 @@ export const FigmaMatrix: Story = {
       <div role="region" tabIndex={0} aria-label="Matriz de InformationCard" className="max-w-full overflow-x-auto">
         <div className="grid w-max grid-cols-[repeat(3,498px)] items-start gap-6">
           <MatrixCards figma />
+          <InformationCard
+            data-figma="Type=Simple"
+            variant="simple"
+            image
+            title="Aquí va un título"
+            description="Lorem ipsum dolor sit amet consectetur. Lobortis orci sed dolor nisi massa laoreet in hendrerit."
+          />
         </div>
         <p className="mt-6 mb-2 text-xs text-ds-text-neutral-body">Revisión a ojo sobre background/container/default-on-card (sin data-figma)</p>
         <div className="grid w-max grid-cols-[repeat(3,498px)] items-start gap-6 bg-ds-background-container-default-on-card p-6">

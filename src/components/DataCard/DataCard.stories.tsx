@@ -30,6 +30,14 @@ const meta = {
   parameters: { layout: 'padded' },
   tags: ['autodocs'],
   argTypes: {
+    selected: { control: 'boolean', type: { name: 'boolean' }, description: 'State Select (visual)' },
+    inactive: { control: 'boolean', type: { name: 'boolean' }, description: 'State Inactive (visual)' },
+    state: {
+      control: 'select',
+      options: [undefined, 'default', 'hover', 'select', 'inactive'],
+      type: { name: 'enum', value: ['default', 'hover', 'select', 'inactive'] },
+      description: 'Fuerza el aspecto (solo documentación)',
+    },
     title: { control: 'text', description: 'Título (dato principal)' },
     description: { control: 'text', description: 'Descripción bajo el título' },
     headingLevel: {
@@ -57,6 +65,16 @@ export const Interactive: Story = {
     <DataCard {...args}>
       <Sparkline />
     </DataCard>
+  ),
+};
+
+/** Estados Select e Inactive: `selected` e `inactive` son visuales; el control de `action` lleva el estado real. */
+export const States: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <DataCard title="12" description="Seleccionada" selected action={<Checkbox aria-label="Elegir equipo A" defaultChecked />} />
+      <DataCard title="9" description="Inactiva" inactive action={<Checkbox aria-label="Elegir equipo B" disabled />} />
+    </div>
   ),
 };
 
@@ -101,20 +119,29 @@ export const WithSelection: Story = {
   ),
 };
 
+const FIGMA_STATES = [
+  { name: 'Propiedad 1=Propiedad 14', props: {} },
+  { name: 'Propiedad 1=Hover', props: { state: 'hover' as const } },
+  { name: 'Propiedad 1=Select', props: { selected: true } },
+  { name: 'Propiedad 1=Inactive', props: { inactive: true } },
+];
+
 /**
- * El único Data card de Figma (set 14043:59910). Sus hijos Toggle, Button y Selection están ocultos en esa variante:
- * en el código son el slot `action`. Los textos son los de Figma.
+ * Las 4 variantes del Data card de Figma (set 14043:59910). Sus hijos Toggle, Button y Selection están ocultos en esas
+ * variantes: en el código son el slot `action`. Los textos son los de Figma.
  */
 export const FigmaMatrix: Story = {
   render: () => (
     <div className="bg-ds-background-general-black p-6">
-      <div className="w-[757px]">
-        <DataCard title="Título" description="Descripción" data-figma="Propiedad 1=Propiedad 14">
-          {/* Solo en la matriz: el Container graphic de Figma mide 81 de alto */}
-          <div className="flex h-[81px] items-center">
-            <Sparkline />
-          </div>
-        </DataCard>
+      <div className="flex w-[757px] flex-col gap-6">
+        {FIGMA_STATES.map(({ name, props }) => (
+          <DataCard key={name} title="Título" description="Descripción" data-figma={name} {...props}>
+            {/* Solo en la matriz: el Container graphic de Figma mide 81 de alto */}
+            <div className="flex h-[81px] items-center">
+              <Sparkline />
+            </div>
+          </DataCard>
+        ))}
       </div>
     </div>
   ),

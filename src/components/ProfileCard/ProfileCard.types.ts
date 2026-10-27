@@ -5,13 +5,16 @@ import type { CardHeadingLevel } from '../_internal/types';
  * Disposición de la tarjeta (prop Type de Figma, set "Profile card" 12995:3291).
  * - `vertical`: Standar vertical. Avatar arriba y texto debajo, superficie con muesca para el Button corner.
  * - `horizontal`: Standar horizontal. Avatar a la izquierda y texto a la derecha, misma superficie.
- * - `hero`: Full / Hero. Fila ancha (avatar, texto, acciones y más opciones) con etiquetas y contadores debajo.
+ * - `full`: Full. Fila ancha (avatar, texto, acciones y más opciones) con etiquetas y contadores debajo.
  *   Cuando la tarjeta mide menos de 42rem pasa a la versión Mobile de Figma (encabezado con avatar y acciones,
  *   texto y etiquetas debajo, contadores a todo el ancho).
  * - `centered`: Qualification. Todo centrado. La calificación con estrellas no es parte del layout: es contenido
  *   (`stars`) y puede ir en cualquier disposición.
  */
-export type ProfileCardLayout = 'vertical' | 'horizontal' | 'hero' | 'centered';
+export type ProfileCardLayout = 'vertical' | 'horizontal' | 'full' | 'hero' | 'centered';
+// `hero` es el nombre anterior de `full` (en Figma, `Full / Hero` pasó a `Full`): sigue funcionando.
+/** @deprecated Usa `full`: el Type `Full / Hero` de Figma se llama ahora `Full`. */
+export type ProfileCardLegacyLayout = 'hero';
 
 /** Control de selección del Button corner (prop Radius button de Figma): Checkbox o Radio. */
 export type ProfileCardSelection = 'checkbox' | 'radio';
@@ -37,7 +40,7 @@ export type ProfileCardSelectionProps = Omit<
 
 export interface ProfileCardProps
   extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'children' | 'defaultChecked' | 'defaultValue' | 'onChange'> {
-  /** Type de Figma. Por defecto `vertical`. */
+  /** Type de Figma. Por defecto `vertical`. `hero` es un alias `@deprecated` de `full`. */
   layout?: ProfileCardLayout;
   /** Prop Title de Figma: nombre de la persona o de la tienda. Es el encabezado y el nombre accesible de la tarjeta. */
   title: ReactNode;
@@ -70,7 +73,7 @@ export interface ProfileCardProps
    */
   actions?: ReactNode;
   /**
-   * Botón de más opciones (Dots-moreoptions en `hero`, Button corner Dots en `vertical` y `horizontal` si no hay
+   * Botón de más opciones (Dots-moreoptions en `full`, Button corner Dots en `vertical` y `horizontal` si no hay
    * `selection`). No aplica a `centered`.
    */
   onMoreClick?: MouseEventHandler<HTMLButtonElement>;

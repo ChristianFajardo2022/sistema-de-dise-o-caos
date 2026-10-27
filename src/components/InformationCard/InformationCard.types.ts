@@ -10,7 +10,17 @@ export type InformationCardHeadingLevel = CardHeadingLevel;
  */
 export type InformationCardTagsPosition = 'header' | 'content';
 
+/**
+ * Type de Figma: `default` = Option 1, 2 y 3 (composiciones por slots); `simple` = Type=Simple (título arriba y descripción abajo;
+ * ignora `leading`, `tags`, `subtitle`, `children`, `footer` y `actions`).
+ */
+export type InformationCardVariant = 'default' | 'simple';
+
 export interface InformationCardProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+  /** Type de Figma. Por defecto `default` (Option 1, 2 y 3). */
+  variant?: InformationCardVariant;
+  /** Prop `Image` de Figma: dibuja la rejilla de puntos de fondo (decorativa, `aria-hidden`). */
+  image?: boolean;
   /** Prop `Tittle` de Figma. Es el encabezado de la tarjeta y su nombre accesible. */
   title: ReactNode;
   /** Prop `Subtitle` de Figma: línea bajo el título. */

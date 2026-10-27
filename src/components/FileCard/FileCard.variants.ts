@@ -14,10 +14,9 @@ import { cva } from 'class-variance-authority';
  * - 15005:15958 (Thumbnail): 160×160, padding 56/16 (space/general/6xl y 2xl), Avatar icon de 32 centrado, muesca de 40 y
  *   Button corner de 34 con trazo interior border/general/default-on-canva. Hover: Backdrop (background/effect/backdrop) con Button primary
  *   Descargar y Button primary delete Eliminar (xs, solo ícono, gap 8).
- * - Texto: Filename en Prospero semibold 14/18 text/neutral/heading, recortado a una línea; Status en Helvetica
+ * - Texto: Filename en Prospero semibold 12/16 text/neutral/heading, recortado a una línea; Status en Helvetica
  *   Neue regular 14/18 (typography/size/md y body/line-height-short/md). Gap 8 (space/general/lg).
- *   Tokens sin equivalente exacto: Figma usa heading/size/xs y heading/line-height/xs (14/18) y tokens.css los resuelve a
- *   12/16: se usan heading/sm (14/18). Figma usa text/neutral/gray 2 con alias G07 (#cfd1d5 / #5e6165), que en tokens.css
+ *   Título: heading/size/xs y heading/line-height/xs (12/16). Figma usa text/neutral/gray 2 con alias G07 (#cfd1d5 / #5e6165), que en tokens.css
  *   es text/neutral/gray (gray-2 apunta a G08/G10): se usa text/neutral/gray.
  * - Colores por State (variables CSS en la raíz, las consumen la silueta, el Button corner y el Avatar):
  *   Default background/container/default-on-card · Hover hover-on-card · Select select-on-card (select-on-canva en
@@ -34,9 +33,9 @@ export const fileCardVariants = cva('group/file-card relative isolate box-border
   variants: {
     type: {
       photo: 'flex w-full flex-col rounded-tl-ds-radius-general-2xl rounded-bl-ds-radius-general-2xl rounded-br-ds-radius-general-2xl',
-      icon: 'flex w-full flex-col gap-ds-space-general-3xl p-ds-space-general-2xl',
+      icon: 'flex w-full flex-col gap-ds-space-general-3xl p-ds-space-container-on-card',
       thumbnail:
-        'flex size-40 shrink-0 flex-col items-center justify-center gap-ds-space-general-3xl px-ds-space-general-2xl py-ds-space-general-6xl',
+        'flex size-40 shrink-0 flex-col items-center justify-center gap-ds-space-general-3xl px-ds-space-container-on-card py-ds-space-general-6xl',
     },
   },
   defaultVariants: { type: 'icon' },
@@ -184,9 +183,10 @@ export const fileCardPhotoTextClass = [
 export const fileCardTextGroupClass = 'flex min-w-0 flex-col gap-ds-space-general-lg';
 
 export const fileCardTitleClass = [
-  'm-0 min-w-0 truncate',
+  // El cuadro de Figma mide 18 con line-height 16 (texto recortado a una línea)
+  'm-0 h-4.5 min-w-0 truncate',
   'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
-  'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading',
+  'text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs text-ds-text-neutral-heading',
 ].join(' ');
 
 export const fileCardDescriptionClass = [

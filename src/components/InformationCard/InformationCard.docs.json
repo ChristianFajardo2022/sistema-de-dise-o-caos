@@ -9,6 +9,8 @@
     "description": { "type": "ReactNode", "required": false, "description": "Prop Description de Figma." },
     "leading": { "type": "ReactNode", "required": false, "description": "Prop Icon de Figma: avatar arriba a la izquierda." },
     "tags": { "type": "ReactNode", "required": false, "description": "Prop Tag de Figma." },
+    "variant": { "type": "'default' | 'simple'", "default": "'default'", "description": "Type de Figma: default = Option 1, 2 y 3 (composiciones por slots); simple = Type=Simple (483x232, título arriba y descripción abajo, solo title y description)." },
+    "image": { "type": "boolean", "default": "false", "description": "Prop Image de Figma: rejilla de puntos de fondo, decorativa (aria-hidden)." },
     "tagsPosition": { "type": "'header' | 'content'", "default": "'header'", "description": "Etiquetas arriba (a la derecha del leading o solas; Option 2 y 3) o bajo el título (Option 1)." },
     "children": { "type": "ReactNode", "required": false, "description": "Contenido entre la descripción y el pie: bloque de progreso (Progress) o lista de ListItem (List)." },
     "footer": { "type": "ReactNode", "required": false, "description": "Lado izquierdo del pie (Avatar group, Content). Con footer se dibuja la línea divisoria." },

@@ -44,7 +44,7 @@ const has = (node: unknown) => node != null && node !== false;
 export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(
   (
     {
-      layout = 'vertical',
+      layout: layoutProp = 'vertical',
       title,
       subtitle,
       description,
@@ -78,6 +78,8 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(
     const titleId = useId();
     const Heading = headingLevel === 'none' ? 'p' : (`h${headingLevel}` as const);
     const titleText = typeof title === 'string' || typeof title === 'number' ? String(title) : null;
+    // `hero` es el nombre anterior de `full`
+    const layout = layoutProp === 'full' ? 'hero' : layoutProp;
     const withCorner = layout === 'vertical' || layout === 'horizontal';
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +96,7 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(
       corner = (
         <span
           data-figma-part="Button corner "
-          className={cn(buttonCornerVariants({ status: 'on-canva', size: 'md' }), profileCardCornerClass, 'cursor-default')}
+          className={cn(buttonCornerVariants({ contrast: 'on-canva', size: 'md' }), profileCardCornerClass, 'cursor-default')}
         >
           {/* La fila del control ocupa todo el círculo: el clic en cualquier punto del Button corner marca */}
           <Control
@@ -120,7 +122,7 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(
         <ButtonCorner
           {...moreButtonProps}
           variant="dots"
-          status="on-canva"
+          contrast="on-canva"
           size="md"
           aria-label={moreName}
           aria-describedby={moreDescribedBy}

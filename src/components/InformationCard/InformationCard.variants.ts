@@ -8,9 +8,12 @@ import { cva } from 'class-variance-authority';
  * sobre la superficie interna común de las tarjetas (`NotchedSurface`, sin muesca); las opciones quedan como composiciones
  * documentadas.
  *
- * - Raíz transparente, columna, padding space/container/default (24/24/20 → space/general/3xl), gap space/general/4xl (32).
+ * - Raíz transparente, columna, padding space/container/on-canva (32), gap space/general/4xl (32).
  *   Superficie background/container/default-on-canva, radius/general/2xl (24). Sombras como en Figma: effect/shadow sm en la
  *   capa Canva (`shadow-ds-on-card`) y md con spread −2 en la forma Subtract (`shadow-ds-on-canva-md`); alfa 0 en oscuro.
+ * - Simple (Type=Simple, 483×232): padding 32 y gap 32, `space-between`: título arriba (Prospero semibold heading/size/lg 20/24,
+ *   text/neutral/heading) y descripción abajo (size/md 14/18, text/neutral/gray). La prop `Image` dibuja una rejilla de puntos
+ *   de fondo (`informationCardImageClass`), sobre la superficie y bajo el contenido.
  * - Encabezado: `leading` y etiquetas en fila (gap 8, etiquetas a la derecha si hay `leading`).
  * - Contenido: título Prospero semibold (heading/size/sm de Figma = 16/20, en tokens.css heading md), text/neutral/heading,
  *   truncado; subtítulo 12/16 (size/sm, body/line-height-short/sm); gap 4. Descripción 14/18 (size/md, line-height-short/md).
@@ -27,9 +30,31 @@ const primary =
 /** Raíz (`<article>`): transparente; el relleno lo pone la superficie con `--surface-fill`. */
 export const informationCardVariants = cva(
   [
-    'relative isolate box-border flex w-full min-w-0 flex-col justify-center gap-ds-space-general-4xl p-ds-space-general-3xl',
+    'relative isolate box-border flex w-full min-w-0 flex-col justify-center gap-ds-space-general-4xl p-ds-space-container-on-canva',
     '[--surface-fill:var(--color-ds-background-container-default-on-canva)]',
-  ].join(' ')
+  ].join(' '),
+  {
+    variants: {
+      /** `default` = Option 1, 2 y 3 (composiciones por slots); `simple` = Type=Simple (título arriba, descripción abajo). */
+      variant: {
+        default: '',
+        simple: 'min-h-58 justify-between',
+      },
+    },
+    defaultVariants: { variant: 'default' },
+  }
+);
+
+/** Prop `Image` de Figma: rejilla de puntos de fondo (decorativa), a 32 px, sobre la superficie y bajo el contenido. */
+export const informationCardImageClass = [
+  'pointer-events-none absolute inset-0 -z-10 rounded-ds-radius-general-2xl',
+  '[background-image:radial-gradient(circle,var(--color-ds-border-general-default-on-card)_1px,transparent_1.5px)]',
+  '[background-size:32px_32px]',
+].join(' ');
+
+/** Título del Simple: heading/size/lg (20/24). */
+export const informationCardSimpleTitleVariants = cva(
+  'm-0 min-w-0 font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)] text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg text-ds-text-neutral-heading'
 );
 
 /** Encabezado: `leading` y etiquetas en fila; las etiquetas van a la derecha si hay `leading`. */
