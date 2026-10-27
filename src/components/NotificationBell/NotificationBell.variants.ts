@@ -12,11 +12,14 @@ import { cva } from 'class-variance-authority';
  */
 export const notificationBellVariants = cva('relative box-border inline-flex shrink-0 align-middle');
 
-/** Parche del tamaño del ícono (deuda 1 del Button: su ranura de ícono fija 20 y xs pide 16). */
+/**
+ * @deprecated Ya no hace falta: Button dibuja el ícono de Icon-single a 16 en xs y 20 en sm y md, como Figma. Se
+ * mantiene (sin clases) para no romper importaciones.
+ */
 export const notificationBellButtonVariants = cva('', {
   variants: {
     size: {
-      xs: '[&_[data-slot=icon]]:size-4',
+      xs: '',
       sm: '',
       md: '',
     },

@@ -1,7 +1,8 @@
 import { forwardRef } from 'react';
-import type { ReactNode } from 'react';
-import type { ButtonProps, ButtonSize, ButtonState, ButtonVariant } from './Button.types';
+import type { AnchorHTMLAttributes, MouseEvent, ReactNode, Ref } from 'react';
+import type { ButtonIconSize, ButtonProps, ButtonSize, ButtonState, ButtonVariant } from './Button.types';
 import { buttonVariants } from './Button.variants';
+import { Spinner } from '../Spinner';
 import { cn } from '../../utils/cn';
 
 /** Forma "Union" del efecto de Primary: dos círculos con blur 24. */
@@ -21,41 +22,35 @@ function EffectUnion({ className }: { className?: string }) {
   );
 }
 
-/**
- * Indicador de Load de Figma: 3 puntos de 8px en una caja de 24×24 (dos arriba, uno abajo
- * al centro), color --btn-icon (icon/button/<tipo>/load). Medidas tomadas de la variante
- * estática; animación según el video del prototipo: el trío gira 120° y se junta/abre alrededor de su centroide, ciclo de 0.667s.
- */
-function LoadDots() {
-  const dot =
-    'absolute size-[8px] rounded-full bg-(--btn-icon) animate-[caos-load-gather_0.667s_ease-in-out_infinite] motion-reduce:animate-none';
-  return (
-    <span
-      data-slot="load"
-      aria-hidden="true"
-      className="absolute left-1/2 top-1/2 z-10 size-[24px] -translate-x-1/2 -translate-y-1/2"
-    >
-      {/* origen en el centroide de los puntos (12px, 8.62px); triángulo equilátero para que el giro de 120° coincida */}
-      <span className="absolute inset-0 origin-[12px_8.62px] animate-[caos-load-turn_0.667s_ease-in-out_infinite] motion-reduce:animate-none">
-        <span className={cn(dot, 'left-0 top-0 [--dx:8px] [--dy:4.62px]')} />
-        <span className={cn(dot, 'right-0 top-0 [--dx:-8px] [--dy:4.62px]')} />
-        <span className={cn(dot, 'top-[13.86px] left-[8px] [--dx:0px] [--dy:-9.24px]')} />
-      </span>
-    </span>
-  );
-}
+/** Clases de cada medida de ícono. En px: no hay token de estas medidas y la raíz no siempre mide 16px. */
+const ICON_SIZE_CLASS: Record<ButtonIconSize, string> = {
+  14: 'size-[14px]',
+  16: 'size-[16px]',
+  20: 'size-[20px]',
+  24: 'size-[24px]',
+};
 
 /**
  * Medida del ícono según Figma (Icon-sizes): con texto 20 en md y sm y 14 en xs; Icon-single 20 en md y sm y 16 en xs
- * (primary y secondary), o 24 y 20 en tertiary. En px: no hay token de estas medidas y la raíz no siempre mide 16px.
+ * (primary y secondary), o 24 y 20 en tertiary. `iconSize` la reemplaza.
  */
-function iconSizeClass(size: ButtonSize, variant: ButtonVariant, iconOnly: boolean) {
-  if (!iconOnly) return size === 'xs' ? 'size-[14px]' : 'size-[20px]';
-  if (variant === 'tertiary') return size === 'xs' ? 'size-[20px]' : 'size-[24px]';
-  return size === 'xs' ? 'size-[16px]' : 'size-[20px]';
+function defaultIconSize(size: ButtonSize, variant: ButtonVariant, iconOnly: boolean): ButtonIconSize {
+  if (!iconOnly) return size === 'xs' ? 14 : 20;
+  if (variant === 'tertiary') return size === 'xs' ? 20 : 24;
+  return size === 'xs' ? 16 : 20;
 }
 
-/** Slot de ícono: tamaño de `iconSizeClass` y color por token del estado (--btn-icon). */
+/**
+ * Caja "Content icon" de Icon-single: 16 de ancho (FIXED en Figma) por dimention/button/container/lg · md · xs de alto
+ * (responsive). El ícono se centra y puede desbordarla, como en Figma (tertiary xs: ícono de 20 en caja de 16).
+ */
+const ICON_ONLY_CONTENT: Record<ButtonSize, string> = {
+  md: 'w-4 h-ds-dimention-button-container-lg',
+  sm: 'w-4 h-ds-dimention-button-container-md',
+  xs: 'w-4 h-ds-dimention-button-container-xs',
+};
+
+/** Slot de ícono: medida de `iconSize` (o la de Figma por tamaño) y color por token del estado (--btn-icon). */
 function IconSlot({ children, sizeClass }: { children: ReactNode; sizeClass: string }) {
   return (
     <span
@@ -80,6 +75,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       leftIcon,
       rightIcon,
       iconOnly = false,
+      iconSize,
+      href,
+      target,
+      rel,
+      download,
+      hrefLang,
       className,
       disabled,
       children,
@@ -103,35 +104,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const showEffect = variant === 'primary' && (computedState === 'default' || computedState === 'hover' || computedState === 'press');
 
     const icon = iconOnly ? (leftIcon ?? rightIcon ?? children) : null;
+    const iconClass = ICON_SIZE_CLASS[iconSize ?? defaultIconSize(size, variant, iconOnly)];
+    const isLink = href !== undefined;
 
-    return (
-      <button
-        ref={ref}
-        type={type}
-        disabled={isDisabled}
-        aria-disabled={isLoading && !isDisabled ? true : undefined}
-        aria-busy={wantsLoad || undefined}
-        onClick={(e) => {
-          // Mientras carga no se dispara el clic ni el submit
-          if (isLoading) {
-            e.preventDefault();
-            return;
-          }
-          onClick?.(e);
-        }}
-        className={cn(
-          buttonVariants({
-            variant,
-            contrast,
-            unicolor: isUnicolor,
-            size,
-            state: computedState,
-            iconOnly,
-          }),
-          className
-        )}
-        {...restProps}
-      >
+    const classes = cn(
+      buttonVariants({
+        variant,
+        contrast,
+        unicolor: isUnicolor,
+        size,
+        state: computedState,
+        iconOnly,
+      }),
+      // Enlace inactivo: sin :disabled nativo, el cursor va por clase
+      isLink && isDisabled && 'cursor-not-allowed',
+      className
+    );
+
+    const content = (
+      <>
         {showEffect && (
           <span
             aria-hidden="true"
@@ -190,22 +181,85 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         <span
           className={cn(
             'relative z-10 inline-flex items-center justify-center gap-ds-space-button-lg',
+            iconOnly && ICON_ONLY_CONTENT[size],
             isLoading && 'opacity-0'
           )}
         >
           {iconOnly ? (
-            icon && <IconSlot sizeClass={iconSizeClass(size, variant, true)}>{icon}</IconSlot>
+            icon && <IconSlot sizeClass={iconClass}>{icon}</IconSlot>
           ) : (
             <>
-              {leftIcon && <IconSlot sizeClass={iconSizeClass(size, variant, false)}>{leftIcon}</IconSlot>}
+              {leftIcon && <IconSlot sizeClass={iconClass}>{leftIcon}</IconSlot>}
               {children && <span className="pb-ds-space-button-sm">{children}</span>}
-              {rightIcon && <IconSlot sizeClass={iconSizeClass(size, variant, false)}>{rightIcon}</IconSlot>}
+              {rightIcon && <IconSlot sizeClass={iconClass}>{rightIcon}</IconSlot>}
             </>
           )}
         </span>
 
-        {isLoading && <LoadDots />}
+        {isLoading && (
+          <Spinner
+            variant="dots"
+            size="md"
+            tone="current"
+            decorative
+            data-slot="load"
+            className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-(color:--btn-icon)"
+          />
+        )}
         {isLoading && <span className="sr-only"> Cargando</span>}
+        {isLink && target === '_blank' && <span className="sr-only"> (se abre en una pestaña nueva)</span>}
+      </>
+    );
+
+    if (isLink) {
+      // Inactive: sin href no navega ni entra en el orden de tabulación; se restituye el rol de enlace.
+      // Load: conserva el href (y el foco) con aria-disabled y cancela la navegación.
+      const blocked = isDisabled || isLoading;
+      return (
+        <a
+          ref={ref as unknown as Ref<HTMLAnchorElement>}
+          href={isDisabled ? undefined : href}
+          role={isDisabled ? 'link' : undefined}
+          aria-disabled={blocked || undefined}
+          aria-busy={wantsLoad || undefined}
+          target={target}
+          rel={rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined)}
+          download={download}
+          hrefLang={hrefLang}
+          onClick={(e) => {
+            if (blocked) {
+              e.preventDefault();
+              return;
+            }
+            onClick?.(e as unknown as MouseEvent<HTMLButtonElement>);
+          }}
+          className={classes}
+          {...(restProps as AnchorHTMLAttributes<HTMLAnchorElement>)}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <button
+        ref={ref}
+        type={type}
+        disabled={isDisabled}
+        aria-disabled={isLoading && !isDisabled ? true : undefined}
+        aria-busy={wantsLoad || undefined}
+        onClick={(e) => {
+          // Mientras carga no se dispara el clic ni el submit
+          if (isLoading) {
+            e.preventDefault();
+            return;
+          }
+          onClick?.(e);
+        }}
+        className={classes}
+        {...restProps}
+      >
+        {content}
       </button>
     );
   }

@@ -6,10 +6,23 @@ import type { AnchorHTMLAttributes, ReactNode } from 'react';
  */
 export type ButtonLinkState = 'default' | 'hover' | 'focus' | 'press' | 'inactive';
 
-export interface ButtonLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+/**
+ * Props de ButtonLink. Con `href` se dibuja como `<a>` (navegación). Sin `href` es un `<button type="button">` real con el
+ * mismo aspecto, para acciones en línea como "Reenviar código": Enter y Espacio nativos, `disabled` nativo.
+ * Los manejadores de eventos y el `ref` reciben el elemento que se dibuja (`<a>` o `<button>`).
+ */
+export interface ButtonLinkProps
+  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement | HTMLButtonElement>, 'type'> {
+  /** Destino. Sin `href` el componente es un `<button>` (acción), no un enlace. */
+  href?: string;
+  /** Solo sin `href` (modo botón): tipo del `<button>`. Por defecto `button`. */
+  type?: 'button' | 'submit' | 'reset';
   /** State forzado */
   state?: ButtonLinkState;
-  /** Estado inactive: quita el href y marca aria-disabled */
+  /**
+   * Estado inactive. Enlace: quita el href, deja `role="link"` y `aria-disabled` (no es enfocable). Botón: `disabled`
+   * nativo.
+   */
   disabled?: boolean;
   /** "Icon right" de Figma: muestra el ícono de enlace externo después del texto */
   iconRight?: boolean;

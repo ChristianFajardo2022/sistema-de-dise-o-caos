@@ -38,7 +38,6 @@ const action = (icon: IconName, label: string, touch = false) => (
     variant="secondary"
     size={touch ? 'sm' : 'xs'}
     aria-label={label}
-    className={touch ? undefined : '[&_[data-slot=icon]]:size-4'}
   >
     <Icon name={icon} size={touch ? 20 : 16} variant="fill" data-figma-part="Icon-sizes" />
   </Button>

@@ -176,8 +176,6 @@ export const FileCard = forwardRef<HTMLDivElement, FileCardProps>(
 
     if (isThumbnail) {
       const hasActions = onDownload != null || onDelete != null;
-      // Figma dibuja los íconos de 16 en estos botones xs (el Button usa 20 por defecto)
-      const smallIcon = '[&_[data-slot=icon]]:size-4';
       return (
         <div ref={ref} {...restProps} className={rootClass}>
           <NotchedSurface notch="sm">{media}</NotchedSurface>
@@ -198,7 +196,6 @@ export const FileCard = forwardRef<HTMLDivElement, FileCardProps>(
                   aria-label={actionName(downloadLabel, 'Descargar')}
                   aria-describedby={describedBy}
                   onClick={onDownload}
-                  className={smallIcon}
                 >
                   <Icon name="download" size={16} data-figma-part="Icon-sizes" />
                 </Button>
@@ -212,7 +209,6 @@ export const FileCard = forwardRef<HTMLDivElement, FileCardProps>(
                   aria-label={actionName(deleteLabel, 'Eliminar')}
                   aria-describedby={describedBy}
                   onClick={onDelete}
-                  className={smallIcon}
                 >
                   <Icon name="trash" size={16} data-figma-part="Icon-sizes" />
                 </Button>

@@ -244,37 +244,46 @@ function SignaturePadInner(
   );
 
   const undoButton = (
-    <button
-      type="button"
+    <Button
+      variant="tertiary"
+      size="xs"
+      iconOnly
+      iconSize={24}
       aria-label={labels.undo}
       aria-disabled={disabled || empty || undefined}
       className={signaturePadIconButtonVariants()}
       onClick={undo}
     >
       <Icon name="rotate-left" size={24} variant="fill" data-figma-part="Icon-sizes" />
-    </button>
+    </Button>
   );
   const clearButton = (
-    <button
-      type="button"
+    <Button
+      variant="tertiary"
+      size="xs"
+      iconOnly
+      iconSize={24}
       aria-label={labels.clear}
       aria-disabled={disabled || empty || undefined}
       className={signaturePadIconButtonVariants()}
       onClick={clear}
     >
       <Icon name="trash" size={24} variant="line" data-figma-part="Icon-sizes" />
-    </button>
+    </Button>
   );
   const maximizeButton = maximizable && (
-    <button
-      type="button"
+    <Button
+      variant="tertiary"
+      size="xs"
+      iconOnly
+      iconSize={24}
       aria-label={labels.maximize}
       aria-disabled={disabled || undefined}
       className={signaturePadIconButtonVariants()}
       onClick={() => !disabled && onMaximize?.()}
     >
       <Icon name="maximize" size={24} variant="line" data-figma-part="Icon-sizes" />
-    </button>
+    </Button>
   );
 
   const status = (
@@ -327,14 +336,17 @@ function SignaturePadInner(
         {placeholder}
       </RotatedColumn>
       <div data-figma-part="line" className="relative flex w-7 shrink-0 flex-col justify-end">
-        <button
-          type="button"
+        <Button
+          variant="tertiary"
+          size="xs"
+          iconOnly
+          iconSize={24}
           aria-label={labels.close}
           className={signaturePadIconButtonVariants()}
           onClick={onClose}
         >
           <Icon name="close" size={24} variant="line" data-figma-part="close" />
-        </button>
+        </Button>
         <span aria-hidden className="absolute inset-y-0 right-0 w-px bg-ds-border-general-default-on-card" />
       </div>
       <RotatedColumn className="w-14" part="CTA">

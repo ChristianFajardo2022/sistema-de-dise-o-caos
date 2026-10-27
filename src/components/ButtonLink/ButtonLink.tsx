@@ -1,10 +1,11 @@
 import { forwardRef } from 'react';
+import type { ButtonHTMLAttributes, Ref } from 'react';
 import type { ButtonLinkProps, ButtonLinkState } from './ButtonLink.types';
 import { buttonLinkVariants } from './ButtonLink.variants';
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
-export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+export const ButtonLink = forwardRef<HTMLAnchorElement | HTMLButtonElement, ButtonLinkProps>(
   (
     {
       state = 'default',
@@ -12,6 +13,7 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
       iconRight = true,
       icon,
       href,
+      type = 'button',
       className,
       children,
       onClick,
@@ -21,24 +23,15 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
   ) => {
     const isDisabled = disabled || state === 'inactive';
     const computedState: ButtonLinkState = isDisabled ? 'inactive' : state;
+    const classes = cn(buttonLinkVariants({ state: computedState }), 'bg-transparent border-0', className);
 
-    return (
-      <a
-        ref={ref}
-        // Inactive: sin href no navega ni entra en el orden de tabulación
-        href={isDisabled ? undefined : href}
-        // Sin href el <a> pierde el rol de enlace: se restituye (no entra en el orden de tabulación)
-        role={isDisabled ? 'link' : undefined}
-        aria-disabled={isDisabled || undefined}
-        onClick={isDisabled ? (e) => e.preventDefault() : onClick}
-        className={cn(buttonLinkVariants({ state: computedState }), className)}
-        {...restProps}
-      >
+    const content = (
+      <>
         {/* Text-button: línea de 16 (dimention/button/container/xs), subrayado sólido 6 % */}
         <span className="inline-flex h-ds-dimention-button-container-xs items-center underline decoration-solid [text-decoration-thickness:6%] [text-decoration-skip-ink:auto]">
           {children}
         </span>
-        {restProps.target === '_blank' && <span className="sr-only"> (se abre en una pestaña nueva)</span>}
+        {href !== undefined && restProps.target === '_blank' && <span className="sr-only"> (se abre en una pestaña nueva)</span>}
         {iconRight && (
           <span
             data-slot="icon"
@@ -48,6 +41,38 @@ export const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(
             {icon ?? <Icon name="export2" variant="line" size={12} />}
           </span>
         )}
+      </>
+    );
+
+    // Sin href: acción (Reenviar, Editar…). <button> real: teclado y disabled nativos
+    if (href === undefined) {
+      return (
+        <button
+          ref={ref as Ref<HTMLButtonElement>}
+          type={type}
+          disabled={isDisabled}
+          onClick={onClick}
+          className={classes}
+          {...(restProps as ButtonHTMLAttributes<HTMLButtonElement>)}
+        >
+          {content}
+        </button>
+      );
+    }
+
+    return (
+      <a
+        ref={ref as Ref<HTMLAnchorElement>}
+        // Inactive: sin href no navega ni entra en el orden de tabulación
+        href={isDisabled ? undefined : href}
+        // Sin href el <a> pierde el rol de enlace: se restituye (no entra en el orden de tabulación)
+        role={isDisabled ? 'link' : undefined}
+        aria-disabled={isDisabled || undefined}
+        onClick={isDisabled ? (e) => e.preventDefault() : onClick}
+        className={classes}
+        {...restProps}
+      >
+        {content}
       </a>
     );
   }

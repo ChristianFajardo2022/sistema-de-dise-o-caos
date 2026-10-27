@@ -144,11 +144,8 @@ const lastText = (c: Conversation) => {
 
 const photo = (name: PhotoName, size: 'sm' | 'md' = 'sm') => <Avatar variant="photo" size={size} src={PHOTO_SRC[name]} alt="" />;
 
-/** Button xs con ícono de 16, como Figma (Button lo dibuja a 20). */
-const SMALL_ICON = '[&_[data-slot=icon]]:size-4';
-
 const iconButton = (icon: Parameters<typeof Icon>[0]['name'], label: string, touch = false) => (
-  <Button iconOnly variant="secondary" size={touch ? 'sm' : 'xs'} aria-label={label} className={touch ? undefined : SMALL_ICON}>
+  <Button iconOnly variant="secondary" size={touch ? 'sm' : 'xs'} aria-label={label}>
     <Icon name={icon} size={touch ? 20 : 16} variant="fill" data-figma-part="Icon-sizes" />
   </Button>
 );
@@ -462,7 +459,7 @@ function DetailsColumn({ conversation, figma = false }: { conversation: Conversa
               backRef={backRef}
               onBack={() => go('profile')}
               actions={
-                <Button iconOnly variant="secondary" size="xs" aria-label="Descargar seleccionados" className={SMALL_ICON}>
+                <Button iconOnly variant="secondary" size="xs" aria-label="Descargar seleccionados">
                   <Icon name="download" size={16} variant="fill" />
                 </Button>
               }

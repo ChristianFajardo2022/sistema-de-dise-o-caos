@@ -14,9 +14,6 @@ import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
-/** Button xs: Figma dibuja el ícono a 16 (Button lo dibuja a 20 en todos los tamaños). Mismo recurso que FileCard. */
-const SMALL_ICON = '[&_[data-slot=icon]]:size-4';
-
 /**
  * Campo para escribir de la conversación (set "Audio (Atom)" de Figma, 14894:2745). Es un `<form>`: Enter o el botón
  * Enviar llaman a `onSend`; Shift+Enter hace un salto de línea (y Enter no envía mientras un IME está componiendo, también
@@ -99,7 +96,7 @@ export const ChatComposer = forwardRef<HTMLTextAreaElement, ChatComposerProps>(
         aria-label={sendLabel}
         disabled={disabled}
         data-figma-part="Button"
-        className={cn(!hasAudio && chatComposerSendInlineVariants(), !touch && SMALL_ICON)}
+        className={cn(!hasAudio && chatComposerSendInlineVariants())}
       >
         <Icon name="send2" size={iconSize} variant="fill" data-figma-part="Icon-sizes" />
       </Button>
@@ -114,7 +111,7 @@ export const ChatComposer = forwardRef<HTMLTextAreaElement, ChatComposerProps>(
         disabled={disabled}
         onClick={onRecord}
         data-figma-part="Button"
-        className={cn('shrink-0', !touch && SMALL_ICON)}
+        className="shrink-0"
       >
         <Icon name="maximize-circle-2" size={iconSize} variant="fill" data-figma-part="Icon-sizes" />
       </Button>

@@ -19,6 +19,12 @@ export type ButtonCornerState = 'default' | 'hover' | 'select';
 /** Size de Figma: md 40 · sm 32 */
 export type ButtonCornerSize = 'md' | 'sm';
 
+/**
+ * Medida del ícono de `variant="icon"` en px. 16 es la de Button corner; 20 es la de la flecha de volver de las
+ * pantallas móviles (44×44 en Figma: el círculo crece con el ícono y conserva el padding, md 44 · sm 36).
+ */
+export type ButtonCornerIconSize = 16 | 20;
+
 export interface ButtonCornerBaseProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'children' | 'aria-pressed'> {
   /** Type: contenido del botón */
@@ -36,8 +42,10 @@ export interface ButtonCornerBaseProps
   size?: ButtonCornerSize;
   /** Stroke=Yes: trazo de 1px (border/general/md) */
   stroke?: boolean;
-  /** Ícono de 16px para variant="icon" (por defecto, flecha diagonal) */
+  /** Ícono para variant="icon" (por defecto, flecha diagonal). Se dibuja a la medida de `iconSize`. */
   icon?: ReactNode;
+  /** Medida del ícono de variant="icon": 16 (por defecto) o 20 (md 44 · sm 36). No aplica a los otros tipos. */
+  iconSize?: ButtonCornerIconSize;
   /**
    * Solo checkbox, radiobutton y favorite: expone `aria-pressed` y activa el aspecto Select.
    * En favorite además rellena el corazón (Favorite (Atom) variante 3).

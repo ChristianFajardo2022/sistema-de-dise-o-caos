@@ -14,7 +14,7 @@ import { Icon } from '../Icon';
 import { FavoriteIcon } from '../../icons/FavoriteIcon';
 import { cn } from '../../utils/cn';
 
-/** Slot de ícono de 16×16: el SVG lo llena y hereda el color del slot */
+/** Slot de ícono (16×16 por defecto): el SVG lo llena y hereda el color del slot */
 function IconSlot({
   className,
   children,
@@ -42,6 +42,7 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
       size = 'md',
       stroke = false,
       icon,
+      iconSize = 16,
       pressed,
       className,
       ...restProps
@@ -97,8 +98,8 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         break;
       default:
         content = (
-          <IconSlot data-figma-part="Icon-sizes">
-            {icon ?? <Icon name="arrow-diagonal-right" variant="line" size={16} />}
+          <IconSlot data-figma-part="Icon-sizes" className={iconSize === 20 ? 'size-[20px]' : undefined}>
+            {icon ?? <Icon name="arrow-diagonal-right" variant="line" size={iconSize} />}
           </IconSlot>
         );
     }
@@ -109,7 +110,7 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         type="button"
         aria-pressed={hasPressed ? pressed : undefined}
         className={cn(
-          buttonCornerVariants({ contrast, state, size, stroke, dots: variant === 'dots' }),
+          buttonCornerVariants({ contrast, state, size, stroke, dots: variant === 'dots', iconSize: variant === 'icon' ? iconSize : 16 }),
           // Favorito presionado: corazón relleno con icon/general/default (Favorite (Atom) variante 3)
           variant === 'favorite' && buttonCornerFavoritePressed[contrast],
           className

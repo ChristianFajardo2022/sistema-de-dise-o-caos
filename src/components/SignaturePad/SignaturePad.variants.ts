@@ -71,15 +71,19 @@ export const signaturePadPlaceholderVariants = cva(
   }
 );
 
-/** Botón de ícono desnudo de 24 (deshacer, borrar, maximizar, cerrar), con foco visible. */
+/**
+ * Ajustes sobre `Button` tertiary Icon-single xs (`iconSize` 24) para los íconos desnudos de 24 de Figma (deshacer,
+ * borrar, maximizar, cerrar): la caja baja a 24 sin padding, el ícono usa icon/general/white del Figma
+ * (icon/general/default) y el foco suma el outline de 2px de los controles de formulario.
+ */
 export const signaturePadIconButtonVariants = cva(
   [
-    'pointer-events-auto inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-ds-radius-general-xs border-0 bg-transparent p-0',
-    'text-ds-icon-general-default',
-    'outline-offset-2 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
-    "relative before:absolute before:-inset-2 before:content-['']", // área táctil de 40 px (WCAG 2.5.8)
-    // Sin firma (o deshabilitado) los íconos de acción se apagan, como en Figma Default
-    'aria-disabled:cursor-default aria-disabled:text-ds-text-neutral-disabled-positive',
+    'pointer-events-auto size-6 p-0 overflow-visible',
+    '[--btn-icon:var(--color-ds-icon-general-default)]',
+    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
+    "before:absolute before:-inset-2 before:content-['']", // área táctil de 40 px (WCAG 2.5.8)
+    // Sin firma (o deshabilitado) los íconos de acción se apagan, como en Figma Default, y no reaccionan al hover
+    'aria-disabled:cursor-default aria-disabled:bg-transparent aria-disabled:[--btn-icon:var(--color-ds-text-neutral-disabled-positive)]',
   ].join(' ')
 );
 

@@ -105,7 +105,7 @@ function BackButton() {
       contrast="on-canva"
       size="md"
       aria-label="Volver"
-      className="size-11 px-ds-space-general-xl py-ds-space-general-lg [&_[data-slot=icon]]:size-5"
+      iconSize={20}
       icon={<Icon name="chevron-left" size={20} variant="fill" data-figma-part="Icon-sizes" />}
       data-figma-part="Button"
     />
@@ -264,7 +264,7 @@ function ProfileScreen({ figma = false, frame }: { figma?: boolean; frame?: stri
             ana.perez@ejemplo.com
           </p>
         </div>
-        <Button iconOnly variant="tertiary" size="sm" aria-label="Cerrar sesión" className="[&_[data-slot=icon]]:size-6" data-figma-part="Button">
+        <Button iconOnly variant="tertiary" size="sm" aria-label="Cerrar sesión" data-figma-part="Button">
           <Icon name="logout2" size={24} variant="fill" data-figma-part="Icon-sizes" />
         </Button>
       </div>

@@ -118,3 +118,41 @@ export const NewTabNameTest: Story = {
     await expect(link).toHaveAttribute('target', '_blank');
   },
 };
+
+/**
+ * Sin `href`: `<button type="button">` real con el aspecto de Button link, para acciones en línea ("Reenviar").
+ * Enter y Espacio son nativos; Inactive usa `disabled` nativo.
+ */
+export const ActionButton: Story = {
+  args: { href: undefined, iconRight: false, children: 'Reenviar' },
+};
+
+/** Test: sin href es un botón y Enter y Espacio lo activan */
+export const ActionButtonTest: Story = {
+  tags: ['!autodocs'],
+  args: { href: undefined, iconRight: false, children: 'Reenviar', onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Reenviar' });
+    await expect(button).toHaveAttribute('type', 'button');
+    await expect(within(canvasElement).queryByRole('link')).toBeNull();
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
+};
+
+/** Test: botón inactivo con disabled nativo */
+export const ActionButtonInactiveTest: Story = {
+  tags: ['!autodocs'],
+  args: { href: undefined, iconRight: false, disabled: true, children: 'Reenviar', onClick: fn() },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Reenviar' });
+    await expect(button).toBeDisabled();
+    await userEvent.click(button);
+    await userEvent.tab();
+    await expect(button).not.toHaveFocus();
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};

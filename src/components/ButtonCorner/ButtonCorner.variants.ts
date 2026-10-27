@@ -1,12 +1,13 @@
 import { cva } from 'class-variance-authority';
-import type { ButtonCornerContrast, ButtonCornerSize, ButtonCornerState } from './ButtonCorner.types';
+import type { ButtonCornerContrast, ButtonCornerIconSize, ButtonCornerSize, ButtonCornerState } from './ButtonCorner.types';
 
 /**
  * CAOS Design System — ButtonCorner Variants
  *
  * Fuente: component set "Button corner" de Figma (65 variantes: Type × Contrast × State × Size × Stroke).
  *
- * - Círculo de 40 (md) o 32 (sm), radio radius/button/full.
+ * - Círculo de 40 (md) o 32 (sm), radio radius/button/full. Con `iconSize` 20 (flecha de volver de las pantallas
+ *   móviles, 44×44 en Figma) el círculo crece con el ícono: md 44 · sm 36, mismo padding.
  * - Padding: md space/general/xl (12), sm space/general/lg (8). Dots: md space/general/md (4) y sm 0,
  *   con un botón interno de 32 (ver ButtonCorner.tsx).
  * - Relleno por Contrast: default-on-canva, default-on-card o hover-unicolor.
@@ -79,12 +80,16 @@ const buttonCornerCva = cva(
       },
       dots: { true: '', false: '' },
       stroke: { true: '', false: '' },
+      iconSize: { 16: '', 20: '' },
     },
     compoundVariants: [
       { size: 'md', dots: false, className: 'p-ds-space-general-xl' },
       { size: 'md', dots: true, className: 'p-ds-space-general-md' },
       { size: 'sm', dots: false, className: 'p-ds-space-general-lg' },
       { size: 'sm', dots: true, className: 'p-ds-space-general-xs' },
+      // Ícono de 20: el círculo suma 4 (padding + 20 + padding)
+      { size: 'md', dots: false, iconSize: 20, className: 'size-11' },
+      { size: 'sm', dots: false, iconSize: 20, className: 'size-9' },
       { stroke: true, contrast: ['on-canva', 'on-card'], className: strokeRest.surface },
       { stroke: true, contrast: 'unicolor-canva', className: strokeRest.unicolor },
       // Los estados van después del trazo de reposo para reemplazarlo (cn deja la última clase de box-shadow)
@@ -95,7 +100,7 @@ const buttonCornerCva = cva(
       { state: 'select', contrast: 'on-canva', className: forced['on-canva'].select },
       { state: 'select', contrast: 'on-card', className: forced['on-card'].select },
     ],
-    defaultVariants: { contrast: 'on-canva', state: 'default', size: 'md', dots: false, stroke: false },
+    defaultVariants: { contrast: 'on-canva', state: 'default', size: 'md', dots: false, stroke: false, iconSize: 16 },
   }
 );
 
@@ -107,6 +112,8 @@ export interface ButtonCornerVariantOptions {
   size?: ButtonCornerSize;
   dots?: boolean;
   stroke?: boolean;
+  /** Medida del ícono de variant="icon" (16 por defecto; 20 agranda el círculo). */
+  iconSize?: ButtonCornerIconSize;
 }
 
 /** Clases del círculo. Acepta `status` (deprecado) como alias de `contrast`. */

@@ -41,19 +41,16 @@ const documents = (count: number, title = (i: number) => `Documento ${i + 1}`, d
 
 const fileActions = (download = true) => (
   <>
-    <Button iconOnly variant="secondary" size="xs" state="delete" aria-label="Eliminar seleccionados" className={SMALL_ICON}>
+    <Button iconOnly variant="secondary" size="xs" state="delete" aria-label="Eliminar seleccionados">
       <Icon name="trash" size={16} variant="fill" data-figma-part="Icon-sizes" />
     </Button>
     {download && (
-      <Button iconOnly variant="secondary" size="xs" aria-label="Descargar seleccionados" className={SMALL_ICON}>
+      <Button iconOnly variant="secondary" size="xs" aria-label="Descargar seleccionados">
         <Icon name="download" size={16} variant="fill" data-figma-part="Icon-sizes" />
       </Button>
     )}
   </>
 );
-
-/** Button xs con ícono de 16, como Figma (Button lo dibuja a 20). */
-const SMALL_ICON = '[&_[data-slot=icon]]:size-4';
 
 type View = 'profile' | 'documents' | 'photos';
 

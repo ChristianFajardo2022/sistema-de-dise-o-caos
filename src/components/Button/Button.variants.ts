@@ -9,7 +9,11 @@ import { cva } from 'class-variance-authority';
  * - Type: primary · secondary · tertiary. Button link es un componente aparte (ButtonLink).
  * - Contrats (contrast): low · high, solo para secondary.
  * - Unicolor: solo secondary y tertiary sin icon-single.
- * - Size: md 56 · sm 48 · xs 32. Padding X 24/24/16, padding Y 8, min-width 92 en md y sm.
+ * - Size: md 56 · sm 48 · xs 32. Padding X 24/24/16, padding Y 8, min-width 92 en md y sm. Con texto el alto es mínimo
+ *   (min-height): un ícono más grande que la línea (iconSize 20 en xs) lo estira como el HUG de Figma (xs 36).
+ * - Icon-single sin alto fijo, como Figma: padding Y space/button/lg (8), padding X space/button/3xl · 2xl · lg
+ *   (md · sm · xs) y caja de contenido de 16 de ancho por dimention/button/container/lg · md · xs de alto (ver
+ *   Button.tsx). Sale md 56 · sm 48 · xs 32 en escritorio y md 48 · sm 40 · xs 32 en móvil (tokens responsive).
  * - State: default · hover · focus · press · inactive · delete · load (tertiary sin load).
  * - Tipografía: Helvetica Neue (typography/family/Primary), peso Semibold (600),
  *   typography/button/size/md-uniform (14px fijo en todos los breakpoints), interlineado 100 %.
@@ -24,7 +28,9 @@ import { cva } from 'class-variance-authority';
 export const buttonVariants = cva(
   [
     'group relative box-border inline-flex shrink-0 items-center justify-center overflow-hidden',
-    'cursor-pointer select-none whitespace-nowrap outline-none',
+    'cursor-pointer select-none whitespace-nowrap no-underline outline-none',
+    // Gap de Figma (space/button/lg) también en la raíz: el único hijo en flujo es el contenido, no cambia el dibujo
+    'gap-ds-space-button-lg',
     'transition-[background-color,border-color,color] duration-300 ease-out',
     'disabled:cursor-not-allowed',
     // Button/Button-md-600: Helvetica Neue, peso Semibold (600 = archivo Medium en fonts.css), 14px fijo (md-uniform, no el responsive), tracking 0
@@ -55,10 +61,11 @@ export const buttonVariants = cva(
         false: '',
       },
 
+      // Las medidas van en compoundVariants: con texto alto mínimo fijo, Icon-single por padding y caja de contenido
       size: {
-        md: 'h-ds-primitives-dimention-5xl',
-        sm: 'h-ds-primitives-dimention-4xl',
-        xs: 'h-ds-primitives-dimention-2xl',
+        md: '',
+        sm: '',
+        xs: '',
       },
 
       state: {
@@ -72,13 +79,22 @@ export const buttonVariants = cva(
       },
 
       iconOnly: {
-        true: 'aspect-square p-0',
+        true: 'py-ds-space-button-lg',
         false: '',
       },
     },
 
     compoundVariants: [
       /* ── Medidas ─────────────────────────────────────────────── */
+      // Con texto: alto mínimo (el contenido puede estirarlo, p. ej. xs con ícono de 20 → 36)
+      // Alto mínimo = dimention/button/container + 2 × space/button/lg, como Icon-single: 56/48 en escritorio, 48/40 en móvil
+      { iconOnly: false, size: 'md', class: 'min-h-[calc(var(--ds-responsive-dimention-button-container-lg)+var(--ds-responsive-space-button-lg)*2)]' },
+      { iconOnly: false, size: 'sm', class: 'min-h-[calc(var(--ds-responsive-dimention-button-container-md)+var(--ds-responsive-space-button-lg)*2)]' },
+      { iconOnly: false, size: 'xs', class: 'min-h-ds-primitives-dimention-2xl' },
+      // Icon-single: padding X de Figma por tamaño (space/button/3xl · 2xl · lg, responsive)
+      { iconOnly: true, size: 'md', class: 'px-ds-space-button-3xl' },
+      { iconOnly: true, size: 'sm', class: 'px-ds-space-button-2xl' },
+      { iconOnly: true, size: 'xs', class: 'px-ds-space-button-lg' },
       {
         variant: ['primary', 'secondary'],
         size: ['md', 'sm'],
@@ -91,18 +107,38 @@ export const buttonVariants = cva(
         iconOnly: false,
         class: 'px-ds-space-button-2xl py-ds-space-button-lg',
       },
-      // Secondary: el trazo de Figma es interior y no suma al ancho; el borde de CSS sí, así que se descuenta del padding
+      // Secondary: el trazo de Figma es interior y no suma a la caja; el borde de CSS sí, así que se descuenta del padding
+      // (también el vertical: con alto mínimo, xs quedaría en 34)
       {
         variant: 'secondary',
         size: ['md', 'sm'],
         iconOnly: false,
-        class: 'px-[calc(var(--ds-responsive-space-button-4xl)-var(--ds-primitives-stroke-lg))]',
+        class: 'px-[calc(var(--ds-responsive-space-button-4xl)-var(--ds-primitives-stroke-lg))] py-[calc(var(--ds-responsive-space-button-lg)-var(--ds-primitives-stroke-lg))]',
       },
       {
         variant: 'secondary',
         size: 'xs',
         iconOnly: false,
-        class: 'px-[calc(var(--ds-responsive-space-button-2xl)-var(--ds-primitives-stroke-lg))]',
+        class: 'px-[calc(var(--ds-responsive-space-button-2xl)-var(--ds-primitives-stroke-lg))] py-[calc(var(--ds-responsive-space-button-lg)-var(--ds-primitives-stroke-lg))]',
+      },
+      // Secondary Icon-single: mismo descuento del borde en los cuatro lados (32/48/56 como Figma, no +2)
+      {
+        variant: 'secondary',
+        size: 'md',
+        iconOnly: true,
+        class: 'px-[calc(var(--ds-responsive-space-button-3xl)-var(--ds-primitives-stroke-lg))] py-[calc(var(--ds-responsive-space-button-lg)-var(--ds-primitives-stroke-lg))]',
+      },
+      {
+        variant: 'secondary',
+        size: 'sm',
+        iconOnly: true,
+        class: 'px-[calc(var(--ds-responsive-space-button-2xl)-var(--ds-primitives-stroke-lg))] py-[calc(var(--ds-responsive-space-button-lg)-var(--ds-primitives-stroke-lg))]',
+      },
+      {
+        variant: 'secondary',
+        size: 'xs',
+        iconOnly: true,
+        class: 'px-[calc(var(--ds-responsive-space-button-lg)-var(--ds-primitives-stroke-lg))] py-[calc(var(--ds-responsive-space-button-lg)-var(--ds-primitives-stroke-lg))]',
       },
       {
         variant: 'tertiary',

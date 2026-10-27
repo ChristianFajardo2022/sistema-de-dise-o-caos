@@ -1,13 +1,13 @@
 {
   "name": "Button",
   "component": "Button",
-  "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Type Primary, Secondary (Contrats low/high, sin fondo, solo borde) y Tertiary; Unicolor para Secondary y Tertiary; tamaños md 56, sm 48 y xs 32; estados Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary sin Load); modo Icon-single cuadrado (Tertiary Icon-single con radio completo y fondo en hover, focus y press). Trazo de Primary de 0.5px (stroke/dm) y de 1px en Focus (stroke/lg). Tipografía Helvetica Neue 400, 14px fijo en todos los breakpoints (typography/button/size/md-uniform), interlineado 100 %. Íconos de 20px con color por token. Sin anillo de foco ni escala al presionar: cada estado usa sus tokens.",
+  "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Type Primary, Secondary (Contrats low/high, sin fondo, solo borde) y Tertiary; Unicolor para Secondary y Tertiary; tamaños md 56, sm 48 y xs 32; estados Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary sin Load); modo Icon-single cuadrado sin alto fijo: padding Y space/button/lg, padding X space/button/3xl · 2xl · lg y caja de contenido de 16 por dimention/button/container/lg · md · xs (md 56 · sm 48 · xs 32 en escritorio, md 48 · sm 40 · xs 32 en móvil); Tertiary Icon-single con radio completo y fondo en hover, focus y press. Trazo de Primary de 0.5px (stroke/dm) y de 1px en Focus (stroke/lg). Tipografía Helvetica Neue Semibold (600), 14px fijo en todos los breakpoints (typography/button/size/md-uniform), interlineado 100 %. Íconos a la medida de Figma por tamaño (con texto 20 en md y sm, 14 en xs; Icon-single 20 en md y sm y 16 en xs, o 24 y 20 en tertiary), reemplazable con iconSize, y color por token. Con href se dibuja como <a> con todos los efectos (incluido el barrido de Primary). Sin anillo de foco ni escala al presionar: cada estado usa sus tokens.",
   "category": "General Controls",
   "props": {
     "variant": {
       "type": "'primary' | 'secondary' | 'tertiary'",
       "default": "'primary'",
-      "description": "Type de Figma. Para enlaces usar ButtonLink."
+      "description": "Type de Figma. Para enlaces de texto usar ButtonLink; para un enlace con aspecto de botón, href."
     },
     "contrast": {
       "type": "'low' | 'high'",
@@ -22,7 +22,7 @@
     "size": {
       "type": "'md' | 'sm' | 'xs'",
       "default": "'md'",
-      "description": "md: alto 56, padding 24/8, min-width 92. sm: alto 48, padding 24/8, min-width 92. xs: alto 32, padding 16/8. Tertiary: padding X 0."
+      "description": "Con texto, alto mínimo: md 56, padding 24/8, min-width 92; sm 48, padding 24/8, min-width 92; xs 32, padding 16/8 (un ícono de 20 lo lleva a 36, como el HUG de Figma). Tertiary: padding X 0. Icon-single: md 56 · sm 48 · xs 32 en escritorio y md 48 · sm 40 · xs 32 en móvil (tokens responsive)."
     },
     "state": {
       "type": "'default' | 'hover' | 'focus' | 'press' | 'inactive' | 'delete' | 'load'",
@@ -32,7 +32,7 @@
     "loading": {
       "type": "boolean",
       "default": false,
-      "description": "Estado load: deshabilita el botón, muestra 3 puntos de 8px y establece aria-busy. Usa aria-disabled en vez de disabled (conserva el foco), cancela onClick y el submit mientras carga, y el nombre accesible queda \"<texto> Cargando\"."
+      "description": "Estado load: deshabilita el botón, muestra el Spinner dots md (3 puntos de 8px) con el color del ícono del estado y establece aria-busy. Usa aria-disabled en vez de disabled (conserva el foco), cancela onClick y el submit mientras carga, y el nombre accesible queda \"<texto> Cargando\"."
     },
     "disabled": {
       "type": "boolean",
@@ -42,17 +42,27 @@
     "leftIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Ícono antes del texto (iconLeft). Se dibuja a 20×20 con el token icon/button del estado."
+      "description": "Ícono antes del texto (iconLeft). Se dibuja a la medida de iconSize (20 en md y sm, 14 en xs) con el token icon/button del estado."
     },
     "rightIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Ícono después del texto (iconRigth). Se dibuja a 20×20 con el token icon/button del estado."
+      "description": "Ícono después del texto (iconRigth). Se dibuja a la medida de iconSize (20 en md y sm, 14 en xs) con el token icon/button del estado."
+    },
+    "iconSize": {
+      "type": "14 | 16 | 20 | 24",
+      "required": false,
+      "description": "Medida del ícono en px. Sin valor sigue a Figma por tamaño y tipo; úsalo solo cuando la pantalla de Figma dibuja otra medida. Con texto, un ícono más alto que la línea estira el botón (xs con 20 → 36)."
     },
     "iconOnly": {
       "type": "boolean",
       "default": false,
-      "description": "Icon-single: botón cuadrado (56, 48 o 32). Pasar el ícono como children. Con iconOnly es obligatorio aria-label o aria-labelledby (el tipo lo exige)."
+      "description": "Icon-single: botón cuadrado (56, 48 o 32 en escritorio; 48, 40 o 32 en móvil). Pasar el ícono como children. Con iconOnly es obligatorio aria-label o aria-labelledby (el tipo lo exige)."
+    },
+    "href": {
+      "type": "string",
+      "required": false,
+      "description": "Con href el botón se dibuja como <a> (navegación real, admite Cmd/Ctrl/clic medio) y conserva todos los efectos del tipo, incluido el barrido de Primary. Inactive quita el href (role=\"link\" + aria-disabled, fuera del orden de tabulación); Load lo conserva con aria-disabled y cancela la navegación. Acepta target, rel (con target=\"_blank\" usa noopener noreferrer y avisa \"se abre en una pestaña nueva\" en sr-only), download y hrefLang. El ref apunta al <a> aunque esté tipado como HTMLButtonElement."
     }
   },
   "examples": [
@@ -73,8 +83,16 @@
       "code": "<Button variant=\"primary\" state=\"delete\" leftIcon={<TrashIcon />}>Eliminar cuenta</Button>"
     },
     {
+      "title": "Enlace con aspecto de Primary",
+      "code": "<Button href=\"/inicio\">Volver al inicio</Button>"
+    },
+    {
       "title": "Icon-single",
       "code": "<Button variant=\"tertiary\" iconOnly aria-label=\"Ajustes\"><SettingIcon /></Button>"
+    },
+    {
+      "title": "Ícono de otra medida",
+      "code": "<Button variant=\"tertiary\" size=\"xs\" iconOnly iconSize={24} aria-label=\"Deshacer\"><Icon name=\"rotate-left\" /></Button>"
     }
   ]
 }

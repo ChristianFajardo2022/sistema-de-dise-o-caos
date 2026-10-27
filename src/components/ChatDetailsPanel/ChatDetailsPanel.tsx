@@ -74,7 +74,6 @@ export const ChatDetailsPanel = forwardRef<HTMLElement, ChatDetailsPanelProps>(
               aria-controls={contentId}
               onClick={toggle}
               data-figma-part="Button"
-              className="[&_[data-slot=icon]]:size-4"
             >
               <Icon name={collapsed ? 'chevron-left' : 'chevron-right'} size={16} variant="fill" data-figma-part="Icon-sizes" />
             </Button>

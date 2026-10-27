@@ -1,6 +1,5 @@
 import type { ComponentProps, ReactNode, Ref } from 'react';
 import { Button } from '../../components/Button';
-import { buttonVariants } from '../../components/Button/Button.variants';
 import { Logo } from '../../components/Logo';
 import { cn } from '../../utils/cn';
 
@@ -86,12 +85,11 @@ export function ErrorPage({
 }: ErrorPageProps) {
   const logoNode = logo === false ? null : (logo ?? <Logo type="icon" size="md" decorative />);
 
-  const defaultAction = href ? (
-    <a href={href} className={cn(buttonVariants({ variant: 'primary', size: 'md', state: 'default' }), 'no-underline')}>
-      <span className="pb-ds-space-button-sm">{actionLabel}</span>
-    </a>
-  ) : (
-    <Button onClick={onAction}>{actionLabel}</Button>
+  // Con href, Button se dibuja como <a> y conserva el efecto animado de Primary
+  const defaultAction = (
+    <Button href={href} onClick={href ? undefined : onAction} data-figma-part="Button">
+      {actionLabel}
+    </Button>
   );
 
   return (

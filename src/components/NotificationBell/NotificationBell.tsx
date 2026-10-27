@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import type { NotificationBellProps } from './NotificationBell.types';
-import { notificationBellBadgeClass, notificationBellButtonVariants, notificationBellVariants } from './NotificationBell.variants';
+import { notificationBellBadgeClass, notificationBellVariants } from './NotificationBell.variants';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
@@ -38,7 +38,6 @@ export const NotificationBell = forwardRef<HTMLButtonElement, NotificationBellPr
           size={size}
           state={open ? 'press' : undefined}
           aria-label={name}
-          className={notificationBellButtonVariants({ size })}
         >
           <Icon name="notification" size={iconSize} variant="fill" data-figma-part="Icon-sizes" />
         </Button>

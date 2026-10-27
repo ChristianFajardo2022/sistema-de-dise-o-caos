@@ -111,7 +111,7 @@ export const ChatAudioPlayer = forwardRef<HTMLButtonElement, ChatAudioPlayerProp
         aria-label={playing ? pauseLabel : playLabel}
         onClick={() => setPlaying(!playing)}
         data-figma-part="Button"
-        className="shrink-0 [&_[data-slot=icon]]:size-4"
+        className="shrink-0"
       >
         <Icon name={playing ? 'pause' : 'play'} size={16} variant="fill" data-figma-part="Icon-sizes" />
       </Button>
