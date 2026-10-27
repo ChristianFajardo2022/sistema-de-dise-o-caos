@@ -5,6 +5,11 @@ import { TooltipBubble } from './TooltipBubble';
 import type { TooltipArrow } from './Tooltip.types';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Tooltip.doc';
+import docsJson from './Tooltip.docs.json';
 
 const ARROW_OPTIONS: TooltipArrow[] = ['top', 'bottom', 'left', 'right'];
 const SURFACE = 'bg-ds-background-general-black';
@@ -14,7 +19,8 @@ const meta = {
   title: 'Overlays/Tooltip',
   component: Tooltip,
   subcomponents: { TooltipBubble },
-  parameters: { layout: 'centered' },
+  // La página Docs usa la plantilla de documentación (Tooltip.doc.tsx) con la referencia de código al final
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
   argTypes: {
     arrow: {
@@ -356,5 +362,49 @@ export const ToggletipTest: Story = {
     await waitFor(() => expect(tooltip.matches(':popover-open')).toBe(true));
     await userEvent.click(canvasElement);
     await waitFor(() => expect(tooltip.matches(':popover-open')).toBe(false));
+  },
+};
+
+/**
+ * La página de documentación (la misma de la pestaña Docs) como historia: así las pruebas y axe la revisan. Recorre
+ * las pestañas con teclado (patrón Tabs) y comprueba los encabezados numerados.
+ */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    expect(canvas.getByRole('heading', { level: 1, name: 'Tooltip' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Código']);
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    // Definición: secciones 01 a 05
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(h2()).toEqual([
+      'Definición del componente',
+      'Propósito y anatomía',
+      'Propiedades y variantes',
+      'Estados y especificaciones de layout',
+      'Estados compuestos y ejemplos base',
+    ]);
+    expect(canvas.getByText('05')).toBeInTheDocument();
+    expect(canvas.getAllByRole('table').length).toBe(4);
+    // Flecha derecha: Aplicación (activación automática), numeración continua 06 y 07
+    tabs[0].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(tabs[1]).toHaveFocus();
+    await waitFor(() => expect(tabs[1]).toHaveAttribute('aria-selected', 'true'));
+    expect(h2()).toEqual(['Comportamiento y reglas de uso', 'Buenas y malas prácticas (Dos and Don’ts)']);
+    expect(canvas.getByText('06')).toBeInTheDocument();
+    expect(canvas.getByText('07')).toBeInTheDocument();
+    expect(canvas.getAllByRole('img', { name: 'Buena práctica' })).toHaveLength(4);
+    // End: Código, con la tabla de props
+    await userEvent.keyboard('{End}');
+    await waitFor(() => expect(tabs[2]).toHaveAttribute('aria-selected', 'true'));
+    const props = canvas.getByRole('table', { name: 'Props de Tooltip' });
+    expect(within(props).getByRole('rowheader', { name: /content/ })).toBeInTheDocument();
+    await userEvent.keyboard('{Home}');
+    await waitFor(() => expect(tabs[0]).toHaveAttribute('aria-selected', 'true'));
   },
 };
