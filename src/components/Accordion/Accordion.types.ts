@@ -4,6 +4,12 @@ import type { IconName } from '../Icon/Icon.types';
 /** Contrast de Figma: la tarjeta sobre el lienzo (On canva) o sobre otra tarjeta (On card). */
 export type AccordionContrast = 'on-canva' | 'on-card';
 
+/**
+ * Type de Figma del ítem: `normal` (avatar, título y descripción en el encabezado) o `table` (encabezado con una
+ * fila de celdas; el título, la descripción y el contenido van en un marco interior al abrir).
+ */
+export type AccordionItemType = 'normal' | 'table';
+
 /** Nivel del encabezado (`<h2>` a `<h6>`) que envuelve el botón de cada ítem. */
 export type AccordionHeadingLevel = 2 | 3 | 4 | 5 | 6;
 
@@ -21,6 +27,10 @@ export interface AccordionItemProps extends Omit<HTMLAttributes<HTMLDivElement>,
   icon?: boolean;
   /** Ícono de la biblioteca CAOS del avatar. Por defecto `folder`, el de Figma. */
   iconName?: IconName;
+  /** Prop Type de Figma. Por defecto `normal`. Con `table` el encabezado muestra `cells`. */
+  type?: AccordionItemType;
+  /** Solo con `type="table"`: contenido de cada celda de la fila del encabezado (es el nombre accesible del botón). */
+  cells?: ReactNode[];
   /** Contrast de Figma. Dentro de un `Accordion` manda el del grupo si no se indica. Por defecto `on-card`. */
   contrast?: AccordionContrast;
   /** Nivel del encabezado. Dentro de un `Accordion` hereda el del grupo. Por defecto 3. */

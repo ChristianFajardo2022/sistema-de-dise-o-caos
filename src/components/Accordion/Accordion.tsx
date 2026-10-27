@@ -4,8 +4,11 @@ import type { AccordionItemProps, AccordionProps } from './Accordion.types';
 import { AccordionContext } from './Accordion.context';
 import type { AccordionContextValue } from './Accordion.context';
 import {
+  accordionCellClass,
   accordionDescriptionClass,
   accordionItemVariants,
+  accordionTableCardClass,
+  accordionTableRowClass,
   accordionPanelInnerVariants,
   accordionPanelVariants,
   accordionShapeClasses,
@@ -114,6 +117,8 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
       description,
       icon = true,
       iconName,
+      type = 'normal',
+      cells,
       contrast: contrastProp,
       headingLevel: levelProp,
       open: openProp,
@@ -140,6 +145,34 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
     const panelId = `${autoId}-panel`;
     const state = open ? 'open' : 'closed';
     const hasDescription = description != null && description !== false && description !== '';
+    const isTable = type === 'table';
+
+    // Encabezado de la tarjeta: avatar con ícono + título y descripción. En `table` va dentro del marco interior
+    const titleBlock = (
+      <span className="flex min-h-9.5 min-w-0 flex-1 items-center gap-ds-space-general-lg" data-figma-part="Container">
+        {icon && (
+          <Avatar
+            variant="icon"
+            size="sm"
+            contrast={isTable ? 'on-canva' : 'on-card'}
+            icon={iconName}
+            // Normal: 40 con ícono de 24 (icon sm de Avatar). Table: 32 con ícono de 16
+            className={cn('shrink-0', isTable ? 'size-8 [&_svg]:size-4' : !open && '-my-px')}
+            data-figma-part="Avatar"
+          />
+        )}
+        <span className="flex min-w-0 flex-1 flex-col justify-center" data-figma-part="Container">
+          <span className={accordionTitleClass} data-figma-part="Filename">
+            {title}
+          </span>
+          {hasDescription && (
+            <span className={accordionDescriptionClass} data-figma-part="Status">
+              {description}
+            </span>
+          )}
+        </span>
+      </span>
+    );
 
     return (
       <div
@@ -147,7 +180,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
         ref={ref}
         data-state={state}
         data-figma-part="Card accordion (Atom)"
-        className={cn(accordionItemVariants({ contrast, open }), className)}
+        className={cn(accordionItemVariants({ contrast, open, type }), className)}
       >
         <span aria-hidden="true" className={accordionShapeClasses.wrapper} data-figma-part="Canva">
           <span className={accordionShapeClasses.body} />
@@ -167,23 +200,19 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
             data-accordion-trigger=""
             onClick={toggle}
             onKeyDown={handleTriggerKeyDown}
-            className={accordionTriggerVariants({ open })}
+            className={accordionTriggerVariants({ open, type })}
           >
-            <span className="flex min-h-9.5 min-w-0 flex-1 items-center gap-ds-space-general-2xl" data-figma-part="Container">
-              {icon && (
-                <Avatar variant="icon" size="sm" contrast="on-card" icon={iconName} className="shrink-0" data-figma-part="Avatar" />
-              )}
-              <span className="flex min-w-0 flex-1 flex-col justify-center" data-figma-part="Container">
-                <span className={accordionTitleClass} data-figma-part="Filename">
-                  {title}
-                </span>
-                {hasDescription && (
-                  <span className={accordionDescriptionClass} data-figma-part="Status">
-                    {description}
+            {isTable ? (
+              <span className={accordionTableRowClass} data-figma-part="Table">
+                {cells?.map((cell, i) => (
+                  <span key={i} className={accordionCellClass} data-figma-part="Cell table">
+                    <span data-figma-part="Filename">{cell}</span>
                   </span>
-                )}
+                ))}
               </span>
-            </span>
+            ) : (
+              titleBlock
+            )}
           </button>
         )}
 
@@ -211,9 +240,20 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
 
         <div id={panelId} role="region" aria-labelledby={triggerId} data-state={state} className={accordionPanelVariants({ open })}>
           <div className={accordionPanelInnerVariants({ open })}>
-            <div className={accordionSlotClass} data-figma-part="Container">
-              {children}
-            </div>
+            {isTable ? (
+              <div className={accordionTableCardClass} data-figma-part="Frame">
+                <div className="flex min-h-10 pr-ds-space-general-5xl" data-figma-part="Container">
+                  {titleBlock}
+                </div>
+                <div className={accordionSlotClass} data-figma-part="Container">
+                  {children}
+                </div>
+              </div>
+            ) : (
+              <div className={accordionSlotClass} data-figma-part="Container">
+                {children}
+              </div>
+            )}
           </div>
         </div>
       </div>

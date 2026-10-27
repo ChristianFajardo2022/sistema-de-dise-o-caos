@@ -22,18 +22,24 @@ import { cva } from 'class-variance-authority';
  */
 export const accordionItemVariants = cva(
   [
-    'relative isolate box-border flex w-full flex-col p-ds-space-general-2xl',
+    'relative isolate box-border flex w-full flex-col',
     '[transition:row-gap_300ms_ease-out] motion-reduce:[transition-duration:0.01ms]',
   ].join(' '),
   {
   variants: {
-    open: { true: 'gap-y-ds-space-general-3xl', false: 'gap-y-0' },
+    open: { true: '', false: 'gap-y-0' },
+    /** Normal: padding space/container/on-card (24), fila de 24 al abrir. Table: padding y fila de 16 (space/general/2xl). */
+    type: { normal: 'p-ds-space-container-on-card', table: 'p-ds-space-general-2xl' },
     contrast: {
       'on-canva': '[--accordion-surface:var(--color-ds-background-container-default-on-canva)]',
       'on-card': '[--accordion-surface:var(--color-ds-background-container-default-on-card)]',
     },
   },
-  defaultVariants: { contrast: 'on-card', open: false },
+  defaultVariants: { contrast: 'on-card', open: false, type: 'normal' },
+  compoundVariants: [
+    { open: true, type: 'normal', className: 'gap-y-ds-space-general-3xl' },
+    { open: true, type: 'table', className: 'gap-y-ds-space-general-2xl' },
+  ],
   }
 );
 
@@ -63,9 +69,15 @@ export const accordionTriggerVariants = cva(
   ].join(' '),
   {
     variants: {
-      open: { true: 'pr-ds-space-general-5xl', false: 'pr-ds-space-general-3xl' },
+      open: { true: '', false: '' },
+      // Table: las celdas ocupan todo el ancho, sin padding derecho
+      type: { normal: '', table: 'pr-0' },
     },
-    defaultVariants: { open: false },
+    compoundVariants: [
+      { type: 'normal', open: true, className: 'pr-ds-space-general-5xl' },
+      { type: 'normal', open: false, className: 'pr-ds-space-general-3xl' },
+    ],
+    defaultVariants: { open: false, type: 'normal' },
   }
 );
 
@@ -113,3 +125,19 @@ export const accordionPanelInnerVariants = cva(
 
 /** Slot Container: columna con gap 16 alineada al final. */
 export const accordionSlotClass = 'flex flex-col items-end gap-ds-space-general-2xl';
+
+/** Type=Table, fila de celdas (Table de Figma): celdas de igual ancho. */
+export const accordionTableRowClass = 'flex min-w-0 flex-1 items-stretch';
+
+/** Celda de la fila: padding horizontal 12 (space/general/xl), alto 42, Helvetica regular body/md 14/20. */
+export const accordionCellClass = [
+  'flex min-h-10.5 min-w-0 flex-1 items-center px-ds-space-general-xl',
+  'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
+  'text-ds-typography-body-size-md leading-ds-typography-body-line-height-large-md text-ds-text-neutral-white',
+].join(' ');
+
+/** Type=Table abierto: marco interior con trazo de 1 px, radio 24, padding 24 y gap 24 (usa box-shadow inset: Chrome redondea border-width). */
+export const accordionTableCardClass = [
+  'flex flex-col gap-ds-space-general-3xl rounded-ds-radius-general-2xl p-ds-space-general-3xl',
+  'shadow-[inset_0_0_0_1px_var(--color-ds-border-general-default-on-card)]',
+].join(' ');

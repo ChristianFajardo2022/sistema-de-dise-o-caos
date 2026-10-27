@@ -1,7 +1,7 @@
 {
   "name": "Accordion",
   "component": "Accordion",
-  "description": "Acordeón del sistema de diseño CAOS, fiel al component set Card accordion (Atom) de Figma (State Default/Dropdown × Contrast On canva/On card) y al componente suelto Accordion (lista de tarjetas con gap 8). Cada ítem es un encabezado (h3 configurable) con un botón aria-expanded/aria-controls y un panel role=region con aria-labelledby, según el patrón WAI-ARIA APG. Incluye Avatar icon, Button corner como indicador, y un slot Container para el contenido (Button, ButtonLink, texto). Funciona controlado y no controlado, type single o multiple, y también como AccordionItem suelto. Teclado: Enter y Espacio alternan; flechas arriba/abajo, Inicio y Fin mueven el foco entre encabezados. La apertura anima grid-template-rows y con prefers-reduced-motion la altura salta sin movimiento. El ancho es el de su contenedor.",
+  "description": "Acordeón del sistema de diseño CAOS, fiel al component set Card accordion (Atom) de Figma (Type Normal/Table × State Default/Dropdown × Contrast On canva/On card; Table solo On canva) y al componente suelto Accordion (lista de tarjetas con gap 8). Cada ítem es un encabezado (h3 configurable) con un botón aria-expanded/aria-controls y un panel role=region con aria-labelledby, según el patrón WAI-ARIA APG. Incluye Avatar icon, Button corner como indicador, y un slot Container para el contenido (Button, ButtonLink, texto). Funciona controlado y no controlado, type single o multiple, y también como AccordionItem suelto. Teclado: Enter y Espacio alternan; flechas arriba/abajo, Inicio y Fin mueven el foco entre encabezados. La apertura anima grid-template-rows y con prefers-reduced-motion la altura salta sin movimiento. El ancho es el de su contenedor.",
   "category": "Layout",
   "props": {
     "type": { "type": "'single' | 'multiple'", "default": "'single'", "description": "Accordion: un ítem abierto a la vez o varios." },
@@ -14,6 +14,8 @@
     "value (AccordionItem)": { "type": "string", "required": false, "description": "Identificador del ítem dentro del grupo. Suelto se genera." },
     "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma; nombre accesible del botón." },
     "description": { "type": "ReactNode", "required": false, "description": "Props Description y Description-2 de Figma: estado bajo el título." },
+    "type (AccordionItem)": { "type": "'normal' | 'table'", "default": "'normal'", "description": "Prop Type de Figma. Con table el encabezado muestra una fila de celdas y, al abrir, el título y el contenido van en un marco interior con trazo." },
+    "cells": { "type": "ReactNode[]", "required": false, "description": "AccordionItem type=table: contenido de cada celda del encabezado; es el nombre accesible del botón." },
     "icon": { "type": "boolean", "default": "true", "description": "Prop Icon de Figma: avatar con ícono antes del título." },
     "iconName": { "type": "IconName", "default": "'folder'", "description": "Ícono de la biblioteca CAOS del avatar." },
     "open": { "type": "boolean", "required": false, "description": "AccordionItem suelto, controlado (State=Dropdown de Figma)." },
@@ -25,6 +27,7 @@
     { "title": "Un ítem abierto a la vez", "code": "<Accordion defaultValue=\"a\">\n  <AccordionItem value=\"a\" title=\"Nombre del archivo\" description=\"Estado\">Contenido</AccordionItem>\n  <AccordionItem value=\"b\" title=\"Otro archivo\">Contenido</AccordionItem>\n</Accordion>" },
     { "title": "Varios abiertos y controlado", "code": "<Accordion type=\"multiple\" value={abiertos} onValueChange={setAbiertos}>…</Accordion>" },
     { "title": "Ítem suelto", "code": "<AccordionItem title=\"Detalles\" defaultOpen>Contenido</AccordionItem>" },
+    { "title": "Type=Table", "code": "<AccordionItem type=\"table\" cells={['8937484782', 'Nombre del item']} title=\"Nombre del archivo\" description=\"Estado\" contrast=\"on-canva\">Contenido</AccordionItem>" },
     { "title": "Sobre el lienzo", "code": "<Accordion contrast=\"on-canva\" headingLevel={2}>…</Accordion>" }
   ]
 }

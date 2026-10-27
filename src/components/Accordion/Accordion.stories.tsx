@@ -6,6 +6,8 @@ import type { AccordionContrast, AccordionProps } from './Accordion.types';
 import { Button } from '../Button';
 import { ButtonLink } from '../ButtonLink';
 
+const TABLE_CELLS = ['8937484782', 'Nombre del item', 'Nombre del item', 'Nombre del item', 'Nombre del item'];
+
 const CONTRAST_OPTIONS: AccordionContrast[] = ['on-canva', 'on-card'];
 
 /** Contenido de muestra del slot Container de Figma: texto con enlace, Button link y Button secundario. */
@@ -49,6 +51,12 @@ const meta = {
   argTypes: {
     title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
     description: { control: 'text', type: { name: 'string' }, description: 'Props Description y Description-2 de Figma' },
+    type: {
+      control: 'radio',
+      options: ['normal', 'table'],
+      type: { name: 'enum', value: ['normal', 'table'] },
+      description: 'Type de Figma: normal o table (fila de celdas en el encabezado)',
+    },
     icon: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Icon de Figma' },
     contrast: {
       name: 'contrast',
@@ -81,6 +89,19 @@ type Story = StoryObj<typeof meta>;
 
 export const Interactive: Story = {};
 
+/** Type=Table: el encabezado es una fila de celdas; al abrir, título y contenido van en un marco interior. */
+export const Table: Story = {
+  args: { type: 'table', cells: TABLE_CELLS, contrast: 'on-canva', defaultOpen: false },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: /8937484782/ });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => expect(canvas.getByText('Nombre del archivo')).toBeVisible());
+  },
+};
+
 /** Sin ícono ni descripción (props Icon y Description de Figma en false): el alto mínimo sigue siendo 70. */
 export const Minimal: Story = {
   args: { icon: false, description: undefined, defaultOpen: false },
@@ -91,28 +112,34 @@ const SURFACES: { contrast: AccordionContrast; figma: string; surface: string }[
   { contrast: 'on-card', figma: 'On card', surface: 'bg-ds-background-container-default-on-canva' },
 ];
 
-/** Las 4 variantes de Figma (State × Contrast) al ancho de la muestra (1286). Cada Contrast sobre su superficie. */
+/** Las 6 variantes de Figma (Type × State × Contrast; Table solo existe On canva) al ancho de la muestra (1286). Cada Contrast sobre su superficie. */
 export const FigmaMatrix: Story = {
-  // Las dos tarjetas abiertas repiten el mismo título de muestra, así que sus regiones comparten nombre
+  // Las tarjetas abiertas repiten el mismo título de muestra, así que sus regiones comparten nombre
   parameters: { layout: 'fullscreen', a11y: { config: { rules: [{ id: 'landmark-unique', enabled: false }] } } },
   render: () => (
     <div className="flex w-fit flex-col">
       {SURFACES.map((s) => (
         <div key={s.contrast} className={`flex flex-col gap-6 p-6 ${s.surface}`}>
           <span className="text-xs text-ds-text-neutral-body">Contrast={s.figma}</span>
-          {(['Default', 'Dropdown'] as const).map((state) => (
-            <AccordionItem
-              key={state}
-              contrast={s.contrast}
-              open={state === 'Dropdown'}
-              title="Nombre del archivo "
-              description="Estado"
-              className="w-[1286px]"
-              data-figma={`State=${state}, Contrast=${s.figma}`}
-            >
-              <SampleContent />
-            </AccordionItem>
-          ))}
+          {(['normal', 'table'] as const).flatMap((type) =>
+            type === 'table' && s.contrast === 'on-card'
+              ? []
+              : (['Default', 'Dropdown'] as const).map((state) => (
+                  <AccordionItem
+                    key={`${type}-${state}`}
+                    type={type}
+                    cells={type === 'table' ? TABLE_CELLS : undefined}
+                    contrast={s.contrast}
+                    open={state === 'Dropdown'}
+                    title="Nombre del archivo "
+                    description="Estado"
+                    className="w-[1286px]"
+                    data-figma={`Type=${type === 'table' ? 'Table' : 'Normal'}, State=${state}, Contrast=${s.figma}`}
+                  >
+                    <SampleContent />
+                  </AccordionItem>
+                ))
+          )}
         </div>
       ))}
     </div>
