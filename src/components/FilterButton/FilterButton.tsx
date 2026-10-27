@@ -57,17 +57,33 @@ export const FilterButton = forwardRef<HTMLButtonElement, FilterButtonProps>(
           <Badge
             id={badgeId}
             type="number"
-            state={disabled ? 'inactive' : 'info'}
+            state={disabled ? 'inactive' : resolved === 'icon' ? 'default' : 'info'}
             label={typeof countLabel === 'function' ? countLabel(count ?? 0) : countLabel}
             // Se lee como descripción del botón (aria-describedby funciona con nodos ocultos): fuera del orden de lectura
             // para no anunciar el conteo dos veces
             aria-hidden="true"
+            className={resolved === 'icon' ? 'absolute right-0 bottom-0 z-10' : undefined}
             data-figma-part="Badge"
           >
             {count}
           </Badge>
         )}
-        {resolved === 'mobile' ? (
+        {resolved === 'icon' ? (
+          <Button
+            {...restProps}
+            ref={ref}
+            variant="secondary"
+            contrast="low"
+            size="md"
+            iconOnly
+            aria-label={typeof children === 'string' ? children : 'Filtros'}
+            aria-describedby={described}
+            disabled={disabled}
+            data-figma-part="Button"
+          >
+            <Icon name="filter" size={20} variant="fill" data-figma-part="Icon-sizes" />
+          </Button>
+        ) : resolved === 'mobile' ? (
           <Button
             {...restProps}
             ref={ref}

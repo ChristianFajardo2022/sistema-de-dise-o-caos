@@ -9,11 +9,12 @@
     "badge": { "type": "boolean", "default": "true", "description": "Prop Badge de Figma." },
     "countLabel": { "type": "string | (count) => string", "default": "'filtro aplicado' / 'filtros aplicados'", "description": "Texto que sigue al número para lectores de pantalla." },
     "disabled": { "type": "boolean", "default": "false", "description": "Type=Inactive." },
-    "layout": { "type": "'auto' | 'desktop' | 'mobile'", "default": "'auto'", "description": "Marco de Figma a dibujar." },
+    "layout": { "type": "'auto' | 'desktop' | 'mobile' | 'icon'", "default": "'auto'", "description": "Marco de Figma a dibujar. `icon` = set Icon button+Filters (21923:89647): Button Secondary low de solo ícono 56×56 con el badge abajo a la derecha; no lo elige `auto`." },
     "rootProps": { "type": "HTMLAttributes<HTMLSpanElement>", "required": false, "description": "Atributos de la raíz; el ref y el resto de props van al botón." }
   },
   "examples": [
     { "title": "Con conteo", "code": "<FilterButton count={countFilters(aplicados)} aria-haspopup=\"dialog\" aria-expanded={abierto} onClick={() => setAbierto(true)} />" },
-    { "title": "Solo ícono", "code": "<FilterButton layout=\"mobile\" count={2} />" }
+    { "title": "Solo ícono", "code": "<FilterButton layout=\"mobile\" count={2} />" },
+    { "title": "Botón de ícono con badge", "code": "<FilterButton layout=\"icon\" count={3} />" }
   ]
 }

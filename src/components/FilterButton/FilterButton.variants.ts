@@ -8,6 +8,8 @@ import { cva } from 'class-variance-authority';
  * - Desktop: fila con gap 8 (gap/general/md ≈ space-general-lg), Badge Number (Info; Inactive en Type=Inactive)
  *   + Button Tertiary md con chevron-right a la derecha (93 × 56).
  * - Mobile: Badge + Button Tertiary icon-single con el ícono filter de 24, sin gap (gap/general/xs = 0).
+ * - Icon (Icon button+Filters, 21923:89647, Type=Default/Icon+badge): Button Secondary low icon-single md (56×56, ícono filter de 20)
+ *   y Badge Number de 16×16 en x=40, y=40 (esquina inferior derecha, superpuesto); sin filtros no hay badge.
  * - El badge va antes del botón, como en Figma; el botón lo referencia con aria-describedby.
  */
 export const filterButtonVariants = cva('inline-flex items-center', {
@@ -15,6 +17,7 @@ export const filterButtonVariants = cva('inline-flex items-center', {
     layout: {
       desktop: 'gap-ds-space-general-lg',
       mobile: 'gap-0',
+      icon: 'relative gap-0',
     },
   },
   defaultVariants: { layout: 'desktop' },

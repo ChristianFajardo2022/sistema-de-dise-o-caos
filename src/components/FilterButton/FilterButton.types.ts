@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 
-/** Marco de Figma que se dibuja: `desktop` (texto + chevron), `mobile` (solo ícono de filtro) o `auto` (según el ancho de la ventana, < 48rem = mobile). */
-export type FilterButtonLayout = 'auto' | 'desktop' | 'mobile';
+/** Marco de Figma que se dibuja: `desktop` (texto + chevron), `mobile` (solo ícono de filtro) o `auto` (según el ancho de la ventana, < 48rem = mobile). `icon` es el set "Icon button+Filters": Button Secondary low de solo ícono (56×56, ícono de 20) con el badge superpuesto abajo a la derecha; nunca lo elige `auto`. */
+export type FilterButtonLayout = 'auto' | 'desktop' | 'mobile' | 'icon';
 
 /** Atributos de la raíz (la fila Badge + botón). Acepta `data-*`. */
 export type FilterButtonRootProps = HTMLAttributes<HTMLSpanElement> & {

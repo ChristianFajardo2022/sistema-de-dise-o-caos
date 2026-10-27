@@ -13,8 +13,8 @@ const meta = {
     disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Type=Inactive' },
     layout: {
       control: 'radio',
-      options: ['auto', 'desktop', 'mobile'],
-      type: { name: 'enum', value: ['auto', 'desktop', 'mobile'] },
+      options: ['auto', 'desktop', 'mobile', 'icon'],
+      type: { name: 'enum', value: ['auto', 'desktop', 'mobile', 'icon'] },
     },
     children: { control: 'text' },
   },
@@ -29,6 +29,8 @@ export const Interactive: Story = {};
 export const WithoutFilters: Story = { args: { count: 0 } };
 
 export const Mobile: Story = { args: { layout: 'mobile' } };
+
+export const Icon: Story = { args: { layout: 'icon' } };
 
 export const Inactive: Story = { args: { disabled: true } };
 
@@ -79,5 +81,32 @@ export const MobileAndInactiveTest: Story = {
     await expect(button).toBeDisabled();
     await userEvent.click(button);
     await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+/** Type=Default e Icon+badge del set Icon button+Filters de Figma (21923:89647). */
+export const FigmaMatrixIconButton: Story = {
+  parameters: { layout: 'padded' },
+  render: () => (
+    <div className="flex items-center gap-6 bg-ds-background-general-black p-6">
+      <div data-figma="Type=Default" className="inline-flex">
+        <FilterButton layout="icon" count={0} />
+      </div>
+      <div data-figma="Type=Icon+badge" className="inline-flex">
+        <FilterButton layout="icon" count="99" />
+      </div>
+    </div>
+  ),
+};
+
+/** Test: en layout icon el botón conserva nombre y descripción con el conteo. */
+export const IconLayoutTest: Story = {
+  tags: ['!autodocs'],
+  args: { layout: 'icon', count: 3 },
+  play: async ({ args, canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Filtros' });
+    await expect(button).toHaveAccessibleDescription('3 filtros aplicados');
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalled();
   },
 };

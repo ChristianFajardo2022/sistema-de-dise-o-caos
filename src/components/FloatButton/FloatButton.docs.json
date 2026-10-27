@@ -1,0 +1,17 @@
+{
+  "name": "FloatButton",
+  "component": "FloatButton",
+  "description": "Botón flotante (FAB) circular, fiel al set Float button de Figma (21900:67738, Status=Icon single 48×48 / With text 126×48). Fondo background/acent/tertiary, texto e ícono unicolor, sombra effect/shadow-on-canva-sm. Sin children es de solo ícono y exige aria-label o aria-labelledby (tipado y aviso en desarrollo); con children es extendido y el texto es el nombre accesible. Hover (tertiary M04), press (M05) y foco visible (outline 2px) no existen en Figma: propuesta para diseño. No fija su posición: quien lo usa lo coloca (p. ej. className=\"fixed bottom-6 right-6\") y se asegura de que no tape contenido.",
+  "category": "General Controls",
+  "props": {
+    "icon": { "type": "IconName", "default": "'heart'", "description": "Ícono de la biblioteca CAOS (24 px)." },
+    "children": { "type": "ReactNode", "required": false, "description": "Texto; con texto el botón es extendido (With text)." },
+    "aria-label": { "type": "string", "required": false, "description": "Obligatorio sin children (o aria-labelledby)." },
+    "state": { "type": "'default' | 'hover' | 'press' | 'focus'", "default": "'default'", "description": "Fuerza el aspecto, solo para documentación." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales; aquí va la posición fija." }
+  },
+  "examples": [
+    { "title": "Solo ícono", "code": "<FloatButton icon=\"heart\" aria-label=\"Favoritos\" className=\"fixed bottom-6 right-6\" />" },
+    { "title": "Extendido", "code": "<FloatButton icon=\"heart\">Crear</FloatButton>" }
+  ]
+}
