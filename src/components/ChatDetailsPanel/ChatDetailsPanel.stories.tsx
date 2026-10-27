@@ -184,7 +184,7 @@ const FIGMA: { name: string; render: (name: string) => ReactNode }[] = [
       <ChatDetailsPanel
         data-figma={name}
         aria-label={`Panel ${name}`}
-        className="h-[749px] gap-ds-space-general-4xl [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-sixth),var(--shadow-ds-on-canva)]"
+        className="h-[749px] gap-ds-space-general-4xl [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-canva),var(--shadow-ds-on-canva-md)]"
       >
         <ChatDetailsHeader onBack={() => {}} actions={fileActions()} />
         <ChatDetailsGrid aria-label={`Documentos ${name}`}>{documents(8, () => 'Titulo')}</ChatDetailsGrid>
@@ -197,7 +197,7 @@ const FIGMA: { name: string; render: (name: string) => ReactNode }[] = [
       <ChatDetailsPanel
         data-figma={name}
         aria-label={`Panel ${name}`}
-        className="h-[749px] [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-sixth),var(--shadow-ds-on-canva)]"
+        className="h-[749px] [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-canva),var(--shadow-ds-on-canva-md)]"
       >
         {/* La segunda acción de Figma usa "Icon-primitive" (9248:39), que no está en la biblioteca: se omite */}
         <ChatDetailsHeader onBack={() => {}} actions={fileActions(false)} />

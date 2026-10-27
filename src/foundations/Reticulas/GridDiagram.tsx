@@ -70,7 +70,7 @@ export function GridDiagram({
   return (
     <figure className={cn('m-0 flex min-w-0 flex-col items-center gap-ds-space-general-lg', className)}>
       <div
-        className="relative w-full overflow-hidden border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-canva"
+        className="relative w-full overflow-hidden border border-ds-border-general-default-on-card bg-ds-background-container-default-on-canva"
         style={{ aspectRatio: `${width} / ${height}` }}
       >
         {chrome && (
@@ -132,7 +132,7 @@ export function Legend({ items }: { items: { className: string; label: string }[
     <ul className="m-0 flex list-none flex-wrap gap-x-ds-space-general-4xl gap-y-ds-space-general-md p-0 text-ds-primitives-typography-size-md text-ds-text-neutral-body">
       {items.map((it) => (
         <li key={it.label} className="flex items-center gap-ds-space-general-lg">
-          <span aria-hidden="true" className={cn('size-4 border border-ds-border-general-gray-fifth', it.className)} />
+          <span aria-hidden="true" className={cn('size-4 border border-ds-border-general-default-on-card', it.className)} />
           {it.label}
         </li>
       ))}

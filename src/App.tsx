@@ -17,7 +17,7 @@ type Theme = 'dark' | 'light';
 
 /** Clases compartidas, todas con utilidades ds- generadas desde tokens.css */
 const card =
-  'rounded-ds-radius-container-on-card border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card p-ds-space-general-5xl';
+  'rounded-ds-radius-container-on-card border border-ds-border-general-default-on-card bg-ds-background-container-default-on-card p-ds-space-general-5xl';
 const h2Class =
   'm-0 mb-ds-space-general-4xl text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg font-semibold text-ds-text-neutral-heading text-balance';
 const h3Class =
@@ -160,7 +160,7 @@ function Selection() {
       {surfaces.map(({ contrast, className, title }) => (
         <div
           key={contrast}
-          className={`${className} flex flex-col gap-ds-space-general-4xl rounded-ds-radius-general-xl border border-ds-border-general-gray-fifth p-ds-space-general-4xl`}
+          className={`${className} flex flex-col gap-ds-space-general-4xl rounded-ds-radius-general-xl border border-ds-border-general-default-on-card p-ds-space-general-4xl`}
         >
           <p className={`${noteClass} font-semibold`}>{title}</p>
           <fieldset className="m-0 flex flex-col gap-ds-space-general-xl border-0 p-0">

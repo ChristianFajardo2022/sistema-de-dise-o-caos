@@ -45,7 +45,7 @@ export const filterPanelHandleClass =
 export const filterPanelHeaderClass = 'flex items-center gap-ds-space-general-lg';
 
 export const filterPanelTitleClass = [
-  'm-0 min-w-0 flex-1 font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'm-0 min-w-0 flex-1 font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   // Figma heading/md (20/24) y, en móvil, heading/sm (16/20): en tokens.css esos valores son heading-lg y heading-md
   'text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg text-ds-text-neutral-white',
   'mobile:text-ds-typography-heading-size-md mobile:leading-ds-typography-heading-line-height-md',
@@ -81,7 +81,7 @@ export const filterSectionPlainVariants = cva('flex w-full flex-col gap-ds-space
 export const filterSectionPlainHeaderClass = 'flex items-center gap-ds-space-general-2xl';
 
 export const filterSectionPlainTitleClass = [
-  'm-0 min-w-0 font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'm-0 min-w-0 font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   // Figma heading/xs (14/18): en tokens.css ese valor es heading-sm (heading-xs resuelve 12/16)
   'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading',
 ].join(' ');

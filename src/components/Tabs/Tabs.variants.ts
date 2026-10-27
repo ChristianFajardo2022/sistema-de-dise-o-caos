@@ -12,21 +12,21 @@ import { cva } from 'class-variance-authority';
  *   typography/body/line-height-short/md (18) en text/neutral/white, y Badge Number (Default).
  * - Default: sin relleno. Hover y Focus: background/tab/hover-on-canva | hover-on-card.
  *   Select: background/tab/select-on-canva | select-on-card.
- * - Inactive: background/general/disabled-low-contrast, ícono icon/general/disabled-negative, texto
+ * - Inactive: background/container/disabled-on-canva, ícono icon/general/disabled-negative, texto
  *   text/neutral/disabled-negative y Badge Neutral.
  * - Foco con teclado: Figma lo dibuja igual que Hover; se agrega un outline de 2px (WCAG 2.4.7).
  *
  * Tab, el contenedor:
  * - Píldora de alto dimention/tabs/container md (56 escritorio, 48 móvil) o container sm (40), padding
  *   space/general/md (4), gap space/general/lg (8), fondo background/tab/container on canva | on card y sombra
- *   0 12 32 -2 effect/shadow md (shadow-ds-on-canva; transparente en modo oscuro).
+ *   0 12 32 -2 effect/shadow md (shadow-ds-on-canva-md; transparente en modo oscuro).
  * - "More options": botón Dots-moreoptions xs (32) a la derecha de las pestañas.
  */
 export const tabListVariants = cva(
   [
     'box-border inline-flex max-w-full items-center gap-ds-space-general-lg rounded-ds-radius-general-full p-ds-space-general-md',
     // box-shadow directo: la utilidad shadow-* antepone las sombras vacías de ring e inset de Tailwind
-    '[box-shadow:var(--shadow-ds-on-canva)]',
+    '[box-shadow:var(--shadow-ds-on-canva-md)]',
   ].join(' '),
   {
     variants: {
@@ -93,12 +93,12 @@ export const tabVariants = cva(
           'enabled:aria-[selected=false]:focus-visible:bg-(--tab-hover)',
           'focus-visible:outline-2 focus-visible:outline-solid',
           'aria-selected:bg-(--tab-select)',
-          'disabled:bg-ds-background-general-disabled-low-contrast disabled:text-ds-text-neutral-disabled-negative',
+          'disabled:bg-ds-background-container-disabled-on-canva disabled:text-ds-text-neutral-disabled-negative',
         ].join(' '),
         hover: 'bg-(--tab-hover)',
         focus: 'bg-(--tab-hover) outline-2 outline-solid',
         select: 'bg-(--tab-select)',
-        inactive: 'bg-ds-background-general-disabled-low-contrast text-ds-text-neutral-disabled-negative',
+        inactive: 'bg-ds-background-container-disabled-on-canva text-ds-text-neutral-disabled-negative',
       },
       fullWidth: {
         true: 'min-w-0 flex-1',

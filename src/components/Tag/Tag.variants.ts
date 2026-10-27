@@ -36,9 +36,9 @@ export const tagVariants = cva(
         alert:
           '[--tag-bg:var(--color-ds-background-semantic-alert-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-alert-firts)] [--tag-bg-press:var(--color-ds-background-semantic-alert-tertiary)] [--tag-fg:var(--color-ds-text-semantic-alert)] [--tag-fg-press:var(--color-ds-text-semantic-alert)] [--tag-ic:var(--color-ds-icon-semantic-alert-tertiary)] [--tag-ic-press:var(--color-ds-icon-semantic-alert-tertiary)]',
         error:
-          '[--tag-bg:var(--color-ds-background-semantic-error-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-error-firts)] [--tag-bg-press:var(--color-ds-background-semantic-error-tertiary)] [--tag-fg:var(--color-ds-text-semantic-error)] [--tag-fg-press:var(--color-ds-text-neutral-white-unicolor)] [--tag-ic:var(--color-ds-icon-semantic-error-high-contrast)] [--tag-ic-press:var(--color-ds-icon-general-white-unicolor)]',
+          '[--tag-bg:var(--color-ds-background-semantic-error-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-error-firts)] [--tag-bg-press:var(--color-ds-background-semantic-error-tertiary)] [--tag-fg:var(--color-ds-text-semantic-error)] [--tag-fg-press:var(--color-ds-text-neutral-white-unicolor)] [--tag-ic:var(--color-ds-icon-semantic-error-tertiary)] [--tag-ic-press:var(--color-ds-icon-general-white-unicolor)]',
         info:
-          '[--tag-bg:var(--color-ds-background-semantic-information-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-information-firts)] [--tag-bg-press:var(--color-ds-background-semantic-information-tertiary)] [--tag-fg:var(--color-ds-text-semantic-information)] [--tag-fg-press:var(--color-ds-text-semantic-information)] [--tag-ic:var(--color-ds-icon-semantic-information)] [--tag-ic-press:var(--color-ds-icon-semantic-information)]',
+          '[--tag-bg:var(--color-ds-background-semantic-information-secondary)] [--tag-bg-hover:var(--color-ds-background-semantic-information-firts)] [--tag-bg-press:var(--color-ds-background-semantic-information-tertiary)] [--tag-fg:var(--color-ds-text-semantic-information)] [--tag-fg-press:var(--color-ds-text-semantic-information)] [--tag-ic:var(--color-ds-icon-semantic-information-tertiary)] [--tag-ic-press:var(--color-ds-icon-semantic-information-tertiary)]',
         neutral: '',
       },
       size: {

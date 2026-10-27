@@ -57,7 +57,7 @@ export const inlineFieldRowVariants = cva(
           'cursor-not-allowed',
           '[--lbl-in:var(--color-ds-text-field-disabled-negative)] [--lbl-up:var(--color-ds-text-field-label-secondary)]',
           '[--val:var(--color-ds-text-field-disabled-negative)] [--opt:var(--color-ds-text-field-disabled-negative)]',
-          '[--chip-bg:var(--color-ds-background-general-disabled-low-contrast)] [--chip-fg:var(--color-ds-text-field-disabled-positive)]',
+          '[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] [--chip-fg:var(--color-ds-text-field-disabled-positive)]',
         ],
       },
     },

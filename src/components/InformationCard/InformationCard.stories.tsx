@@ -133,7 +133,7 @@ function RatingSummary({ figma = false }: { figma?: boolean }) {
   return (
     <div className="flex min-w-0 flex-col gap-ds-space-general-lg">
       <div className="flex min-w-0 flex-col gap-ds-space-general-md">
-        <p className="m-0 truncate font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)] text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading">
+        <p className="m-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)] text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading">
           {figma ? 'Titulo' : 'Valoración'}
         </p>
         <p className="m-0 font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm leading-ds-typography-body-line-height-short-sm text-ds-text-neutral-gray">

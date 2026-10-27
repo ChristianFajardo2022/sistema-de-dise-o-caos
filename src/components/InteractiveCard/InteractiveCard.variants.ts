@@ -11,12 +11,12 @@ import { cva } from 'class-variance-authority';
  * - Simple: fila, padding space/container/second-level (16 → space/general/2xl), gap space/general/2xl (16), alto 80.
  *   Avatar icon de 32 (On Card), título (heading 16/20) y subtítulo (body 14/20) con gap space/badge/sm (2); radio de 16.
  *   Default background/container/default-on-card · Hover hover-on-card + effect/shadow md (box-shadow
- *   `shadow-ds-on-canva`, con el spread −2 de Figma) · Select select-on-card +
- *   trazo interior de 1 (border/general/lg) en border/general/gray-fifth · Inactive default-on-card y textos
+ *   `shadow-ds-on-canva-md`, con el spread −2 de Figma) · Select select-on-card +
+ *   trazo interior de 1 (border/general/lg) en border/general/default-on-card · Inactive default-on-card y textos
  *   text/neutral/disabled-positive.
  * - Complex: columna, padding space/container/default (24/24/20 → space/general/3xl), gap space/general/3xl (24).
  *   Grupo "Content" con gap space/general/2xl (16). Silueta con muesca de 48 y Button corner md (40) arriba a la derecha.
- *   Default background/container/default-on-canva · Hover + trazo de 1 en border/general/gray-fifth (y Button corner
+ *   Default background/container/default-on-canva · Hover + trazo de 1 en border/general/default-on-card (y Button corner
  *   con trazo) · Select background/general/gray-seventh + trazo en border/general/gray-tertiary (Button corner On card
  *   con trazo, avatar del encabezado On Card) · Inactive default-on-canva y textos deshabilitados.
  * - Complex: sombra effect/shadow sm (0 4 12) en la superficie: drop-shadow si hay muesca (sigue la silueta) y
@@ -57,19 +57,19 @@ export const interactiveCardVariants = cva(
           '[--surface-fill:var(--color-ds-background-container-default-on-card)]',
           '[&:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]:[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
           'has-[[data-card-control]:checked]:[--surface-fill:var(--color-ds-background-container-select-on-card)]',
-          'has-[[data-card-control]:checked]:[--surface-edge:var(--color-ds-border-general-gray-fifth)]',
+          'has-[[data-card-control]:checked]:[--surface-edge:var(--color-ds-border-general-default-on-card)]',
         ].join(' '),
         complex: [
           'w-full flex-col justify-center gap-ds-space-general-3xl p-ds-space-general-3xl',
           '[--surface-fill:var(--color-ds-background-container-default-on-canva)]',
           // Button corner: On canva sin trazo
           '[--corner-bg:var(--color-ds-background-container-default-on-canva)] [--corner-ring:transparent]',
-          '[&:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]:[--surface-edge:var(--color-ds-border-general-gray-fifth)]',
-          '[&:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]:[--corner-ring:var(--color-ds-border-general-gray-fifth)]',
+          '[&:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]:[--surface-edge:var(--color-ds-border-general-default-on-card)]',
+          '[&:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]:[--corner-ring:var(--color-ds-border-general-hover-on-canva)]',
           'has-[[data-card-control]:checked]:[--surface-fill:var(--color-ds-background-general-gray-seventh)]',
           'has-[[data-card-control]:checked]:[--surface-edge:var(--color-ds-border-general-gray-tertiary)]',
           'has-[[data-card-control]:checked]:[--corner-bg:var(--color-ds-background-container-default-on-card)]',
-          'has-[[data-card-control]:checked]:[--corner-ring:var(--color-ds-border-general-gray-fifth)]',
+          'has-[[data-card-control]:checked]:[--corner-ring:var(--color-ds-border-general-hover-on-card)]',
         ].join(' '),
       },
       disabled: {
@@ -83,7 +83,7 @@ export const interactiveCardVariants = cva(
 
 /** Simple: sombra effect/shadow md solo en hover (real o forzado), sobre la superficie. */
 export const interactiveCardHoverShadowClass =
-  'group-[:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]/card:shadow-ds-on-canva';
+  'group-[:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]/card:shadow-ds-on-canva-md';
 
 /**
  * Acciones de `InteractiveCardList` (botones de ListItem): quedan sobre el área de clic de la tarjeta. Se limita a los
@@ -104,7 +104,7 @@ export const interactiveCardAvatarCheckedClass = 'group-has-[[data-card-control]
 
 const semibold = '[font-weight:var(--ds-primitives-typography-weight-semibold)]';
 const regular = '[font-weight:var(--ds-primitives-typography-weight-regular)]';
-const secondary = `font-ds-primitives-typography-family-secundary ${semibold}`;
+const secondary = `font-ds-primitives-typography-family-secondary ${semibold}`;
 const primary = `font-ds-primitives-typography-family-primary ${regular}`;
 
 /** Textos de la tarjeta. `strong` = blanco, `body` = gris de cuerpo; con `disabled` todos pasan a disabled-positive. */

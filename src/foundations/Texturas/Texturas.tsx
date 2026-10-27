@@ -61,7 +61,7 @@ function CopyCode({ label, code }: { label: string; code: string }) {
     <div className="flex flex-col gap-ds-space-general-sm">
       <div className="flex items-center justify-between gap-ds-space-general-lg text-ds-primitives-typography-size-md text-ds-text-neutral-body">
         <span>{label}</span>
-        <button type="button" onClick={copy} className="cursor-pointer rounded-ds-radius-general-full border border-ds-border-general-gray-fifth bg-transparent px-ds-space-general-lg py-ds-space-general-xs text-ds-text-neutral-heading">
+        <button type="button" onClick={copy} className="cursor-pointer rounded-ds-radius-general-full border border-ds-border-general-default-on-card bg-transparent px-ds-space-general-lg py-ds-space-general-xs text-ds-text-neutral-heading">
           {copied ? 'Copiado' : 'Copiar CSS'}
         </button>
       </div>
@@ -77,7 +77,7 @@ function ParamList({ params }: { params: [string, string][] }) {
   return (
     <dl className="m-0 grid grid-cols-2 gap-x-ds-space-general-4xl gap-y-ds-space-general-sm text-ds-primitives-typography-size-md sm:grid-cols-3">
       {params.map(([k, v]) => (
-        <div key={k} className="flex items-baseline justify-between gap-ds-space-general-lg border-b border-ds-border-general-gray-fifth py-ds-space-general-xs">
+        <div key={k} className="flex items-baseline justify-between gap-ds-space-general-lg border-b border-ds-border-general-default-on-card py-ds-space-general-xs">
           <dt className="text-ds-text-neutral-body">{k}</dt>
           <dd className="m-0 font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading">{v}</dd>
         </div>
@@ -128,7 +128,7 @@ function GlassPure({ shadow = false }: { shadow?: boolean }) {
     <div
       className={cn(
         'w-full rounded-ds-radius-container-on-card border border-white/25 bg-linear-135 from-white/20 to-transparent to-55% p-ds-space-general-4xl',
-        shadow && 'shadow-ds-on-canva',
+        shadow && 'shadow-ds-on-canva-md',
       )}
       style={shadow ? { ...GLASS_STYLE, boxShadow: undefined } : GLASS_STYLE}
     >

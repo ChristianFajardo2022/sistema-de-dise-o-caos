@@ -335,7 +335,7 @@ function SignaturePadInner(
         >
           <Icon name="close" size={24} variant="line" data-figma-part="close" />
         </button>
-        <span aria-hidden className="absolute inset-y-0 right-0 w-px bg-ds-border-general-gray-fifth" />
+        <span aria-hidden className="absolute inset-y-0 right-0 w-px bg-ds-border-general-default-on-card" />
       </div>
       <RotatedColumn className="w-14" part="CTA">
         <div className="absolute inset-0 flex items-center justify-end gap-ds-space-general-xl">

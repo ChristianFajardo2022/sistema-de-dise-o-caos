@@ -40,7 +40,7 @@ export const accordionItemVariants = cva(
 /** Capas de la silueta (Subtract). Todas pintan `--accordion-surface`. */
 export const accordionShapeClasses = {
   wrapper:
-    'pointer-events-none absolute inset-0 -z-10 [filter:drop-shadow(0_12px_32px_var(--ds-responsive-effect-shadow-md))]',
+    'pointer-events-none absolute inset-0 -z-10 [filter:drop-shadow(0_12px_32px_var(--color-ds-responsive-effect-shadow-on-canva-md))]',
   /** Cuerpo: todo el ancho menos la muesca, con esquinas de 24 y la de la muesca de 20. */
   body:
     'absolute top-0 bottom-0 left-0 right-10 bg-(--accordion-surface) rounded-tl-ds-radius-general-2xl rounded-bl-ds-radius-general-2xl rounded-tr-[20px]',
@@ -71,7 +71,7 @@ export const accordionTriggerVariants = cva(
 
 export const accordionTitleClass = [
   '-my-px block min-h-[18px] min-w-0 break-words',
-  'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md text-ds-text-neutral-heading',
 ].join(' ');
 

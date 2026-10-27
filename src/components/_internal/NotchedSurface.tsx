@@ -27,7 +27,7 @@ import { DROP_SHADOW } from './shadows';
  *   contenido recortado. La capa interior usa la misma muesca desplazada 1 px.
  * - `shadow`: con muesca, `filter: drop-shadow` sobre esta capa (sigue el canal alfa de la máscara; nunca en la raíz de
  *   la tarjeta, que rasterizaría el contenido). Sin muesca, `box-shadow` con los tokens `shadow-ds-on-card`
- *   (effect/shadow sm, en la capa Canva) y `shadow-ds-on-canva` (effect/shadow md con spread −2, en la capa Subtract),
+ *   (effect/shadow sm, en la capa Canva) y `shadow-ds-on-canva-md` (effect/shadow md con spread −2, en la capa Subtract),
  *   como en Figma. Las sombras de CAOS tienen alfa 0 en oscuro. Una sombra condicional (p. ej. solo en hover) se pasa
  *   por `className`.
  * - `fill`: relleno plano sin trazo (p. ej. el Backdrop de la miniatura de FileCard).
@@ -126,7 +126,7 @@ export function NotchedSurface({
           className={cn(
             'absolute inset-0 block overflow-hidden bg-(color:--surface-fill,transparent)',
             r.outer,
-            boxShadow && (shadow === 'on-canva' || shadow === 'on-card-on-canva') && 'shadow-ds-on-canva'
+            boxShadow && (shadow === 'on-canva' || shadow === 'on-card-on-canva') && 'shadow-ds-on-canva-md'
           )}
           style={outerMask}
         >
@@ -140,7 +140,7 @@ export function NotchedSurface({
           className={cn(
             'absolute inset-0 block bg-(color:--surface-edge,var(--surface-fill))',
             r.outer,
-            boxShadow && (shadow === 'on-canva' || shadow === 'on-card-on-canva') && 'shadow-ds-on-canva'
+            boxShadow && (shadow === 'on-canva' || shadow === 'on-card-on-canva') && 'shadow-ds-on-canva-md'
           )}
           style={outerMask}
         >

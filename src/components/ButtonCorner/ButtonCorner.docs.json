@@ -22,7 +22,7 @@
     "stroke": {
       "type": "boolean",
       "default": false,
-      "description": "Stroke=Yes: borde exterior de 1px (border/general/gray-fifth, o su versión -unicolor)."
+      "description": "Stroke=Yes: borde exterior de 1px (border/general/default-on-card, o su versión -unicolor)."
     },
     "icon": {
       "type": "ReactNode",

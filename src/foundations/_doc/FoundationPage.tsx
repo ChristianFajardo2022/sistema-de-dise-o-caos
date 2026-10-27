@@ -69,7 +69,7 @@ export function FoundationPage({ iconSvg, title, subtitle, tabs, initialTab }: F
             className="flex size-16 items-center justify-center rounded-ds-radius-general-xl border border-ds-primitives-color-primary-g13 bg-ds-primitives-color-primary-n01 [&_svg]:size-8"
             dangerouslySetInnerHTML={{ __html: iconSvg }}
           />
-          <h1 className="m-0 font-ds-primitives-typography-family-secundary text-ds-primitives-typography-size-5xl leading-none font-ds-primitives-typography-weight-semibold tablet:text-ds-primitives-typography-size-6xl">
+          <h1 className="m-0 font-ds-primitives-typography-family-secondary text-ds-primitives-typography-size-5xl leading-none font-ds-primitives-typography-weight-semibold tablet:text-ds-primitives-typography-size-6xl">
             {title}
           </h1>
           <p className="m-0 max-w-[560px] text-ds-primitives-typography-size-lg leading-normal text-pretty">{subtitle}</p>
@@ -80,7 +80,7 @@ export function FoundationPage({ iconSvg, title, subtitle, tabs, initialTab }: F
         role="tablist"
         aria-label={`Secciones de ${title}`}
         // A 320 px las pestañas no caben: la barra hace scroll propio (las pestañas son enfocables y se traen a la vista al enfocarlas)
-        className="flex overflow-x-auto border-y border-ds-border-general-gray-fifth bg-ds-background-container-surface"
+        className="flex overflow-x-auto border-y border-ds-border-general-default-on-card bg-ds-background-container-surface"
       >
         {tabs.map((tab, i) => {
           const selected = tab.id === activeId;
@@ -100,7 +100,7 @@ export function FoundationPage({ iconSvg, title, subtitle, tabs, initialTab }: F
               onKeyDown={(e) => onKeyDown(e, i)}
               className={cn(
                 'flex-1 shrink-0 cursor-pointer border-0 px-ds-space-general-md py-ds-primitives-space-5xl text-center font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-md text-ds-text-neutral-heading transition-colors motion-reduce:transition-none tablet:text-ds-primitives-typography-size-lg',
-                'not-last:border-r not-last:border-ds-border-general-gray-fifth',
+                'not-last:border-r not-last:border-ds-border-general-default-on-card',
                 'focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ds-text-neutral-heading',
                 !selected && 'font-medium',
                 // Seleccionada: además del fondo, subrayado de 3 px y peso semibold (indicador no cromático, 1.4.1 y 1.4.11)

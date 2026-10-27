@@ -7,7 +7,7 @@ import { cva } from 'class-variance-authority';
  * El marco `Desktop` y el `Mobile` (oculto en Figma) se resuelven con una sola estructura y container queries.
  *
  * - Raíz: padding space/general/lg (8) lateral y space/general/2xl (16) arriba y abajo; borde superior de
- *   border/general/lg (1) en border/general/gray-sixth. El trazo de Figma es INSIDE y no suma alto: se dibuja
+ *   border/general/lg (1) en border/general/default-on-canva. El trazo de Figma es INSIDE y no suma alto: se dibuja
  *   con un box-shadow inset (no ocupa espacio, así que el padding y el alto coinciden con Figma). Es el contenedor de consulta (`@container`): el layout vive en el hijo.
  * - Desktop (contenedor >= 18rem de contenido, lo que mide la fila con avatar, texto y dos botones; no el corte de viewport de 48rem, que no aplica a un container query): una fila, gap 16 (complex) u 8 (simple).
  * - Mobile (< 18rem): la fila lleva casilla, avatar, título (con la categoría encima) y acciones;
@@ -15,7 +15,7 @@ import { cva } from 'class-variance-authority';
  * - Disabled: textos en text/neutral/disabled-*; los controles se deshabilitan por su propia API.
  */
 export const listItemVariants = cva(
-  '@container list-none bg-transparent [box-shadow:inset_0_var(--ds-responsive-border-general-lg)_0_0_var(--color-ds-border-general-gray-sixth)] px-ds-space-general-lg py-ds-space-general-2xl',
+  '@container list-none bg-transparent [box-shadow:inset_0_var(--ds-responsive-border-general-lg)_0_0_var(--color-ds-border-general-default-on-canva)] px-ds-space-general-lg py-ds-space-general-2xl',
   {
     variants: {
       disabled: { true: 'cursor-not-allowed', false: '' },
@@ -56,7 +56,7 @@ const fontPrimary = 'font-ds-primitives-typography-family-primary [font-weight:v
  * tokens.css ese token vale 12: se usan los primitivos size/md y line-height/lg, que sí dan 14/18.
  */
 export const listItemTitleVariants = cva(
-  'min-w-0 truncate font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)] text-(length:--ds-primitives-typography-size-md) leading-(--ds-primitives-typography-line-height-lg)',
+  'min-w-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)] text-(length:--ds-primitives-typography-size-md) leading-(--ds-primitives-typography-line-height-lg)',
   {
     variants: {
       variant: {

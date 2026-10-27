@@ -125,9 +125,9 @@ function ComposedDemo() {
         className={cn(inputFieldVariants({ state: 'default' }), 'gap-ds-space-general-2xl [--input-field-gap:var(--ds-responsive-space-general-2xl)]')}
       >
         <Select frame="none" anchorRef={tripleRef} label="Día" options={days} className="flex-1" />
-        <span aria-hidden="true" className="h-10 w-px shrink-0 bg-ds-border-general-gray-sixth" />
+        <span aria-hidden="true" className="h-10 w-px shrink-0 bg-ds-border-general-default-on-canva" />
         <Select frame="none" anchorRef={tripleRef} label="Mes" options={months} className="flex-1" />
-        <span aria-hidden="true" className="h-10 w-px shrink-0 bg-ds-border-general-gray-sixth" />
+        <span aria-hidden="true" className="h-10 w-px shrink-0 bg-ds-border-general-default-on-canva" />
         <Select frame="none" anchorRef={tripleRef} label="Año" options={years} className="flex-1" />
       </div>
       <div ref={phoneRef} className="flex items-start gap-ds-space-general-lg">

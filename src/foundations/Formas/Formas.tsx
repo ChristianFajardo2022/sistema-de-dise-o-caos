@@ -57,7 +57,7 @@ function NestedRadii({ label, levels }: { label: string; levels: RadiusKey[] }) 
     i >= levels.length ? null : (
       <div
         className={cn(
-          'flex flex-1 flex-col gap-ds-space-general-lg border border-ds-border-general-gray-fifth p-ds-space-general-lg',
+          'flex flex-1 flex-col gap-ds-space-general-lg border border-ds-border-general-default-on-card p-ds-space-general-lg',
           RADIUS_CLASS[levels[i]],
           surfaces[i % surfaces.length],
         )}
@@ -80,7 +80,7 @@ function NestedRadii({ label, levels }: { label: string; levels: RadiusKey[] }) 
 function RadiusSample({ className, size, tag }: { className: string; size: string; tag: string }) {
   return (
     <div className="flex flex-col items-center gap-ds-space-general-lg">
-      <div className={cn('bg-ds-background-tab-select-on-canva border border-ds-border-general-gray-fifth', className, size)} />
+      <div className={cn('bg-ds-background-tab-select-on-canva border border-ds-border-general-default-on-card', className, size)} />
       <ValueTag>{tag}</ValueTag>
     </div>
   );
@@ -152,7 +152,7 @@ function Definicion(): ReactNode {
         <DocFigure>
           <div className="flex justify-center py-ds-space-general-4xl">
             <div className="flex flex-col items-center gap-ds-space-general-lg">
-              <span className="h-12 w-64 rounded-ds-radius-general-full border border-ds-border-general-gray-fifth bg-ds-background-tab-select-on-canva" />
+              <span className="h-12 w-64 rounded-ds-radius-general-full border border-ds-border-general-default-on-card bg-ds-background-tab-select-on-canva" />
               <ValueTag>48 px</ValueTag>
             </div>
           </div>
@@ -275,7 +275,7 @@ function ValoresDeToken(): ReactNode {
               <span
                 key="m"
                 aria-hidden="true"
-                className="block size-10 border border-ds-border-general-gray-fifth bg-ds-background-tab-select-on-canva"
+                className="block size-10 border border-ds-border-general-default-on-card bg-ds-background-tab-select-on-canva"
                 style={{ borderRadius: v }}
               />,
               <TokenChip key="c">{`rounded-ds-${name(k)}`}</TokenChip>,
@@ -368,7 +368,7 @@ function NestedMock({ good }: { good: boolean }) {
           Responsable de gestión de inventarios, optimización de almacén y supervisión de equipos.
         </span>
         <span className="flex justify-between text-ds-primitives-typography-size-sm text-ds-text-neutral-heading">
-          <span className={cn('border border-ds-border-general-gray-fifth px-ds-space-general-xl py-ds-space-general-md', inner)}>Anterior</span>
+          <span className={cn('border border-ds-border-general-default-on-card px-ds-space-general-xl py-ds-space-general-md', inner)}>Anterior</span>
           <span className={cn('bg-ds-text-neutral-heading px-ds-space-general-xl py-ds-space-general-md text-ds-background-container-surface', inner)}>Siguiente</span>
         </span>
       </div>

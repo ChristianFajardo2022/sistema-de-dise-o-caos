@@ -6,13 +6,13 @@ import { cva } from 'class-variance-authority';
  * Fuente: dos component sets "File card" de la página Card de Figma.
  * - 14043:59452 (Type Icon/Photo × State Default/Hover/Select):
  *   - Photo: 344×240 (ancho fluido). Lienzo de 160 con la silueta Subtract (radius/general/2xl 24, muesca de 48 para el
- *     Button corner md de 40) y trazo interior border/general/lg (1) en gray-fifth. Bloque de texto debajo, montado 20 px
+ *     Button corner md de 40) y trazo interior border/general/lg (1) en border/general/default-on-card. Bloque de texto debajo, montado 20 px
  *     bajo el lienzo (gap -20 de Figma: margin-top negativo), padding 40/16/16 (space/general/5xl y 2xl), radio inferior 24.
  *     Avatar icon de 48 centrado cuando no hay foto. Sombra effect/shadow sm (0 4 12): drop-shadow en una capa de superficie con la silueta entera (lienzo y texto), no en la raíz.
  *   - Icon: ancho fluido (498 en Figma) × 148. Padding 16 (space/container/second-level -> space/general/2xl), gap 24
  *     (space/general/3xl). Silueta con muesca de 40 para el Button corner sm de 32. Avatar icon de 48 arriba a la izquierda.
  * - 15005:15958 (Thumbnail): 160×160, padding 56/16 (space/general/6xl y 2xl), Avatar icon de 32 centrado, muesca de 40 y
- *   Button corner de 34 con trazo interior gray-sixth. Hover: Backdrop (background/effect/backdrop) con Button primary
+ *   Button corner de 34 con trazo interior border/general/default-on-canva. Hover: Backdrop (background/effect/backdrop) con Button primary
  *   Descargar y Button primary delete Eliminar (xs, solo ícono, gap 8).
  * - Texto: Filename en Prospero semibold 14/18 text/neutral/heading, recortado a una línea; Status en Helvetica
  *   Neue regular 14/18 (typography/size/md y body/line-height-short/md). Gap 8 (space/general/lg).
@@ -21,8 +21,8 @@ import { cva } from 'class-variance-authority';
  *   es text/neutral/gray (gray-2 apunta a G08/G10): se usa text/neutral/gray.
  * - Colores por State (variables CSS en la raíz, las consumen la silueta, el Button corner y el Avatar):
  *   Default background/container/default-on-card · Hover hover-on-card · Select select-on-card (select-on-canva en
- *   Thumbnail). Trazo de la silueta: Photo gray-fifth siempre; Icon gray-sixth en Hover y Select; Thumbnail gray-sixth en Hover.
- *   Hover cambia el Button corner a hover-on-canva con trazo exterior gray-fifth (Photo e Icon) y el Avatar a low-contrast
+ *   Thumbnail). Trazo de la silueta: Photo default-on-card siempre; Icon default-on-canva en Hover y Select; Thumbnail default-on-canva en Hover.
+ *   Hover cambia el Button corner a hover-on-canva con trazo exterior (Photo) o default-on-card (Icon) y el Avatar a low-contrast
  *   (Icon y Thumbnail).
  */
 
@@ -57,7 +57,7 @@ export const fileCardStateVariants = cva('', {
       type: 'photo',
       class: [
         '[--surface-fill:var(--color-ds-background-container-default-on-card)]',
-        '[--surface-edge:var(--color-ds-border-general-gray-fifth)]',
+        '[--surface-edge:var(--color-ds-border-general-default-on-card)]',
         '[--fc-text-ring:transparent]',
         '[--fc-corner-bg:var(--color-ds-background-container-default-on-card)]',
         '[--fc-corner-ring:0_0_0_0_transparent]',
@@ -69,9 +69,9 @@ export const fileCardStateVariants = cva('', {
       state: 'auto',
       class: [
         'hover:not-has-checked:[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
-        'hover:not-has-checked:[--fc-text-ring:var(--color-ds-border-general-gray-fifth)]',
+        'hover:not-has-checked:[--fc-text-ring:var(--color-ds-border-general-default-on-card)]',
         'hover:not-has-checked:[--fc-corner-bg:var(--color-ds-background-container-hover-on-canva)]',
-        'hover:not-has-checked:[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-fifth)]',
+        'hover:not-has-checked:[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-hover-on-canva)]',
         'has-checked:[--surface-fill:var(--color-ds-background-container-select-on-card)]',
       ],
     },
@@ -80,9 +80,9 @@ export const fileCardStateVariants = cva('', {
       state: 'hover',
       class: [
         '[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
-        '[--fc-text-ring:var(--color-ds-border-general-gray-fifth)]',
+        '[--fc-text-ring:var(--color-ds-border-general-default-on-card)]',
         '[--fc-corner-bg:var(--color-ds-background-container-hover-on-canva)]',
-        '[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-fifth)]',
+        '[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-hover-on-canva)]',
       ],
     },
     { type: 'photo', state: 'select', class: '[--surface-fill:var(--color-ds-background-container-select-on-card)]' },
@@ -102,12 +102,12 @@ export const fileCardStateVariants = cva('', {
       state: 'auto',
       class: [
         'hover:not-has-checked:[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
-        'hover:not-has-checked:[--surface-edge:var(--color-ds-border-general-gray-sixth)]',
+        'hover:not-has-checked:[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
         'hover:not-has-checked:[--fc-corner-bg:var(--color-ds-background-container-hover-on-canva)]',
-        'hover:not-has-checked:[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-fifth)]',
+        'hover:not-has-checked:[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-card)]',
         'hover:not-has-checked:[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
         'has-checked:[--surface-fill:var(--color-ds-background-container-select-on-card)]',
-        'has-checked:[--surface-edge:var(--color-ds-border-general-gray-sixth)]',
+        'has-checked:[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
       ],
     },
     {
@@ -115,9 +115,9 @@ export const fileCardStateVariants = cva('', {
       state: 'hover',
       class: [
         '[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
-        '[--surface-edge:var(--color-ds-border-general-gray-sixth)]',
+        '[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
         '[--fc-corner-bg:var(--color-ds-background-container-hover-on-canva)]',
-        '[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-fifth)]',
+        '[--fc-corner-ring:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-card)]',
         '[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
       ],
     },
@@ -126,7 +126,7 @@ export const fileCardStateVariants = cva('', {
       state: 'select',
       class: [
         '[--surface-fill:var(--color-ds-background-container-select-on-card)]',
-        '[--surface-edge:var(--color-ds-border-general-gray-sixth)]',
+        '[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
       ],
     },
 
@@ -136,7 +136,7 @@ export const fileCardStateVariants = cva('', {
       class: [
         '[--surface-fill:var(--color-ds-background-container-default-on-card)]',
         '[--fc-corner-bg:var(--color-ds-background-container-default-on-card)]',
-        '[--fc-corner-ring:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-sixth)]',
+        '[--fc-corner-ring:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-canva)]',
         '[--fc-avatar:var(--color-ds-background-icon-high-contrast)]',
       ],
     },
@@ -145,7 +145,7 @@ export const fileCardStateVariants = cva('', {
       state: 'auto',
       class: [
         'hover:not-has-checked:[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
-        'hover:not-has-checked:[--surface-edge:var(--color-ds-border-general-gray-sixth)]',
+        'hover:not-has-checked:[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
         'hover:[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
         'has-checked:[--surface-fill:var(--color-ds-background-container-select-on-canva)]',
         'has-checked:[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
@@ -156,7 +156,7 @@ export const fileCardStateVariants = cva('', {
       state: 'hover',
       class: [
         '[--surface-fill:var(--color-ds-background-container-hover-on-card)]',
-        '[--surface-edge:var(--color-ds-border-general-gray-sixth)]',
+        '[--surface-edge:var(--color-ds-border-general-default-on-canva)]',
         '[--fc-avatar:var(--color-ds-background-icon-low-contrast)]',
       ],
     },
@@ -185,7 +185,7 @@ export const fileCardTextGroupClass = 'flex min-w-0 flex-col gap-ds-space-genera
 
 export const fileCardTitleClass = [
   'm-0 min-w-0 truncate',
-  'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading',
 ].join(' ');
 
@@ -206,7 +206,7 @@ export const fileCardCornerClass =
  * Photo: sombra effect/shadow sm del Button corner (Figma la pone en la instancia). Antes la daba el filtro de la raíz;
  * ahora la sombra de la tarjeta vive en su capa de superficie y el corner lleva la suya.
  */
-export const fileCardPhotoCornerShadowClass = '[filter:drop-shadow(0_4px_12px_var(--ds-responsive-effect-shadow-sm))]';
+export const fileCardPhotoCornerShadowClass = '[filter:drop-shadow(0_4px_12px_var(--color-ds-responsive-effect-shadow-on-card))]';
 
 /** Thumbnail: el Button corner mide 34 en Figma (instancia sm de 32 estirada con trazo interior de 1). */
 export const fileCardThumbnailCornerClass = 'size-8.5';

@@ -8,7 +8,7 @@ import { cva } from 'class-variance-authority';
  * - Avatar colors (Type Names/User × Size xs/sm/md/lg × Color): círculo con dimention/avatar/*
  *   (24, 32, 48, 56), radio radius/button/full, texto Helvetica (md y lg: typography/button/size/md en regular,
  *   sm y xs: typography/button/size/sm en medium 500). Color: fondo background/*-secondary, texto text/* e ícono icon/*.
- *   Disabled: background/general/disabled-high-contrast, text/neutral/disabled-negative, icon/general/disabled-negative.
+ *   Disabled: background/container/disabled-on-card, text/neutral/disabled-negative, icon/general/disabled-negative.
  * - Avatar photo (Size xs-lg): círculo con la imagen; Disabled = imagen en grises.
  * - Avatar brand / Avatar icon (Contrast × State × Size): píldora con fondo background/icon/{low,high}-contrast
  *   y radio radius/general/full. Figma: 56 (padding space/general/xl o 2xl), 48 (lg o xl), 32 (md o lg).
@@ -53,7 +53,7 @@ export const avatarCircleVariants = cva(
         blue: 'bg-ds-background-semantic-information-secondary text-ds-text-semantic-information',
         green: 'bg-ds-background-semantic-success-secondary text-ds-text-semantic-success',
         red: 'bg-ds-background-semantic-error-secondary text-ds-text-semantic-error',
-        disabled: 'bg-ds-background-general-disabled-high-contrast text-ds-text-neutral-disabled-negative',
+        disabled: 'bg-ds-background-container-disabled-on-card text-ds-text-neutral-disabled-negative',
         none: '',
       },
     },
@@ -96,9 +96,9 @@ export const avatarUserHeadVariants = cva('absolute rounded-full', {
     tone: {
       purple: 'bg-ds-icon-acent-tertiary',
       yellow: 'bg-ds-icon-semantic-alert-secondary',
-      blue: 'bg-ds-icon-semantic-information-neutral',
+      blue: 'bg-ds-icon-semantic-information-secondary',
       green: 'bg-ds-icon-semantic-success-secondary',
-      red: 'bg-ds-icon-semantic-error-secundary',
+      red: 'bg-ds-icon-semantic-error-secondary',
       disabled: 'bg-ds-icon-general-disabled-negative',
     },
   },
@@ -116,9 +116,9 @@ export const avatarUserBodyVariants = cva('absolute rounded-full', {
     tone: {
       purple: 'bg-ds-icon-acent-tertiary',
       yellow: 'bg-ds-icon-semantic-alert-secondary',
-      blue: 'bg-ds-icon-semantic-information-neutral',
+      blue: 'bg-ds-icon-semantic-information-secondary',
       green: 'bg-ds-icon-semantic-success-secondary',
-      red: 'bg-ds-icon-semantic-error-secundary',
+      red: 'bg-ds-icon-semantic-error-secondary',
       disabled: 'bg-ds-icon-general-disabled-negative',
     },
   },

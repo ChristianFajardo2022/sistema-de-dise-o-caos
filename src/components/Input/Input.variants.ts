@@ -157,7 +157,7 @@ export const inputMessageVariants = cva(
       kind: {
         error: 'text-ds-text-semantic-error-secondary [--msg-ico:var(--color-ds-icon-semantic-error-firts)]',
         success: 'text-ds-text-semantic-success-secondary [--msg-ico:var(--color-ds-icon-semantic-success-secondary)]',
-        helper: 'text-ds-text-semantic-information-secondary [--msg-ico:var(--color-ds-icon-semantic-information-neutral)]',
+        helper: 'text-ds-text-semantic-information-secondary [--msg-ico:var(--color-ds-icon-semantic-information-secondary)]',
       },
     },
     defaultVariants: { kind: 'helper' },

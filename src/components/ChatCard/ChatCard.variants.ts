@@ -45,7 +45,7 @@ export const chatCardControlVariants = cva(
   [
     'm-0 block min-w-0 cursor-pointer appearance-none truncate border-0 bg-transparent p-0 text-left no-underline outline-none',
     "after:absolute after:inset-0 after:z-0 after:rounded-[inherit] after:content-['']",
-    'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md text-ds-text-neutral-heading',
     'disabled:cursor-not-allowed',
   ].join(' ')

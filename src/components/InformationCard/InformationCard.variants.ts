@@ -10,14 +10,14 @@ import { cva } from 'class-variance-authority';
  *
  * - Raíz transparente, columna, padding space/container/default (24/24/20 → space/general/3xl), gap space/general/4xl (32).
  *   Superficie background/container/default-on-canva, radius/general/2xl (24). Sombras como en Figma: effect/shadow sm en la
- *   capa Canva (`shadow-ds-on-card`) y md con spread −2 en la forma Subtract (`shadow-ds-on-canva`); alfa 0 en oscuro.
+ *   capa Canva (`shadow-ds-on-card`) y md con spread −2 en la forma Subtract (`shadow-ds-on-canva-md`); alfa 0 en oscuro.
  * - Encabezado: `leading` y etiquetas en fila (gap 8, etiquetas a la derecha si hay `leading`).
  * - Contenido: título Prospero semibold (heading/size/sm de Figma = 16/20, en tokens.css heading md), text/neutral/heading,
  *   truncado; subtítulo 12/16 (size/sm, body/line-height-short/sm); gap 4. Descripción 14/18 (size/md, line-height-short/md).
  *   Los dos en "text/neutral/gray 2" de Figma (G07), que en tokens.css es text/neutral/gray.
  *   Gap título/descripción: 8 (space/general/lg); con etiquetas bajo el título, 16 (space/general/2xl).
  * - Título: el cuadro de Figma mide 18 (line-height 20, truncado).
- * - Pie: línea de 0.5 (border/general/md) en border/general/gray-fifth y fila con gap 24 (space/general/3xl), separadas 32;
+ * - Pie: línea de 0.5 (border/general/md) en border/general/default-on-card y fila con gap 24 (space/general/3xl), separadas 32;
  *   botones con gap 8 alineados a la derecha.
  */
 
@@ -51,7 +51,7 @@ export const informationCardTitleBlockVariants = cva('flex min-w-0 flex-col gap-
 export const informationCardTitleVariants = cva(
   [
     // Figma fija el cuadro en 18 con line-height 20 (texto truncado): -my-px deja el mismo alto
-    '-my-px min-w-0 truncate font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    '-my-px min-w-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md text-ds-text-neutral-heading',
   ].join(' ')
 );
@@ -68,7 +68,7 @@ export const informationCardFooterVariants = cva('flex min-w-0 flex-col gap-ds-s
 
 /** Línea de Figma: alto 0 y trazo centrado de 0.5 (box-shadow, porque Chrome redondea border-width). */
 export const informationCardDividerVariants = cva(
-  'm-0 h-0 w-full shrink-0 border-0 [box-shadow:0_0_0_calc(var(--ds-responsive-border-general-md)/2)_var(--color-ds-border-general-gray-fifth)]'
+  'm-0 h-0 w-full shrink-0 border-0 [box-shadow:0_0_0_calc(var(--ds-responsive-border-general-md)/2)_var(--color-ds-border-general-default-on-card)]'
 );
 
 export const informationCardFooterRowVariants = cva('flex min-w-0 flex-wrap items-center gap-ds-space-general-3xl');

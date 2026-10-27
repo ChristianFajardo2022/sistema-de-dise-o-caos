@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
  * Reutiliza sin copiar la base de Input (`inputFieldVariants`: recuadro 56, padding 8/12, radio field/md, borde de 1 y
  * colores por estado) y `Select` con `frame="none"` para cada sección. Aquí solo vive lo que Triple agrega:
  * - Gap entre secciones y líneas: space/general/2xl (16).
- * - Línea: border/general/gray-sixth (gray-fifth en Burnt-In), 1 de ancho por 40 de alto.
+ * - Línea: border/general/default-on-canva (gray-fifth en Burnt-In), 1 de ancho por 40 de alto.
  * - Disabled: Figma conserva border/field/default (Input usa border/field/disabled), por eso se fuerza.
  * - Mensaje: debajo, separado 8 (space/general/lg), con NotificationText.
  */
@@ -38,8 +38,8 @@ export const tripleSelectFrameVariants = cva(
 export const tripleSelectDividerVariants = cva('h-10 w-px shrink-0', {
   variants: {
     burntIn: {
-      true: 'bg-ds-border-general-gray-fifth',
-      false: 'bg-ds-border-general-gray-sixth',
+      true: 'bg-ds-border-general-default-on-card',
+      false: 'bg-ds-border-general-default-on-canva',
     },
   },
   defaultVariants: { burntIn: false },

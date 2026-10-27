@@ -54,7 +54,7 @@ export function DocHeading({ level: Level = 'h3', size = 'md', id, children, cla
     <Level
       id={id}
       className={cn(
-        'm-0 font-ds-primitives-typography-family-secundary leading-tight font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading',
+        'm-0 font-ds-primitives-typography-family-secondary leading-tight font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading',
         size === 'md' ? 'text-ds-primitives-typography-size-2xl tablet:text-ds-primitives-typography-size-3xl' : 'text-ds-primitives-typography-size-xl',
         className,
       )}
@@ -94,7 +94,7 @@ export function DocSection({ title, children, id: anchor }: { title: string; chi
     <section id={anchor} aria-labelledby={id} className="flex scroll-mt-ds-space-general-4xl flex-col gap-ds-space-general-4xl">
       <h2
         id={id}
-        className="m-0 font-ds-primitives-typography-family-secundary text-ds-primitives-typography-size-3xl leading-tight font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading text-balance tablet:text-ds-primitives-typography-size-4xl"
+        className="m-0 font-ds-primitives-typography-family-secondary text-ds-primitives-typography-size-3xl leading-tight font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading text-balance tablet:text-ds-primitives-typography-size-4xl"
       >
         {title}
       </h2>
@@ -137,7 +137,7 @@ export function DocFigure({ children, image, alt, caption, className }: DocFigur
     <figure className="m-0 flex flex-col gap-ds-space-general-lg">
       <div
         className={cn(
-          'overflow-hidden rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card',
+          'overflow-hidden rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-background-container-default-on-card',
           !image && 'p-ds-space-general-4xl tablet:p-ds-primitives-space-6xl',
           className,
         )}
@@ -179,7 +179,7 @@ export function TokenTable({ caption, columns, rows, minWidth = 640 }: TokenTabl
   return (
     <ScrollRegion
       label={caption}
-      className="rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card"
+      className="rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-background-container-default-on-card"
     >
       <table
         className="w-full border-collapse text-ds-primitives-typography-size-md leading-normal text-ds-text-neutral-body"
@@ -187,7 +187,7 @@ export function TokenTable({ caption, columns, rows, minWidth = 640 }: TokenTabl
       >
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className="border-b border-ds-border-general-gray-fifth">
+          <tr className="border-b border-ds-border-general-default-on-card">
             {columns.map((c) => (
               <th key={c} scope="col" className={th}>
                 {c}
@@ -197,7 +197,7 @@ export function TokenTable({ caption, columns, rows, minWidth = 640 }: TokenTabl
         </thead>
         <tbody>
           {rows.map((cells, r) => (
-            <tr key={r} className="border-b border-ds-border-general-gray-fifth last:border-b-0">
+            <tr key={r} className="border-b border-ds-border-general-default-on-card last:border-b-0">
               {cells.map((cell, c) =>
                 c === 0 ? (
                   <th key={c} scope="row" className="px-ds-space-general-4xl py-ds-space-general-2xl text-left font-normal">
@@ -234,7 +234,7 @@ export function DoDont({ variant, children, description }: DoDontProps) {
       className={cn(
         'm-0 flex flex-col gap-ds-space-general-4xl rounded-ds-radius-container-on-canva border p-ds-space-general-4xl',
         isDo
-          ? 'border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card'
+          ? 'border-ds-border-general-default-on-card bg-ds-background-container-default-on-card'
           : 'border-ds-background-semantic-error-fourth bg-ds-background-graphic-error-secondary-opacity',
       )}
     >
@@ -281,7 +281,7 @@ export function DocNote({ title, children, className }: DocNoteProps) {
     <div
       role="note"
       className={cn(
-        'flex flex-col gap-ds-space-general-md rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card p-ds-space-general-4xl text-ds-primitives-typography-size-md leading-normal text-ds-text-neutral-body',
+        'flex flex-col gap-ds-space-general-md rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-background-container-default-on-card p-ds-space-general-4xl text-ds-primitives-typography-size-md leading-normal text-ds-text-neutral-body',
         '[&_code]:font-medium [&_code]:text-ds-text-neutral-heading [&_strong]:font-semibold [&_strong]:text-ds-text-neutral-heading',
         className,
       )}

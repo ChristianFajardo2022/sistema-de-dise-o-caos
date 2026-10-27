@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
  * Fuente: component sets "Dropdown" (11673:7804, el panel, visible en el lienzo; reemplaza al viejo "Dropdown menu" 5331:1745) y "Dropdown list" (el ítem) de Figma.
  *
  * Panel:
- * - Fondo background/field/surface, trazo de 1 por dentro (border/general/gray-sixth), radio field/md (16),
+ * - Fondo background/field/surface, trazo de 1 por dentro (border/general/default-on-card), radio field/md (16),
  *   sombra effect/shadow md (0 12 28 -2), ancho 310.
  * - Simple: padding 8 (lados space/field/sm), gap 8; Search: padding y gap space/field/sm (8, mobile 4), campo arriba.
  * - Área de ítems: 280 + gap 8 + riel de 6 (prop Scroll bar). Ítems separados 4 (Simple) u 8 (Search).
@@ -19,7 +19,7 @@ import { cva } from 'class-variance-authority';
  */
 
 const panelStroke =
-  '[box-shadow:inset_0_0_0_var(--ds-primitives-stroke-lg)_var(--color-ds-border-general-gray-sixth),0_12px_28px_-2px_var(--ds-responsive-effect-shadow-md)]';
+  '[box-shadow:inset_0_0_0_var(--ds-primitives-stroke-lg)_var(--color-ds-border-general-default-on-card),0_12px_28px_-2px_var(--color-ds-responsive-effect-shadow-on-canva-md)]';
 
 export const dropdownMenuPanelVariants = cva(
   [

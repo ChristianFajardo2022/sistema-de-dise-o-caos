@@ -14,7 +14,7 @@ import { cva } from 'class-variance-authority';
  * - Estados por variables CSS (--chip-bg, --chip-stroke, --chip-fg, --chip-ic): Default = sin relleno y trazo
  *   0.5 border/general/gray-fourth; Hover = background/general/gray-seventh + mismo trazo; Focus =
  *   gray-sixth + border/general/gray-tertiary; Select = gray-sixth sin trazo; Inactive =
- *   disabled-low-contrast con trazo border/general/disabled y texto/ícono disabled-negative.
+ *   container/disabled-on-canva con trazo border/general/disabled y texto/ícono disabled-negative.
  * - Trazo fino como box-shadow inset (Chrome redondea border-width). Figma no dibuja anillo de foco: se
  *   añade un outline de 2px con border/field/active (WCAG 2.4.7).
  * - El ícono de cerrar es icon/general/white en todos los estados (también en Inactive, así lo dibuja Figma).
@@ -54,7 +54,7 @@ export const chipVariants = cva(
           '[--chip-bg:var(--color-ds-background-general-gray-sixth)] [--chip-stroke:var(--color-ds-border-general-gray-tertiary)] outline-2 outline-offset-2 outline-solid outline-ds-border-field-active',
         select: '[--chip-bg:var(--color-ds-background-general-gray-sixth)] [--chip-stroke:transparent]',
         inactive:
-          '[--chip-bg:var(--color-ds-background-general-disabled-low-contrast)] [--chip-stroke:var(--color-ds-border-general-disabled)] [--chip-fg:var(--color-ds-text-neutral-disabled-negative)] [--chip-ic:var(--color-ds-icon-general-disabled-negative)]',
+          '[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] [--chip-stroke:var(--color-ds-border-general-disabled)] [--chip-fg:var(--color-ds-text-neutral-disabled-negative)] [--chip-ic:var(--color-ds-icon-general-disabled-negative)]',
       },
       interactive: {
         true: 'transition-[background-color,box-shadow] duration-200 ease-out',
@@ -157,7 +157,7 @@ export const chipCloseVariants = cva(
  * "+N" de "Chips plus": botón-cápsula de padding 8 (space/button/lg) con el número en un marco de 14 + 2 de
  * relleno inferior → 30 x 32. Estados con las mismas variables que el chip: Default = trazo
  * border/general/gray-fourth; Hover/Focus = background/general/gray-sixth + trazo; Select (menú abierto) =
- * gray-sixth sin trazo; Inactive = disabled-low-contrast con texto disabled-negative.
+ * gray-sixth sin trazo; Inactive = container/disabled-on-canva con texto disabled-negative.
  */
 export const chipPlusVariants = cva(
   [
@@ -174,7 +174,7 @@ export const chipPlusVariants = cva(
     'focus-visible:[--chip-bg:var(--color-ds-background-general-gray-sixth)]',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
     'aria-expanded:[--chip-bg:var(--color-ds-background-general-gray-sixth)] aria-expanded:[--chip-stroke:transparent]',
-    'disabled:cursor-not-allowed disabled:[--chip-bg:var(--color-ds-background-general-disabled-low-contrast)] disabled:[--chip-stroke:transparent] disabled:[--chip-fg:var(--color-ds-text-neutral-disabled-negative)]',
+    'disabled:cursor-not-allowed disabled:[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] disabled:[--chip-stroke:transparent] disabled:[--chip-fg:var(--color-ds-text-neutral-disabled-negative)]',
   ].join(' '),
   {
     variants: {
@@ -185,7 +185,7 @@ export const chipPlusVariants = cva(
           '[--chip-bg:var(--color-ds-background-general-gray-sixth)] outline-2 outline-offset-2 outline-solid outline-ds-border-field-active',
         select: '[--chip-bg:var(--color-ds-background-general-gray-sixth)] [--chip-stroke:transparent]',
         inactive:
-          '[--chip-bg:var(--color-ds-background-general-disabled-low-contrast)] [--chip-stroke:transparent] [--chip-fg:var(--color-ds-text-neutral-disabled-negative)] cursor-not-allowed',
+          '[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] [--chip-stroke:transparent] [--chip-fg:var(--color-ds-text-neutral-disabled-negative)] cursor-not-allowed',
       },
     },
     defaultVariants: { state: 'default' },

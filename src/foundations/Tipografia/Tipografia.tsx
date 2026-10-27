@@ -25,7 +25,7 @@ export type TipografiaTab = 'definicion' | 'parametros' | 'accesibilidad';
 
 const BREAKPOINTS: TokenBreakpoint[] = ['mobile', 'tablet', 'desktop'];
 const PRIMARY = 'var(--ds-primitives-typography-family-primary)';
-const SECONDARY = 'var(--ds-primitives-typography-family-secundary)';
+const SECONDARY = 'var(--ds-primitives-typography-family-secondary)';
 
 /** Orden de las tallas de los tokens (xs → 6xl); `md-uniform` va justo después de `md`. */
 const SIZE_ORDER = ['xs', 'sm', 'md', 'md-uniform', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl'];

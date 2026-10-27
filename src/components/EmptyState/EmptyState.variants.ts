@@ -37,7 +37,7 @@ export const emptyStateTextsClass = 'flex w-full flex-col items-center justify-c
 
 export const emptyStateTitleClass = [
   'm-0 w-full text-center',
-  'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg text-ds-text-neutral-heading',
 ].join(' ');
 

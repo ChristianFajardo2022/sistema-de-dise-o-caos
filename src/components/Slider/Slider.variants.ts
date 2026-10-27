@@ -63,9 +63,9 @@ export const sliderThumbVariants = cva(
   {
     variants: {
       appearance: {
-        simple: 'size-4 [--slider-thumb-stroke:var(--ds-responsive-border-general-xl)]',
+        simple: 'size-4 [--slider-thumb-stroke:var(--ds-responsive-border-general-lg)]',
         range: 'size-2 [--slider-thumb-stroke:var(--ds-responsive-border-general-lg)]',
-        number: 'h-5.5 min-w-5.5 p-ds-space-general-sm [--slider-thumb-stroke:var(--ds-responsive-border-general-xl)]',
+        number: 'h-5.5 min-w-5.5 p-ds-space-general-sm [--slider-thumb-stroke:var(--ds-responsive-border-general-lg)]',
       },
       disabled: {
         true: '',

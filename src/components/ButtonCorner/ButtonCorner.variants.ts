@@ -44,7 +44,7 @@ export const buttonCornerVariants = cva(
         stroke: true,
         status: ['on-canva', 'on-card'],
         className:
-          '[box-shadow:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-gray-fifth)]',
+          '[box-shadow:0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-default-on-card)]',
       },
       {
         stroke: true,

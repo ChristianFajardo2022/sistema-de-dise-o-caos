@@ -106,7 +106,7 @@ export const popoverTextVariants = cva('flex flex-col gap-ds-space-general-lg', 
 
 export const popoverTitleClass = [
   'm-0 min-w-0 flex-1 pt-ds-primitives-space-sm',
-  'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-white-unicolor',
 ].join(' ');
 

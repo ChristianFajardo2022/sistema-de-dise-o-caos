@@ -45,8 +45,8 @@ export const alertIconVariants = cva('shrink-0', {
     type: {
       success: 'text-ds-icon-semantic-success-secondary',
       alert: 'text-ds-icon-semantic-alert-secondary',
-      error: 'text-ds-icon-semantic-error-secundary',
-      info: 'text-ds-icon-semantic-information-neutral',
+      error: 'text-ds-icon-semantic-error-secondary',
+      info: 'text-ds-icon-semantic-information-secondary',
     },
   },
   defaultVariants: { type: 'success' },
@@ -63,7 +63,7 @@ export const ALERT_DEFAULT_ICONS: Record<AlertType, IconName> = {
 /** Subheading: Prospero semibold, 14/18 (heading/sm = valor de heading/xs en Figma), con padding superior space/sm (2). */
 export const alertTitleClass = [
   'm-0 pt-ds-primitives-space-sm',
-  'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading',
 ].join(' ');
 

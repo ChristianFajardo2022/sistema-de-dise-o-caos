@@ -208,7 +208,7 @@ function ChatSidebar({ conversations, selectedId, onSelect, cardRefs, figma = fa
                   key={`${c.id}-line`}
                   aria-hidden="true"
                   data-figma-part={`Line ${(lines += 1) + 1}`}
-                  className="h-(--ds-responsive-border-general-md) shrink-0 bg-ds-border-general-gray-sixth"
+                  className="h-(--ds-responsive-border-general-md) shrink-0 bg-ds-border-general-default-on-canva"
                 />
               ) : null;
             return [
@@ -248,7 +248,7 @@ function ChatSidebar({ conversations, selectedId, onSelect, cardRefs, figma = fa
       <div className="flex items-center gap-ds-space-general-lg pr-12">
         <h2
           id={titleId}
-          className="m-0 font-ds-primitives-typography-family-secundary text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg text-ds-text-neutral-heading [font-weight:var(--ds-primitives-typography-weight-semibold)]"
+          className="m-0 font-ds-primitives-typography-family-secondary text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg text-ds-text-neutral-heading [font-weight:var(--ds-primitives-typography-weight-semibold)]"
         >
           Chat
         </h2>
@@ -308,7 +308,7 @@ function ConversationView({ conversation, onSend, touch = false, onBack, heading
           id={titleId}
           ref={headingRef}
           tabIndex={-1}
-          className="m-0 min-w-0 flex-1 truncate text-right font-ds-primitives-typography-family-secundary text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading outline-none [font-weight:var(--ds-primitives-typography-weight-semibold)]"
+          className="m-0 min-w-0 flex-1 truncate text-right font-ds-primitives-typography-family-secondary text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading outline-none [font-weight:var(--ds-primitives-typography-weight-semibold)]"
         >
           {conversation.name}
         </h2>
@@ -494,7 +494,7 @@ function DesktopScreen({ figma = false, frame }: { figma?: boolean; frame?: stri
         conversation={current}
         onSend={(text) => send(current.id, text)}
         figma={figma}
-        className="flex-1 rounded-ds-radius-container-on-card bg-ds-background-container-default-on-canva shadow-ds-on-canva"
+        className="flex-1 rounded-ds-radius-container-on-card bg-ds-background-container-default-on-canva shadow-ds-on-canva-md"
       />
       <DetailsColumn key={`details-${current.id}`} conversation={current} figma={figma} />
     </div>

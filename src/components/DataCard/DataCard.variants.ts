@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
  * - Fondo background/container/default-on-card con esquina radius/general/2xl (24) en la superficie interna común
  *   (`NotchedSurface`, capa "Canva" de Figma, con `--surface-fill`); la raíz es transparente.
  * - Avatar icon de 48 (Contrast On Card), texto en columna con gap space/badge/sm (2) y slot gráfico que reparte el ancho con el texto.
- * - Título: Prospero (family/secundary) semibold 48/52 con text/neutral/heading. Descripción: 16/22 con text/neutral/body.
+ * - Título: Prospero (family/secondary) semibold 48/52 con text/neutral/heading. Descripción: 16/22 con text/neutral/body.
  */
 export const dataCardVariants = cva(
   [
@@ -23,7 +23,7 @@ export const dataCardTextVariants = cva('flex min-w-0 flex-1 flex-col gap-ds-spa
 
 export const dataCardTitleVariants = cva(
   [
-    'm-0 font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    'm-0 font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-primitives-typography-size-6xl leading-ds-typography-heading-line-height-3xl',
     'text-ds-text-neutral-heading',
   ].join(' ')

@@ -27,7 +27,7 @@ import { cva } from 'class-variance-authority';
  */
 
 const primary = 'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]';
-const secundary = 'font-ds-primitives-typography-family-secundary';
+const secondary = 'font-ds-primitives-typography-family-secondary';
 
 /** Raíz (`<article>`). En surface la superficie lee `--surface-fill`. */
 export const featureCardVariants = cva('relative isolate box-border flex w-full min-w-0 flex-col text-left', {
@@ -89,7 +89,7 @@ export const featureCardDateVariants = cva(
 );
 
 export const featureCardTitleClass = [
-  `m-0 min-w-0 ${secundary} [font-weight:var(--ds-primitives-typography-weight-semibold)]`,
+  `m-0 min-w-0 ${secondary} [font-weight:var(--ds-primitives-typography-weight-semibold)]`,
   'text-ds-typography-heading-size-2xl leading-ds-typography-heading-line-height-2xl text-ds-text-neutral-heading',
 ].join(' ');
 
@@ -103,7 +103,7 @@ export const featureCardCornerClass = 'absolute top-0 right-0 z-[1] flex';
 
 /** Cutout: capa de sombra (effect/shadow md sin spread: drop-shadow sigue el recorte de la máscara). */
 export const featureCardCutoutShadowClass =
-  'pointer-events-none absolute inset-0 -z-10 [filter:drop-shadow(0_12px_32px_var(--ds-responsive-effect-shadow-md))]';
+  'pointer-events-none absolute inset-0 -z-10 [filter:drop-shadow(0_12px_32px_var(--color-ds-responsive-effect-shadow-on-canva-md))]';
 
 /** Cutout: forma "Subtract" (foto recortada con máscara). */
 export const featureCardCutoutShapeClass =
@@ -120,12 +120,12 @@ export const featureCardCutoutTextClass = [
 ].join(' ');
 
 export const featureCardEyebrowClass = [
-  `order-first m-0 min-w-0 ${secundary} [font-weight:var(--ds-primitives-typography-weight-semibold)]`,
+  `order-first m-0 min-w-0 ${secondary} [font-weight:var(--ds-primitives-typography-weight-semibold)]`,
   'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-white',
 ].join(' ');
 
 export const featureCardCutoutTitleClass = [
   // Palabras más anchas que el recorte (títulos largos, 320 px): se parten en vez de salirse sobre la foto
-  `m-0 min-w-0 whitespace-pre-line break-words hyphens-auto ${secundary} [font-weight:var(--ds-primitives-typography-weight-bold)]`,
+  `m-0 min-w-0 whitespace-pre-line break-words hyphens-auto ${secondary} [font-weight:var(--ds-primitives-typography-weight-bold)]`,
   'text-ds-primitives-typography-size-5xl leading-ds-primitives-typography-line-height-9xl text-ds-text-neutral-heading',
 ].join(' ');

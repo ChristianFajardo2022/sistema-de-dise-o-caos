@@ -98,7 +98,7 @@ function Definicion(): ReactNode {
               node: (
                 <figure className="m-0 flex flex-col items-center gap-ds-space-general-lg">
                   <div
-                    className="w-full border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-canva"
+                    className="w-full border border-ds-border-general-default-on-card bg-ds-background-container-default-on-canva"
                     style={{ aspectRatio: `${s.width} / ${s.height}` }}
                   >
                     <div className="h-[4%] bg-ds-text-neutral-heading" />

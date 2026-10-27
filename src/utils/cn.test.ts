@@ -9,7 +9,7 @@ describe('cn: utilidades de tokens (ds-) en conflicto con las de Tailwind', () =
 
   it('ancho, size y mínimos', () => {
     expect(cn('w-ds-dimention-field-input-default', 'w-full')).toBe('w-full');
-    expect(cn('size-ds-dimention-icon-md', 'size-4')).toBe('size-4');
+    expect(cn('size-ds-dimention-icono-m', 'size-4')).toBe('size-4');
     expect(cn('min-h-ds-dimention-field-input-default', 'min-h-0')).toBe('min-h-0');
   });
 
@@ -31,7 +31,7 @@ describe('cn: utilidades de tokens (ds-) en conflicto con las de Tailwind', () =
   it('radio y sombra', () => {
     expect(cn('rounded-ds-radius-field-md', 'rounded-ds-radius-field-sm')).toBe('rounded-ds-radius-field-sm');
     expect(cn('rounded-ds-radius-field-md', 'rounded-none')).toBe('rounded-none');
-    expect(cn('shadow-ds-on-canva', 'shadow-none')).toBe('shadow-none');
+    expect(cn('shadow-ds-on-canva-md', 'shadow-none')).toBe('shadow-none');
   });
 
   it('colores de token siguen en su grupo (fondo, borde, texto)', () => {

@@ -13,7 +13,7 @@ import { cva } from 'class-variance-authority';
  * - Grupo: columna gap 16; título Helvetica Neue Medium 16/20 (size/lg, line-height-short/lg); filas gap 8.
  *   Fila: viñeta de 8 px (Ellipse, background/general/gray-fifth) en marco de 8×12 con padding superior 4, gap 8,
  *   texto 14/18 (size/md, line-height-short/md) en text/neutral/white; rótulo en medium; rótulo+valor con gap 4.
- * - Divider: trazo 0.5 (border/general/md) en border/general/gray-fifth, dibujado con borde superior de la barra inferior.
+ * - Divider: trazo 0.5 (border/general/md) en border/general/default-on-card, dibujado con borde superior de la barra inferior.
  * - Barra inferior: Portals, copyright a la izquierda y nota legal a la derecha; Web, marca 32 + copyright (gap 8) y redes a la derecha.
  * - Tokens sin equivalente en tokens.css: gap/general/xl (16, móvil 12) no existe como utilidad; se usa
  *   space-general-2xl y en móvil space-general-xl (para diseño).
@@ -68,4 +68,4 @@ export const footerLinkClass = [
 ].join(' ');
 export const footerBottomClass =
   // Divider de 0.5: sombra interior (no suma alto ni se redondea como un borde)
-  'flex pt-ds-space-general-3xl shadow-[inset_0_0.5px_0_0_var(--color-ds-border-general-gray-fifth)]';
+  'flex pt-ds-space-general-3xl shadow-[inset_0_0.5px_0_0_var(--color-ds-border-general-default-on-card)]';

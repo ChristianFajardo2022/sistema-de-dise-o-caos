@@ -92,7 +92,7 @@ function NestedContainers({ levels = LEVELS }: { levels?: typeof LEVELS }) {
   const render = (level: (typeof LEVELS)[number], remaining: typeof rest): ReactNode => {
     const [next, ...others] = remaining;
     return (
-      <div className={cn('border border-ds-border-general-gray-fifth', level.className)} style={{ padding: sp(level.pad) }}>
+      <div className={cn('border border-ds-border-general-default-on-card', level.className)} style={{ padding: sp(level.pad) }}>
         {next ? render(next, others) : <div className="h-14" />}
       </div>
     );
@@ -147,7 +147,7 @@ function Definicion(): ReactNode {
             <ol className="m-0 flex list-none flex-col gap-ds-space-general-lg p-0 text-ds-primitives-typography-size-md text-ds-text-neutral-heading">
               {LEVELS.map((l) => (
                 <li key={l.name} className="flex items-center gap-ds-space-general-lg">
-                  <span aria-hidden="true" className={cn('size-4 shrink-0 border border-ds-border-general-gray-fifth', l.className)} />
+                  <span aria-hidden="true" className={cn('size-4 shrink-0 border border-ds-border-general-default-on-card', l.className)} />
                   {l.name} <span className="text-ds-text-neutral-gray">· {px(SPACE_PREFIX + l.pad)} px</span>
                 </li>
               ))}
@@ -201,7 +201,7 @@ function Definicion(): ReactNode {
 function PaddingSpecimen() {
   return (
     <Scroll name="Esquema de padding" minWidth={420}>
-      <div className="mx-auto max-w-[640px] overflow-hidden rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth">
+      <div className="mx-auto max-w-[640px] overflow-hidden rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card">
         <Spacer size={sp('6xl')} label="40 px" className={PAD} />
         <div className="flex">
           <Spacer horizontal size={sp('6xl')} label="40" className={PAD} />
@@ -213,13 +213,13 @@ function PaddingSpecimen() {
             <span className="text-ds-primitives-typography-size-2xl font-semibold text-ds-text-neutral-heading">¿Dónde recogemos tu envío?</span>
             <div className="grid grid-cols-2 gap-ds-space-general-2xl">
               {['Nombres', 'Apellidos', 'Correo electrónico', 'Celular'].map((f) => (
-                <span key={f} className="rounded-ds-radius-general-md border border-ds-border-general-gray-fifth px-ds-space-general-2xl py-ds-space-general-xl text-ds-primitives-typography-size-sm text-ds-text-neutral-body">
+                <span key={f} className="rounded-ds-radius-general-md border border-ds-border-general-default-on-card px-ds-space-general-2xl py-ds-space-general-xl text-ds-primitives-typography-size-sm text-ds-text-neutral-body">
                   {f}
                 </span>
               ))}
             </div>
             <div className="flex justify-end gap-ds-space-general-lg text-ds-primitives-typography-size-sm">
-              <span className="rounded-full border border-ds-border-general-gray-fifth px-ds-space-general-4xl py-ds-space-general-lg text-ds-text-neutral-heading">Anterior</span>
+              <span className="rounded-full border border-ds-border-general-default-on-card px-ds-space-general-4xl py-ds-space-general-lg text-ds-text-neutral-heading">Anterior</span>
               <span className="rounded-full bg-ds-text-neutral-heading px-ds-space-general-4xl py-ds-space-general-lg text-ds-background-container-surface">Siguiente</span>
             </div>
           </div>
@@ -236,7 +236,7 @@ function GapSpecimen() {
   const box = 'bg-ds-background-container-surface p-ds-space-general-2xl text-ds-primitives-typography-size-md text-ds-text-neutral-body';
   return (
     <Scroll name="Esquema de gap" minWidth={360}>
-      <div className="mx-auto flex max-w-[480px] flex-col overflow-hidden rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth">
+      <div className="mx-auto flex max-w-[480px] flex-col overflow-hidden rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card">
         <div className={cn(box, 'flex items-center')}>
           <span aria-hidden="true" className="size-12 shrink-0 rounded-ds-radius-general-sm bg-ds-background-general-gray-secondary" />
           <Spacer horizontal size={sp('2xl')} label="" className={GAP} />
@@ -257,7 +257,7 @@ function GapSpecimen() {
         </div>
         <Spacer size={sp('6xl')} label="40 px" className={GAP} />
         <div className={cn(box, 'flex gap-ds-space-general-lg')}>
-          <span className="rounded-full border border-ds-border-general-gray-fifth px-ds-space-general-4xl py-ds-space-general-lg text-ds-text-neutral-heading">Ver más información</span>
+          <span className="rounded-full border border-ds-border-general-default-on-card px-ds-space-general-4xl py-ds-space-general-lg text-ds-text-neutral-heading">Ver más información</span>
           <span className="rounded-full bg-ds-text-neutral-heading px-ds-space-general-4xl py-ds-space-general-lg text-ds-background-container-surface">Aceptar</span>
         </div>
       </div>

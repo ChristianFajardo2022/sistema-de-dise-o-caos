@@ -82,7 +82,7 @@ const IconCell = memo(function IconCell({
         aria-label={`${name}, copiar código`}
         title={`Copiar ${snippet(name, size, variant)}`}
         className={cn(
-          'flex min-h-28 w-full cursor-pointer flex-col items-center justify-between gap-ds-space-general-lg rounded-ds-radius-general-xl border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card p-ds-space-general-lg text-ds-text-neutral-heading',
+          'flex min-h-28 w-full cursor-pointer flex-col items-center justify-between gap-ds-space-general-lg rounded-ds-radius-general-xl border border-ds-border-general-default-on-card bg-ds-background-container-default-on-card p-ds-space-general-lg text-ds-text-neutral-heading',
           'hover:bg-ds-background-container-hover-on-card',
           focusRing,
         )}
@@ -127,7 +127,7 @@ function Segmented<T extends string | number>({
               'min-h-10 min-w-10 cursor-pointer rounded-full border px-ds-space-general-xl text-ds-primitives-typography-size-md',
               o.value === value
                 ? 'border-ds-text-neutral-heading bg-ds-text-neutral-heading text-ds-background-container-surface'
-                : 'border-ds-border-general-gray-fifth bg-transparent text-ds-text-neutral-heading hover:bg-ds-background-container-hover-on-canva',
+                : 'border-ds-border-general-default-on-card bg-transparent text-ds-text-neutral-heading hover:bg-ds-background-container-hover-on-canva',
               focusRing,
             )}
           >
@@ -231,7 +231,7 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
     >
       {fullscreen && (
         <header className="flex flex-col gap-ds-space-general-md">
-          <h1 className="m-0 font-ds-primitives-typography-family-secundary text-ds-primitives-typography-size-4xl leading-tight font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading">
+          <h1 className="m-0 font-ds-primitives-typography-family-secondary text-ds-primitives-typography-size-4xl leading-tight font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading">
             Catálogo de íconos
           </h1>
           <p className="m-0 text-ds-primitives-typography-size-lg leading-normal">
@@ -243,7 +243,7 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
       <div
         role="search"
         aria-label="Filtros del catálogo"
-        className="grid grid-cols-1 items-start gap-ds-space-general-4xl rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card p-ds-space-general-4xl tablet:grid-cols-2"
+        className="grid grid-cols-1 items-start gap-ds-space-general-4xl rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-background-container-default-on-card p-ds-space-general-4xl tablet:grid-cols-2"
       >
         <Input
           variant="search"
@@ -262,7 +262,7 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className={cn(
-              'min-h-10 w-full cursor-pointer rounded-ds-radius-general-xl border border-ds-border-general-gray-fifth bg-ds-background-container-surface px-ds-space-general-xl text-ds-primitives-typography-size-md text-ds-text-neutral-heading',
+              'min-h-10 w-full cursor-pointer rounded-ds-radius-general-xl border border-ds-border-general-default-on-card bg-ds-background-container-surface px-ds-space-general-xl text-ds-primitives-typography-size-md text-ds-text-neutral-heading',
               focusRing,
             )}
           >
@@ -302,7 +302,7 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
       {status && (
         <p
           aria-hidden="true"
-          className="fixed right-ds-space-general-4xl bottom-ds-space-general-4xl z-50 m-0 rounded-ds-radius-general-xl bg-ds-text-neutral-heading px-ds-space-general-4xl py-ds-space-general-xl text-ds-primitives-typography-size-md text-ds-background-container-surface shadow-ds-on-canva"
+          className="fixed right-ds-space-general-4xl bottom-ds-space-general-4xl z-50 m-0 rounded-ds-radius-general-xl bg-ds-text-neutral-heading px-ds-space-general-4xl py-ds-space-general-xl text-ds-primitives-typography-size-md text-ds-background-container-surface shadow-ds-on-canva-md"
         >
           {status}
         </p>
@@ -318,7 +318,7 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
               id={`${selectId}-${g.category}`}
               level={fullscreen ? 'h2' : 'h3'}
               size="sm"
-              className="border-b border-ds-border-general-gray-fifth pb-ds-space-general-lg"
+              className="border-b border-ds-border-general-default-on-card pb-ds-space-general-lg"
             >
               {categoryLabel(g.category)} <span className="font-normal text-ds-text-neutral-gray">· {g.items.length}</span>
             </DocHeading>

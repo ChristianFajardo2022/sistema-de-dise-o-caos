@@ -42,7 +42,7 @@ export const contactCardEyebrowVariants = cva(
 /** Encabezado (capa "Subtitulo"): el nombre. */
 export const contactCardTitleVariants = cva(
   [
-    'm-0 min-w-0 truncate font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    'm-0 min-w-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-white',
   ].join(' ')
 );

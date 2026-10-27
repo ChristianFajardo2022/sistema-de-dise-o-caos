@@ -10,7 +10,7 @@ export function ColorCell({ variable, theme }: { variable: string; theme: TokenT
     <span className="flex items-center gap-ds-space-general-xl whitespace-nowrap">
       <span
         aria-hidden="true"
-        className="size-8 shrink-0 overflow-hidden rounded-ds-radius-general-md border border-ds-border-general-gray-fifth bg-ds-background-general-gray-secondary"
+        className="size-8 shrink-0 overflow-hidden rounded-ds-radius-general-md border border-ds-border-general-default-on-card bg-ds-background-general-gray-secondary"
       >
         <span className="block size-full" style={{ background: info.css }} />
       </span>

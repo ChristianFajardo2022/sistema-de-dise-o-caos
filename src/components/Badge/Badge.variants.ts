@@ -71,7 +71,7 @@ export const badgeIconVariants = cva('', {
       success: 'text-ds-icon-semantic-success-tertiary',
       alert: 'text-ds-icon-semantic-alert-tertiary',
       error: 'text-ds-icon-general-white-unicolor',
-      info: 'text-ds-icon-semantic-information',
+      info: 'text-ds-icon-semantic-information-tertiary',
       neutral: 'text-ds-icon-general-white',
       negative: 'text-ds-icon-general-black',
       positive: 'text-ds-icon-general-white',

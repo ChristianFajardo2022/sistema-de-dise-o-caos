@@ -81,7 +81,7 @@ export const productCardTextGroupClass = 'flex flex-col gap-ds-space-general-lg'
 
 /** Título (Filename): Prospero semibold 14/18, una línea. */
 export const productCardTitleClass = [
-  'm-0 truncate font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'm-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-white-unicolor',
 ].join(' ');
 
@@ -96,7 +96,7 @@ export const productCardPriceRowClass = 'flex items-center gap-2.5';
 
 /** Precio (Filename): Prospero semibold 16/20, una línea. */
 export const productCardPriceClass = [
-  'm-0 min-w-0 flex-1 truncate font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'm-0 min-w-0 flex-1 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md text-ds-text-neutral-white-unicolor',
 ].join(' ');
 

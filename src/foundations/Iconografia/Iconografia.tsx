@@ -74,7 +74,7 @@ function IconTrio({ names, variant }: { names: [IconName, IconName, IconName]; v
         <span
           key={n}
           className={cn(
-            'mx-ds-space-general-md flex size-20 items-center justify-center rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth bg-ds-background-container-default-on-card text-ds-text-neutral-heading shadow-ds-on-card',
+            'mx-ds-space-general-md flex size-20 items-center justify-center rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-background-container-default-on-card text-ds-text-neutral-heading shadow-ds-on-card',
             tilt[i],
           )}
         >
@@ -427,7 +427,7 @@ function Swatch({ token, theme }: { token: string; theme: 'dark' | 'light' }) {
  */
 function ColorSpecimen({ bg, icon, name = 'airplane' }: { bg: string; icon: string; name?: IconName }) {
   return (
-    <div className={cn('flex h-28 items-center justify-center rounded-ds-radius-general-xl border border-ds-border-general-gray-fifth', bg)}>
+    <div className={cn('flex h-28 items-center justify-center rounded-ds-radius-general-xl border border-ds-border-general-default-on-card', bg)}>
       <Icon name={name} size={48} variant="line" className={icon} />
     </div>
   );
@@ -560,14 +560,14 @@ function Valores(): ReactNode {
                 <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva bg-ds-primitives-color-primary-g13 text-ds-icon-general-white-unicolor">
                   <Icon name="airplane" size={48} variant="line" />
                 </span>
-                <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth bg-ds-primitives-color-primary-b01 text-ds-icon-general-black-unicolor">
+                <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-primitives-color-primary-b01 text-ds-icon-general-black-unicolor">
                   <Icon name="airplane" size={48} variant="line" />
                 </span>
               </div>
             </div>
             <div className="flex flex-col items-center gap-ds-space-general-lg">
               <span className="text-ds-primitives-typography-size-md text-ds-text-neutral-gray">Cromático</span>
-              <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth bg-ds-background-container-surface text-ds-icon-acent-firts">
+              <span className="flex size-24 items-center justify-center rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card bg-ds-background-container-surface text-ds-icon-acent-firts">
                 <Icon name="airplane" size={48} variant="line" />
               </span>
             </div>
@@ -585,7 +585,7 @@ function Valores(): ReactNode {
                   <span
                     key={n}
                     className={cn(
-                      'flex size-14 items-center justify-center rounded-ds-radius-general-xl border border-ds-border-general-gray-fifth bg-ds-background-container-surface',
+                      'flex size-14 items-center justify-center rounded-ds-radius-general-xl border border-ds-border-general-default-on-card bg-ds-background-container-surface',
                       c,
                     )}
                   >

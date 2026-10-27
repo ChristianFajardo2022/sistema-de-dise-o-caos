@@ -17,7 +17,7 @@ function Sparkline() {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      className="h-auto w-48 text-ds-icon-semantic-information-neutral"
+      className="h-auto w-48 text-ds-icon-semantic-information-secondary"
     >
       <path d="M1 44c10 0 12-6 18-22 4-10 9-10 13-2 3 6 6 7 10 2 5-6 9-16 14-16 6 0 9 12 14 24 4 9 9 12 20 12h104" />
     </svg>

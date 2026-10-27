@@ -6,16 +6,16 @@ import { cva } from 'class-variance-authority';
  * Fuente: component set "Firm" (17805:32039) de Figma. Position Horizontal / Vertical × Propiedad 1 Default / Filled
  * (Filled = hay firma dibujada; en el código sale del valor, no es una prop).
  *
- * Horizontal (1102 × 178): tarjeta background/container/default-on-card, radius/general/xl (16), trazo de 1 border/general/gray-sixth
+ * Horizontal (1102 × 178): tarjeta background/container/default-on-card, radius/general/xl (16), trazo de 1 border/general/default-on-canva
  * por dentro (box-shadow inset: Chrome redondea border-width), padding space/general/2xl (16) arriba y abajo y
  * space/general/xl (12) a los lados, gap 10. Filas de 24 con los íconos al final: arriba "maximize" (oculto por defecto),
  * abajo "rotate-left" y "trash" (24; blancos icon/general/white con firma, y grises sin ella: Figma usa
- * background/general/disabled-high-contrast, #7e8187 en Dark y #f0f2f4 en Light; aquí text/neutral/disabled-positive, el mismo gris en Dark y legible en Light). Texto guía 16/22 (typography/body size lg, line-height-large lg) en
+ * background/container/disabled-on-card, #7e8187 en Dark y #f0f2f4 en Light; aquí text/neutral/disabled-positive, el mismo gris en Dark y legible en Light). Texto guía 16/22 (typography/body size lg, line-height-large lg) en
  * text/neutral/disabled-positive, centrado en una franja de 76.
  *
  * Vertical (376 × 812): la interfaz horizontal girada −90° dentro de una pantalla de celular, sin relleno; padding
  * space/container/default (24; no existe en tokens.css, se usa `p-6`) y space/general/5xl (40) a la izquierda, gap 10. Cuatro columnas de izquierda a derecha:
- * íconos (24), firma (174), línea con "close" (28; línea de 1 en border/general/gray-fifth) y CTA (56: bloque nombre/documento
+ * íconos (24), firma (174), línea con "close" (28; línea de 1 en border/general/default-on-card) y CTA (56: bloque nombre/documento
  * 16/20 en text/neutral/white y los botones Cancelar y Crear firma, gap space/general/xl (12)). Las columnas giradas miden
  * con container query units (cqh/cqw) para ocupar su largo real.
  *
@@ -31,7 +31,7 @@ export const signaturePadRootVariants = cva(
           'h-44.5 w-full flex-col justify-end gap-2.5 overflow-hidden rounded-ds-radius-general-xl',
           'bg-ds-background-container-default-on-card px-ds-space-general-xl py-ds-space-general-2xl',
           // Trazo de 1 px por dentro (el lienzo es transparente y lo deja ver)
-          'shadow-[inset_0_0_0_1px_var(--color-ds-border-general-gray-sixth)]',
+          'shadow-[inset_0_0_0_1px_var(--color-ds-border-general-default-on-canva)]',
         ].join(' '),
         vertical: [
           'h-203 w-94 max-w-full flex-row gap-2.5',

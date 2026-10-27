@@ -24,7 +24,7 @@ import { cva } from 'class-variance-authority';
  *   en un cuadro de 18; datos 12/16 y descripción 14/18 en "text/neutral/gray 2" de Figma (G07), que en tokens.css es
  *   text/neutral/gray. Cifras de los contadores heading/size/md de Figma (20/24; en tokens.css heading lg).
  * - Contadores: columnas del mismo ancho (el de la etiqueta más larga), gap 8 + divisor de 1 (stroke/lg) en
- *   border/general/gray-sixth + gap 8.
+ *   border/general/default-on-canva + gap 8.
  * - Las acciones ocupan todo el ancho bajo 48rem de pantalla (marco Mobile de Figma, variable responsive/general/mobile).
  */
 
@@ -91,7 +91,7 @@ export const profileCardTextVariants = cva('flex min-w-0 flex-col', {
 /** Nombre. El cuadro de Figma mide 18 con line-height 20 (texto recortado): -my-px deja el mismo alto. */
 export const profileCardTitleVariants = cva(
   [
-    'm-0 -my-px w-full min-w-0 truncate font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    'm-0 -my-px w-full min-w-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md text-ds-text-neutral-heading',
   ].join(' '),
   {
@@ -167,13 +167,13 @@ export const profileCardStatsVariants = cva(
  */
 export const profileCardStatClass = [
   'relative flex min-w-0 flex-col-reverse items-center gap-ds-space-general-lg',
-  'not-first:before:absolute not-first:before:inset-y-0 not-first:before:w-(--ds-primitives-stroke-lg) not-first:before:bg-ds-border-general-gray-sixth',
+  'not-first:before:absolute not-first:before:inset-y-0 not-first:before:w-(--ds-primitives-stroke-lg) not-first:before:bg-ds-border-general-default-on-canva',
   "not-first:before:left-[calc(-1*var(--ds-responsive-space-general-lg)-var(--ds-primitives-stroke-lg)/2)] not-first:before:content-['']",
 ].join(' ');
 
 export const profileCardStatValueClass = [
   'm-0 flex min-w-0 items-center justify-center gap-ds-space-general-md',
-  'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+  'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   'text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg text-ds-text-neutral-heading',
 ].join(' ');
 

@@ -141,7 +141,7 @@ export interface ShadowToken {
   y: string;
   blur: string;
   spread: string;
-  /** Variable de color que usa la sombra, p. ej. "--ds-responsive-effect-shadow-sm" */
+  /** Variable de color que usa la sombra, p. ej. "--color-ds-responsive-effect-shadow-on-card" */
   colorVar: string;
 }
 

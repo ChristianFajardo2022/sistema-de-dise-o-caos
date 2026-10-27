@@ -9,15 +9,15 @@ import { cva } from 'class-variance-authority';
  * (eliminar, descargar) · Type5 = fotografías con acciones.
  *
  * - Panel: background/container/default-on-canva, radius/container/On card (24), sombra effect/shadow md
- *   (`shadow-ds-on-canva`), padding 16 (space/container/second-level -> space/general/2xl), gap space/general/3xl (24),
+ *   (`shadow-ds-on-canva-md`), padding 16 (space/container/second-level -> space/general/2xl), gap space/general/3xl (24),
  *   320 de ancho. Riel: ancho 64 (padding 16 y botones de 32), gap space/general/6xl (56), centrado.
- *   Type6 y Type5 traen además un trazo de 1 (border/general/gray-sixth) y Type6 gap 32: no se hace variante (ver docs).
+ *   Type6 y Type5 traen además un trazo de 1 (border/general/default-on-canva) y Type6 gap 32: no se hace variante (ver docs).
  * - Encabezado de vistas: fila de 36, justify-between: Button tertiary xs con `chevron-left` ("Anterior") y acciones
  *   Button secondary xs (gap space/general/lg 8).
  * - Perfil: avatar md (48) y bloque de texto con gap space/general/3xl (24); texto centrado con gap 4 (gap/general/sm ->
  *   space/general/md). Nombre Prospero semibold 16/20 (heading/size/sm de Figma = heading/md en tokens.css), descripción
  *   14/20 (body/size/md, body/line-height-large/md) en text/neutral/body.
- * - Fila de sección (List (Atom) Complex): padding 16/8, trazo superior de 1 en border/general/gray-sixth, Avatar icon
+ * - Fila de sección (List (Atom) Complex): padding 16/8, trazo superior de 1 en border/general/default-on-canva, Avatar icon
  *   xs (32) On Canva, título Prospero semibold 14/18 (heading/size/xs de Figma = heading/sm en tokens.css) y
  *   `chevron-right` de 20 a la derecha.
  * - Cuadrícula: 2 columnas, gap space/general/lg (8), con Scroll bar (ScrollArea).
@@ -25,7 +25,7 @@ import { cva } from 'class-variance-authority';
 export const chatDetailsPanelVariants = cva(
   [
     'box-border flex min-h-0 flex-col rounded-ds-radius-container-on-card bg-ds-background-container-default-on-canva',
-    'shadow-ds-on-canva p-ds-space-general-2xl',
+    'shadow-ds-on-canva-md p-ds-space-general-2xl',
   ].join(' '),
   {
     variants: {
@@ -66,7 +66,7 @@ export const chatDetailsProfileVariants = cva('flex w-full flex-col items-center
 
 export const chatDetailsProfileNameVariants = cva(
   [
-    'm-0 font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    'm-0 font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md text-ds-text-neutral-heading',
   ].join(' ')
 );

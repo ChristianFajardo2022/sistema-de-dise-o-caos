@@ -29,7 +29,7 @@ import { cva } from 'class-variance-authority';
  */
 
 const primary = 'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]';
-const semibold = 'font-ds-primitives-typography-family-secundary [font-weight:var(--ds-primitives-typography-weight-semibold)]';
+const semibold = 'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]';
 const corners = 'rounded-tl-ds-radius-general-2xl rounded-bl-ds-radius-general-2xl rounded-br-ds-radius-general-2xl';
 
 /** Raíz (`<article>`). */

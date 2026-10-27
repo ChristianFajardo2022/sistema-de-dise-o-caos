@@ -99,8 +99,8 @@ function Definicion(): ReactNode {
         <DocFigure caption="Cada caja usa la sombra real del token indicado. Si el tema activo define la sombra sin opacidad, la caja se distingue solo por el tono de su superficie.">
           <div className="grid grid-cols-1 gap-ds-space-general-4xl tablet:grid-cols-3">
             <LevelBox label="Primer nivel" token="shadow-ds-on-card" shadow="shadow-ds-on-card" />
-            <LevelBox label="Segundo nivel" token="shadow-ds-on-canva" shadow="shadow-ds-on-canva" />
-            <LevelBox label="Tercer nivel" token="shadow-ds-on-canva" shadow="shadow-ds-on-canva" />
+            <LevelBox label="Segundo nivel" token="shadow-ds-on-canva-md" shadow="shadow-ds-on-canva-md" />
+            <LevelBox label="Tercer nivel" token="shadow-ds-on-canva-md" shadow="shadow-ds-on-canva-md" />
           </div>
         </DocFigure>
       </DocSection>
@@ -185,7 +185,7 @@ function PaymentMock({ good }: { good: boolean }) {
         ))}
       </div>
       <div className={cn('flex justify-between', good ? 'mt-ds-primitives-space-6xl' : '')}>
-        <span className="rounded-full border border-ds-border-general-gray-fifth px-ds-space-general-4xl py-ds-space-general-lg text-ds-primitives-typography-size-sm text-ds-text-neutral-heading">
+        <span className="rounded-full border border-ds-border-general-default-on-card px-ds-space-general-4xl py-ds-space-general-lg text-ds-primitives-typography-size-sm text-ds-text-neutral-heading">
           Anterior
         </span>
         <span className="rounded-full bg-ds-text-neutral-heading px-ds-space-general-4xl py-ds-space-general-lg text-ds-primitives-typography-size-sm text-ds-background-container-surface">

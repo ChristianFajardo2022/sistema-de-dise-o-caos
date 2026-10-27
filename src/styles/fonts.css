@@ -24,7 +24,7 @@
   font-display: swap;
 }
 
-/* typography/family/secundary — solo títulos */
+/* typography/family/secondary — solo títulos */
 @font-face {
   font-family: "Prospero";
   src: url("../assets/fonts/Prospero-Regular.woff2") format("woff2");

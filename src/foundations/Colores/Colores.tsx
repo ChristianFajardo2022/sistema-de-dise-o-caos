@@ -42,7 +42,7 @@ function PrimitiveSwatch({ item }: { item: Primitive }) {
   const themes: TokenTheme[] = changes ? ['dark', 'light'] : ['light'];
   return (
     <li
-      className="m-0 flex min-h-20 list-none overflow-hidden rounded-ds-radius-general-lg border border-ds-border-general-gray-fifth"
+      className="m-0 flex min-h-20 list-none overflow-hidden rounded-ds-radius-general-lg border border-ds-border-general-default-on-card"
       aria-label={`${item.code} ${themes.map((t) => item.value[t]).join(' / ')}`}
     >
       {themes.map((t) => (
@@ -81,7 +81,7 @@ function PrincipalCard({ theme, token }: { theme: TokenTheme; token: string }) {
   if (!info) return null;
   return (
     <div
-      className="flex items-center gap-ds-space-general-4xl rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth p-ds-space-general-4xl"
+      className="flex items-center gap-ds-space-general-4xl rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card p-ds-space-general-4xl"
       style={{ background: surface, color: heading }}
     >
       <span aria-hidden="true" className="size-20 shrink-0 rounded-ds-radius-general-md" style={{ background: info.css }} />
@@ -223,7 +223,7 @@ function PrincipalSemantic({ theme }: { theme: TokenTheme }) {
   const heading = resolveToken('--color-ds-text-neutral-heading', theme);
   return (
     <div
-      className="flex flex-col gap-ds-space-general-2xl rounded-ds-radius-container-on-canva border border-ds-border-general-gray-fifth p-ds-space-general-4xl"
+      className="flex flex-col gap-ds-space-general-2xl rounded-ds-radius-container-on-canva border border-ds-border-general-default-on-card p-ds-space-general-4xl"
       style={{ background: surface, color: heading }}
     >
       <span className="text-ds-primitives-typography-size-lg font-semibold italic">{THEME_LABELS[theme]}</span>
@@ -262,7 +262,7 @@ function DominanceBar() {
   return (
     <DocFigure caption="Proporción de cada color en la interfaz. Los colores son los primitivos de tokens.css.">
       <div className="flex flex-col gap-ds-space-general-2xl">
-        <div role="img" aria-label={DOMINANCE.map((d) => `${d.label} ${d.percent}%`).join(', ')} className="flex h-20 overflow-hidden rounded-ds-radius-general-lg border border-ds-border-general-gray-fifth">
+        <div role="img" aria-label={DOMINANCE.map((d) => `${d.label} ${d.percent}%`).join(', ')} className="flex h-20 overflow-hidden rounded-ds-radius-general-lg border border-ds-border-general-default-on-card">
           {DOMINANCE.map((d) => {
             const hex = resolveToken(d.variable, 'light') ?? '#000000';
             return (
@@ -279,7 +279,7 @@ function DominanceBar() {
         <ul className="m-0 grid list-none grid-cols-2 gap-ds-space-general-md p-0 text-ds-primitives-typography-size-md text-ds-text-neutral-body tablet:grid-cols-4">
           {DOMINANCE.map((d) => (
             <li key={d.label} className="flex items-center gap-ds-space-general-md">
-              <span aria-hidden="true" className="size-4 shrink-0 rounded-full border border-ds-border-general-gray-fifth" style={{ background: `var(${d.variable})` }} />
+              <span aria-hidden="true" className="size-4 shrink-0 rounded-full border border-ds-border-general-default-on-card" style={{ background: `var(${d.variable})` }} />
               {d.label} · {d.percent} %
             </li>
           ))}
@@ -333,7 +333,7 @@ function Parametros(): ReactNode {
                 .map((p) => (
                   <span
                     key={p.variable}
-                    className="rounded-full border border-ds-border-general-gray-fifth px-ds-space-general-lg py-ds-space-general-sm text-ds-primitives-typography-size-sm"
+                    className="rounded-full border border-ds-border-general-default-on-card px-ds-space-general-lg py-ds-space-general-sm text-ds-primitives-typography-size-sm"
                     style={{ background: p.value.light, color: onColor(p.value.light) }}
                   >
                     {p.code}
@@ -374,7 +374,7 @@ function Tokens(): ReactNode {
             <li key={c}>
               <a
                 href={`#colores-${c}`}
-                className="inline-block rounded-full border border-ds-border-general-gray-fifth px-ds-space-general-2xl py-ds-space-general-md text-ds-primitives-typography-size-md text-ds-text-neutral-heading hover:bg-ds-background-tab-select-on-canva"
+                className="inline-block rounded-full border border-ds-border-general-default-on-card px-ds-space-general-2xl py-ds-space-general-md text-ds-primitives-typography-size-md text-ds-text-neutral-heading hover:bg-ds-background-tab-select-on-canva"
               >
                 {CATEGORY_LABELS[c]} ({countTokens(groups[c])})
               </a>
@@ -425,7 +425,7 @@ function RatioCell({ fg, bg, theme }: { fg: string; bg: string; theme: TokenThem
     <span className="flex items-center gap-ds-space-general-xl whitespace-nowrap">
       <span
         aria-hidden="true"
-        className="flex size-10 shrink-0 items-center justify-center rounded-ds-radius-general-md border border-ds-border-general-gray-fifth font-semibold"
+        className="flex size-10 shrink-0 items-center justify-center rounded-ds-radius-general-md border border-ds-border-general-default-on-card font-semibold"
         style={{ background: b.css, color: f.css }}
       >
         Aa

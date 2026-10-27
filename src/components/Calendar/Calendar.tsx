@@ -598,7 +598,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) =
             <div key={panel.getTime()} className="contents">
               {i > 0 && (
                 <div aria-hidden="true" className="relative w-0 self-stretch">
-                  <span className="absolute inset-y-0 left-0 w-px -translate-x-1/2 bg-ds-border-general-gray-fifth" />
+                  <span className="absolute inset-y-0 left-0 w-px -translate-x-1/2 bg-ds-border-general-default-on-card" />
                 </div>
               )}
               <div className="flex min-w-0 flex-1 flex-col gap-4">
