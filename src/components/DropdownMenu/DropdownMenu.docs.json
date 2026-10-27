@@ -10,6 +10,8 @@
     "aria-label": { "type": "string", "required": true, "description": "Nombre accesible del menú o de la lista." },
     "align": { "type": "'start' | 'end'", "default": "'end'", "description": "end: borde derecho del panel con el borde derecho del disparador (Figma)." },
     "side": { "type": "'bottom' | 'top'", "default": "'bottom'", "description": "Lado preferido; si no cabe pasa al otro." },
+    "offset": { "type": "number", "default": "4", "description": "Separación en px entre el ancla y el panel." },
+    "anchorRef": { "type": "RefObject<HTMLElement>", "required": false, "description": "Elemento al que se alinea el panel en lugar del disparador (como anchorRef de Select). El foco sigue en el disparador." },
     "scrollbar": { "type": "boolean", "default": "true", "description": "Prop Scroll bar de Figma: reserva y dibuja el riel de 6." },
     "maxHeight": { "type": "string | number", "default": "'20rem'", "description": "Alto máximo del área de ítems; pasado ese alto se desplaza." },
     "open": { "type": "boolean", "required": false, "description": "Abierto (controlado). Usar con onOpenChange." },

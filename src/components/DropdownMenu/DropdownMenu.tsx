@@ -7,7 +7,7 @@ import { TOP_LAYER_CLASS, TOP_LAYER_MAX_WIDTH } from '../_internal/overlay';
 import { useAnchoredPosition } from '../../utils/anchoredPosition';
 import { assignRef } from '../../utils/refs';
 
-/** Separación entre el disparador y el panel, y margen mínimo con el borde de la pantalla. */
+/** Separación por defecto entre el disparador y el panel, y margen mínimo con el borde de la pantalla. */
 const OFFSET = 4;
 const MARGIN = 8;
 const TYPEAHEAD_RESET_MS = 600;
@@ -35,7 +35,8 @@ const SELECTED_SELECTOR = '[aria-current="true"], [role="menuitemradio"][aria-ch
  * Al abrir, el foco va al ítem elegido (`selected` o radio marcado) si lo hay; si no, al primero.
  *
  * Posición (compartida con Select y DatePicker, `utils/anchoredPosition`): se calcula al abrir y mientras esté abierto
- * (scroll, resize). Por defecto abajo y con el borde derecho del panel alineado al del disparador; no se sale de la
+ * (scroll, resize). `offset` cambia la separación (4 por defecto) y `anchorRef` coloca el panel junto a otro elemento (p. ej.
+ * la barra que contiene al disparador); el foco sigue volviendo al disparador. Por defecto abajo y con el borde derecho del panel alineado al del disparador; no se sale de la
  * pantalla, pasa al otro lado si no cabe y, si no cabe en ninguno, usa el lado con más espacio con el alto limitado.
  */
 export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
@@ -45,6 +46,8 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       mode = 'menu',
       align = 'end',
       side = 'bottom',
+      offset = OFFSET,
+      anchorRef,
       open: openProp,
       defaultOpen = false,
       onOpenChange,
@@ -77,8 +80,8 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       triggerRef.current = node;
     }, []);
 
-    const getAnchor = useCallback(() => triggerRef.current, []);
-    const place = useAnchoredPosition(open, popoverRef, getAnchor, { align, side, offset: OFFSET, margin: MARGIN });
+    const getAnchor = useCallback(() => anchorRef?.current ?? triggerRef.current, [anchorRef]);
+    const place = useAnchoredPosition(open, popoverRef, getAnchor, { align, side, offset, margin: MARGIN });
 
     const items = () => Array.from(popoverRef.current?.querySelectorAll<HTMLElement>(ITEM_SELECTOR) ?? []);
 

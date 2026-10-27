@@ -204,7 +204,7 @@ const ATOM_STATES: { state: TabState; figma: string }[] = [
 /** Variantes que el set de Figma no trae (no se dibujan para que el comparador no las cuente de más). */
 const ATOM_MISSING = new Set(['Single Icon=Yes, Size=sm, State=Inactive, Contrast=On card']);
 
-const BADGE_00 = <span data-figma-part="00">00</span>;
+const BADGE_00 = '00';
 const label = 'text-xs text-ds-text-neutral-body';
 
 /**

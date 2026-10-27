@@ -228,8 +228,8 @@ export const FigmaMatrixSimple: Story = {
   ),
 };
 
-// Figma nombra "00" la capa de texto del contador de cada pestaña: el comparador la empareja por ese nombre
-const figmaBadge = <span data-figma-part="00">00</span>;
+// Texto de muestra del contador (Tabs ya marca su capa como "00" para el comparador)
+const figmaBadge = '00';
 const COMPLEX_TABS: NotificationPanelTab[] = [
   { value: 'one', label: 'Text', icon: 'heart', badge: figmaBadge },
   { value: 'two', icon: 'heart', badge: figmaBadge, 'aria-label': 'Segunda' },

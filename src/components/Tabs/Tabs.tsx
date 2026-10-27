@@ -255,7 +255,8 @@ export const Tab = forwardRef<HTMLButtonElement, TabProps>(
         )}
         {hasBadge && (
           <Badge type="number" state={isDisabled ? 'neutral' : 'default'} label={badgeLabel} data-figma-part="Badge">
-            {badge}
+            {/* Capa de texto del contador: Figma la llama "00" */}
+            <span data-figma-part="00">{badge}</span>
           </Badge>
         )}
       </button>

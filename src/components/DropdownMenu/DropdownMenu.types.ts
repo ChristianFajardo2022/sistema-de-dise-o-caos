@@ -1,4 +1,4 @@
-import type { HTMLAttributes, LiHTMLAttributes, ReactElement, ReactNode, Ref } from 'react';
+import type { HTMLAttributes, LiHTMLAttributes, ReactElement, ReactNode, Ref, RefObject } from 'react';
 import type { IconName } from '../Icon/Icon.types';
 
 /** Type del set "Dropdown menu" de Figma: panel simple o con campo de búsqueda arriba. */
@@ -37,6 +37,15 @@ export interface DropdownMenuTriggerProps {
   popoverTarget: string;
   popoverTargetAction: 'toggle';
   onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => void;
+}
+
+/** Props de la lista de ítems suelta (`DropdownMenuList`). */
+export interface DropdownMenuListProps extends HTMLAttributes<HTMLDivElement> {
+  /** Nombre accesible del menú (obligatorio). */
+  'aria-label': string;
+  /** Cierra la superficie que contiene la lista al activar un ítem. Sin él, la lista suelta no cierra nada. */
+  onClose?: () => void;
+  children?: ReactNode;
 }
 
 /** Props del panel visual (set "Dropdown menu"). */
@@ -82,6 +91,13 @@ export interface DropdownMenuProps
   align?: DropdownMenuAlign;
   /** Lado preferido. Por defecto `bottom`. */
   side?: DropdownMenuSide;
+  /** Separación en px entre el ancla y el panel. Por defecto 4. */
+  offset?: number;
+  /**
+   * Elemento al que se alinea el panel en lugar del disparador (como `anchorRef` de Select), p. ej. una barra que
+   * contiene al disparador. El foco y los atributos ARIA siguen en el disparador.
+   */
+  anchorRef?: RefObject<HTMLElement | null>;
   /** Abierto (controlado). */
   open?: boolean;
   /** Abierto al inicio (no controlado). */

@@ -315,6 +315,8 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               <>
                 <DropdownMenu
                   align="start"
+                  anchorRef={barRef}
+                  offset={OFFSET}
                   aria-label={labels.category}
                   trigger={(triggerProps) => (
                     <button
