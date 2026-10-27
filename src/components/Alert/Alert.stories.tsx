@@ -61,36 +61,29 @@ const TYPES: { type: AlertType; figma: string }[] = [
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (
-    <div className="w-fit max-w-full bg-ds-background-general-black p-6">
-     <div role="region" tabIndex={0} aria-label="Matriz de Alert" className="max-w-full overflow-x-auto">
-      <div className="grid grid-cols-[auto_auto_auto] items-start gap-x-8 gap-y-4">
-        <span />
-        <span className="text-xs text-ds-text-neutral-body">Background=True</span>
-        <span className="text-xs text-ds-text-neutral-body">Background=False</span>
-        {TYPES.map((t) => (
-          <div key={t.type} className="contents">
-            <span className="text-xs text-ds-text-neutral-body">{t.type}</span>
-            {[true, false].map((bg) => (
-              <Alert
-                key={String(bg)}
-                type={t.type}
-                background={bg}
-                className="w-86"
-                title="Subheading"
-                data-figma={`Type=${t.figma}, Background=${bg ? 'True' : 'False'}`}
-              >
-                Description
-              </Alert>
-            ))}
-          </div>
-        ))}
-      </div>
-     </div>
+    <div className="flex flex-col gap-4 bg-ds-background-general-black p-6">
+      {TYPES.map((t) => (
+        <div key={t.type} className="flex flex-wrap items-start gap-x-8 gap-y-4">
+          <span className="w-16 shrink-0 text-xs text-ds-text-neutral-body">{t.type}</span>
+          {[true, false].map((bg) => (
+            <Alert
+              key={String(bg)}
+              type={t.type}
+              background={bg}
+              className="w-86 shrink-0"
+              title="Subheading"
+              data-figma={`Type=${t.figma}, Background=${bg ? 'True' : 'False'}`}
+            >
+              Description
+            </Alert>
+          ))}
+        </div>
+      ))}
     </div>
   ),
 };
 
-/** Título y descripción opcionales (booleanos Tittle y Description de Figma). */
+/** Título y descripción opcionales (los booleanos Tittle y Description de Figma se resuelven por presencia: sin `title` o sin `children` no se dibuja). */
 export const Partial: Story = {
   render: () => (
     <div className="flex w-86 max-w-full flex-col gap-4">
