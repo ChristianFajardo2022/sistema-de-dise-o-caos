@@ -13,14 +13,14 @@ import { cva } from 'class-variance-authority';
  *   es menor que 56 + padding 16×2) para el avatar y la calificación
  *   (Badge ícono + número a 22/40 del avatar).
  * - Información: gap 4. Línea corta (`eyebrow`, capa "Titulo") 12/18 (typography/body/size/sm) en text/neutral/body;
- *   encabezado (`title`, capa "Subtitulo") Prospero semibold 14/18 en text/neutral/white.
+ *   encabezado (`title`, capa "Subtitulo") Prospero semibold 12/16 (heading xs) en text/neutral/white.
  * - More: Button corner Dots en la muesca de 48. External Link: Button primario de 48 en una muesca de 54 (`lg`).
  * - Communication: dos Button secondary sm de ícono (48), gap 8.
  */
 export const contactCardVariants = cva(
   [
     'relative isolate box-border flex min-h-20.5 w-full min-w-0 items-center gap-ds-space-general-2xl',
-    'p-ds-space-general-2xl',
+    'p-ds-space-container-on-card',
     '[--surface-fill:var(--color-ds-background-container-default-on-card)]',
   ].join(' ')
 );
@@ -43,7 +43,7 @@ export const contactCardEyebrowVariants = cva(
 export const contactCardTitleVariants = cva(
   [
     'm-0 min-w-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
-    'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-white',
+    'text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs text-ds-text-neutral-white',
   ].join(' ')
 );
 

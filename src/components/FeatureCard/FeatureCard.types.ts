@@ -31,7 +31,7 @@ export interface FeatureCardProps extends Omit<HTMLAttributes<HTMLElement>, 'tit
   alt?: string;
   /**
    * Una acción. En `photo` va bajo el texto (normalmente `<Button variant="secondary" size="sm" unicolor />`);
-   * en `surface` va en la muesca de arriba a la derecha (normalmente `<ButtonCorner status="on-card" />`) y sin ella
+   * en `surface` va en la muesca de arriba a la derecha (normalmente `<ButtonCorner contrast="on-card" />`) y sin ella
    * la superficie no lleva muesca. En `cutout` no se usa. Debe tener nombre accesible propio.
    */
   action?: ReactNode;

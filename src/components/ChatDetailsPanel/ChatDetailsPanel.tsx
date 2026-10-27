@@ -28,7 +28,7 @@ import { cn } from '../../utils/cn';
 
 /**
  * Panel lateral de detalle de la conversación (set "Laterales (Atom)" de Figma, 14894:12557). Es un `<aside>` con
- * nombre. Con `collapsible` dibuja arriba el botón de plegar (con `aria-expanded`); plegado mide 64 de ancho (riel). El
+ * nombre. Con `collapsible` dibuja arriba el botón de plegar (con `aria-expanded`); plegado mide 80 de ancho (riel). El
  * contenido se compone con `ChatDetailsHeader`, `ChatDetailsProfile`, `ChatDetailsLink` y `ChatDetailsGrid`.
  */
 export const ChatDetailsPanel = forwardRef<HTMLElement, ChatDetailsPanelProps>(

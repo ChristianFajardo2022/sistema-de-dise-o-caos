@@ -3,13 +3,13 @@ import type { ScrollAreaProps } from '../ScrollArea/ScrollArea.types';
 
 /**
  * Lado del mensaje (Property 1 de Figma).
- * - `incoming` (Default): mensaje recibido, avatar a la izquierda y burbuja background/acent/secondary.
- * - `outgoing` (Variant2 y Variant3): mensaje enviado, burbuja background/general/gray-seventh y avatar a la derecha.
+ * - `incoming` (Default y Variant5): mensaje recibido, avatar a la izquierda y burbuja background/general/gray-seventh.
+ * - `outgoing` (Variant2 y Variant4): mensaje enviado, burbuja background/acent/secondary y avatar a la derecha.
  */
 export type ChatMessageDirection = 'incoming' | 'outgoing';
 
 /**
- * Contenido de la burbuja. `text` ajusta la burbuja al texto; `audio` (Variant3 de Figma) la estira al ancho libre
+ * Contenido de la burbuja. `text` ajusta la burbuja al texto; `audio` (Variant4 y Variant5 de Figma) la estira al ancho libre
  * para el `ChatAudioPlayer`.
  */
 export type ChatMessageType = 'text' | 'audio';
@@ -22,11 +22,11 @@ export interface ChatMessageProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 
   /** Contenido: el texto del mensaje (capa "Status" de Figma) o un `<ChatAudioPlayer />`. */
   children: ReactNode;
   /**
-   * Autor del mensaje. No se ve (Figma no lo dibuja): se lee antes del contenido ("Ana Pérez, 20:14: …") para que cada
+   * Autor del mensaje. No se ve (Figma no lo dibuja): se lee antes del contenido ("Ana Pérez: …") para que cada
    * mensaje del registro diga quién lo escribió.
    */
   author: string;
-  /** Hora visible para lectores (p. ej. "20:14"). Va en un `<time>`; tampoco se dibuja. */
+  /** Hora del mensaje (p. ej. "20:14"). Se ve bajo el contenido (10/14), en un `<time>`. */
   time?: string;
   /** Valor `dateTime` del `<time>` (ISO 8601), si se conoce. */
   dateTime?: string;

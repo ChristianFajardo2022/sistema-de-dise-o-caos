@@ -15,10 +15,9 @@ import { cva } from 'class-variance-authority';
  *   título 20/24 (heading/size/md de Figma = heading-lg de tokens.css), resumen 14/18 y Button terciario sm.
  * - horizontal (497×266): foto a la izquierda (radio 24) con etiquetas arriba (padding 8) y franja del autor abajo
  *   (48: padding 12/8); a la derecha, bloque de 16 de padding (space/container/second-level → space/general/2xl) con
- *   gap 16: fecha y bloque "Information" (gap 4 = gap/general/sm → space/general/md): título 14/18 (heading/size/xs de
- *   Figma = heading-sm de tokens.css), resumen 12/18 (body/size/sm, body/line-height-large/sm) y Button terciario xs.
+ *   gap 16: fecha y bloque "Information" (gap 4 = gap/general/sm → space/general/md): título 12/16 (heading/size/xs), resumen 12/18 (body/size/sm, body/line-height-large/sm) y Button terciario xs.
  *   Gap 16 entre las dos columnas (space/general/2xl). Figma reparte 224,5 / 256,5 con las dos en FILL: aquí mitades.
- * - Autor: Helvetica Neue 14/18 (vertical; Figma pide Medium, sin token de peso 500 → regular) o 12/16 (horizontal) en
+ * - Autor: Helvetica Neue 14/18 (vertical, Semibold) o 12/16 (horizontal) en
  *   text/neutral/black. Degradado de Figma en blanco sin variable → background/general/white; con el tema oscuro
  *   forzado de `MediaScrim` son siempre blanco y negro, como en Figma.
  * - Fecha (las dos): 10/14 en text/neutral/body con ícono calendar de 12 (icon/general/gray-high-contrast), gap 4.
@@ -30,6 +29,7 @@ import { cva } from 'class-variance-authority';
 
 const primary = 'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]';
 const semibold = 'font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]';
+const primarySemibold = 'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-semibold)]';
 const corners = 'rounded-tl-ds-radius-general-2xl rounded-bl-ds-radius-general-2xl rounded-br-ds-radius-general-2xl';
 
 /** Raíz (`<article>`). */
@@ -93,7 +93,7 @@ export const blogCardAuthorBarVariants = cva(
 /** Capa "Container": avatar y nombre, gap 8. */
 export const blogCardAuthorClass = 'flex min-w-0 flex-1 items-center gap-ds-space-general-lg';
 
-export const blogCardAuthorNameVariants = cva(`min-w-0 truncate ${primary} text-ds-text-neutral-black`, {
+export const blogCardAuthorNameVariants = cva(`min-w-0 truncate ${primarySemibold} text-ds-text-neutral-black`, {
   variants: {
     orientation: {
       vertical: 'text-ds-primitives-typography-size-md leading-ds-typography-body-line-height-short-md',
@@ -145,7 +145,7 @@ export const blogCardTitleVariants = cva(`m-0 min-w-0 ${semibold}`, {
   variants: {
     orientation: {
       vertical: 'text-ds-typography-heading-size-lg leading-ds-typography-heading-line-height-lg text-ds-text-neutral-heading',
-      horizontal: 'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-heading',
+      horizontal: 'text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs text-ds-text-neutral-heading',
     },
   },
   defaultVariants: { orientation: 'vertical' },

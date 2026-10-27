@@ -20,16 +20,16 @@ const meta = {
       control: 'inline-radio',
       options: ['incoming', 'outgoing'],
       type: { name: 'enum', value: ['incoming', 'outgoing'] },
-      description: 'Property 1 de Figma: Default = incoming; Variant2 y Variant3 = outgoing',
+      description: 'Property 1 de Figma: Default = incoming; Variant5 = incoming audio; Variant2 y Variant4 = outgoing',
     },
     type: {
       control: 'inline-radio',
       options: ['text', 'audio'],
       type: { name: 'enum', value: ['text', 'audio'] },
-      description: 'Variant3 de Figma = audio',
+      description: 'Variant4 y Variant5 de Figma = audio',
     },
     author: { control: 'text', type: { name: 'string' }, description: 'Autor (solo para lectores)' },
-    time: { control: 'text', type: { name: 'string' }, description: 'Hora (solo para lectores)' },
+    time: { control: 'text', type: { name: 'string' }, description: 'Hora visible bajo el contenido' },
     children: { control: 'text', type: { name: 'string' } },
   },
   args: {
@@ -58,7 +58,7 @@ export const Interactive: Story = {
   render: ({ children, ...args }) => (
     <ul className="m-0 list-none p-0">
       <ChatMessage {...args} avatar={avatar(args.direction === 'outgoing' ? 'Men_4' : 'Woman_1')}>
-        {args.type === 'audio' ? <ChatAudioPlayer duration={74} /> : children}
+        {args.type === 'audio' ? <ChatAudioPlayer duration={74} timePosition="start" buttonPosition="end" /> : children}
       </ChatMessage>
     </ul>
   ),
@@ -101,7 +101,7 @@ function ConversationDemo() {
             time={m.time}
             avatar={avatar(m.direction === 'incoming' ? 'Woman_1' : 'Men_4')}
           >
-            {m.audio ? <ChatAudioPlayer duration={m.audio} /> : m.text}
+            {m.audio ? <ChatAudioPlayer duration={m.audio} timePosition="start" buttonPosition="end" /> : m.text}
           </ChatMessage>
         ))}
       </ChatMessageList>
@@ -117,10 +117,11 @@ export const Conversation: Story = { render: () => <ConversationDemo /> };
 const FIGMA: { name: string; direction: ChatMessageDirection; type: ChatMessageType; photo: PhotoName }[] = [
   { name: 'Property 1=Default', direction: 'incoming', type: 'text', photo: 'Woman_1' },
   { name: 'Property 1=Variant2', direction: 'outgoing', type: 'text', photo: 'Men_4' },
-  { name: 'Property 1=Variant3', direction: 'outgoing', type: 'audio', photo: 'Men_4' },
+  { name: 'Property 1=Variant4', direction: 'outgoing', type: 'audio', photo: 'Men_4' },
+  { name: 'Property 1=Variant5', direction: 'incoming', type: 'audio', photo: 'Woman_1' },
 ];
 
-/** Las tres variantes de Figma (266 de ancho), con los textos de Figma. La onda marca 10 barras reproducidas. */
+/** Las cuatro variantes de Figma (266 de ancho), con los textos de Figma. La onda marca 10 barras reproducidas. */
 export const FigmaMatrix: Story = {
   decorators: [(Story) => <Story />],
   render: () => (
@@ -136,7 +137,7 @@ export const FigmaMatrix: Story = {
             time="20:14"
             avatar={avatar(v.photo)}
           >
-            {v.type === 'audio' ? <ChatAudioPlayer duration={1214} defaultCurrentTime={(1214 * 10) / 179} /> : 'Tienda oficial del libro '}
+            {v.type === 'audio' ? <ChatAudioPlayer duration={1214} defaultCurrentTime={(1214 * 10) / 179} timePosition="start" buttonPosition="end" /> : 'Tienda oficial del libro '}
           </ChatMessage>
         ))}
       </ul>
@@ -144,7 +145,7 @@ export const FigmaMatrix: Story = {
   ),
 };
 
-/** Test: registro con nombre, cada mensaje lee autor y hora antes del contenido; el audio se reproduce y se pausa. */
+/** Test: registro con nombre, cada mensaje lee el autor antes del contenido y muestra la hora; el audio se reproduce y se pausa. */
 export const AccessibilityTest: Story = {
   tags: ['!autodocs'],
   render: () => (
@@ -154,7 +155,7 @@ export const AccessibilityTest: Story = {
           Hola
         </ChatMessage>
         <ChatMessage direction="outgoing" type="audio" author="Tú" time="09:13" avatar={avatar('Men_4')}>
-          <ChatAudioPlayer duration={20} />
+          <ChatAudioPlayer duration={20} timePosition="start" buttonPosition="end" />
         </ChatMessage>
       </ChatMessageList>
     </div>
@@ -165,7 +166,7 @@ export const AccessibilityTest: Story = {
     await expect(log).toHaveAttribute('aria-live', 'polite');
     const items = within(log).getAllByRole('listitem');
     await expect(items).toHaveLength(2);
-    await expect(items[0]).toHaveTextContent(/^Ana Pérez, 09:12: Hola$/);
+    await expect(items[0]).toHaveTextContent(/^Ana Pérez: Hola, 09:12$/);
     await expect(items[0].querySelector('time')).toHaveTextContent('09:12');
     const play = canvas.getByRole('button', { name: 'Reproducir audio' });
     await userEvent.click(play);

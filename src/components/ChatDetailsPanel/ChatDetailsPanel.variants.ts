@@ -9,8 +9,8 @@ import { cva } from 'class-variance-authority';
  * (eliminar, descargar) · Type5 = fotografías con acciones.
  *
  * - Panel: background/container/default-on-canva, radius/container/On card (24), sombra effect/shadow md
- *   (`shadow-ds-on-canva-md`), padding 16 (space/container/second-level -> space/general/2xl), gap space/general/3xl (24),
- *   320 de ancho. Riel: ancho 64 (padding 16 y botones de 32), gap space/general/6xl (56), centrado.
+ *   (`shadow-ds-on-canva-md`), padding 24 (space/container/on-card), gap space/general/3xl (24),
+ *   320 de ancho. Riel: ancho 80 (padding 24 y botones de 32), gap space/general/6xl (56), centrado.
  *   Type6 y Type5 traen además un trazo de 1 (border/general/default-on-canva) y Type6 gap 32: no se hace variante (ver docs).
  * - Encabezado de vistas: fila de 36, justify-between: Button tertiary xs con `chevron-left` ("Anterior") y acciones
  *   Button secondary xs (gap space/general/lg 8).
@@ -25,13 +25,13 @@ import { cva } from 'class-variance-authority';
 export const chatDetailsPanelVariants = cva(
   [
     'box-border flex min-h-0 flex-col rounded-ds-radius-container-on-card bg-ds-background-container-default-on-canva',
-    'shadow-ds-on-canva-md p-ds-space-general-2xl',
+    'shadow-ds-on-canva-md p-ds-space-container-on-card',
   ].join(' '),
   {
     variants: {
       collapsed: {
         false: 'w-80 gap-ds-space-general-3xl',
-        true: 'w-16 items-center gap-ds-space-general-6xl',
+        true: 'w-20 items-center gap-ds-space-general-6xl',
       },
     },
     defaultVariants: { collapsed: false },

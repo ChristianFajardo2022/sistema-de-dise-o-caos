@@ -53,7 +53,7 @@ export const chatCardControlVariants = cva(
 
 export const chatCardDescriptionVariants = cva(
   [
-    'm-0 min-w-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
+    'm-0 min-w-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-primitives-typography-size-md leading-ds-typography-body-line-height-short-md text-ds-text-neutral-gray',
   ].join(' '),
   {

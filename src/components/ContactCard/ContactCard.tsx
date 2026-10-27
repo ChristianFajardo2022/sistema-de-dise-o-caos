@@ -65,7 +65,7 @@ export const ContactCard = forwardRef<HTMLElement, ContactCardProps>(
     const moreCorner = (
       <ButtonCorner
         variant="dots"
-        status="on-canva"
+        contrast="on-canva"
         size="md"
         aria-label={moreLabel ?? withName('Más opciones de')}
         onClick={has(menuItems) ? undefined : onMoreClick}

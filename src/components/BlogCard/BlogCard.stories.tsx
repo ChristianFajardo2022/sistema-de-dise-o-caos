@@ -99,7 +99,7 @@ export const WithAction: Story = {
       {...args}
       authorAvatar={authorAvatar}
       tags={<Tag>Logística</Tag>}
-      action={<ButtonCorner variant="favorite" status="on-canva" aria-label={`Guardar ${String(args.title)}`} />}
+      action={<ButtonCorner variant="favorite" contrast="on-canva" aria-label={`Guardar ${String(args.title)}`} />}
     />
   ),
 };
@@ -178,7 +178,7 @@ export const AccessibilityTest: Story = {
       authorAvatar={authorAvatar}
       tags={<Tag>Logística</Tag>}
       linkProps={{ onClick: onOpen }}
-      action={<ButtonCorner variant="favorite" status="on-canva" aria-label="Guardar Cinco ideas para empacar mejor" onClick={onSave} />}
+      action={<ButtonCorner variant="favorite" contrast="on-canva" aria-label="Guardar Cinco ideas para empacar mejor" onClick={onSave} />}
     />
   ),
   play: async ({ canvasElement }) => {

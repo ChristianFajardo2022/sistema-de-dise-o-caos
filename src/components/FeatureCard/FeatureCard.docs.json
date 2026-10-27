@@ -19,7 +19,7 @@
   },
   "examples": [
     { "title": "photo", "code": "<FeatureCard\n  variant=\"photo\"\n  src={foto}\n  date=\"7 feb 2024\"\n  dateTime=\"2024-02-07\"\n  title=\"Nueva colección de empaques\"\n  description=\"Cajas rígidas en negro mate.\"\n  action={<Button variant=\"secondary\" size=\"sm\" unicolor>Ver colección</Button>}\n/>" },
-    { "title": "surface con lista", "code": "<FeatureCard\n  variant=\"surface\"\n  title=\"Pedidos por despachar\"\n  action={<ButtonCorner status=\"on-card\" aria-label=\"Abrir Pedidos por despachar\" />}\n>\n  <ul role=\"list\"><ListItem title=\"Pedido 1024\" leading={<Avatar name=\"Hugo García\" size=\"sm\" />} /></ul>\n</FeatureCard>" },
+    { "title": "surface con lista", "code": "<FeatureCard\n  variant=\"surface\"\n  title=\"Pedidos por despachar\"\n  action={<ButtonCorner contrast=\"on-card\" aria-label=\"Abrir Pedidos por despachar\" />}\n>\n  <ul role=\"list\"><ListItem title=\"Pedido 1024\" leading={<Avatar name=\"Hugo García\" size=\"sm\" />} /></ul>\n</FeatureCard>" },
     { "title": "cutout", "code": "<FeatureCard variant=\"cutout\" src={foto} eyebrow=\"Guía\" title={'Cómo preparar\\ntu primer envío'} />" }
   ]
 }

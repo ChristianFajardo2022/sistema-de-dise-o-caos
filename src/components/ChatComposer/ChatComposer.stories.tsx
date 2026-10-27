@@ -56,12 +56,12 @@ export const Interactive: Story = {
   args: { onSend: fn(), onRecord: fn() },
 };
 
-/** Con adjuntos (State4 de Figma). */
+/** Con adjuntos (State=Default de Figma). */
 export const WithAttachments: Story = {
   args: { onSend: fn(), onRecord: fn(), attachments },
 };
 
-/** Audio grabado listo para enviar (State3 de Figma, la segunda). */
+/** Audio grabado listo para enviar con reproducir a la izquierda (ya no está en el set de Figma). */
 export const WithAudio: Story = {
   args: {
     onRecord: fn(),
@@ -116,7 +116,7 @@ function SendDemo() {
 export const Controlled: Story = { render: () => <SendDemo /> };
 
 const FIGMA: { name: string; render: (name: string) => ReactNode }[] = [
-  { name: 'State=Default', render: (name) => <ChatComposer data-figma={name} onRecord={() => {}} /> },
+  { name: 'State=Default', render: (name) => <ChatComposer data-figma={name} onRecord={() => {}} attachments={attachments} /> },
   {
     name: 'State=State3',
     render: (name) => (
@@ -127,24 +127,10 @@ const FIGMA: { name: string; render: (name: string) => ReactNode }[] = [
       />
     ),
   },
-  { name: 'State=State4', render: (name) => <ChatComposer data-figma={name} onRecord={() => {}} attachments={attachments} /> },
-  {
-    name: 'State=State3',
-    render: (name) => (
-      <ChatComposer
-        data-figma={name}
-        onRecord={() => {}}
-        onSendAudio={() => {}}
-        attachments={attachments}
-        audio={<ChatAudioPlayer duration={1214} defaultCurrentTime={(1214 * 10) / 179} />}
-      />
-    ),
-  },
 ];
 
 /**
- * Las cuatro variantes de Figma (1269 de ancho), en orden. El set tiene errores: dos variantes se llaman
- * "State=State3" (el comparador las empareja por orden).
+ * Las dos variantes de Figma (1269 de ancho), en orden.
  */
 export const FigmaMatrix: Story = {
   decorators: [(Story) => <Story />],

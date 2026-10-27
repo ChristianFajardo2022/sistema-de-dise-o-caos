@@ -244,7 +244,7 @@ function ChatSidebar({ conversations, selectedId, onSelect, cardRefs, figma = fa
       className={cn('relative isolate box-border flex min-h-0 flex-col gap-ds-space-general-3xl p-ds-space-general-2xl', className)}
     >
       <NotchedSurface notch="md" shadow="on-canva" className="[--surface-fill:var(--color-ds-background-container-default-on-canva)]" />
-      <ButtonCorner variant="icon" status="on-canva" size="md" aria-label="Ajustes del chat" icon={<Icon name="setting" size={16} variant="fill" data-figma-part="Icon-sizes" />} className="absolute top-0 right-0" />
+      <ButtonCorner variant="icon" contrast="on-canva" size="md" aria-label="Ajustes del chat" icon={<Icon name="setting" size={16} variant="fill" data-figma-part="Icon-sizes" />} className="absolute top-0 right-0" />
       <div className="flex items-center gap-ds-space-general-lg pr-12">
         <h2
           id={titleId}
@@ -330,7 +330,11 @@ function ConversationView({ conversation, onSend, touch = false, onBack, heading
             avatar={photo(m.mine ? ME : conversation.photo)}
           >
             {m.audio ? (
-              figma ? <FigmaAudioPlayer /> : <ChatAudioPlayer duration={m.audio} />
+              figma ? (
+                <FigmaAudioPlayer timePosition="start" buttonPosition="end" />
+              ) : (
+                <ChatAudioPlayer duration={m.audio} timePosition="start" buttonPosition="end" />
+              )
             ) : figma ? (
               'Tienda oficial del libro '
             ) : (
@@ -344,7 +348,18 @@ function ConversationView({ conversation, onSend, touch = false, onBack, heading
         label={`Mensaje para ${conversation.name}`}
         onSend={onSend}
         onRecord={() => setRecorded(true)}
-        attachments={touch ? (recorded ? iconButton('add-2', 'Adjuntar', true) : undefined) : undefined}
+        attachments={
+          touch ? (
+            recorded ? (
+              iconButton('add-2', 'Adjuntar', true)
+            ) : undefined
+          ) : (
+            <>
+              {iconButton('folder', 'Adjuntar documento')}
+              {iconButton('image', 'Adjuntar imagen')}
+            </>
+          )
+        }
         audio={
           recorded ? (
             figma ? (
@@ -610,7 +625,7 @@ export const FlowTest: Story = {
     const field = canvas.getByRole('textbox', { name: 'Mensaje para Sara Molina' });
     await userEvent.click(field);
     await userEvent.keyboard('Sí, claro{Enter}');
-    await expect(within(log).getAllByRole('listitem').at(-1)).toHaveTextContent(/^Tú, \d\d:\d\d: Sí, claro$/);
+    await expect(within(log).getAllByRole('listitem').at(-1)).toHaveTextContent(/^Tú: Sí, claro, \d\d:\d\d$/);
     await userEvent.click(canvas.getByRole('button', { name: 'Conversaciones' }));
     await waitFor(() => expect(canvas.getByRole('button', { name: 'Sara Molina' })).toHaveFocus());
     await expect(canvas.queryByRole('log')).not.toBeInTheDocument();

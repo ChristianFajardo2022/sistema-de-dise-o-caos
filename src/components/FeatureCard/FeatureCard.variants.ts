@@ -121,7 +121,7 @@ export const featureCardCutoutTextClass = [
 
 export const featureCardEyebrowClass = [
   `order-first m-0 min-w-0 ${secondary} [font-weight:var(--ds-primitives-typography-weight-semibold)]`,
-  'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-white',
+  'text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs text-ds-text-neutral-white',
 ].join(' ');
 
 export const featureCardCutoutTitleClass = [

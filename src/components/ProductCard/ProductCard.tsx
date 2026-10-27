@@ -186,7 +186,7 @@ export const ProductCard = forwardRef<HTMLElement, ProductCardProps>(
         <ButtonCorner
           {...favoriteButtonProps}
           variant="favorite"
-          status="on-card"
+          contrast="on-card"
           size="md"
           pressed={favorite}
           aria-label={favoriteLabel ?? `Agregar ${title} a favoritos`}

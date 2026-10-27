@@ -14,6 +14,7 @@
     "src": { "type": "string", "required": false, "description": "URL del audio; activa el audio interno." },
     "waveform": { "type": "readonly number[]", "required": false, "description": "Alturas 0–1 de las barras; por defecto la onda de Figma (179). Si no caben, se reduce a las barras que caben en el ancho (medido con ResizeObserver) para que la parte encendida coincida con la posición." },
     "buttonVariant": { "type": "'secondary' | 'primary'", "default": "'secondary'", "description": "primary = composer móvil." },
+    "timePosition": { "type": "'start' | 'end'", "default": "'end'", "description": "Hora (duración) a la izquierda de la onda, con el color de la burbuja (mensaje de chat), o a la derecha (composer)." },
     "buttonPosition": { "type": "'start' | 'end'", "default": "'start'", "description": "Botón antes o después de la duración." },
     "playLabel": { "type": "string", "default": "'Reproducir audio'", "description": "Nombre del botón en pausa." },
     "pauseLabel": { "type": "string", "default": "'Pausar audio'", "description": "Nombre del botón reproduciendo." },

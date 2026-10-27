@@ -5,15 +5,15 @@ import { cva } from 'class-variance-authority';
  *
  * Fuente: component set "Audio (Atom)" de Figma (14894:2745). Pese al nombre, es el campo para escribir de la
  * conversación (no el mensaje de audio). Set con errores: dos variantes se llaman "State=State3".
- * - State=Default (98 de alto): campo con Enviar dentro y Grabar a la derecha, en una fila.
- * - State=State4 (146): lo mismo y debajo la fila "CTA" con los adjuntos (folder, image).
- * - State=State3 (114, la primera): audio grabado (onda, duración y reproducir a la derecha) y adjuntos debajo.
- * - State=State3 (134, la segunda): audio con reproducir a la izquierda; abajo adjuntos a la izquierda y Grabar + Enviar
- *   a la derecha. La pantalla Chat móvil usa esta disposición con botones sm (40) y el ícono `add` como adjunto.
+ * - State=Default (146): campo con Enviar dentro y Grabar a la derecha, y debajo la fila "CTA" con los adjuntos
+ *   (folder, image). Sin adjuntos (`attachments` vacío) queda solo la fila superior (98).
+ * - State=State3: audio grabado (onda, duración y reproducir a la derecha) y adjuntos debajo.
+ * - Disposición con reproducir a la izquierda; abajo adjuntos a la izquierda y Grabar + Enviar a la derecha (ya no está
+ *   en el set de Figma). La pantalla Chat móvil la usa con botones sm (40) y el ícono `add` como adjunto.
  *
  * - Raíz: background/container/default-on-card, trazo de 1 (border/general/default-on-canva, suma al alto como en Figma), radius/container/On card
- *   (24 en escritorio, responsive), padding y gap space/general/2xl (16). Dos filas: gap space/general/2xl (16); con
- *   audio, space/general/4xl (32). Móvil (`touch`): padding 8/8/8/16 (space/general/lg y 2xl), gap 3xl (24), sin trazo.
+ *   (24 en escritorio, responsive), padding y gap space/general/2xl (16). Dos filas: gap space/general/2xl (16), con o
+ *   sin audio. Móvil (`touch`): padding 8/8/8/16 (space/general/lg y 2xl), gap 3xl (24), sin trazo.
  * - Campo: alto 64, padding space/general/xl (12), radius/general/xl (16). Figma no enlaza el relleno (#45484d = G12):
  *   se usa background/field/surface-secondary, que es G12 en oscuro.
  * - Texto: typography/field/size/sm y field/line-height/sm (14/18), familia primaria; ayuda en text/field/label-secondary.
@@ -37,7 +37,6 @@ export const chatComposerVariants = cva(
         false: '',
       },
     },
-    compoundVariants: [{ touch: false, withAudio: true, class: 'gap-ds-space-general-4xl' }],
     defaultVariants: { touch: false, withAudio: false },
   }
 );

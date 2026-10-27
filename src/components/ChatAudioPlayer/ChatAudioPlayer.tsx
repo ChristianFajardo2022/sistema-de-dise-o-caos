@@ -38,6 +38,7 @@ export const ChatAudioPlayer = forwardRef<HTMLButtonElement, ChatAudioPlayerProp
       waveform = DEFAULT_WAVEFORM,
       buttonVariant = 'secondary',
       buttonPosition = 'start',
+      timePosition = 'end',
       playLabel = 'Reproducir audio',
       pauseLabel = 'Pausar audio',
       seekLabel = 'Posición del audio',
@@ -116,9 +117,16 @@ export const ChatAudioPlayer = forwardRef<HTMLButtonElement, ChatAudioPlayerProp
       </Button>
     );
 
+    const time = (
+      <p data-figma-part="Hora" className={chatAudioPlayerTimeVariants({ position: timePosition })}>
+        {formatAudioTime(duration)}
+      </p>
+    );
+
     return (
       <div {...rest} data-figma-part="Reproductor" className={cn(chatAudioPlayerVariants(), className)}>
         {buttonPosition === 'start' && button}
+        {timePosition === 'start' && time}
         <div ref={waveRef} data-figma-part="Onda de audio" className={chatAudioPlayerWaveVariants()}>
           {bars.map((height, i) => (
             <span
@@ -142,9 +150,7 @@ export const ChatAudioPlayer = forwardRef<HTMLButtonElement, ChatAudioPlayerProp
             className={chatAudioPlayerSeekVariants()}
           />
         </div>
-        <p data-figma-part="Hora" className={chatAudioPlayerTimeVariants()}>
-          {formatAudioTime(duration)}
-        </p>
+        {timePosition === 'end' && time}
         {buttonPosition === 'end' && button}
         {src && (
           <audio

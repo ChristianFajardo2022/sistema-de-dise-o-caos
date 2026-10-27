@@ -3,6 +3,9 @@ import type { HTMLAttributes } from 'react';
 /** Botón de reproducir: `secondary` (burbuja y composer de escritorio, con trazo) o `primary` (composer móvil, relleno). */
 export type ChatAudioPlayerButtonVariant = 'secondary' | 'primary';
 
+/** Posición de la hora (duración) respecto de la onda. */
+export type ChatAudioPlayerTimePosition = 'start' | 'end';
+
 /** Posición del botón de reproducir respecto de la onda. */
 export type ChatAudioPlayerButtonPosition = 'start' | 'end';
 
@@ -36,6 +39,11 @@ export interface ChatAudioPlayerProps extends Omit<HTMLAttributes<HTMLDivElement
   buttonVariant?: ChatAudioPlayerButtonVariant;
   /** Botón antes (`start`, por defecto) o después de la duración (`end`). */
   buttonPosition?: ChatAudioPlayerButtonPosition;
+  /**
+   * Hora antes (`start`, dentro del mensaje de chat: a la izquierda de la onda, con el color del texto de la burbuja) o
+   * después de la onda (`end`, composer). Por defecto `end`.
+   */
+  timePosition?: ChatAudioPlayerTimePosition;
   /** Nombre accesible del botón en pausa. Por defecto "Reproducir audio". */
   playLabel?: string;
   /** Nombre accesible del botón reproduciendo. Por defecto "Pausar audio". */

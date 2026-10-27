@@ -10,7 +10,8 @@ import { cva } from 'class-variance-authority';
  * - Botón: Button xs (32) solo ícono `play`, secondary (trazo border/button/secondary low) o primary.
  * - "Onda de audio": alto 26 (sin token), barras de 3 de ancho con radio completo y separación 3; las reproducidas en
  *   background/acent/tertiary y las demás en background/general/gray-fifth. Ocupa el ancho libre y recorta.
- * - "Hora": 12 px en text/neutral/body. Figma usa Inter 12/auto sin variables: se usa la familia primaria con
+ * - "Hora": 12 px; a la derecha de la onda en el composer (text/neutral/body) o a la izquierda en el mensaje de chat
+ *   (`timePosition="start"`, color heredado de la burbuja). Figma usa Inter 12/auto sin variables: se usa la familia primaria con
  *   typography/size/sm y body/line-height-short/sm (16).
  */
 export const chatAudioPlayerVariants = cva('flex min-h-9 w-full min-w-0 items-center gap-2.5');
@@ -42,6 +43,16 @@ export const chatAudioPlayerSeekVariants = cva(
 export const chatAudioPlayerTimeVariants = cva(
   [
     'm-0 shrink-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
-    'text-ds-primitives-typography-size-sm leading-ds-typography-body-line-height-short-sm text-ds-text-neutral-body tabular-nums',
-  ].join(' ')
+    'text-ds-primitives-typography-size-sm leading-ds-typography-body-line-height-short-sm tabular-nums',
+  ].join(' '),
+  {
+    variants: {
+      // `start` (dentro del mensaje) hereda el color de la burbuja; `end` (composer) usa text/neutral/body
+      position: {
+        start: 'text-inherit',
+        end: 'text-ds-text-neutral-body',
+      },
+    },
+    defaultVariants: { position: 'end' },
+  }
 );

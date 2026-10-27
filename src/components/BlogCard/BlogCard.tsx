@@ -162,7 +162,7 @@ export const BlogCard = forwardRef<HTMLElement, BlogCardProps>(
               <span
                 aria-hidden="true"
                 data-figma-part="Button corner "
-                className={cn(buttonCornerVariants({ status: 'on-canva', size: 'md' }), blogCardCornerClass, cornerShadowClass, 'cursor-pointer')}
+                className={cn(buttonCornerVariants({ contrast: 'on-canva', size: 'md' }), blogCardCornerClass, cornerShadowClass, 'cursor-pointer')}
               >
                 <Icon name="arrow-diagonal-right" size={16} variant="line" data-figma-part="Icon-sizes" />
               </span>

@@ -39,7 +39,7 @@ const meta = {
       control: 'radio',
       options: VARIANT_OPTIONS,
       type: { name: 'enum', value: [...VARIANT_OPTIONS] },
-      description: 'photo = "Type=File card, State=default" · surface = "Type=File card" · cutout = "Type=canva"',
+      description: 'photo y surface sin set en Figma (se conservan) · cutout = "Type=2"',
     },
     title: { control: 'text', type: { name: 'string' } },
     description: { control: 'text', type: { name: 'string' } },
@@ -80,7 +80,7 @@ function ItemList({ figma = false }: { figma?: boolean }) {
 function Corner({ label }: { label: string }) {
   return (
     <ButtonCorner
-      status="on-card"
+      contrast="on-card"
       size="md"
       aria-label={label}
       icon={<Icon name="arrow-diagonal-right" size={16} variant="line" data-figma-part="Icon-sizes" />}
@@ -151,12 +151,14 @@ const FIGMA_TEXT = {
   dateTime: '2024-02-07',
 } satisfies Partial<FeatureCardProps>;
 
-/** Las 3 variantes del set 16903:57057 con los textos de Figma. `figma` pone `data-figma` (solo una copia lo lleva). */
+/**
+ * Las 3 variantes con los textos de Figma. El set vigente (16903:57057) solo tiene `Type=2` (= cutout): `photo` y `surface`
+ * ya no tienen set y no llevan `data-figma`. `figma` pone `data-figma` (solo una copia lo lleva).
+ */
 function MatrixCards({ figma }: { figma: boolean }) {
   return (
     <>
       <FeatureCard
-        data-figma={figma ? 'Type=File card, State=default' : undefined}
         className="w-[498px]"
         variant="photo"
         {...FIGMA_TEXT}
@@ -168,14 +170,13 @@ function MatrixCards({ figma }: { figma: boolean }) {
         }
       />
       <FeatureCard
-        data-figma={figma ? 'Type=canva, State=default' : undefined}
+        data-figma={figma ? 'Type=2' : undefined}
         className="w-[612px]"
         variant="cutout"
         eyebrow="Titulo"
         title={'Best Full Body\nHome Gym Machines'}
       />
       <FeatureCard
-        data-figma={figma ? 'Type=File card' : undefined}
         className="w-[498px]"
         variant="surface"
         {...FIGMA_TEXT}

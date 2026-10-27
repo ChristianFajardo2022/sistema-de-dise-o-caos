@@ -79,10 +79,10 @@ export const productCardRevealVariants = cva('', {
 /** Grupo de textos (Frame 1984080535): gap 8. */
 export const productCardTextGroupClass = 'flex flex-col gap-ds-space-general-lg';
 
-/** Título (Filename): Prospero semibold 14/18, una línea. */
+/** Título (Filename): Prospero semibold 12/16 (heading xs), una línea. */
 export const productCardTitleClass = [
   'm-0 truncate font-ds-primitives-typography-family-secondary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
-  'text-ds-typography-heading-size-sm leading-ds-typography-heading-line-height-sm text-ds-text-neutral-white-unicolor',
+  'text-ds-typography-heading-size-xs leading-ds-typography-heading-line-height-xs text-ds-text-neutral-white-unicolor',
 ].join(' ');
 
 /** Descripción (Status): Helvetica Neue regular 14/18. */
