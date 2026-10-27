@@ -39,6 +39,7 @@ export const fileDropzoneVariants = cva(rootBase, {
         'has-[input:focus-visible]:text-ds-border-field-active has-[input:focus-visible]:px-ds-space-field-lg',
         'has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-solid has-[input:focus-visible]:outline-ds-border-field-active',
       ].join(' '),
+      static: 'px-ds-space-field-xl text-ds-border-field-disabled',
       idle: 'cursor-pointer px-ds-space-field-xl text-ds-border-field-disabled',
       hover: `cursor-pointer ${hoverLook}`,
       focus: `cursor-pointer ${focusLook}`,
@@ -49,6 +50,7 @@ export const fileDropzoneVariants = cva(rootBase, {
 });
 
 /** SVG del trazo punteado, sobre toda la raíz y sin interceptar el puntero. */
+/** @deprecated El trazo lo dibuja `_internal/DashedStroke`; ya no se usa. */
 export const fileDropzoneStrokeClass = 'pointer-events-none absolute inset-0 size-full overflow-visible';
 
 export const fileDropzoneContentClass = 'flex w-full min-w-0 flex-col items-center justify-center gap-ds-space-field-xs';

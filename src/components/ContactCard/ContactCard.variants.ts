@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
  * - Raíz transparente, fila, centrada, alto mínimo 82 (min-h-20.5), padding 16 (space/general/2xl), gap 16.
  *   Superficie background/container/default-on-card, radius/general/2xl (24); con muesca (More y External Link)
  *   el Button corner va arriba a la derecha.
- * - "Item card" (Avatar 56): marcador interno, un contenedor 56×56 relativo (con -3 de margen vertical: el alto de 82 de Figma
+ * - "Item card" (Avatar 56): pieza común `_internal/ItemCardMark` (contenedor 56×56 relativo) (con -3 de margen vertical: el alto de 82 de Figma
  *   es menor que 56 + padding 16×2) para el avatar y la calificación
  *   (Badge ícono + número a 22/40 del avatar).
  * - Información: gap 4. Línea corta (`eyebrow`, capa "Titulo") 12/18 (typography/body/size/sm) en text/neutral/body;
@@ -25,7 +25,7 @@ export const contactCardVariants = cva(
   ].join(' ')
 );
 
-export const contactCardItemVariants = cva('relative -my-0.75 flex size-14 shrink-0 items-center justify-center');
+export const contactCardItemVariants = cva('-my-0.75');
 
 export const contactCardRatingVariants = cva('absolute top-10 left-5.5');
 

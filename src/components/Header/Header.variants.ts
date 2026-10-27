@@ -13,7 +13,7 @@ import { cva } from 'class-variance-authority';
  * - Izquierda ("Logo+options", ocupa lo que sobra): Logo icon sm (32) + navegación con gap 16. Centro: buscador de 334.
  *   Derecha: campana de 48 y avatar de 48, gap 8.
  * - Submenú: banda de todo el ancho bajo la barra, relleno background/container/surface-opacity (60 %) con el efecto GLASS
- *   de Figma (receta de Fundamentos › Texturas: blur 4, saturate 180 %, brightness 1.15; sin token de efecto), padding inferior
+ *   de Figma (utilidad `ds-effect-glass` de index.css), padding inferior
  *   24; la lista (280 de ancho, ítems "Dropdown list" de 34) empieza donde empieza el botón que la abrió.
  * Móvil:
  * - Barra: padding 20 (space/general/3xl, token que vale lo mismo que space/container/default), gap 12, fila de 32:
@@ -61,7 +61,7 @@ export const headerMenuButtonClass =
 
 /** Banda del submenú de escritorio. */
 export const headerBandClass =
-  'absolute inset-x-0 top-full z-10 box-border pb-ds-space-general-3xl bg-ds-background-container-surface-opacity backdrop-blur-[4px] backdrop-saturate-[180%] backdrop-brightness-[1.15]';
+  'absolute inset-x-0 top-full z-10 box-border pb-ds-space-general-3xl bg-ds-background-container-surface-opacity ds-effect-glass';
 
 export const headerBandListClass = 'm-0 flex w-70 max-w-full list-none flex-col p-0';
 

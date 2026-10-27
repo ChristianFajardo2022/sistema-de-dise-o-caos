@@ -3,9 +3,9 @@ import type { HTMLAttributes, InputHTMLAttributes, ReactNode, Ref } from 'react'
 /**
  * State de Figma (Input file upload 11438:5774). Solo fuerza el aspecto para documentación: en uso normal Hover sale
  * de `:hover` (o de arrastrar un archivo encima), Focus del foco con teclado del input y Disabled de `disabled`.
- * `default` fija el aspecto en reposo (sin reaccionar al puntero).
+ * `default` fija el aspecto en reposo (sin reaccionar al puntero). `static` es igual pero sin el cursor de acción.
  */
-export type FileDropzoneState = 'default' | 'hover' | 'focus' | 'disabled';
+export type FileDropzoneState = 'default' | 'hover' | 'focus' | 'disabled' | 'static';
 
 /** Motivo por el que se descarta un archivo: tipo no admitido, tamaño mayor al máximo o más de un archivo sin `multiple`. */
 export type FileRejectionReason = 'type' | 'size' | 'count';
@@ -38,6 +38,18 @@ export interface FileDropzoneProps
   multiple?: boolean;
   /** State de Figma forzado (solo documentación). */
   state?: FileDropzoneState;
+  /**
+   * Ícono de 32 que reemplaza al `attach-circle` por defecto (cualquier nodo; `null` lo quita). Se pinta tal cual: quien
+   * lo pasa decide su color.
+   */
+  icon?: ReactNode;
+  /**
+   * Contenido propio (reemplaza título, acción y especificaciones, y se coloca bajo el ícono). Con `children` el
+   * componente es solo el recuadro (trazo punteado, ícono y estados): la raíz pasa a `<div>`, no hay input ni región
+   * aria-live, y quien lo usa aporta sus controles y el manejo de arrastre (`rootProps`). Es lo que usa FileUploadSimple
+   * para sus estados cargando y cargado.
+   */
+  children?: ReactNode;
   /** Texto principal (capa Heading de Figma). Por defecto "Selecciona tu". */
   title?: ReactNode;
   /** Texto en color de enlace tras el título (segunda capa Heading). Por defecto "archivo". */

@@ -4,10 +4,10 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { FileDropzone } from './FileDropzone';
 import type { FileDropzoneProps, FileDropzoneState } from './FileDropzone.types';
 
-const STATES: FileDropzoneState[] = ['default', 'hover', 'disabled', 'focus'];
+const STATES: Exclude<FileDropzoneState, 'static'>[] = ['default', 'hover', 'disabled', 'focus'];
 
 /** Nombre de cada variante de Figma (set 11438:5774), en el orden del set. */
-const FIGMA: Record<FileDropzoneState, string> = {
+const FIGMA: Record<Exclude<FileDropzoneState, 'static'>, string> = {
   default: 'State=Default',
   hover: 'State=Hover',
   disabled: 'State=Disabled',

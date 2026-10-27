@@ -1,4 +1,4 @@
-import { forwardRef, useId, useSyncExternalStore } from 'react';
+import { forwardRef, useId } from 'react';
 import type { ReactNode } from 'react';
 import type { FooterItem, FooterProps, FooterSection } from './Footer.types';
 import {
@@ -7,7 +7,9 @@ import {
   footerBulletBoxClass,
   footerBulletClass,
   footerColumnVariants,
+  footerBadgesClass,
   footerContainerVariants,
+  footerContentVariants,
   footerItemClass,
   footerLabelClass,
   footerLinkClass,
@@ -18,21 +20,7 @@ import {
 } from './Footer.variants';
 import { Accordion, AccordionItem } from '../Accordion';
 import { cn } from '../../utils/cn';
-
-/** Móvil = menos de 48rem, el mismo corte de tokens.css (modo Mobile de Figma). */
-const MOBILE_QUERY = '(max-width: 47.999rem)';
-const subscribe = (onChange: () => void) => {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
-  const mql = window.matchMedia(MOBILE_QUERY);
-  mql.addEventListener('change', onChange);
-  return () => mql.removeEventListener('change', onChange);
-};
-const useIsMobile = () =>
-  useSyncExternalStore(
-    subscribe,
-    () => typeof window !== 'undefined' && Boolean(window.matchMedia?.(MOBILE_QUERY).matches),
-    () => false
-  );
+import { useIsMobile } from '../../utils/useMediaQuery';
 
 /** En Figma el texto del copyright es una capa con su propio texto como nombre. */
 const figmaName = (node: ReactNode) => (typeof node === 'string' ? node : undefined);
@@ -195,19 +183,18 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
     return (
       <footer {...restProps} ref={ref} className={className}>
         <div className={footerRootVariants()} data-figma-part="Desktop">
-          <div className={footerContainerVariants({ type })} data-figma-part="Container">
-            {brand}
-            {links}
-            {has(actionNode) && (
-              <div className="shrink-0 max-md:[&>*]:w-full" data-figma-part="Button">
-                {actionNode}
-              </div>
-            )}
+          <div className={footerContainerVariants()} data-figma-part="Container">
+            <div className={footerContentVariants({ type })}>
+              {brand}
+              {links}
+              {has(actionNode) && (
+                <div className="shrink-0 max-md:[&>*]:w-full" data-figma-part="Button">
+                  {actionNode}
+                </div>
+              )}
+            </div>
             {has(badges) && (
-              <div
-                className="flex flex-wrap items-center gap-ds-primitives-space-5xl md:absolute md:right-0 md:bottom-0 md:flex-nowrap md:justify-center"
-                data-figma-part="Logos gov"
-              >
+              <div className={footerBadgesClass} data-figma-part="Logos gov">
                 {badges}
               </div>
             )}

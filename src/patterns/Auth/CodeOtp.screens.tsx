@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import type { FormEvent, KeyboardEvent } from 'react';
+import type { FormEvent } from 'react';
 import { Alert } from '../../components/Alert';
 import { Button } from '../../components/Button';
 import { ButtonCorner } from '../../components/ButtonCorner';
@@ -7,6 +7,7 @@ import { ButtonLink } from '../../components/ButtonLink';
 import { CodeInput } from '../../components/CodeInput';
 import { Icon } from '../../components/Icon';
 import { InteractiveCard } from '../../components/InteractiveCard';
+import { ItemCard } from '../../components/_internal/ItemCardMark';
 import { cn } from '../../utils/cn';
 import { AUTH_HINT_TEXT, AuthHeader, AuthSurface } from './Auth.parts';
 
@@ -76,17 +77,6 @@ const SELECT_TITLE = 'Para continuar,\nnecesitamos confirmar que eres tú';
 const SELECT_TITLE_PART = 'Para continuar,  necesitamos confirmar que eres tú';
 
 const seconds = (n: number) => `${n} ${n === 1 ? 'segundo' : 'segundos'}`;
-
-/** "Item card" de Figma (tipo Icon, md): círculo de 56 con el ícono de éxito. Solo lo usa este estado. */
-const SuccessMark = () => (
-  <span
-    aria-hidden="true"
-    data-figma-part="Item card"
-    className="inline-flex size-14 shrink-0 items-center justify-center rounded-ds-radius-general-full bg-ds-background-graphic-success-firts-opacity text-ds-icon-semantic-success-secondary"
-  >
-    <Icon name="tick-circle" size={24} variant="fill" data-figma-part="Icon Right" />
-  </span>
-);
 
 export function CodeOtpScreen({
   type = 'modal',
@@ -181,14 +171,6 @@ export function CodeOtpScreen({
     setAnnouncement(`Enviamos un código nuevo a ${contact.value}.`);
     onResend?.(contact);
     firstCellRef.current?.focus();
-  };
-
-  // "Reenviar" es una acción, no una navegación: rol de botón y Espacio además de Enter
-  const resendKey = (event: KeyboardEvent<HTMLAnchorElement>) => {
-    if (event.key === ' ') {
-      event.preventDefault();
-      handleResend();
-    }
   };
 
   const back = step === 'code' ? () => goTo('select') : onBack;
@@ -330,16 +312,11 @@ export function CodeOtpScreen({
                 >
                   ¿No lo recibiste?
                 </p>
+                {/* "Reenviar" es una acción, no una navegación: ButtonLink sin `href` es un <button> nativo */}
                 <ButtonLink
-                  role="button"
-                  href="#reenviar"
                   iconRight={false}
                   disabled={counting || busy || status === 'success'}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    handleResend();
-                  }}
-                  onKeyDown={resendKey}
+                  onClick={handleResend}
                   data-figma-part="Button"
                 >
                   Reenviar
@@ -349,7 +326,7 @@ export function CodeOtpScreen({
 
             {status === 'success' ? (
               <div className="flex w-full justify-center" data-figma-part="CTA">
-                <SuccessMark />
+                <ItemCard icon="tick-circle" />
               </div>
             ) : (
               <Button

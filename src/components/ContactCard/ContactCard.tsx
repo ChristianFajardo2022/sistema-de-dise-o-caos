@@ -18,6 +18,7 @@ import { Button } from '../Button';
 import { ButtonCorner } from '../ButtonCorner';
 import { DropdownMenu } from '../DropdownMenu';
 import { Icon } from '../Icon';
+import { ItemCard } from '../_internal/ItemCardMark';
 import { NotchedSurface } from '../_internal/NotchedSurface';
 import { cn } from '../../utils/cn';
 import { RATING_SUFFIX, formatRating } from '../../utils/format';
@@ -122,14 +123,14 @@ export const ContactCard = forwardRef<HTMLElement, ContactCardProps>(
       <article {...rest} ref={ref} aria-labelledby={rest['aria-labelledby'] ?? titleId} className={cn(contactCardVariants(), className)}>
         <NotchedSurface notch={corner === 'more' ? 'md' : corner === 'link' ? 'lg' : 'none'} />
         {(has(leading) || rating != null) && (
-          <div data-figma-part="Item card" className={contactCardItemVariants()}>
+          <ItemCard className={contactCardItemVariants()}>
             {leading}
             {rating != null && (
               <Badge type="icon-number" label={ratingLabel} className={contactCardRatingVariants()} data-figma-part="Badge">
                 <span data-figma-part="00">{formatRating(rating)}</span>
               </Badge>
             )}
-          </div>
+          </ItemCard>
         )}
         <div data-figma-part="Information" className={contactCardInfoVariants()}>
           <Heading id={titleId} data-figma-part="Subtitulo" className={contactCardTitleVariants()}>

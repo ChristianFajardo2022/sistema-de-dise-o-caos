@@ -14,6 +14,7 @@ import {
 } from './EmptyState.variants';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
+import { DashedStroke } from '../_internal/DashedStroke';
 import type { IconName } from '../Icon/Icon.types';
 import { cn } from '../../utils/cn';
 
@@ -67,18 +68,7 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
       <div ref={ref} {...restProps} className={cn(emptyStateVariants(), className)}>
         <div aria-hidden="true" data-figma-part="Group" className={emptyStateArtClass}>
           <span className={emptyStateSquareSolidClass} />
-          <svg className={emptyStateSquareDashedClass} viewBox="0 0 80 80" fill="none" focusable="false">
-            <rect
-              x="0.5"
-              y="0.5"
-              width="79"
-              height="79"
-              rx="23.5"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeDasharray="5 5"
-            />
-          </svg>
+          <DashedStroke dash={5} radius="var(--radius-ds-radius-general-2xl)" className={emptyStateSquareDashedClass} />
           <span className={emptyStateIconBoxClass} data-figma-part="Frame 12">
             <Icon name={icon ?? TYPE_ICON[type]} size={32} variant="line" data-figma-part="Icon-sizes" />
           </span>

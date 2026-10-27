@@ -34,8 +34,15 @@ export const footerRootVariants = cva(
   ].join(' ')
 );
 
-export const footerContainerVariants = cva(
-  'relative flex flex-col gap-ds-primitives-space-5xl md:flex-row md:gap-ds-space-general-2xl',
+/**
+ * Contenedor en rejilla de una sola celda: en escritorio las columnas y los sellos comparten la celda (los sellos van
+ * abajo a la derecha, como en Figma, sin posición absoluta); en móvil los sellos pasan a una segunda fila.
+ */
+export const footerContainerVariants = cva('grid grid-cols-1 gap-ds-primitives-space-5xl md:gap-0');
+
+/** Columnas del pie (marca, grupos de enlaces y acción). */
+export const footerContentVariants = cva(
+  'col-start-1 row-start-1 flex flex-col gap-ds-primitives-space-5xl md:flex-row md:gap-ds-space-general-2xl',
   {
     variants: {
       type: { portals: 'md:justify-between', web: 'md:justify-start' },
@@ -43,6 +50,10 @@ export const footerContainerVariants = cva(
     defaultVariants: { type: 'portals' },
   }
 );
+
+/** Sellos (Logos gov): fila 2 en móvil; en escritorio, en la celda de las columnas, abajo a la derecha. */
+export const footerBadgesClass =
+  'col-start-1 row-start-2 flex flex-wrap items-center gap-ds-primitives-space-5xl md:row-start-1 md:flex-nowrap md:items-center md:justify-center md:self-end md:justify-self-end';
 
 export const footerColumnVariants = cva('flex min-w-0 flex-col gap-ds-space-general-2xl max-md:gap-ds-space-general-xl', {
   variants: {

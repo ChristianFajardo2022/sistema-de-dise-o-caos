@@ -2,6 +2,12 @@
 @import './styles/tokens.css';
 @import './styles/fonts.css';
 
+/* CAOS — Efecto GLASS de Figma (receta de Fundamentos › Texturas: blur 4, saturación 180 %, brillo 1.15). El relleno va
+   aparte con su token de superficie; sin token de efecto en Figma. */
+@utility ds-effect-glass {
+  backdrop-filter: blur(4px) saturate(180%) brightness(1.15);
+}
+
 /* CAOS — Hover de Primary: la forma difuminada cruza de izquierda a derecha y reinicia (3s, una fase) */
 @keyframes caos-primary-sweep {
   from {

@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useId, useRef, useState } from 'react';
-import type { DragEvent } from 'react';
+import type { DragEvent, HTMLAttributes } from 'react';
 import type { FileDropzoneProps } from './FileDropzone.types';
 import {
   fileDropzoneActionVariants,
@@ -8,12 +8,12 @@ import {
   fileDropzoneMaxVariants,
   fileDropzoneRowClass,
   fileDropzoneSpecsVariants,
-  fileDropzoneStrokeClass,
   fileDropzoneTitleVariants,
   fileDropzoneVariants,
 } from './FileDropzone.variants';
 import { defaultRejectionMessage, describeAccept, filterFiles, formatFileSize } from './FileDropzone.utils';
 import { Icon } from '../Icon';
+import { DashedStroke } from '../_internal/DashedStroke';
 import { cn } from '../../utils/cn';
 
 /**
@@ -31,6 +31,8 @@ export const FileDropzone = forwardRef<HTMLInputElement, FileDropzoneProps>(
       maxSize,
       multiple = false,
       state,
+      icon,
+      children,
       title = 'Selecciona tu',
       actionText = 'archivo',
       specifications,
@@ -66,6 +68,7 @@ export const FileDropzone = forwardRef<HTMLInputElement, FileDropzoneProps>(
     };
 
     const isDisabled = disabled || state === 'disabled';
+    const custom = children !== undefined;
     const visual = isDisabled ? 'disabled' : state === 'default' ? 'idle' : (state ?? 'auto');
     const specsText = specifications ?? (accept ? `${describeAccept(accept)}.` : null);
     const maxText = maxSizeLabel ?? (maxSize !== undefined ? `Máx. ${formatFileSize(maxSize)}` : null);
@@ -101,6 +104,39 @@ export const FileDropzone = forwardRef<HTMLInputElement, FileDropzoneProps>(
       handleFiles(Array.from(event.dataTransfer.files));
     };
 
+    const iconNode =
+      icon !== undefined ? (
+        icon
+      ) : (
+        <Icon
+          name="attach-circle"
+          size={32}
+          variant="line"
+          data-figma-part="Icon Right"
+          className={fileDropzoneIconVariants({ disabled: isDisabled })}
+        />
+      );
+
+    // Modo con contenido propio (`children`): solo el recuadro (trazo, ícono y estados). Sin `<label>` ni input: el
+    // contenido trae sus controles (botones) y el arrastre lo maneja quien lo usa mediante `rootProps`.
+    if (custom) {
+      return (
+        <div
+          {...(rootProps as HTMLAttributes<HTMLDivElement>)}
+          className={cn(
+            fileDropzoneVariants({ visual }),
+            'cursor-auto has-[:focus-visible]:px-ds-space-field-lg has-[:focus-visible]:text-ds-border-field-active',
+            rootProps?.className,
+            className
+          )}
+        >
+          <DashedStroke />
+          {iconNode}
+          {children}
+        </div>
+      );
+    }
+
     return (
       <label
         htmlFor={inputId}
@@ -129,28 +165,8 @@ export const FileDropzone = forwardRef<HTMLInputElement, FileDropzoneProps>(
             event.target.value = '';
           }}
         />
-        <svg aria-hidden="true" focusable="false" className={fileDropzoneStrokeClass}>
-          <rect
-            x="0.5"
-            y="0.5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeDasharray="8 8"
-            style={{
-              width: 'calc(100% - 1px)',
-              height: 'calc(100% - 1px)',
-              rx: 'calc(var(--radius-ds-radius-field-lg) - 0.5px)',
-            }}
-          />
-        </svg>
-        <Icon
-          name="attach-circle"
-          size={32}
-          variant="line"
-          data-figma-part="Icon Right"
-          className={fileDropzoneIconVariants({ disabled: isDisabled })}
-        />
+        <DashedStroke />
+        {iconNode}
         <span data-figma-part="Container " className={fileDropzoneContentClass}>
           <span data-figma-part="Frame 1984079840" className={fileDropzoneRowClass}>
             <span id={titleId} data-figma-part="Heading" className={fileDropzoneTitleVariants({ disabled: isDisabled })}>

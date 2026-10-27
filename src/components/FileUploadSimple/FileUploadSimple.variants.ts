@@ -43,6 +43,7 @@ export const fileUploadSimpleFrameVariants = cva(frameBase, {
 });
 
 /** SVG del trazo punteado, sobre todo el recuadro y sin interceptar el puntero. */
+/** @deprecated El trazo lo dibuja `_internal/DashedStroke`; ya no se usa. */
 export const fileUploadSimpleStrokeClass = 'pointer-events-none absolute inset-0 size-full overflow-visible';
 
 export const fileUploadSimpleRootClass = 'flex w-full max-w-[304px] flex-col gap-ds-space-general-lg';

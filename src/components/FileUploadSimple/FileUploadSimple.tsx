@@ -2,13 +2,11 @@ import { forwardRef, useEffect, useId, useRef, useState } from 'react';
 import type { DragEvent, FocusEvent } from 'react';
 import type { FileUploadSimpleFile, FileUploadSimpleProps, FileUploadSimpleStatus } from './FileUploadSimple.types';
 import {
-  fileUploadSimpleFrameVariants,
   fileUploadSimpleIconVariants,
   fileUploadSimpleLinkClass,
   fileUploadSimpleNameClass,
   fileUploadSimpleProgressRowClass,
   fileUploadSimpleRootClass,
-  fileUploadSimpleStrokeClass,
 } from './FileUploadSimple.variants';
 import { Alert } from '../Alert';
 import { ButtonCorner } from '../ButtonCorner';
@@ -31,27 +29,6 @@ import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 import { useMergedRefs } from '../../utils/refs';
 
-/** Trazo punteado 8/8 del recuadro (el borde CSS no admite el patrón); toma el color de `currentColor`. */
-function DashedStroke() {
-  return (
-    <svg aria-hidden="true" focusable="false" className={fileUploadSimpleStrokeClass}>
-      <rect
-        x="0.5"
-        y="0.5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeDasharray="8 8"
-        style={{
-          width: 'calc(100% - 1px)',
-          height: 'calc(100% - 1px)',
-          rx: 'calc(var(--radius-ds-radius-field-lg) - 0.5px)',
-        }}
-      />
-    </svg>
-  );
-}
-
 /**
  * Carga de un solo archivo (sets "File upload simple-2" 21407:3920 y "File upload simple" 21412:4523 de Figma): un
  * recuadro de 304 que cambia de contenido según `status`. En `idle` es un FileDropzone (se reutiliza tal cual); en
@@ -59,8 +36,8 @@ function DashedStroke() {
  * "volver a cargar" y su tamaño. No sube nada: quien lo usa recibe el archivo en `onFileChange`, hace la carga y
  * describe `status` y `progress`. Sin `status`, elegir un archivo pasa a `loaded` y eliminar vuelve a `idle`.
  *
- * Por qué no es solo FileDropzone: su recuadro no admite contenido propio (ícono fijo, sin barra ni acciones), así que
- * en `uploading` y `loaded` se dibuja un recuadro gemelo con los mismos tokens y el mismo trazo. El `ref` apunta al
+ * En `uploading` y `loaded` usa el FileDropzone en modo contenido propio (`icon` + `children`): el recuadro, el trazo
+ * y sus estados son los mismos que en `idle`. El `ref` apunta al
  * `<input type="file">` activo.
  *
  * Teclado y lector: el input nativo sigue siendo el control (Enter/Espacio abren el selector); "volver a cargar" y
@@ -181,17 +158,17 @@ export const FileUploadSimple = forwardRef<HTMLInputElement, FileUploadSimplePro
       },
     };
 
-    const onDrag = (event: DragEvent<HTMLDivElement>) => {
+    const onDrag = (event: DragEvent<HTMLElement>) => {
       if (isDisabled) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = 'copy';
       setDragging(true);
     };
-    const onDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    const onDragLeave = (event: DragEvent<HTMLElement>) => {
       if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
       setDragging(false);
     };
-    const onDrop = (event: DragEvent<HTMLDivElement>) => {
+    const onDrop = (event: DragEvent<HTMLElement>) => {
       if (isDisabled) return;
       event.preventDefault();
       setDragging(false);
@@ -240,30 +217,34 @@ export const FileUploadSimple = forwardRef<HTMLInputElement, FileUploadSimplePro
 
     const uploading = status === 'uploading';
     const nameId = `${baseId}-name`;
-    const visual = isDisabled ? 'disabled' : uploading ? 'static' : (forced ?? 'auto');
     // Cargando con archivo conocido (Type=Uploading, State=Loaded): se ve el archivo, apagado, con la barra debajo
     const showFile = file != null || !uploading;
     const dim = isDisabled || uploading;
 
     return (
       <div {...rootProps}>
-        <div
-          data-figma-part="Input file upload (Atom)"
-          data-dragging={dragging || undefined}
-          onDragEnter={uploading ? undefined : onDrag}
-          onDragOver={uploading ? undefined : onDrag}
-          onDragLeave={uploading ? undefined : onDragLeave}
-          onDrop={uploading ? undefined : onDrop}
-          className={fileUploadSimpleFrameVariants({ visual })}
+        <FileDropzone
+          state={isDisabled ? undefined : uploading ? 'static' : forced}
+          disabled={isDisabled}
+          icon={
+            <Icon
+              name={showFile ? 'tick-circle' : 'attach-circle'}
+              size={32}
+              variant={showFile ? 'fill' : 'line'}
+              data-figma-part="Icon Right"
+              className={fileUploadSimpleIconVariants({ tone: isDisabled ? 'disabled' : 'loaded' })}
+            />
+          }
+          rootProps={{
+            'data-figma-part': 'Input file upload (Atom)',
+            'data-dragging': dragging || undefined,
+            onDragEnter: uploading ? undefined : onDrag,
+            onDragOver: uploading ? undefined : onDrag,
+            onDragLeave: uploading ? undefined : onDragLeave,
+            onDrop: uploading ? undefined : onDrop,
+          }}
+          className="min-h-[234px]"
         >
-          <DashedStroke />
-          <Icon
-            name={showFile ? 'tick-circle' : 'attach-circle'}
-            size={32}
-            variant={showFile ? 'fill' : 'line'}
-            data-figma-part="Icon Right"
-            className={fileUploadSimpleIconVariants({ tone: isDisabled ? 'disabled' : 'loaded' })}
-          />
           <span data-figma-part="Container " className={fileDropzoneContentClass}>
             <span data-figma-part="Frame 1984079840" className={cn(fileDropzoneRowClass, 'flex-nowrap')}>
               {!showFile ? (
@@ -366,7 +347,7 @@ export const FileUploadSimple = forwardRef<HTMLInputElement, FileUploadSimplePro
               }}
             />
           )}
-        </div>
+        </FileDropzone>
         {alertNode}
         {live}
       </div>

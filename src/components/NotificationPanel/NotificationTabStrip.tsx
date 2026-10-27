@@ -5,6 +5,7 @@ import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Tab, TabList } from '../Tabs';
 import { cn } from '../../utils/cn';
+import { REDUCED_MOTION_QUERY, matchesMedia } from '../../utils/useMediaQuery';
 
 /**
  * Fila de pestañas del panel complejo: la lista de pestañas (`TabList`) con, opcionalmente, un botón de desplazamiento a
@@ -23,7 +24,7 @@ export function NotificationTabStrip({
   const scroll = (direction: -1 | 1) => {
     const el = listRef.current;
     if (!el) return;
-    const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const reduce = matchesMedia(REDUCED_MOTION_QUERY);
     el.scrollBy({ left: direction * el.clientWidth * 0.6, behavior: reduce ? 'auto' : 'smooth' });
   };
 

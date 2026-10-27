@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useId, useRef, useSyncExternalStore } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useRef } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import type { HeaderProps } from './Header.types';
 import {
@@ -21,21 +21,11 @@ import { Logo } from '../Logo';
 import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 import { useMergedRefs } from '../../utils/refs';
+import { useMediaQuery } from '../../utils/useMediaQuery';
 
 /** Desde este ancho (64rem, donde tokens.css pasa al modo Desktop) `layout="auto"` dibuja la cabecera de escritorio. */
 const DESKTOP_QUERY = '(min-width: 64rem)';
-const subscribe = (onChange: () => void) => {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
-  const mql = window.matchMedia(DESKTOP_QUERY);
-  mql.addEventListener('change', onChange);
-  return () => mql.removeEventListener('change', onChange);
-};
-const useIsDesktop = () =>
-  useSyncExternalStore(
-    subscribe,
-    () => typeof window === 'undefined' || !window.matchMedia || window.matchMedia(DESKTOP_QUERY).matches,
-    () => true
-  );
+const useIsDesktop = () => useMediaQuery(DESKTOP_QUERY, true);
 
 /**
  * Cabecera del producto: "Header desktop" (13448:29988) y "Header mobile" (13520:81850) de Figma.

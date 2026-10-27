@@ -138,7 +138,7 @@ export const FlowTest: Story = {
     await expect(first).toHaveAccessibleDescription('Código incorrecto');
 
     const resend = canvas.getByRole('button', { name: 'Reenviar' });
-    await waitFor(() => expect(resend).not.toHaveAttribute('aria-disabled', 'true'), { timeout: 4000 });
+    await waitFor(() => expect(resend).toBeEnabled(), { timeout: 4000 });
     await userEvent.click(resend);
     await expect(resendSpy).toHaveBeenCalledTimes(1);
     await expect(canvas.getByRole('timer')).toHaveTextContent('Podrás pedir uno nuevo en');

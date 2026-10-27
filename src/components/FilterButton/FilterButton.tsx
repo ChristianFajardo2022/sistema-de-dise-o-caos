@@ -1,21 +1,11 @@
-import { forwardRef, useId, useSyncExternalStore } from 'react';
+import { forwardRef, useId } from 'react';
 import type { FilterButtonProps } from './FilterButton.types';
 import { filterButtonVariants } from './FilterButton.variants';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
-
-/** Mismo corte que la variante `mobile:` de tokens.css. */
-const MOBILE_QUERY = '(width < 48rem)';
-
-const subscribe = (notify: () => void) => {
-  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
-  const mql = window.matchMedia(MOBILE_QUERY);
-  mql.addEventListener('change', notify);
-  return () => mql.removeEventListener('change', notify);
-};
-const isMobileViewport = () => typeof window !== 'undefined' && Boolean(window.matchMedia?.(MOBILE_QUERY).matches);
+import { useIsMobile } from '../../utils/useMediaQuery';
 
 const defaultCountLabel = (count: number | string) => (count === 1 ? 'filtro aplicado' : 'filtros aplicados');
 
@@ -42,7 +32,7 @@ export const FilterButton = forwardRef<HTMLButtonElement, FilterButtonProps>(
     ref
   ) => {
     const badgeId = useId();
-    const mobileViewport = useSyncExternalStore(subscribe, isMobileViewport, () => false);
+    const mobileViewport = useIsMobile();
     const resolved = layout === 'auto' ? (mobileViewport ? 'mobile' : 'desktop') : layout;
     const showBadge = badge && (typeof count === 'number' ? count > 0 : typeof count === 'string' && count !== '');
     const described = [describedBy, showBadge ? badgeId : null].filter(Boolean).join(' ') || undefined;

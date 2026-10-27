@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ButtonHTMLAttributes, KeyboardEvent } from 'react';
 import type { CalendarLabels, CalendarProps, CalendarView, DateRange } from './Calendar.types';
 import {
@@ -21,6 +21,7 @@ import { Button } from '../Button';
 import { DropdownMenu, DropdownMenuItem } from '../DropdownMenu';
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
+import { useMediaQuery } from '../../utils/useMediaQuery';
 
 const DEFAULT_LABELS: CalendarLabels = {
   calendar: 'Calendario',
@@ -46,17 +47,7 @@ const YEAR_LIST_SPAN = 50;
 
 /** Desde la tableta (48rem, el mismo corte de tokens.css) `range` muestra dos meses; en móvil, uno. */
 const TABLET_QUERY = '(min-width: 48rem)';
-function subscribeTablet(onChange: () => void) {
-  const mql = window.matchMedia(TABLET_QUERY);
-  mql.addEventListener('change', onChange);
-  return () => mql.removeEventListener('change', onChange);
-}
-const useTabletUp = () =>
-  useSyncExternalStore(
-    subscribeTablet,
-    () => window.matchMedia(TABLET_QUERY).matches,
-    () => true
-  );
+const useTabletUp = () => useMediaQuery(TABLET_QUERY, true);
 
 /** Botón anterior/siguiente: instancia de Button secondary xs con solo ícono (icono de 16, como Figma). */
 function NavButton({

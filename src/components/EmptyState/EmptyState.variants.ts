@@ -21,12 +21,12 @@ export const emptyStateVariants = cva(
 /** Grupo de la composición de cuadros (102 × 107.95). */
 export const emptyStateArtClass = 'relative h-[107.95px] w-[102px] shrink-0';
 
-const squareBase = 'absolute box-border size-20 rounded-ds-radius-general-2xl opacity-70';
+const squareBase = 'absolute box-border size-20 opacity-70';
 
 /** Cuadro de contorno sólido (Rectangle 4). */
-export const emptyStateSquareSolidClass = `${squareBase} top-0 left-0 border border-solid border-ds-border-general-gray-fourth`;
+export const emptyStateSquareSolidClass = `${squareBase} rounded-ds-radius-general-2xl top-0 left-0 border border-solid border-ds-border-general-gray-fourth`;
 
-/** Cuadro de contorno punteado 5/5 (Rectangle 5): el SVG dibuja los guiones porque el borde CSS no admite el patrón. */
+/** Cuadro de contorno punteado 5/5 (Rectangle 5): `_internal/DashedStroke` dibuja los guiones porque el borde CSS no admite el patrón. */
 export const emptyStateSquareDashedClass = `${squareBase} top-[27.95px] left-[22px] text-ds-border-general-gray-fourth`;
 
 /** Cuadro del ícono (Frame 12). */
