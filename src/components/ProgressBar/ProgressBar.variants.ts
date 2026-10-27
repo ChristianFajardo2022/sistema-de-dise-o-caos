@@ -65,11 +65,11 @@ export const progressBarFillVariants = cva(
   }
 );
 
-/** Texto del porcentaje: Helvetica regular 12/16 (typography/field xs). */
+/** Texto del porcentaje: Helvetica Semibold 12/16 (typography/field xs, typography/weight/Semibold). */
 export const progressBarTextVariants = cva(
   [
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
-    '[font-weight:var(--ds-primitives-typography-weight-regular)]',
+    '[font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-typography-field-size-xs leading-ds-typography-field-line-height-xs',
     'text-center text-ds-text-neutral-white select-none whitespace-nowrap',
     'pb-ds-space-general-sm',

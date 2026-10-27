@@ -1,7 +1,7 @@
 {
   "name": "NumberRating",
   "component": "NumberRating",
-  "description": "Promedio numérico con estrella del sistema de diseño CAOS, fiel al nodo Number rating de Figma (12745:16784): número Helvetica Neue medium 14/18 (typography/body/size/md, text/neutral/white), gap 4 y una IconStar select de 16. El número se formatea con Intl.NumberFormat('es') con un decimal como máximo (\"4,5\"). `total` (extensión, Figma no la dibuja) agrega el conteo de reseñas en texto de apoyo. El conjunto se lee como una sola frase con role=\"img\": \"4,5 de 5 estrellas, 1280 reseñas\".",
+  "description": "Promedio numérico con estrella del sistema de diseño CAOS, fiel al nodo Number rating de Figma (12745:16784): número Helvetica Neue Semibold 14/18 (typography/body/size/md, text/neutral/white), gap 4 y una IconStar select de 16. El número se formatea con Intl.NumberFormat('es') con un decimal como máximo (\"4,5\"). `total` (extensión, Figma no la dibuja) agrega el conteo de reseñas en texto de apoyo. El conjunto se lee como una sola frase con role=\"img\": \"4,5 de 5 estrellas, 1280 reseñas\".",
   "category": "Data Display/Rating",
   "props": {
     "value": { "type": "number", "required": true, "description": "Promedio de 0 a 5." },

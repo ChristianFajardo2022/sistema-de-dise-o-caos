@@ -30,7 +30,6 @@ const meta = {
       description: 'Position de Figma: borde de la burbuja con la flecha (la burbuja aparece del lado opuesto)',
     },
     solid: { control: 'boolean', type: { name: 'boolean' }, description: 'Solid de Figma: relleno sólido o translúcido' },
-    icon: { control: 'boolean', type: { name: 'boolean' }, description: 'Icon de Figma: ícono info-circle' },
     content: { control: 'text', description: 'Text de Figma: texto breve, sin contenido interactivo' },
     delay: { control: { type: 'number', min: 0, step: 50 }, type: { name: 'number' }, description: 'Retraso al abrir (ms)' },
     closeDelay: { control: { type: 'number', min: 0, step: 50 }, type: { name: 'number' }, description: 'Retraso al cerrar (ms)' },
@@ -40,7 +39,6 @@ const meta = {
   args: {
     arrow: 'bottom',
     solid: true,
-    icon: true,
     content: 'Guarda los cambios',
     delay: 300,
     closeDelay: 150,
@@ -73,7 +71,7 @@ const FIGMA_VARIANTS: { solid: boolean; arrow: TooltipArrow; name: string }[] = 
   }))
 );
 
-/** Las 8 variantes de Figma (Solid × Position), sueltas y visibles a la vez, con el texto de Figma. */
+/** Las 7 variantes de Figma (Solid × Position; no existe Solid=No con Position=Bottom), sueltas y a la vez. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
@@ -88,11 +86,15 @@ export const FigmaMatrix: Story = {
         <span key={solid} className={LABEL}>
           Solid={solid}
         </span>,
-        ...FIGMA_VARIANTS.filter((v) => v.solid === (solid === 'Yes')).map((v) => (
-          <TooltipBubble key={v.name} arrow={v.arrow} solid={v.solid} data-figma={v.name}>
-            Tooltips title
-          </TooltipBubble>
-        )),
+        ...FIGMA_VARIANTS.filter((v) => v.solid === (solid === 'Yes')).map((v) =>
+          v.name === 'Solid=No, Position=Bottom' ? (
+            <span key={v.name} />
+          ) : (
+            <TooltipBubble key={v.name} arrow={v.arrow} solid={v.solid} data-figma={v.name}>
+              Tooltips title
+            </TooltipBubble>
+          )
+        ),
       ])}
     </div>
   ),
@@ -120,7 +122,7 @@ export const Positions: Story = {
 export const IconButton: Story = {
   render: (args) => (
     <div className="p-24">
-      <Tooltip {...args} id="tooltip-editar-perfil" content="Editar perfil" icon={false} describes="label">
+      <Tooltip {...args} id="tooltip-editar-perfil" content="Editar perfil" describes="label">
         <Button iconOnly variant="secondary" size="sm" aria-labelledby="tooltip-editar-perfil">
           <Icon name="edit" size={20} />
         </Button>

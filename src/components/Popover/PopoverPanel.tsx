@@ -8,6 +8,8 @@ import {
   popoverContentVariants,
   popoverDescriptionClass,
   popoverInnerVariants,
+  popoverLinkRowClass,
+  popoverLinkTextClass,
   popoverMediaClass,
   popoverPageClass,
   popoverPanelVariants,
@@ -32,10 +34,14 @@ export const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
   (
     {
       arrow = 'top-left',
+      type: typeProp,
       title,
       headingLevel = 2,
-      icon,
+      // `icon` está obsoleto (Figma quitó el ícono del título): se descarta para que no llegue al DOM
+      icon: _icon,
       children,
+      link,
+      linkDescription,
       media,
       onClose,
       closeLabel = 'Cerrar',
@@ -49,17 +55,17 @@ export const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
     ref
   ) => {
     const withMedia = has(media);
-    const showIcon = icon ?? !withMedia;
+    const type = typeProp ?? (withMedia ? 'complex' : 'simple');
     const Heading = headingLevel === 'none' ? 'p' : (`h${headingLevel}` as const);
     const withFooter = has(page) || has(actions);
 
     return (
       <div data-theme="dark" {...rest} ref={ref} className={cn(popoverPanelVariants({ arrow }), className)}>
-        <div data-figma-part="Content" className={popoverContentVariants({ arrow })}>
-          <div data-figma-part="Inner Container" className={popoverInnerVariants({ media: withMedia })}>
+        <div data-figma-part="Content" className={popoverContentVariants({ type, arrow })}>
+          <div data-figma-part="Inner Container" className={popoverInnerVariants({ type })}>
             {withMedia && (
               <div data-figma-part="Frame 6" className={popoverMediaClass}>
-                <NotchedSurface notch={onClose ? 'md' : 'none'} radius="xl" bleed interactive data-figma-part="Subtract">
+                <NotchedSurface notch={onClose ? 'sm' : 'none'} radius="xl" bleed interactive data-figma-part="Subtract">
                   <span className="flex size-full items-center justify-center gap-ds-space-general-2xl p-ds-space-general-2xl">
                     {media}
                   </span>
@@ -67,8 +73,8 @@ export const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 {onClose && (
                   <ButtonCorner
                     variant="icon"
-                    status="on-canva"
-                    size="md"
+                    contrast="on-canva"
+                    size="sm"
                     aria-label={closeLabel}
                     icon={<Icon name="close" size={16} variant="line" data-figma-part="Icon-sizes" />}
                     onClick={onClose}
@@ -81,15 +87,6 @@ export const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
             <div data-figma-part="Text" className={popoverTextVariants({ media: withMedia })}>
               {has(title) && (
                 <div data-figma-part="Title Wrapper" className="flex items-center gap-ds-space-general-md">
-                  {showIcon && (
-                    <Icon
-                      name="info-circle"
-                      size={20}
-                      variant="fill"
-                      className="shrink-0 text-ds-icon-general-default-unicolor"
-                      data-figma-part="Icon-sizes"
-                    />
-                  )}
                   <Heading id={titleId} data-figma-part="Tooltip Title" className={popoverTitleClass}>
                     {title}
                   </Heading>
@@ -101,6 +98,18 @@ export const PopoverPanel = forwardRef<HTMLDivElement, PopoverPanelProps>(
                 </div>
               )}
             </div>
+            {has(link) && (
+              <div data-figma-part="Description+link" className={popoverLinkRowClass}>
+                {has(linkDescription) ? (
+                  <p data-figma-part="Paragraph Default" className={popoverLinkTextClass}>
+                    {linkDescription}
+                  </p>
+                ) : (
+                  <span aria-hidden="true" className="flex-1" />
+                )}
+                {link}
+              </div>
+            )}
             {withFooter && (
               <div data-figma-part="Actions" className={popoverActionsVariants({ media: withMedia })}>
                 {has(page) ? (

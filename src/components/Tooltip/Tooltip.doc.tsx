@@ -14,7 +14,7 @@ import type { TooltipBubbleProps } from './Tooltip.types';
  * Contenido de la página de documentación de Tooltip (Figma: "Documentación Tooltip — Definición" 22159:22799 y
  * "— Aplicación" 22159:22689). Los textos son los de Figma salvo donde contradicen al código (manda el código):
  * nombres y valores de props, retardos (300 / 150 ms), separación con el disparador (4 px), ancho máximo (288 px),
- * ícono (16 px) y el sentido de las posiciones (`arrow` es el borde de la flecha; la burbuja va del lado opuesto).
+ * y el sentido de las posiciones (`arrow` es el borde de la flecha; la burbuja va del lado opuesto).
  */
 
 /**
@@ -22,7 +22,7 @@ import type { TooltipBubbleProps } from './Tooltip.types';
  * (`describes="label"`): `aria-labelledby` apunta a la burbuja, sin `aria-label`. `id` debe ser único en la página.
  */
 const liveTrigger = (id: string, icon: IconName, label: string, focused = false) => (
-  <Tooltip id={id} content={label} icon={false} describes="label">
+  <Tooltip id={id} content={label} describes="label">
     <Button iconOnly variant="secondary" size="sm" state={focused ? 'focus' : undefined} aria-labelledby={id}>
       <Icon name={icon} size={20} variant="line" />
     </Button>
@@ -50,7 +50,7 @@ const actions = (
 );
 
 const bubble = (text: string, props: TooltipBubbleProps = {}) => (
-  <TooltipBubble icon={false} {...props}>
+  <TooltipBubble {...props}>
     {text}
   </TooltipBubble>
 );
@@ -79,7 +79,7 @@ export const doc: ComponentDocContent = {
               description: [
                 'Uso exclusivo para mensajes breves, informativos y no interactivos asociados a un único elemento disparador.',
                 <>
-                  <strong>Anatomía:</strong> contenedor, indicador/flecha, texto descriptivo e icono. <strong>Posiciones soportadas:</strong>{' '}
+                  <strong>Anatomía:</strong> contenedor, indicador/flecha y texto descriptivo. <strong>Posiciones soportadas:</strong>{' '}
                   top, bottom, left, right (prop <code>arrow</code>).
                   <br />
                   <strong>Comportamiento:</strong> se activa por hover o focus. Se oculta al retirar el puntero o desenfocar (blur).
@@ -90,7 +90,7 @@ export const doc: ComponentDocContent = {
               title: 'Rich tooltip',
               eyebrow: 'Composición',
               preview: (
-                <PopoverPanel arrow="center-top" icon={false} headingLevel="none" title="Personaliza tu espacio" page="1 de 2" actions={actions}>
+                <PopoverPanel arrow="center-top" headingLevel="none" title="Personaliza tu espacio" page="1 de 2" actions={actions}>
                   Conoce cómo personalizar tu espacio de trabajo.
                 </PopoverPanel>
               ),
@@ -120,15 +120,15 @@ export const doc: ComponentDocContent = {
             [
               'Tooltip',
               <>
-                <code>arrow</code>: top · bottom · right · left | <code>solid</code>: true · false | <code>icon</code>: true · false
+                <code>arrow</code>: top · bottom · right · left | <code>solid</code>: true · false
               </>,
               'Ayuda contextual breve y no interactiva.',
             ],
             [
               'Rich tooltip (Popover)',
               <>
-                <code>arrow</code>: 8 posiciones | <code>media</code>: con o sin | <code>title</code> · <code>icon</code> ·{' '}
-                <code>actions</code>
+                <code>type</code>: simple · complex | <code>arrow</code>: 8 posiciones | <code>media</code>: con o sin |{' '}
+                <code>title</code> · <code>link</code> · <code>actions</code>
               </>,
               'Explicación compuesta, onboarding o guía contextual.',
             ],
@@ -188,7 +188,6 @@ export const doc: ComponentDocContent = {
               'Borde de la burbuja donde va la flecha (Position en Figma). La burbuja aparece del lado opuesto del disparador y la flecha lo apunta. Por defecto bottom.',
             ],
             [<code key="p">solid</code>, 'true · false', '“true” usa superficie opaca. “false” usa una superficie translúcida para contextos con menor contraste.'],
-            [<code key="p">icon</code>, 'true · false', 'Muestra u oculta el icono informativo (info) al inicio del mensaje.'],
             [<code key="p">content</code>, 'ReactNode', 'Contenido breve; recomendado entre 2 y 8 palabras y una sola idea.'],
           ],
         },
@@ -258,9 +257,8 @@ export const doc: ComponentDocContent = {
           caption: 'Especificaciones de layout',
           columns: ['Elemento', 'Medida', 'Separación', 'Alineación'],
           rows: [
-            ['Contenedor simple', 'Alto 34 px (42 con la flecha arriba o abajo) · ancho según texto', 'Padding 8 px · gap 4 px', 'Texto e icono centrados verticalmente'],
+            ['Contenedor simple', 'Alto 34 px (42 con la flecha arriba o abajo) · ancho según texto', 'Padding 8 px', 'Texto centrado verticalmente'],
             ['Flecha', '16 × 8 px', 'Unida al borde del contenedor', 'Apunta al centro del disparador'],
-            ['Icono', '16 px', 'Gap 4 px con el texto', 'Alineado a la primera línea'],
             ['Distancia al disparador', '4 px', 'Nunca superponer el objetivo; 8 px mínimos con el borde de la pantalla', 'Centrada; admite desplazamiento seguro'],
             ['Ancho máximo', '288 px', 'Una idea por mensaje', 'Texto alineado al inicio si envuelve'],
           ],
@@ -285,7 +283,7 @@ export const doc: ComponentDocContent = {
               title: 'Orientación breve',
               preview: (
                 <>
-                  <PopoverPanel arrow="center-top" icon={false} headingLevel="none" title="Filtra tus pedidos" page="1 de 2" actions={actions}>
+                  <PopoverPanel arrow="center-top" headingLevel="none" title="Filtra tus pedidos" page="1 de 2" actions={actions}>
                     Usa los filtros para encontrar pedidos por estado.
                   </PopoverPanel>
                   <DocTag>Sin recurso visual</DocTag>
@@ -294,7 +292,7 @@ export const doc: ComponentDocContent = {
               description: [
                 'Estructura ligera diseñada para onboarding progresivo o introducción de características dentro del flujo de trabajo.',
                 <>
-                  <strong>Anatomía:</strong> icono informativo, título, párrafo descriptivo, paginación y hasta 2 botones de acción.
+                  <strong>Anatomía:</strong> título, párrafo descriptivo, enlace opcional, paginación y hasta 2 botones de acción.
                   <br />
                   <strong>Uso recomendado:</strong> mostrar pasos secuenciales en herramientas complejas o guiar en la configuración inicial de una
                   función.

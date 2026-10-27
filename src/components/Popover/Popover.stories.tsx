@@ -3,11 +3,12 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Popover } from './Popover';
 import { PopoverPanel } from './PopoverPanel';
-import type { PopoverArrow, PopoverProps } from './Popover.types';
+import type { PopoverArrow, PopoverProps, PopoverType } from './Popover.types';
 import { Avatar, AvatarGroup } from '../Avatar';
 import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
 import type { PhotoName } from '../Avatar/Avatar.sample-data';
 import { Button } from '../Button';
+import { ButtonLink } from '../ButtonLink';
 import { Icon } from '../Icon';
 
 const ARROW_OPTIONS: PopoverArrow[] = [
@@ -20,6 +21,7 @@ const ARROW_OPTIONS: PopoverArrow[] = [
   'center-top',
   'center-bottom',
 ];
+const TYPE_OPTIONS: PopoverType[] = ['simple', 'complex'];
 const SURFACE = 'bg-ds-background-general-black';
 const LABEL = 'font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm text-ds-text-neutral-gray';
 
@@ -57,16 +59,23 @@ const meta = {
       control: 'select',
       options: ARROW_OPTIONS,
       type: { name: 'enum', value: ARROW_OPTIONS },
-      description: 'Type de Figma: dónde está la flecha (el panel aparece del lado opuesto del ancla)',
+      description: 'Position de Figma: dónde está la flecha (el panel aparece del lado opuesto del ancla)',
     },
+    type: {
+      control: 'radio',
+      options: TYPE_OPTIONS,
+      type: { name: 'enum', value: TYPE_OPTIONS },
+      description: 'Type de Figma: simple (radio 12) o complex (radio 24, con media). Por defecto según media.',
+    },
+    linkDescription: { control: 'text', description: 'Texto de la fila Description+link' },
     title: { control: 'text', description: 'Text title de Figma' },
     children: { control: 'text', description: 'Text de Figma' },
     page: { control: 'text', description: 'Page de Figma: contador ("1 de 2")' },
-    icon: { control: 'boolean', type: { name: 'boolean' }, description: 'Icon de Figma: info-circle antes del título' },
     trigger: { control: false },
     anchor: { control: false },
     media: { control: false },
     actions: { control: false },
+    link: { control: false },
   },
   args: {
     arrow: 'top-left',
@@ -111,8 +120,13 @@ export const Interactive: Story = {
   render: (args) => <InteractiveDemo {...args} />,
 };
 
+/** Simple ⇔ Photo=no y Complex ⇔ Photo=yes: 16 variantes */
 const FIGMA_VARIANTS = (['no', 'yes'] as const).flatMap((photo) =>
-  ARROW_OPTIONS.map((arrow) => ({ arrow, photo, name: `Type=${arrow}, Photo=${photo}` }))
+  ARROW_OPTIONS.map((arrow) => ({
+    arrow,
+    photo,
+    name: `Type=${photo === 'yes' ? 'Complex' : 'Simple'}, Position=${arrow}, Photo=${photo}`,
+  }))
 );
 
 const figmaActions = (
@@ -126,7 +140,7 @@ const figmaActions = (
   </>
 );
 
-/** Las 16 variantes de Figma (Type × Photo), sueltas y visibles a la vez, con los textos de Figma. */
+/** Las 16 variantes de Figma (Type × Position × Photo), sueltas y visibles a la vez, con los textos de Figma. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
@@ -139,8 +153,16 @@ export const FigmaMatrix: Story = {
             title="Tooltip Title"
             page="1 de 2"
             actions={figmaActions}
-            media={photo === 'yes' ? <SampleMedia action="Button" /> : undefined}
+            media={photo === 'yes' ? <SampleMedia /> : undefined}
             onClose={photo === 'yes' ? () => {} : undefined}
+            linkDescription={photo === 'no' ? 'Descripción' : undefined}
+            link={
+              photo === 'no' ? (
+                <ButtonLink href="#" data-figma-part="Button link">
+                  <span data-figma-part="Button">Button</span>
+                </ButtonLink>
+              ) : undefined
+            }
             data-figma={name}
           >
             Lorem ipsum dolor sit amet consectetur. Turpis.
@@ -167,6 +189,51 @@ export const WithMedia: Story = {
       />
     </div>
   ),
+};
+
+/** Fila Description+link (Simple): texto a la izquierda y un ButtonLink en el slot `link`. */
+export const WithLink: Story = {
+  args: { arrow: 'top-left', linkDescription: 'Consulta la guía completa' },
+  render: (args) => (
+    <div className="p-6 md:p-48">
+      <Popover
+        {...args}
+        link={<ButtonLink href="#guia">Ver guía</ButtonLink>}
+        trigger={
+          <Button variant="secondary" size="sm">
+            Ver novedades
+          </Button>
+        }
+        actions={
+          <Button variant="secondary" contrast="low" size="xs" unicolor>
+            Entendido
+          </Button>
+        }
+      />
+    </div>
+  ),
+};
+
+/** Test: la fila Description+link se dibuja con su texto y el enlace es alcanzable por nombre; sin ícono en el título */
+export const LinkRowTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <PopoverPanel
+      aria-label="Novedades"
+      title="Tooltip Title"
+      linkDescription="Descripción"
+      link={<ButtonLink href="#guia">Ver guía</ButtonLink>}
+    >
+      Texto
+    </PopoverPanel>
+  ),
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await expect(c.getByText('Descripción')).toBeInTheDocument();
+    await expect(c.getByRole('link', { name: /Ver guía/ })).toHaveAttribute('href', '#guia');
+    await expect(canvasElement.querySelector('[data-figma-part="Title Wrapper"] svg')).toBeNull();
+    await expect(canvasElement.querySelector('[data-figma-part="Content"]')!.className).toContain('rounded-ds-radius-general-lg');
+  },
 };
 
 const TOUR = [

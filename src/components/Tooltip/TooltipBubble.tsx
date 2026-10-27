@@ -7,7 +7,6 @@ import {
   tooltipContentVariants,
   tooltipTextClass,
 } from './Tooltip.variants';
-import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
 /**
@@ -17,18 +16,10 @@ import { cn } from '../../utils/cn';
  * el contenido usa siempre los tokens de Dark (`data-theme="dark"`, como MediaScrim).
  */
 export const TooltipBubble = forwardRef<HTMLDivElement, TooltipBubbleProps>(
-  ({ arrow = 'bottom', solid = true, icon = true, children, className, ...rest }, ref) => (
+  // `icon` está obsoleto (Figma quitó el ícono): se descarta para que no llegue al DOM
+  ({ arrow = 'bottom', solid = true, icon: _icon, children, className, ...rest }, ref) => (
     <div data-theme={solid ? 'dark' : undefined} {...rest} ref={ref} className={cn(tooltipBubbleVariants({ arrow }), className)}>
       <div data-figma-part="Content" className={tooltipContentVariants({ solid })}>
-        {icon && (
-          <Icon
-            name="info-circle"
-            size={16}
-            variant="fill"
-            className="shrink-0 text-ds-icon-general-default-unicolor"
-            data-figma-part="Icon-sizes"
-          />
-        )}
         <span data-figma-part="Supporting text" className={tooltipTextClass}>
           {children}
         </span>

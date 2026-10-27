@@ -101,7 +101,8 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
       content,
       arrow = 'bottom',
       solid = true,
-      icon = true,
+      // `icon` está obsoleto (Figma quitó el ícono): se descarta para que no llegue al DOM
+      icon: _icon,
       mode = 'tooltip',
       describes = 'description',
       delay = 300,
@@ -266,7 +267,6 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
           popover="manual"
           arrow={open ? ARROW_OF[placedSide] : arrow}
           solid={solid}
-          icon={icon}
           className={cn(TOP_LAYER_CLASS, 'fixed', className)}
           onPointerEnter={(event) => {
             onPointerEnter?.(event);

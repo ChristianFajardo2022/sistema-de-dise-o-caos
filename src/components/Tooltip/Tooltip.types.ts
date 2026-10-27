@@ -9,9 +9,11 @@ export type TooltipArrow = 'top' | 'bottom' | 'left' | 'right';
 export interface TooltipBubbleProps extends HTMLAttributes<HTMLDivElement> {
   /** Position de Figma: borde donde se dibuja la flecha. Por defecto `bottom`. */
   arrow?: TooltipArrow;
-  /** Solid de Figma: `true` relleno sólido (background/container/default-unicolor); `false` translúcido. Por defecto `true`. */
+  /** Solid de Figma: `true` relleno sólido (background/general/gray-sixth); `false` translúcido. Por defecto `true`. */
   solid?: boolean;
-  /** Icon de Figma: ícono info-circle antes del texto. Por defecto `true`. */
+  /**
+   * @deprecated Figma quitó el ícono del tooltip: la prop se ignora y se quitará en la próxima versión mayor.
+   */
   icon?: boolean;
   /** Text de Figma: texto breve, sin contenido interactivo. */
   children?: ReactNode;

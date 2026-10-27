@@ -1,7 +1,12 @@
 import type { HTMLAttributes, ReactElement, ReactNode, RefObject } from 'react';
 
 /**
- * Type de Figma: dónde está la flecha. El panel aparece del lado opuesto del ancla (`top-left` = flecha en la esquina
+ * Type de Figma: `simple` (sin foto, radio 12, gap 8) o `complex` (con foto, radio 24, gap 12).
+ */
+export type PopoverType = 'simple' | 'complex';
+
+/**
+ * Position de Figma: dónde está la flecha. El panel aparece del lado opuesto del ancla (`top-left` = flecha en la esquina
  * superior izquierda, panel debajo y hacia la derecha; `middle-right` = flecha a la derecha, panel a la izquierda).
  */
 export type PopoverArrow =
@@ -15,16 +20,25 @@ export type PopoverArrow =
   | 'center-bottom';
 
 export interface PopoverPanelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
-  /** Type de Figma: dónde está la flecha. Por defecto `top-left`. */
+  /** Position de Figma: dónde está la flecha. Por defecto `top-left`. */
   arrow?: PopoverArrow;
+  /** Type de Figma. Por defecto `complex` con `media` y `simple` sin ella (en Figma, Complex ⇔ Photo=yes). */
+  type?: PopoverType;
   /** Text title de Figma (con Title). Sin título, el panel necesita `aria-label`. */
   title?: ReactNode;
   /** Nivel del título (`none` = párrafo). Por defecto 2. */
   headingLevel?: 2 | 3 | 4 | 5 | 6 | 'none';
-  /** Icon de Figma: info-circle antes del título. Por defecto `true` sin `media` y `false` con `media` (como en Figma). */
+  /** @deprecated Figma quitó el ícono del título: la prop se ignora y se quitará en la próxima versión mayor. */
   icon?: boolean;
   /** Text de Figma: descripción. */
   children?: ReactNode;
+  /**
+   * Description+link de Figma (Simple): el enlace o botón de la fila, normalmente un `ButtonLink`. Con `link` se dibuja
+   * la fila.
+   */
+  link?: ReactNode;
+  /** Texto de la fila Description+link, a la izquierda del enlace ("Descripción" en Figma). */
+  linkDescription?: ReactNode;
   /**
    * Photo=yes de Figma: bloque de medios (imagen, avatares, una acción) con la muesca del botón cerrar. Lo interactivo
    * que se ponga aquí debe tener su propio nombre accesible.

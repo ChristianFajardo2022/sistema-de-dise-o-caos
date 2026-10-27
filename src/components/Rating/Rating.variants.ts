@@ -10,7 +10,7 @@ import { cva } from 'class-variance-authority';
  * - Star rating: set 11252:401. Size 20px/32px × State 0-5. Fila de 5 estrellas, gap space/general/md (4)
  *   en 20px y space/general/lg (8) en 32px.
  * - Rating bar: set 11569:947. Columna con gap space/general/lg (8); cada fila: estrella 16, gap 8, ProgressBar.
- * - Number rating: nodo 12745:16784. Número 14/18 medium + estrella 16, gap 4.
+ * - Number rating: nodo 12745:16784. Número 14/18 Semibold + estrella 16, gap 4.
  */
 export const iconStarVariants = cva('inline-flex shrink-0 items-center justify-center', {
   variants: {
@@ -62,6 +62,7 @@ export const numberRatingVariants = cva(
     'inline-flex items-center gap-ds-space-general-md',
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
     'text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md',
-    'text-ds-text-neutral-white font-medium',
+    // Promedio en typography/weight/Semibold (el contador de reseñas vuelve a Regular en NumberRating.tsx)
+    'text-ds-text-neutral-white [font-weight:var(--ds-primitives-typography-weight-semibold)]',
   ].join(' ')
 );
