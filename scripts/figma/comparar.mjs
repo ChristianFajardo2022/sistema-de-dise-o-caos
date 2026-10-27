@@ -18,6 +18,31 @@
  *
  * `--out` escribe comparacion.json/html y capturas en otra carpeta (para no pisar la de otro agente).
  *
+ * Reglas de la tanda de deuda (D5, 27-oct):
+ * - R24 Variables de color con alias y opacidad: un valor de modo `{ color: VARIABLE_ALIAS, opacity }` se resuelve en
+ *   el modo de color del tema (Dark/Light): color del alias × opacidad/100 (la opacidad viene en %). Si el id del alias
+ *   no está en la spec se busca su nombre en `com.figma.variableId` de `tokens/**\/*.tokens.json` y su valor en
+ *   `tokens/variables-principal.json`. Las variables de la colección Responsive de tipo color (`effect/shadow-*`) se
+ *   resuelven por nombre en el principal (modo Responsive -> variable de Mode -> modo de color), porque la spec solo
+ *   guarda el valor Dark. Vale para rellenos, trazos, textos y efectos.
+ * - R5 Colores `color(srgb r g b / a)` del DOM se leen directo (el canvas los devolvía premultiplicados con alfa bajo).
+ *   Trazo decorativo en svg: si la raíz no dibuja trazo y un svg que la cubre tiene una sola forma con stroke, se mide
+ *   esa forma (grosor, color × opacidades) y, si Figma trae `guiones`, también `stroke-dasharray` ("trazo guiones").
+ * - R30 Nodos recortados en Figma: los que quedan del todo fuera de la caja de una INSTANCE ancestro, o de la raíz
+ *   cuando el PNG exportado mide lo mismo que la raíz (si el PNG es mayor, lo que sobresale se ve y se compara), no se
+ *   comparan (textos, íconos, formas) ni compiten por los svg. Si el DOM sí los muestra queda el aviso "recortado en
+ *   Figma pero visible en Storybook".
+ * - R32 Capas hijas: si la raíz del DOM no dibuja trazo, cuenta el de la primera capa descendiente que la cubre (mismo
+ *   rectángulo ±1 px, hasta 3 niveles): border, box-shadow inset (span absoluto del Button) o svg (R5). Igual con el
+ *   fondo (solo si Figma pinta la raíz y la raíz del DOM es transparente) y el radio (solo si Figma pide radio y la raíz
+ *   del DOM no tiene). Padding: con trazo de Figma y `border` en código se acepta padding + borde (el trazo INSIDE de
+ *   Figma no ocupa sitio); y en un contenedor centrado (CENTER/CENTER, un solo hijo en flujo, sin textos, la raíz mide
+ *   igual) no se reporta si algún elemento del DOM ocupa la misma caja que el contenido de Figma (unión de íconos y
+ *   formas hoja). Hijos que sobresalen de la raíz en un eje HUG se tratan como absolutos: no cuentan para el gap.
+ *   Envoltorio: si la raíz del DOM tiene un único hijo con caja que la cubre (el `div` del Checkbox con su `label`) y
+ *   su padding o gap valen 0, se acepta el de ese hijo cuando coincide con Figma.
+ *   Los hijos de GROUP / BOOLEAN_OPERATION traen x/y en el espacio del padre del grupo.
+ *
  * Lee .qa/figma/componentes/<carpeta>/spec.json (generado por extraer.js), abre la historia
  * FigmaMatrix en Storybook y compara cada variante (`[data-figma="<nombre>"]`) contra la spec.
  * Escribe comparacion.json, comparacion.html y capturas/<tema>/<slug>.png en la misma carpeta.
@@ -42,6 +67,9 @@ const MODOS = ['Desktop', 'Tablet', 'Mobile'];
 const VIEWPORT_POR_MODO = { Desktop: 1440, Tablet: 800, Mobile: 390 };
 const TOL_COLOR = 2;
 const TOL_ALPHA = 0.02;
+
+// En Figma los hijos de un GROUP o BOOLEAN_OPERATION tienen x/y relativos al padre del grupo (el grupo no crea espacio)
+const esGrupo = (n) => n.tipo === 'GROUP' || n.tipo === 'BOOLEAN_OPERATION';
 
 // Sombra inset sin blur ni spread desplazada en un solo eje: trazo de un lado
 const esTrazoLado = (s) => s.inset && s.blur === 0 && s.spread === 0 && (s.x === 0) !== (s.y === 0);
@@ -76,15 +104,95 @@ function coloresIguales(a, b) {
   return [0, 1, 2].every((i) => Math.abs(a[i] - b[i]) <= TOL_COLOR);
 }
 
+// ───────────────────────── variables del archivo principal (R24) ─────────────────────────
+// `tokens/variables-principal.json` (por nombre, con los valores por id de modo) y los `com.figma.variableId` de
+// `tokens/**/*.tokens.json` (id -> nombre). Sirven para resolver los alias que la spec no trae: un valor de modo con
+// forma `{ color: { type: 'VARIABLE_ALIAS', id }, opacity }` apunta a un id que casi nunca está en `spec.variables`.
+const PRINCIPAL = (() => {
+  const porNombre = new Map();
+  const modosDe = new Map(); // id de colección -> { idModo: nombreModo }
+  const nombrePorId = new Map();
+  try {
+    const d = JSON.parse(fs.readFileSync(path.join(RAIZ, 'tokens', 'variables-principal.json'), 'utf8'));
+    for (const c of d.colecciones || []) modosDe.set(c.id, Object.fromEntries((c.modos || []).map((m) => [m.id, m.nombre])));
+    for (const v of d.variables || []) porNombre.set(v.nombre, v);
+  } catch {}
+  const recorrer = (o, ruta) => {
+    if (!o || typeof o !== 'object') return;
+    const id = o.$extensions && o.$extensions['com.figma.variableId'];
+    if (id && '$value' in o) {
+      if (!nombrePorId.has(id)) nombrePorId.set(id, ruta.join('/'));
+      return;
+    }
+    for (const [k, v] of Object.entries(o)) if (!k.startsWith('$')) recorrer(v, [...ruta, k]);
+  };
+  try {
+    for (const sub of fs.readdirSync(path.join(RAIZ, 'tokens'))) {
+      const dirSub = path.join(RAIZ, 'tokens', sub);
+      if (!fs.statSync(dirSub).isDirectory()) continue;
+      for (const f of fs.readdirSync(dirSub).filter((x) => x.endsWith('.tokens.json'))) {
+        try {
+          recorrer(JSON.parse(fs.readFileSync(path.join(dirSub, f), 'utf8')), []);
+        } catch {}
+      }
+    }
+  } catch {}
+  return { porNombre, modosDe, nombrePorId };
+})();
+
 // ───────────────────────── resolución de la spec ─────────────────────────
 function crearResolvedor(spec, tema, modoResponsive = 'Desktop') {
   const modoColor = tema === 'dark' ? 'Dark' : 'Light';
   const vars = spec.variables || {};
+  // R24: valor de modo de una variable de color -> [r,g,b,a]. Acepta hex, `{ alias: nombre }` y
+  // `{ color: alias, opacity }` (la opacidad viene en %, 0-100, y multiplica el alfa del color al que apunta).
+  const valorColor = (val, prof = 0) => {
+    if (prof > 8 || val == null) return null;
+    if (typeof val === 'string') return parseHex(val);
+    if (typeof val !== 'object') return null;
+    if (typeof val.alias === 'string') return colorPorNombre(val.alias, prof + 1);
+    if (val.color && val.color.id) {
+      const base = colorPorId(val.color.id, prof + 1);
+      if (!base) return null;
+      const op = typeof val.opacity === 'number' ? val.opacity / 100 : 1;
+      return [base[0], base[1], base[2], +(base[3] * op).toFixed(4)];
+    }
+    return null;
+  };
+  // Variable del archivo principal por nombre, en el modo que toque (color, Responsive o el único que tenga)
+  const colorPorNombre = (nombre, prof = 0) => {
+    const v = PRINCIPAL.porNombre.get(nombre);
+    if (!v || !v.valores) return null;
+    const modos = PRINCIPAL.modosDe.get(v.coleccion) || {};
+    const ids = Object.keys(v.valores);
+    const id = ids.find((k) => modos[k] === modoColor) ?? ids.find((k) => modos[k] === modoResponsive) ?? ids[0];
+    return valorColor(v.valores[id], prof + 1);
+  };
+  const colorPorId = (id, prof = 0) => {
+    const v = vars[id];
+    if (v) {
+      const c = colorDeVar(v, prof + 1);
+      if (c) return c;
+    }
+    const nombre = PRINCIPAL.nombrePorId.get(id);
+    return nombre ? colorPorNombre(nombre, prof + 1) : null;
+  };
+  // Variable de la spec: un hex por modo se usa tal cual; un alias con opacidad se resuelve por modo; una variable de
+  // la colección Responsive enlazada a un color (p. ej. `effect/shadow-*`) se resuelve por nombre en el principal, porque
+  // la spec guarda en `porModo` solo el valor Dark de la variable de Mode a la que apunta.
+  const colorDeVar = (v, prof = 0) => {
+    if (!v || !v.porModo) return null;
+    if (/^Responsive/i.test(v.coleccion || '') && v.tipo === 'COLOR') {
+      const c = colorPorNombre(v.nombre, prof + 1);
+      if (c) return c;
+    }
+    const val = v.porModo[modoColor] ?? v.porModo[modoResponsive] ?? Object.values(v.porModo)[0];
+    return valorColor(val, prof + 1);
+  };
   const colorDe = (literal, varId) => {
     const v = varId && vars[varId];
     if (v && v.porModo) {
-      const val = v.porModo[modoColor] ?? Object.values(v.porModo)[0];
-      const c = parseHex(val);
+      const c = colorDeVar(v);
       if (c) return c;
     }
     return parseHex(literal);
@@ -102,19 +210,11 @@ function crearResolvedor(spec, tema, modoResponsive = 'Desktop') {
     const p = primerSolido(lista);
     return p ? colorDe(p.color, p.var) : null;
   };
-  // Color de un efecto. Si está enlazado a una variable de la colección Responsive, el modo trae
-  // `{ color: alias, opacity }` (no un hex): se resuelve el alias del color y se aplica la opacidad.
+  // Color de un efecto (R24): misma resolución que los rellenos (alias + opacidad por modo de color, y las variables
+  // Responsive por nombre en el principal). Si no se puede resolver, el literal del efecto.
   const colorEfecto = (e) => {
     const v = e.vars && e.vars.color && vars[e.vars.color];
-    const val = v && v.porModo && (v.porModo[modoResponsive] ?? Object.values(v.porModo)[0]);
-    if (val && typeof val === 'object' && val.color) {
-      const base = vars[val.color.id];
-      const mc = base && base.porModo && parseHex(base.porModo[modoColor] ?? Object.values(base.porModo)[0]);
-      const rgb = mc || parseHex(e.color) || [0, 0, 0, 1];
-      return [rgb[0], rgb[1], rgb[2], typeof val.opacity === 'number' ? val.opacity : rgb[3]];
-    }
-    if (typeof val === 'string') return parseHex(val) || parseHex(e.color);
-    return parseHex(e.color);
+    return (v && colorDeVar(v)) || parseHex(e.color);
   };
   return { colorDe, numDe, colorPintura, primerSolido, colorEfecto };
 }
@@ -192,6 +292,13 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
       return [Math.round(+m[1]), Math.round(+m[2]), Math.round(+m[3]), a];
     }
     if (css === 'transparent') return [0, 0, 0, 0];
+    // R5: `color(srgb r g b / a)` (lo que da color-mix y los tokens con opacidad) se lee directo: pasar por el canvas
+    // con alfa bajo devuelve el color premultiplicado y redondeado (p. ej. 46,48,51 al 5 % salía 39,39,59)
+    const srgb = /^color\(\s*srgb\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.e+-]+%?))?\s*\)$/i.exec(css.trim());
+    if (srgb) {
+      const a = srgb[4] === undefined ? 1 : srgb[4].endsWith('%') ? parseFloat(srgb[4]) / 100 : parseFloat(srgb[4]);
+      return [1, 2, 3].map((i) => Math.round(Math.min(1, Math.max(0, parseFloat(srgb[i]))) * 255)).concat(a);
+    }
     ctx.clearRect(0, 0, 1, 1);
     ctx.fillStyle = '#000';
     ctx.fillStyle = css;
@@ -266,6 +373,11 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
     if (!propias.length && capa.firstElementChild) propias = cajas(capa.firstElementChild);
     sombras.push(...propias.map((f) => ({ ...f, deCanva: true })));
   }
+  // Elemento con el mismo rectángulo que la raíz (±1 px)
+  const cubre = (e) => {
+    const b = e.getBoundingClientRect();
+    return Math.abs(b.left - r.left) <= 1 && Math.abs(b.top - r.top) <= 1 && Math.abs(b.width - r.width) <= 1 && Math.abs(b.height - r.height) <= 1;
+  };
   // Distancia real entre los dos primeros hijos visibles (para gaps negativos de Figma, que en CSS son márgenes)
   const hijosVis = [...raiz.children].filter((h) => h.getBoundingClientRect().height > 0 || h.getBoundingClientRect().width > 0);
   const vertical = cs.flexDirection.startsWith('column') || (cs.display !== 'flex' && cs.display !== 'inline-flex');
@@ -275,6 +387,13 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
     const b = hijosVis[1].getBoundingClientRect();
     gapReal = vertical ? b.top - a.bottom : b.left - a.right;
   }
+  // R32: envoltorio — la raíz tiene un único hijo con caja y ese hijo la cubre (el `div` del Checkbox con su `label`):
+  // su padding y su gap se usan como respaldo cuando los de la raíz no coinciden con Figma
+  let envoltorio = null;
+  if (hijosVis.length === 1 && !(hijosVis[0] instanceof SVGElement) && cubre(hijosVis[0])) {
+    const ce = getComputedStyle(hijosVis[0]);
+    envoltorio = { padding: ['Top', 'Right', 'Bottom', 'Left'].map((l) => px(ce[`padding${l}`])), columnGap: px(ce.columnGap), rowGap: px(ce.rowGap) };
+  }
   // Hijos absolutos + posición del primer texto respecto de la raíz (H4: gaps negativos de Figma)
   const hayAbs = [...raiz.children].some((h) => getComputedStyle(h).position === 'absolute');
   const lados = ['Top', 'Right', 'Bottom', 'Left'];
@@ -282,13 +401,71 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
     grosores: lados.map((l) => px(cs[`border${l}Width`]) * (cs[`border${l}Style`] === 'none' ? 0 : 1)),
     colores: lados.map((l) => rgba(cs[`border${l}Color`])),
   };
+  // R32/R5: capas descendientes que cubren la raíz (mismo rectángulo ±1 px) y dibujan su cuerpo o su trazo: el span
+  // absoluto con box-shadow inset del Button, la caja del Checkbox/Radio dentro de un envoltorio, o el svg con un
+  // <rect> punteado del dropzone. Se baja hasta 3 niveles; no se entra en svg ni en íconos.
+  const capas = [];
+  const bajar = (el, d) => {
+    if (d > 3) return;
+    for (const h of el.children) {
+      if (h.hasAttribute('data-icon')) continue;
+      if (cubre(h)) capas.push(h);
+      if (!(h instanceof SVGElement)) bajar(h, d + 1);
+    }
+  };
+  bajar(raiz, 1);
+  let trazoHijo = null;
+  let cuerpoHijo = null;
+  let radioHijo = null;
+  for (const h of capas) {
+    const ch = getComputedStyle(h);
+    if (!trazoHijo) {
+      const g = lados.map((l) => px(ch[`border${l}Width`]) * (ch[`border${l}Style`] === 'none' ? 0 : 1));
+      const sh = cajas(h).filter((s) => (s.inset && s.blur === 0 && s.x === 0 && s.y === 0 && s.spread > 0) || (s.inset && s.blur === 0 && s.spread === 0 && (s.x === 0) !== (s.y === 0)));
+      if (Math.max(...g) > 0) trazoHijo = { tipo: 'borde', borde: { grosores: g, colores: lados.map((l) => rgba(ch[`border${l}Color`])) } };
+      else if (sh.length) trazoHijo = { tipo: 'sombra', sombras: sh };
+      else if (h.tagName.toLowerCase() === 'svg') {
+        // Trazo decorativo en svg (R5): una sola forma con stroke y sin relleno
+        const formasSvg = [...h.querySelectorAll('rect, path, circle, ellipse, polygon, line, polyline')].filter((f) => {
+          const cf = getComputedStyle(f);
+          return cf.stroke && cf.stroke !== 'none' && px(cf.strokeWidth) > 0;
+        });
+        if (formasSvg.length === 1) {
+          const cf = getComputedStyle(formasSvg[0]);
+          const c = rgba(cf.stroke);
+          const op = parseFloat(cf.strokeOpacity) * parseFloat(cf.opacity) * parseFloat(getComputedStyle(h).opacity);
+          if (c) c[3] = +(c[3] * (Number.isFinite(op) ? op : 1)).toFixed(4);
+          const guiones = cf.strokeDasharray && cf.strokeDasharray !== 'none' ? cf.strokeDasharray.split(/[\s,]+/).map(px) : null;
+          trazoHijo = { tipo: 'svg', grosor: px(cf.strokeWidth), color: c, guiones };
+        }
+      }
+    }
+    const fh = rgba(ch.backgroundColor);
+    if (!cuerpoHijo && fh && fh[3] > 0.01) cuerpoHijo = { fondo: fh };
+    if (!radioHijo && !(h instanceof SVGElement)) {
+      const rr = ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'].map((c) => radio(`border${c}Radius`, h, ch));
+      if (rr.some((x) => x > 0)) radioHijo = rr;
+    }
+  }
   const out = {
     raiz: {
+      trazoHijo,
+      cuerpoHijo,
+      radioHijo,
+      // R32: cajas de los descendientes con tamaño (svg y elementos HTML; no se entra en los svg), respecto de la raíz,
+      // para ubicar el contenido en contenedores centrados (íconos, spinner del estado Load)
+      cajasHijas: [...raiz.querySelectorAll('*')]
+        .filter((e) => !e.parentElement.closest('svg'))
+        .slice(0, 600)
+        .map((s) => s.getBoundingClientRect())
+        .filter((b) => b.width > 0 && b.height > 0)
+        .map((b) => ({ x: b.left - r.left, y: b.top - r.top, w: b.width, h: b.height })),
       w: r.width,
       h: r.height,
       padding: lados.map((l) => px(cs[`padding${l}`])),
       columnGap: px(cs.columnGap),
       gapReal,
+      envoltorio,
       hayAbs,
       rowGap: px(cs.rowGap),
       radios: ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'].map((c) => radio(`border${c}Radius`, raiz, cs)),
@@ -352,7 +529,9 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
     // Campo vacío: lo que se ve es el placeholder, con su propio color
     const c = getComputedStyle(el);
     const color = campo && !el.value ? getComputedStyle(el, '::placeholder').color : c.color;
+    const bt = el.getBoundingClientRect();
     return {
+      visible: bt.width > 0 && bt.height > 0 && c.visibility !== 'hidden',
       familia: c.fontFamily,
       tamano: px(c.fontSize),
       peso: parseInt(c.fontWeight, 10),
@@ -482,7 +661,8 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
   const asignado = new Map();
   {
     // Con una sola parte marcada el emparejamiento ya es trivial; con varias (o ninguna) se usa la posición
-    const pend = partes.iconos.map((ic, i) => ({ ic, i })).filter(({ ic }) => marcados(busca(ic)).length !== 1 && ic.pos);
+    // R30: los íconos recortados en Figma no compiten por los svg (no se comparan)
+    const pend = partes.iconos.map((ic, i) => ({ ic, i })).filter(({ ic }) => marcados(busca(ic)).length !== 1 && ic.pos && !ic.recortado);
     const pares = [];
     for (const { ic, i } of pend) {
       for (const sv of candidatos(ic)) {
@@ -569,11 +749,69 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
 
   // layout
   if (lay) {
+    // R32: hijo que sobresale de la raíz en un eje HUG: no puede ir en el flujo del auto layout (es absoluto, p. ej. el
+    // brillo `Union` del Button primary); no cuenta para el gap ni como contenido
+    const absolutoInferido = (h) =>
+      (lay.tamH === 'HUG' && (h.x < -0.5 || h.x + h.w > n.w + 0.5)) || (lay.tamV === 'HUG' && (h.y < -0.5 || h.y + h.h > n.h + 0.5));
+    const enFlujo = (n.hijos || []).filter((h) => !h.oculto && !absolutoInferido(h));
+    // R32: contenedor de tamaño fijo en código con el contenido centrado (Button Icon-single, caja del Checkbox): el
+    // padding de Figma no se reporta si la raíz mide lo mismo, el auto layout centra en ambos ejes, hay un solo hijo en
+    // flujo, ningún texto visible, y algún elemento del DOM (svg o caja) ocupa la misma caja que el contenido de Figma (unión de
+    // los íconos y formas hoja visibles de ese hijo), con max(tol, 0,5 px).
+    let centrado = null;
+    if (
+      lay.principal === 'CENTER' &&
+      lay.cruzado === 'CENTER' &&
+      enFlujo.length === 1 &&
+      !m.__textos.some((t) => !t.recortado) &&
+      Math.abs(n.w - rz.w) <= tol &&
+      Math.abs(n.h - rz.h) <= tol
+    ) {
+      const hojas = [];
+      const juntar = (h, x, y) => {
+        if (h.oculto) return;
+        const vis = (h.hijos || []).filter((k) => !k.oculto);
+        if (h.icono || !vis.length) {
+          if (h.icono || ['VECTOR', 'BOOLEAN_OPERATION', 'ELLIPSE', 'RECTANGLE', 'POLYGON', 'STAR', 'LINE'].includes(h.tipo)) hojas.push({ x, y, w: h.w, h: h.h });
+          return;
+        }
+        // Los hijos de GROUP y BOOLEAN_OPERATION traen x/y en el espacio del padre del grupo, no del grupo
+        const g = esGrupo(h);
+        for (const k of vis) juntar(k, (g ? x - (h.x || 0) : x) + (k.x || 0), (g ? y - (h.y || 0) : y) + (k.y || 0));
+      };
+      juntar(enFlujo[0], enFlujo[0].x || 0, enFlujo[0].y || 0);
+      if (hojas.length) {
+        const x1 = Math.min(...hojas.map((b) => b.x));
+        const y1 = Math.min(...hojas.map((b) => b.y));
+        const caja = { x: x1, y: y1, w: Math.max(...hojas.map((b) => b.x + b.w)) - x1, h: Math.max(...hojas.map((b) => b.y + b.h)) - y1 };
+        const t = Math.max(tol, 0.5);
+        const hit = (rz.cajasHijas || []).find((s) => Math.abs(s.x - caja.x) <= t && Math.abs(s.y - caja.y) <= t && Math.abs(s.w - caja.w) <= t && Math.abs(s.h - caja.h) <= t);
+        if (hit) centrado = { caja, hit };
+      }
+    }
     const claves = ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'];
+    const gTrazo = n.trazos && n.trazo ? [].concat(n.trazo.grosor) : [];
     ['arriba', 'derecha', 'abajo', 'izquierda'].forEach((lado, i) => {
-      num(`padding ${lado}`, R.numDe(lay.padding[i], v[claves[i]]), rz.padding[i]);
+      const f = R.numDe(lay.padding[i], v[claves[i]]);
+      const sb = rz.padding[i];
+      const bi = rz.borde.grosores[i];
+      if (Math.abs(f - sb) <= tol) return num(`padding ${lado}`, f, sb);
+      // R32: trazo INSIDE de Figma (no ocupa sitio en el layout) hecho con `border` en código: el contenido empieza en
+      // borde + padding, así que se compara la suma
+      const gi = gTrazo.length === 4 ? gTrazo[i] : gTrazo[0];
+      if (gi > 0 && bi > 0 && Math.abs(f - (sb + bi)) <= tol) return num(`padding ${lado} (padding + borde ${bi}px del código)`, f, sb + bi);
+      if (sb === 0 && rz.envoltorio && Math.abs(f - rz.envoltorio.padding[i]) <= tol) return num(`padding ${lado} (envoltorio que cubre la raíz)`, f, rz.envoltorio.padding[i]);
+      if (centrado) {
+        return lista.push({
+          propiedad: `padding ${lado} (contenido centrado: la raíz mide igual y el contenido está en ${+centrado.hit.x.toFixed(2)},${+centrado.hit.y.toFixed(2)} ${+centrado.hit.w.toFixed(2)}×${+centrado.hit.h.toFixed(2)})`,
+          figma: f,
+          storybook: +(+sb).toFixed(3),
+          ok: true,
+        });
+      }
+      num(`padding ${lado}`, f, sb);
     });
-    const visibles = (n.hijos || []).filter((h) => !h.oculto).length;
+    const visibles = enFlujo.length;
     if (visibles > 1) {
       const gap = R.numDe(lay.gap, v.itemSpacing);
       // Un gap negativo no existe en CSS (se resuelve con margen negativo): se mide la distancia real entre hermanos
@@ -584,7 +822,13 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
         // así que la distancia entre cajas no es comparable; se compara dónde queda el primer texto (H4)
         const eje = lay.modo === 'VERTICAL' ? 'y' : 'x';
         num(`posición ${eje} del primer texto (gap negativo ${gap})`, pos[eje], rz.primerTextoPos[eje]);
-      } else num(lay.modo === 'VERTICAL' ? 'gap (row-gap)' : 'gap (column-gap)', gap, medido);
+      } else {
+        const etq = lay.modo === 'VERTICAL' ? 'gap (row-gap)' : 'gap (column-gap)';
+        const env = rz.envoltorio && (lay.modo === 'VERTICAL' ? rz.envoltorio.rowGap : rz.envoltorio.columnGap);
+        // R32: la raíz es un envoltorio de un solo hijo que la cubre: el gap vive en ese hijo
+        if (Math.abs(gap - medido) > tol && medido === 0 && rz.envoltorio && Math.abs(gap - env) <= tol) num(`${etq} (envoltorio que cubre la raíz)`, gap, env);
+        else num(etq, gap, medido);
+      }
     }
   }
 
@@ -605,15 +849,19 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
     const nombres = ['sup-izq', 'sup-der', 'inf-der', 'inf-izq'];
     const valores = Array.isArray(n.radio) ? n.radio : [n.radio, n.radio, n.radio, n.radio];
     const mitad = Math.min(n.w, n.h) / 2;
-    const iguales = valores.every((x) => x === valores[0]) && rz.radios.every((x) => Math.abs(x - rz.radios[0]) < 0.01);
+    // R32: Figma pide radio y la raíz del DOM no tiene: se mide en la capa hija que cubre la raíz (caja del Checkbox)
+    const hijo = valores.some((x) => x > 0) && rz.radios.every((x) => x === 0) && rz.radioHijo;
+    const radiosSb = hijo ? rz.radioHijo : rz.radios;
+    const sufijo = hijo ? ' (capa hija que cubre la raíz)' : '';
+    const iguales = valores.every((x) => x === valores[0]) && radiosSb.every((x) => Math.abs(x - radiosSb[0]) < 0.01);
     const lim = iguales ? [0] : [0, 1, 2, 3];
     for (const i of lim) {
       const f = R.numDe(valores[i], v[esquinas[i]]);
-      const etiqueta = iguales ? 'border-radius' : `border-radius ${nombres[i]}`;
+      const etiqueta = (iguales ? 'border-radius' : `border-radius ${nombres[i]}`) + sufijo;
       if (f >= mitad && f > 0) {
-        lista.push({ propiedad: etiqueta, figma: `${f} (píldora, ≥ ${mitad})`, storybook: +rz.radios[i].toFixed(3), ok: rz.radios[i] >= mitad - tol });
+        lista.push({ propiedad: etiqueta, figma: `${f} (píldora, ≥ ${mitad})`, storybook: +radiosSb[i].toFixed(3), ok: radiosSb[i] >= mitad - tol });
       } else {
-        num(etiqueta, f, rz.radios[i]);
+        num(etiqueta, f, radiosSb[i]);
       }
     }
   }
@@ -622,31 +870,47 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
   const rel = R.primerSolido(n.rellenos);
   if (rel || !n.rellenos) {
     const esperado = rel ? R.colorDe(rel.color, rel.var) : [0, 0, 0, 0];
-    col('fondo', esperado, rz.fondo);
+    // R32: Figma pinta la raíz y la raíz del DOM es transparente: se mide la primera capa hija que la cubre con fondo
+    if (esperado && esperado[3] > 0.01 && (!rz.fondo || rz.fondo[3] <= 0.01) && rz.cuerpoHijo) col('fondo (capa hija que cubre la raíz)', esperado, rz.cuerpoHijo.fondo);
+    else col('fondo', esperado, rz.fondo);
   }
 
   // trazo
   if (n.trazos && n.trazo) {
     const colorTrazo = R.colorPintura(n.trazos);
     const g = Array.isArray(n.trazo.grosor) ? n.trazo.grosor : [n.trazo.grosor, n.trazo.grosor, n.trazo.grosor, n.trazo.grosor];
-    const insets = rz.sombras.filter((s) => s.inset && s.blur === 0 && s.x === 0 && s.y === 0);
+    // R32/R5: si la raíz no dibuja trazo (ni border ni box-shadow inset), cuenta el de la capa hija que la cubre:
+    // border, box-shadow inset (span absoluto del Button) o la forma con stroke de un svg (rect punteado del dropzone)
+    const raizSinTrazo = Math.max(...rz.borde.grosores) === 0 && !rz.sombras.some((s) => (s.inset && s.blur === 0 && s.x === 0 && s.y === 0) || esTrazoLado(s));
+    const th = raizSinTrazo ? rz.trazoHijo : null;
+    const borde = th && th.tipo === 'borde' ? th.borde : rz.borde;
+    const sombrasT = th && th.tipo === 'sombra' ? th.sombras : rz.sombras;
+    const svgT = th && th.tipo === 'svg' ? th : null;
+    const suf = th ? (svgT ? ' (svg hijo)' : ' (capa hija)') : '';
+    const insets = sombrasT.filter((s) => s.inset && s.blur === 0 && s.x === 0 && s.y === 0);
     // Trazo de un solo lado con box-shadow inset desplazado (p. ej. `inset 0 1px 0 0` = arriba)
     const ladoDe = (s) => (s.y > 0 ? 0 : s.x < 0 ? 1 : s.y < 0 ? 2 : 3);
     const porLado = [0, 0, 0, 0];
-    const deLado = rz.sombras.filter(esTrazoLado);
+    const deLado = sombrasT.filter(esTrazoLado);
     deLado.forEach((s) => (porLado[ladoDe(s)] = Math.abs(s.x || s.y)));
-    const bordeMax = Math.max(...rz.borde.grosores);
+    const bordeMax = Math.max(...borde.grosores);
     const usaBorde = bordeMax > 0;
     const lados = ['arriba', 'derecha', 'abajo', 'izquierda'];
-    const grosorSb = (i) => (usaBorde ? rz.borde.grosores[i] : insets[0] ? insets[0].spread : porLado[i]);
+    const grosorSb = (i) => (svgT ? svgT.grosor : usaBorde ? borde.grosores[i] : insets[0] ? insets[0].spread : porLado[i]);
     const iguales = g.every((x) => x === g[0]);
     for (const i of iguales ? [0] : [0, 1, 2, 3]) {
-      const sb = iguales && usaBorde ? Math.max(...rz.borde.grosores) : grosorSb(i);
-      num(iguales ? 'trazo grosor' : `trazo grosor ${lados[i]}`, g[i], sb);
+      const sb = iguales && usaBorde && !svgT ? Math.max(...borde.grosores) : grosorSb(i);
+      num((iguales ? 'trazo grosor' : `trazo grosor ${lados[i]}`) + suf, g[i], sb);
     }
     const idx = g.findIndex((x) => x > 0);
-    const colorSb = usaBorde ? rz.borde.colores[rz.borde.grosores.findIndex((x) => x > 0)] : insets[0] ? insets[0].color : deLado[0] ? deLado[0].color : null;
-    if (idx >= 0) col('trazo color', colorTrazo, colorSb || [0, 0, 0, 0]);
+    const colorSb = svgT ? svgT.color : usaBorde ? borde.colores[borde.grosores.findIndex((x) => x > 0)] : insets[0] ? insets[0].color : deLado[0] ? deLado[0].color : null;
+    if (idx >= 0) col('trazo color' + suf, colorTrazo, colorSb || [0, 0, 0, 0]);
+    // R5: patrón de guiones del trazo (Figma `dashPattern`) contra `stroke-dasharray` del svg
+    if (svgT && Array.isArray(n.trazo.guiones) && n.trazo.guiones.length) {
+      const fg = n.trazo.guiones.join(' ');
+      const sg = (svgT.guiones || []).join(' ');
+      txt('trazo guiones' + suf, fg, sg || 'sólido', !!svgT.guiones && svgT.guiones.length === n.trazo.guiones.length && svgT.guiones.every((x, k) => Math.abs(x - n.trazo.guiones[k]) <= tol));
+    }
   } else if (!n.trazos && Math.max(...rz.borde.grosores) > 0) {
     lista.push({ propiedad: 'trazo', figma: 'sin trazo', storybook: `borde ${Math.max(...rz.borde.grosores)}px`, ok: false });
   }
@@ -680,10 +944,17 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
   if (sobran > 0) lista.push({ propiedad: 'sombra extra', figma: 'sin sombra', storybook: `${sobran} box-shadow`, ok: false });
 
   // textos
+  // R30: nodos recortados en Figma (fuera de la caja de una instancia o de la raíz que recorta) no se comparan; si el
+  // DOM sí los muestra queda un aviso
+  const recortadosVisibles = [];
   for (const t of m.__textos) {
     const sb = m.textos[t.nombre + '#' + t.ord];
     const seg = t.nodo.texto.segmentos[0];
     const pre = `texto "${t.nombre}" `;
+    if (t.recortado) {
+      if (sb && sb.visible) recortadosVisibles.push(`texto "${t.nombre}"`);
+      continue;
+    }
     if (!sb) {
       if (m.conteos[t.nombre] > 0) continue; // sin par: se resume en la entrada informativa
       lista.push({ propiedad: `${pre}presente`, figma: 'sí', storybook: 'no encontrado', ok: false });
@@ -721,6 +992,10 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
   m.__iconos.forEach((ic) => {
     const sb = m.iconos[ic.nombre + '#' + ic.ord];
     const pre = `ícono "${ic.nombre}" `;
+    if (ic.recortado) {
+      if (sb && sb.w > 0 && sb.h > 0) recortadosVisibles.push(`ícono "${ic.nombre}"`);
+      return;
+    }
     if (!sb) {
       if (m.conteos[ic.nombre] > 0) return;
       lista.push({ propiedad: `${pre}presente`, figma: 'sí', storybook: 'svg no encontrado', ok: false });
@@ -743,7 +1018,7 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
   // H3: relleno de las formas hoja con variable enlazada
   (m.__formas || []).forEach((f, i) => {
     const sb = m.formas && m.formas[i];
-    if (!sb) return;
+    if (!sb || f.recortado) return;
     const c = R.colorPintura(f.nodo.rellenos);
     if (c) col(`forma "${f.nombre}" relleno`, c, sb);
   });
@@ -756,6 +1031,13 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
     avisos.push({
       propiedad: 'marco fuera de la vista',
       detalle: `vista ${modo} de ${m.vista.ancho} px; el marco va de ${+m.vista.izq.toFixed(1)} a ${+m.vista.der.toFixed(1)} px: la captura y las medidas pueden salir cortadas (revisar el padding de la historia)`,
+    });
+  }
+  const nRecortados = [...m.__textos, ...m.__iconos, ...(m.__formas || [])].filter((x) => x.recortado).length;
+  if (recortadosVisibles.length) {
+    avisos.push({
+      propiedad: 'recortado en Figma pero visible en Storybook',
+      detalle: `${recortadosVisibles.length} de ${nRecortados} nodos que Figma recorta se ven en el DOM: ${[...new Set(recortadosVisibles)].join(', ')}`,
     });
   }
   // Los textos sin pareja son avisos (sección propia), no diferencias
@@ -882,10 +1164,55 @@ async function main() {
   } catch {}
 
   const R0 = crearResolvedor(spec, 'dark');
+  // R30: tamaño del PNG exportado (cabecera IHDR) para saber si la raíz de la variante recorta su contenido
+  const pngTam = (rel) => {
+    try {
+      const fd = fs.openSync(path.join(dirSpec, rel), 'r');
+      const b = Buffer.alloc(24);
+      fs.readSync(fd, b, 0, 24, 0);
+      fs.closeSync(fd);
+      return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+    } catch {
+      return null;
+    }
+  };
+  /**
+   * R30: nodos que Figma no muestra aunque no estén ocultos: los que quedan del todo fuera de la caja de una INSTANCE
+   * ancestro (las instancias heredan el "clip content" del componente: paneles cerrados del Header, la tarjeta del
+   * Avatar+dropdown) o de la raíz de la variante cuando el PNG exportado mide lo mismo que la raíz (la raíz recorta; si
+   * el PNG es más grande, lo que sobresale se ve y se compara). Devuelve el Set de nodos recortados (con su subárbol).
+   */
+  const recortadosDe = (v) => {
+    const set = new Set();
+    const raiz = v.arbol;
+    const tam = v.png ? pngTam(v.png) : null;
+    let raizRecorta = false;
+    if (tam && raiz.w > 0 && raiz.h > 0) {
+      const esc = tam.w / raiz.w;
+      raizRecorta = esc > 0 && Math.abs(tam.h / esc - raiz.h) <= 1 && Math.abs(tam.w / esc - raiz.w) <= 1;
+    }
+    const fuera = (a, c) => a.x + a.w <= c.x + 0.01 || a.x >= c.x + c.w - 0.01 || a.y + a.h <= c.y + 0.01 || a.y >= c.y + c.h - 0.01;
+    const marcar = (n) => {
+      set.add(n);
+      (n.hijos || []).forEach(marcar);
+    };
+    const visitar = (n, x, y, cajas) => {
+      const caja = { x, y, w: n.w || 0, h: n.h || 0 };
+      if (n !== raiz && cajas.some((c) => fuera(caja, c))) return marcar(n);
+      const sig = n === raiz ? (raizRecorta ? [caja] : []) : n.tipo === 'INSTANCE' ? [...cajas, caja] : cajas;
+      // Hijos de GROUP / BOOLEAN_OPERATION: x/y en el espacio del padre del grupo
+      const bx = esGrupo(n) ? x - (n.x || 0) : x;
+      const by = esGrupo(n) ? y - (n.y || 0) : y;
+      for (const h of n.hijos || []) visitar(h, bx + (h.x || 0), by + (h.y || 0), sig);
+    };
+    visitar(raiz, 0, 0, []);
+    return set;
+  };
   const variantes = spec.variantes.map((v) => {
     const textos = [];
     const iconos = [];
     const formas = [];
+    const recortados = recortadosDe(v);
     // H1/H3: cadena de ancestros (la raíz de la variante no cuenta) con el índice de cada uno entre los de su nombre y
     // los ordinales de los textos / formas dentro de él
     const idxAnc = {};
@@ -902,15 +1229,15 @@ async function main() {
     const visitar = (nodo, x, y, anc = [], ancs = []) => {
       if (nodo.oculto) return;
       if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
-        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre), anc, cadena: cadenaDe(ancs, 't:' + nodo.nombre) });
+        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre), anc, cadena: cadenaDe(ancs, 't:' + nodo.nombre), recortado: recortados.has(nodo) });
         primero = false;
       }
       if (esForma(nodo) && R0.primerSolido(nodo.rellenos)?.var) {
-        formas.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, w: nodo.w, h: nodo.h, cadena: cadenaDe(ancs, `f:${nodo.w}x${nodo.h}`), cadenaNombre: cadenaDe(ancs, `fn:${nodo.nombre}`) });
+        formas.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, w: nodo.w, h: nodo.h, cadena: cadenaDe(ancs, `f:${nodo.w}x${nodo.h}`), cadenaNombre: cadenaDe(ancs, `fn:${nodo.nombre}`), recortado: recortados.has(nodo) });
       }
       if (nodo.icono) {
         const size = nodo.instancia?.variante?.Size;
-        iconos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], pos: { x, y }, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined });
+        iconos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], pos: { x, y }, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined, recortado: recortados.has(nodo) });
       }
       // Nombres de los ancestros (y su alias en código) para H3; la raíz de la variante no cuenta
       const sig = nodo === v.arbol ? anc : [...anc, nodo.nombre, ...(aliasCarpeta[nodo.nombre] ? [aliasCarpeta[nodo.nombre]] : [])];
@@ -1022,7 +1349,7 @@ async function main() {
             nombre: v.def.nombre,
             k: v.k,
             conocidos: v.conocidos,
-            partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord, anc: t.anc, cadena: t.cadena })), formas: v.formas.map((f) => ({ nombre: f.nombre, busca: f.busca, w: f.w, h: f.h, cadena: f.cadena, ordNombre: f.ordNombre, totNombre: f.totNombre })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos })) },
+            partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord, anc: t.anc, cadena: t.cadena })), formas: v.formas.map((f) => ({ nombre: f.nombre, busca: f.busca, w: f.w, h: f.h, cadena: f.cadena, ordNombre: f.ordNombre, totNombre: f.totNombre })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos, recortado: x.recortado })) },
           });
           if (!m) {
             salida[tema] = { encontrada: false, comparaciones: [] };
