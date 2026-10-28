@@ -1,0 +1,15 @@
+{
+  "name": "ScanPoints",
+  "component": "ScanPoints",
+  "description": "Puntos del marco de captura del escaneo, fiel al component set points-scan de Figma (19548:38784): 129×175 con 8 puntos de 5×5 en blanco unicolor. Los 9 fotogramas (Propiedad 1 = 0 a 8) son una animación, no estados a elegir: en 0 todos están apagados y, de 1 a 8, los puntos pasan a opacidad completa en el orden 6, 3, 7, 5, 4, 1, 8, 2 mientras el resto queda al 30 %. Con animated (por defecto) recorre los fotogramas en bucle con SVG (SMIL); con prefers-reduced-motion: reduce o animated={false} queda fija en step. Es decorativa (aria-hidden) salvo que se pase label, que la expone como imagen. El color es blanco fijo: se coloca sobre la vista oscura de la cámara. Categoría: Feedback.",
+  "category": "Feedback",
+  "props": {
+    "step": { "type": "number", "default": 8, "description": "Fotograma fijo 0 a 8 (Propiedad 1 de Figma). Solo con animated={false} o reducción de movimiento." },
+    "animated": { "type": "boolean", "default": true, "description": "Recorre los 9 fotogramas en bucle. Se apaga solo con prefers-reduced-motion: reduce." },
+    "label": { "type": "string", "required": false, "description": "Texto para lectores de pantalla. Sin él, aria-hidden." }
+  },
+  "examples": [
+    { "title": "Animada", "code": "<ScanPoints />" },
+    { "title": "Fotograma fijo", "code": "<ScanPoints animated={false} step={4} label=\"Captura al 50 %\" />" }
+  ]
+}

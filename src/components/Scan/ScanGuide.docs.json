@@ -1,0 +1,16 @@
+{
+  "name": "ScanGuide",
+  "component": "ScanGuide",
+  "description": "Guía animada del escaneo, fiel al component set animation-scan de Figma (20889:54087, 334×140): rejilla de 15×8 puntos con un foco de luz radial (degradado de background/general/gray-fifth a default-on-canva cuyo segundo tope va 0, 1 o 0,5 según el fotograma), visor de esquinas y la figura del tipo. Type = face (rostro con un leve movimiento vertical), code (código de barras con líneas de barrido), id (documento: pasa de pequeño a grande y el frente se desliza para mostrar el reverso; tiene 3 fotogramas) y qr (ícono scan-barcode con barrido y estela). Los fotogramas (Transition) son una animación, no estados a elegir. Con animated (por defecto) los recorre en bucle con SVG (SMIL, interpolados con ease); con prefers-reduced-motion: reduce o animated={false} queda fija en frame. Es decorativa (aria-hidden) salvo que se pase label, que la expone como imagen. Los colores siguen el tema (blanco en dark, gris oscuro en light). Los trazados de las figuras son aproximados: Figma no entrega la geometría de los vectores. Categoría: Feedback.",
+  "category": "Feedback",
+  "props": {
+    "type": { "type": "'face' | 'code' | 'id' | 'qr'", "default": "'face'", "description": "Type de Figma." },
+    "frame": { "type": "1 | 2 | 3", "default": 2, "description": "Transition de Figma. Solo con animated={false} o reducción de movimiento; id tiene 3, el resto 2." },
+    "animated": { "type": "boolean", "default": true, "description": "Recorre los fotogramas en bucle. Se apaga solo con prefers-reduced-motion: reduce." },
+    "label": { "type": "string", "required": false, "description": "Texto para lectores de pantalla. Sin él, aria-hidden." }
+  },
+  "examples": [
+    { "title": "Rostro", "code": "<ScanGuide type=\"face\" label=\"Ubica tu rostro dentro del marco\" />" },
+    { "title": "Sin animación", "code": "<ScanGuide type=\"id\" animated={false} frame={2} />" }
+  ]
+}

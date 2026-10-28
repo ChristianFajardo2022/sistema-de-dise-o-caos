@@ -1,0 +1,16 @@
+{
+  "name": "ScanProgress",
+  "component": "ScanProgress",
+  "description": "Progreso del escaneo, fiel al component set progress-scan de Figma (21258:21640): círculo de 60×60 con anillo en blanco unicolor, arco de trazo redondeado de 4 con degradado success/secondary a success/fourth y el porcentaje al centro (heading sm 14/18, Prospero semibold). Las 11 variantes 0 a 100 % son fotogramas del avance: se controla con value (0-100). La variante 12 de Figma es el estado terminado: disco con degradado success/tertiary a success/fourth y el ícono tick-circle de 24, y se activa con complete. Es un role=\"progressbar\" con nombre (label, por defecto \"Progreso del escaneo\"), aria-valuemin/max/now y aria-valuetext; el porcentaje visible queda fuera del árbol de accesibilidad. El arco avanza con una transición de 300 ms que se apaga con prefers-reduced-motion. Se coloca sobre fondo oscuro. Categoría: Feedback.",
+  "category": "Feedback",
+  "props": {
+    "value": { "type": "number", "default": 0, "description": "Avance de 0 a 100 (se acota)." },
+    "complete": { "type": "boolean", "default": false, "description": "Estado terminado (Variante12 de Figma): aria-valuenow 100 y aria-valuetext \"Completado\"." },
+    "label": { "type": "string", "default": "'Progreso del escaneo'", "description": "Nombre accesible del progressbar." },
+    "showValue": { "type": "boolean", "default": true, "description": "Muestra el porcentaje en el centro." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<ScanProgress value={60} />" },
+    { "title": "Terminado", "code": "<ScanProgress complete label=\"Escaneo completado\" />" }
+  ]
+}
