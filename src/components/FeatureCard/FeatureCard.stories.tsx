@@ -128,9 +128,9 @@ export const Photo: Story = {
 
 /** surface: superficie con muesca para el Button corner y una lista en el slot. */
 export const Surface: Story = {
-  args: { variant: 'surface', title: 'Pedidos por despachar', description: 'Dos pedidos esperan guía de envío.' },
+  args: { variant: 'surface', title: 'Tareas por revisar', description: 'Dos pedidos esperan guía de envío.' },
   render: (args) => (
-    <FeatureCard {...args} action={<Corner label="Abrir Pedidos por despachar" />}>
+    <FeatureCard {...args} action={<Corner label="Abrir Tareas por revisar" />}>
       <ItemList />
     </FeatureCard>
   ),
@@ -216,7 +216,7 @@ export const AccessibleNamesTest: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <FeatureCard className="max-w-[498px]" variant="photo" title="Empaques" date="7 feb 2024" dateTime="2024-02-07" src={featurePhoto} action={<Button size="sm" aria-label="Ver colección Empaques">Ver colección</Button>} />
-      <FeatureCard className="max-w-[498px]" variant="surface" title="Pedidos" headingLevel={2} action={<Corner label="Abrir Pedidos" />}>
+      <FeatureCard className="max-w-[498px]" variant="surface" title="Pedidos" headingLevel={2} action={<Corner label="Abrir Tareas" />}>
         <ItemList />
       </FeatureCard>
       <FeatureCard className="max-w-[612px]" variant="cutout" eyebrow="Guía" title="Primer envío" />
@@ -230,7 +230,7 @@ export const AccessibleNamesTest: Story = {
     await expect(canvas.getByRole('button', { name: 'Ver colección Empaques' })).toBeInTheDocument();
     await expect(canvas.getByRole('article', { name: 'Pedidos' })).toBeInTheDocument();
     await expect(canvas.getByRole('heading', { level: 2, name: 'Pedidos' })).toBeInTheDocument();
-    await expect(canvas.getByRole('button', { name: 'Abrir Pedidos' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Abrir Tareas' })).toBeInTheDocument();
     await expect(canvas.getByRole('article', { name: 'Primer envío' })).toBeInTheDocument();
     // Cutout: el recorte se mide del bloque de texto
     const cutout = canvas.getByRole('article', { name: 'Primer envío' });

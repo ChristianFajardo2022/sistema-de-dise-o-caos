@@ -84,7 +84,7 @@ const CONVERSATIONS: Conversation[] = [
     unread: 2,
     pending: true,
     messages: [
-      { id: 1, mine: false, time: '19:52', text: 'Hola, ¿llegó el pedido de esta mañana?' },
+      { id: 1, mine: false, time: '19:52', text: 'Hola, ¿recibiste el archivo de esta mañana?' },
       { id: 2, mine: true, time: '19:53', text: 'Sí, ya está en bodega.' },
       { id: 3, mine: false, time: '19:55', text: '¿Me confirmas la factura?' },
       { id: 4, mine: true, time: '19:56', text: 'Te la envío en un momento.' },

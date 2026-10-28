@@ -96,7 +96,7 @@
     },
     {
       "title": "No cerrar hasta terminar",
-      "code": "<AlertModal open={open} onOpenChange={setOpen} type=\"info\" title=\"Confirmar envío\" primaryAction={{ label: 'Enviar', loading: enviando, onClick: (e) => { e.preventDefault(); enviar().then(() => setOpen(false)); } }} secondaryAction={{ label: 'Cancelar' }} />"
+      "code": "<AlertModal open={open} onOpenChange={setOpen} type=\"info\" title=\"Confirmar solicitud\" primaryAction={{ label: 'Enviar', loading: enviando, onClick: (e) => { e.preventDefault(); enviar().then(() => setOpen(false)); } }} secondaryAction={{ label: 'Cancelar' }} />"
     }
   ]
 }

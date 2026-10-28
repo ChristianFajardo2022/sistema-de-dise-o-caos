@@ -283,7 +283,7 @@ export const doc: ComponentDocContent = {
               title: 'Orientación breve',
               preview: (
                 <>
-                  <PopoverPanel arrow="center-top" headingLevel="none" title="Filtra tus pedidos" page="1 de 2" actions={actions}>
+                  <PopoverPanel arrow="center-top" headingLevel="none" title="Filtra tus resultados" page="1 de 2" actions={actions}>
                     Usa los filtros para encontrar pedidos por estado.
                   </PopoverPanel>
                   <DocTag>Sin recurso visual</DocTag>

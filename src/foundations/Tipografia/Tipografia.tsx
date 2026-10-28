@@ -67,7 +67,7 @@ const GROUPS: StyleGroup[] = [
     lineHeightVar: lh('heading'),
     weightVar: '--ds-primitives-typography-weight-semibold',
     family: SECONDARY,
-    sample: (s) => (s > 32 ? 'Aa' : 'Envíos rápidos'),
+    sample: (s) => (s > 32 ? 'Aa' : 'Diseño claro'),
   },
   {
     title: 'Body corto',
@@ -365,7 +365,7 @@ function Definicion(): ReactNode {
                 className="text-ds-text-neutral-heading"
                 style={{ fontFamily: SECONDARY, fontWeight: 600, fontSize: 'var(--ds-responsive-typography-heading-size-3xl)', lineHeight: 1.1 }}
               >
-                Envíos rápidos
+                Diseño claro
               </span>
               <span
                 className="text-ds-text-neutral-heading"

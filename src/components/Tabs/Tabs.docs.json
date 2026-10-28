@@ -19,7 +19,7 @@
     "icon": { "type": "IconName", "required": false, "description": "Tab: ícono de 16 relleno antes del texto (prop Icon de Figma). Obligatorio en solo ícono." },
     "aria-label (Tab)": { "type": "string", "required": false, "description": "Obligatorio en pestañas de solo ícono." },
     "badge": { "type": "ReactNode", "required": false, "description": "Tab: contador (prop Badge de Figma, Badge number Default; Neutral si está deshabilitada)." },
-    "badgeLabel": { "type": "string", "required": false, "description": "Tab: texto sr-only que sigue al número del badge (\"3 pedidos\")." },
+    "badgeLabel": { "type": "string", "required": false, "description": "Tab: texto sr-only que sigue al número del badge (\"3 solicitudes\")." },
     "disabled": { "type": "boolean", "default": "false", "description": "Tab: State Inactive de Figma. No se enfoca con flechas ni se selecciona." },
     "state": { "type": "'default' | 'hover' | 'focus' | 'select' | 'inactive'", "required": false, "description": "Tab: fuerza el aspecto de un State, solo para documentación. En uso normal sale de CSS, la selección y disabled." },
     "focusable": { "type": "boolean", "default": "true", "description": "TabPanel: entra en el orden de Tab (tabIndex 0). Pasar false si el panel ya contiene controles enfocables (APG)." },
@@ -27,7 +27,7 @@
     "label (TabOverflow)": { "type": "string", "default": "'Más pestañas'", "description": "TabOverflow: nombre accesible del botón Dots; también nombra el menú si no se da aria-label." }
   },
   "examples": [
-    { "title": "Básico", "code": "<Tabs defaultValue=\"pendientes\">\n  <TabList aria-label=\"Estado de los pedidos\">\n    <Tab value=\"pendientes\" icon=\"heart\" badge={3} badgeLabel=\"pedidos\">Pendientes</Tab>\n    <Tab value=\"enviados\">Enviados</Tab>\n    <Tab value=\"archivados\" disabled>Archivados</Tab>\n  </TabList>\n  <TabPanel value=\"pendientes\">…</TabPanel>\n  <TabPanel value=\"enviados\">…</TabPanel>\n  <TabPanel value=\"archivados\">…</TabPanel>\n</Tabs>" },
+    { "title": "Básico", "code": "<Tabs defaultValue=\"pendientes\">\n  <TabList aria-label=\"Estado de las solicitudes\">\n    <Tab value=\"pendientes\" icon=\"heart\" badge={3} badgeLabel=\"solicitudes\">Pendientes</Tab>\n    <Tab value=\"enviados\">Enviados</Tab>\n    <Tab value=\"archivados\" disabled>Archivados</Tab>\n  </TabList>\n  <TabPanel value=\"pendientes\">…</TabPanel>\n  <TabPanel value=\"enviados\">…</TabPanel>\n  <TabPanel value=\"archivados\">…</TabPanel>\n</Tabs>" },
     { "title": "Solo ícono", "code": "<Tab value=\"ajustes\" icon=\"setting\" aria-label=\"Ajustes\" />" },
     { "title": "Controlado y activación manual", "code": "<Tabs value={tab} onValueChange={setTab} activationMode=\"manual\" size=\"sm\" contrast=\"on-card\">…</Tabs>" },
     { "title": "Desborde", "code": "<TabList aria-label=\"Secciones\" overflow={<TabOverflow label=\"Más secciones\"><DropdownMenuItem onSelect={() => setTab('reportes')}>Reportes</DropdownMenuItem></TabOverflow>}>…</TabList>" }

@@ -361,7 +361,7 @@ function ScreenMock({ layout }: { layout: 'good' | 'bad' }) {
     <div className="flex flex-col gap-ds-space-general-lg rounded-ds-radius-container-on-canva bg-ds-background-container-default-on-canva p-ds-space-general-lg">
       {plain('Te damos la bienvenida', 'Resumen de tu cuenta')}
       {grad('Sigue tu envío', 'Número de guía')}
-      {layout === 'good' ? plain('Tus pedidos semanales', 'Entregado 45 · En reparto 15 · Devolución 45') : grad('Tus pedidos semanales', 'Entregado 45 · En reparto 15 · Devolución 45')}
+      {layout === 'good' ? plain('Tus tareas semanales', 'Listas 45 · En curso 15 · Pendientes 45') : grad('Tus tareas semanales', 'Listas 45 · En curso 15 · Pendientes 45')}
       {layout === 'good' ? plain('Nuevo envío', 'Genera tu guía y programa la recolección.') : grad('Nuevo envío', 'Genera tu guía y programa la recolección.')}
       {grad('Pago en Casa', 'Paga el producto y el envío al recibir.')}
     </div>

@@ -47,12 +47,12 @@ const panelText = 'm-0 pt-4 font-ds-primitives-typography-family-primary text-ds
 function OrdersTabs(args: TabsProps) {
   return (
     <Tabs {...args}>
-      <TabList aria-label="Estado de los pedidos">
-        <Tab value="pendientes" icon="heart" badge={3} badgeLabel="pedidos">
+      <TabList aria-label="Estado de las solicitudes">
+        <Tab value="pendientes" icon="heart" badge={3} badgeLabel="solicitudes">
           Pendientes
         </Tab>
-        <Tab value="alistamiento" icon="heart" badge={12} badgeLabel="pedidos">
-          En alistamiento
+        <Tab value="en-proceso" icon="heart" badge={12} badgeLabel="solicitudes">
+          En proceso
         </Tab>
         <Tab value="enviados" icon="heart">
           Enviados
@@ -62,10 +62,10 @@ function OrdersTabs(args: TabsProps) {
         </Tab>
       </TabList>
       <TabPanel value="pendientes">
-        <p className={panelText}>Tres pedidos esperan confirmación.</p>
+        <p className={panelText}>Tres solicitudes esperan confirmación.</p>
       </TabPanel>
-      <TabPanel value="alistamiento">
-        <p className={panelText}>Doce pedidos se están preparando.</p>
+      <TabPanel value="en-proceso">
+        <p className={panelText}>Doce solicitudes están en proceso.</p>
       </TabPanel>
       <TabPanel value="enviados">
         <p className={panelText}>Sin envíos hoy.</p>
@@ -326,13 +326,13 @@ export const KeyboardAutomaticTest: Story = {
   render: (args) => <OrdersTabs {...args} />,
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    const list = canvas.getByRole('tablist', { name: 'Estado de los pedidos' });
+    const list = canvas.getByRole('tablist', { name: 'Estado de las solicitudes' });
     const pendientes = canvas.getByRole('tab', { name: /Pendientes/ });
-    const alistamiento = canvas.getByRole('tab', { name: /En alistamiento/ });
+    const alistamiento = canvas.getByRole('tab', { name: /En proceso/ });
     const enviados = canvas.getByRole('tab', { name: /Enviados/ });
     const archivados = canvas.getByRole('tab', { name: /Archivados/ });
     await expect(list).toContainElement(pendientes);
-    await expect(pendientes).toHaveAccessibleName('Pendientes 3 pedidos');
+    await expect(pendientes).toHaveAccessibleName('Pendientes 3 solicitudes');
 
     // Selección inicial, paneles enlazados y roving tabindex
     await expect(pendientes).toHaveAttribute('aria-selected', 'true');
@@ -349,8 +349,8 @@ export const KeyboardAutomaticTest: Story = {
     await userEvent.keyboard('{ArrowRight}');
     await expect(alistamiento).toHaveFocus();
     await expect(alistamiento).toHaveAttribute('aria-selected', 'true');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('alistamiento');
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('Doce pedidos');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('en-proceso');
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('Doce solicitudes');
 
     // Fin salta a la última habilitada (Archivados está deshabilitada) y la derecha vuelve al principio
     await userEvent.keyboard('{End}');
@@ -383,7 +383,7 @@ export const KeyboardManualTest: Story = {
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     const pendientes = canvas.getByRole('tab', { name: /Pendientes/ });
-    const alistamiento = canvas.getByRole('tab', { name: /En alistamiento/ });
+    const alistamiento = canvas.getByRole('tab', { name: /En proceso/ });
     const enviados = canvas.getByRole('tab', { name: /Enviados/ });
     await waitFor(() => expect(pendientes).toHaveAttribute('tabindex', '0'));
     pendientes.focus();
@@ -393,7 +393,7 @@ export const KeyboardManualTest: Story = {
     await expect(args.onValueChange).not.toHaveBeenCalled();
     await userEvent.keyboard('{Enter}');
     await expect(alistamiento).toHaveAttribute('aria-selected', 'true');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('alistamiento');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('en-proceso');
     await userEvent.keyboard('{ArrowRight}');
     await expect(enviados).toHaveFocus();
     await userEvent.keyboard(' ');

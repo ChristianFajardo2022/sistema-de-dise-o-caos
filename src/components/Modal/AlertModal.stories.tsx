@@ -180,7 +180,7 @@ export const ActionsTest: Story = {
     const trigger = canvas.getByRole('button', { name: 'Abrir' });
 
     await userEvent.click(trigger);
-    const dialog = await canvas.findByRole('alertdialog', { name: 'Confirmar envío' });
+    const dialog = await canvas.findByRole('alertdialog', { name: 'Confirmar solicitud' });
     await waitFor(() => expect(dialog).toHaveAttribute('open'));
     const modal = within(dialog);
 
@@ -213,7 +213,7 @@ function ActionsDemo() {
       </p>
       <AlertModal
         type="info"
-        title="Confirmar envío"
+        title="Confirmar solicitud"
         open={open}
         onOpenChange={setOpen}
         primaryAction={{
