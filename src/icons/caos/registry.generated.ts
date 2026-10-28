@@ -54,6 +54,7 @@ import {
   arrowDiagonalLeftIcon,
   arrowDiagonalRightIcon,
   arrowRight3Icon,
+  arrowLeft2Icon,
   searchIcon,
   searchFavoriteIcon,
   searchStatus2Icon,
@@ -410,7 +411,7 @@ import {
   rowVerticalIcon,
 } from './icons.generated';
 
-/** Nombres de todos los íconos de la biblioteca (407) */
+/** Nombres de todos los íconos de la biblioteca (408) */
 export type IconName =
   | "ac"
   | "add"
@@ -465,6 +466,7 @@ export type IconName =
   | "arrow-diagonal-left"
   | "arrow-diagonal-right"
   | "arrow-right3"
+  | "arrow-left2"
   | "search"
   | "search-favorite"
   | "search-status2"
@@ -821,7 +823,7 @@ export type IconName =
   | "row-vertical"
 ;
 
-/** Registro completo: importarlo arrastra los 407 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
+/** Registro completo: importarlo arrastra los 408 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
 export const caosIcons: Record<IconName, CaosIconData> = {
   "ac": acIcon,
   "add": addIcon,
@@ -876,6 +878,7 @@ export const caosIcons: Record<IconName, CaosIconData> = {
   "arrow-diagonal-left": arrowDiagonalLeftIcon,
   "arrow-diagonal-right": arrowDiagonalRightIcon,
   "arrow-right3": arrowRight3Icon,
+  "arrow-left2": arrowLeft2Icon,
   "search": searchIcon,
   "search-favorite": searchFavoriteIcon,
   "search-status2": searchStatus2Icon,
@@ -1287,6 +1290,7 @@ export const caosIconCategories: Record<IconName, string> = {
   "arrow-diagonal-left": "Arrows",
   "arrow-diagonal-right": "Arrows",
   "arrow-right3": "Arrows",
+  "arrow-left2": "Arrows",
   "search": "Search",
   "search-favorite": "Search",
   "search-status2": "Search",
