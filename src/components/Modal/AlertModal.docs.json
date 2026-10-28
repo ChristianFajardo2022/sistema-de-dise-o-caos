@@ -1,0 +1,102 @@
+{
+  "name": "AlertModal",
+  "component": "AlertModal",
+  "description": "Simple modal de Figma (set 11946:10227, Type Info / Error / Alert / Success): aviso o confirmación corta con ícono semántico de 56 (48 en móvil), título, descripción destacada y texto de apoyo, acciones Tertiary · Secondary · Primary y el Button corner de cerrar en la muesca de la silueta. Es un <dialog> con showModal() y role=\"alertdialog\" (patrón APG Alert Dialog, pieza interna ModalDialog): foco atrapado e inerte el resto, Escape y clic en el fondo cierran, el documento no se desplaza debajo y al cerrar el foco vuelve a quien lo abrió. aria-labelledby apunta al título y aria-describedby a las descripciones. El foco inicial va a la acción menos destructiva (Secondary, luego Tertiary, luego Primary). Controlado o no (open / defaultOpen / onOpenChange). En escritorio va centrado (480 de ancho); en móvil (< 48rem) es una hoja inferior con asa, fondo background/container/surface, sin Button corner y con los botones apilados a todo el ancho (Primary arriba; el orden del DOM y del tabulador sigue siendo Tertiary, Secondary, Primary). AlertModalPanel es la superficie sola (sin diálogo), para documentación.",
+  "category": "Overlays",
+  "props": {
+    "type": {
+      "type": "'info' | 'error' | 'alert' | 'success'",
+      "default": "'success'",
+      "description": "Type de Figma: ícono (info-circle, close-circle, warning, tick-circle) y color icon/semantic/*-firts. El ícono es decorativo: el tipo lo cuentan el título y el texto."
+    },
+    "open": {
+      "type": "boolean",
+      "required": false,
+      "description": "Abierto (controlado). Usar con onOpenChange."
+    },
+    "defaultOpen": {
+      "type": "boolean",
+      "default": false,
+      "description": "Abierto al montar (no controlado)."
+    },
+    "onOpenChange": {
+      "type": "(open: boolean) => void",
+      "required": false,
+      "description": "Se llama al pedir abrir o cerrar: Escape, clic en el fondo, botón cerrar o una acción del pie."
+    },
+    "title": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Título (Heading / Text heading de Figma); da el nombre accesible al diálogo (aria-labelledby). Sin título, pasar aria-label."
+    },
+    "headingLevel": {
+      "type": "2 | 3 | 4",
+      "default": 2,
+      "description": "Nivel del título."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Descripción destacada (↪ Text description1, semibold body/lg)."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto de apoyo (↪ Text descriptio2, regular body/md)."
+    },
+    "primaryAction": {
+      "type": "ModalAction",
+      "required": false,
+      "description": "Button Primary. ModalAction = { label, onClick?, disabled?, loading?, state?, leftIcon?, rightIcon?, iconSize?, aria-label? }. Tras onClick cierra, salvo event.preventDefault()."
+    },
+    "secondaryAction": {
+      "type": "ModalAction",
+      "required": false,
+      "description": "Button Secondary (Btn secondary de Figma)."
+    },
+    "tertiaryAction": {
+      "type": "ModalAction",
+      "required": false,
+      "description": "Button Tertiary (Btn tertiary de Figma)."
+    },
+    "actions": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Pie propio: reemplaza a las tres acciones."
+    },
+    "closable": {
+      "type": "boolean",
+      "default": true,
+      "description": "Botón cerrar (Icon close de Figma). En móvil Figma no lo dibuja: cierran Escape, el fondo o una acción."
+    },
+    "closeLabel": {
+      "type": "string",
+      "default": "'Cerrar'",
+      "description": "Nombre accesible del botón cerrar."
+    },
+    "closeOnBackdrop": {
+      "type": "boolean",
+      "default": true,
+      "description": "Cierra con un clic en el fondo (solo si el puntero bajó y subió en el fondo)."
+    },
+    "initialFocus": {
+      "type": "RefObject<HTMLElement | null>",
+      "required": false,
+      "description": "Elemento que recibe el foco al abrir (sustituye al de por defecto)."
+    }
+  },
+  "examples": [
+    {
+      "title": "Confirmación",
+      "code": "<AlertModal open={open} onOpenChange={setOpen} type=\"alert\" title=\"¿Eliminar el documento?\" description=\"El documento se borrará de la carpeta compartida.\" primaryAction={{ label: 'Eliminar', onClick: eliminar }} secondaryAction={{ label: 'Cancelar' }}>Puedes recuperarlo desde la papelera durante 30 días.</AlertModal>"
+    },
+    {
+      "title": "Aviso de éxito",
+      "code": "<AlertModal open={open} onOpenChange={setOpen} type=\"success\" title=\"Cambios guardados\" primaryAction={{ label: 'Entendido' }} />"
+    },
+    {
+      "title": "No cerrar hasta terminar",
+      "code": "<AlertModal open={open} onOpenChange={setOpen} type=\"info\" title=\"Confirmar envío\" primaryAction={{ label: 'Enviar', loading: enviando, onClick: (e) => { e.preventDefault(); enviar().then(() => setOpen(false)); } }} secondaryAction={{ label: 'Cancelar' }} />"
+    }
+  ]
+}

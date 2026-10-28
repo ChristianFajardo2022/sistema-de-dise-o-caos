@@ -8,8 +8,9 @@ import { cn } from '../../utils/cn';
  * - `center`: centrado en la pantalla.
  * - `side`: panel lateral derecho a todo el alto; en móvil (< 48rem), hoja inferior que crece hasta el 90 % del alto.
  * - `sheet`: hoja inferior en todos los tamaños.
+ * - `center-sheet`: centrado en escritorio y tableta; en móvil (< 48rem), hoja inferior que crece hasta el 90 % del alto.
  */
-export type ModalDialogPlacement = 'center' | 'side' | 'sheet';
+export type ModalDialogPlacement = 'center' | 'side' | 'sheet' | 'center-sheet';
 
 export interface ModalDialogProps extends Omit<DialogHTMLAttributes<HTMLDialogElement>, 'open'> {
   /** Abierto. Sincroniza el `<dialog>` con `showModal()` / `close()`. */
@@ -39,6 +40,10 @@ const PLACEMENT_CLASS: Record<ModalDialogPlacement, string> = {
     'mobile:inset-x-0 mobile:top-auto mobile:bottom-0 mobile:h-auto mobile:max-h-[90dvh] mobile:w-full',
   ].join(' '),
   sheet: 'fixed inset-x-0 top-auto bottom-0 h-auto max-h-[90dvh] w-full max-w-none',
+  'center-sheet': [
+    'fixed inset-0 m-auto max-h-[90dvh] max-w-[calc(100vw-2rem)]',
+    'mobile:inset-x-0 mobile:top-auto mobile:bottom-0 mobile:m-0 mobile:h-auto mobile:w-full mobile:max-w-none',
+  ].join(' '),
 };
 
 /** Cuenta de diálogos abiertos que bloquean el desplazamiento (para anidar sin soltar el bloqueo antes de tiempo). */
@@ -59,8 +64,8 @@ function lockDocumentScroll() {
 }
 
 /**
- * Diálogo modal sobre `<dialog>` nativo (patrón APG Dialog Modal). Pieza interna: no se exporta desde el paquete
- * hasta tener las specs de Modal. La usa FilterPanel.
+ * Diálogo modal sobre `<dialog>` nativo (patrón APG Dialog Modal). Pieza interna: no se exporta desde el paquete.
+ * La usan FilterPanel, Modal y AlertModal.
  *
  * - `showModal()`: el navegador atrapa el foco, deja inerte el resto y, al cerrar, devuelve el foco a quien lo abrió.
  * - Escape y el clic en el fondo piden el cierre con `onOpenChange(false)`; el estado manda (`open` controlado).
