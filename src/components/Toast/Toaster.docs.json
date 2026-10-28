@@ -1,0 +1,34 @@
+{
+  "name": "Toaster",
+  "component": "Toaster",
+  "description": "Región que apila Toasts y Snackbars (no está en Figma). Es un <section> con aria-label; cada aviso aporta su propia región viva, así que no repite aria-live. No roba ni atrapa el foco. Los nuevos avisos se apilan hacia el centro de la pantalla según placement.",
+  "category": "Feedback",
+  "props": {
+    "placement": {
+      "type": "'top-start' | 'top-center' | 'top-end' | 'bottom-start' | 'bottom-center' | 'bottom-end'",
+      "default": "'bottom-end'",
+      "description": "Dónde se apilan."
+    },
+    "position": {
+      "type": "'fixed' | 'absolute'",
+      "default": "'fixed'",
+      "description": "Anclaje al viewport o a un contenedor relative."
+    },
+    "label": {
+      "type": "string",
+      "default": "'Notificaciones'",
+      "description": "Nombre accesible de la región."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Toasts y Snackbars."
+    }
+  },
+  "examples": [
+    {
+      "title": "Pila",
+      "code": "<Toaster>{items.map((i) => <Toast key={i.id} {...i} onClose={() => remove(i.id)} />)}</Toaster>"
+    }
+  ]
+}

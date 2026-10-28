@@ -1,0 +1,68 @@
+{
+  "name": "Toast",
+  "component": "Toast",
+  "description": "Aviso breve y no modal del sistema de diseño CAOS, fiel al component set Toast de Figma (11198:12704, 4 variantes: Type). Tarjeta de 344 con muesca arriba a la derecha (NotchedSurface sm, radius 24), ícono semántico de 20 en círculo de 24, Subheading (Prospero semibold 12/16) y Description (Helvetica Neue regular 12/18) y Button corner sm unicolor para cerrar (aparece si hay onClose; aria-label por closeLabel). Accesibilidad: es una región viva (role=status en success e info, role=alert en error y alert) con aria-atomic; se anuncia sin mover el foco y no lo atrapa. El tipo se antepone como texto sr-only porque color e ícono solos no bastan (WCAG 1.4.1); el ícono es decorativo. Escape con el foco dentro lo cierra. La entrada (opacidad y 8 px) solo ocurre con motion-safe; con movimiento reducido aparece de golpe. Es siempre Dark (todo es unicolor). Pendiente de diseño: el ruido (NOISE) y el desenfoque de fondo del Canva no tienen recurso; el relleno es opaco, así que el desenfoque no se vería.",
+  "category": "Feedback",
+  "props": {
+    "type": {
+      "type": "'success' | 'alert' | 'error' | 'info'",
+      "default": "'success'",
+      "description": "Type de Figma: color semántico e ícono."
+    },
+    "title": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Text subheading de Figma."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Text description de Figma. El booleano Description se resuelve por presencia: sin esta prop no se dibuja."
+    },
+    "icon": {
+      "type": "IconName",
+      "required": false,
+      "description": "Sobrescribe el ícono del type."
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Texto sr-only con el tipo (Éxito, Advertencia, Error, Información). Cadena vacía lo desactiva."
+    },
+    "role": {
+      "type": "'status' | 'alert'",
+      "required": false,
+      "description": "Región viva. Por defecto status en success e info y alert en error y alert."
+    },
+    "duration": {
+      "type": "number",
+      "required": false,
+      "description": "Cierre automático en ms; se pausa con puntero o foco. Sin valor no se cierra solo."
+    },
+    "onClose": {
+      "type": "() => void",
+      "required": false,
+      "description": "Cierre: botón (Toast), Escape con el foco dentro, fin de duration."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para el div raíz. El resto de props nativas y el ref van al div."
+    },
+    "closeLabel": {
+      "type": "string",
+      "default": "'Cerrar notificación'",
+      "description": "Nombre accesible del botón de cierre."
+    }
+  },
+  "examples": [
+    {
+      "title": "Éxito con cierre",
+      "code": "<Toast type=\"success\" title=\"Cambios guardados\" description=\"Tu perfil se actualizó.\" onClose={close} />"
+    },
+    {
+      "title": "Cierre automático",
+      "code": "<Toast type=\"info\" title=\"Sincronizado\" duration={5000} onClose={close} />"
+    }
+  ]
+}
