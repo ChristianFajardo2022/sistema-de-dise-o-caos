@@ -38,7 +38,7 @@ export const badgeVariants = cva(
         neutral: 'bg-ds-background-general-gray-fifth text-ds-text-neutral-white',
         negative: 'bg-ds-background-general-white text-ds-text-neutral-black',
         positive: 'bg-ds-background-general-black text-ds-text-neutral-white',
-        inactive: 'bg-ds-background-general-gray-seventh text-ds-text-neutral-disabled-positive',
+        inactive: 'bg-ds-background-general-gray-seventh text-ds-text-neutral-disabled-on-canva',
       },
     },
     defaultVariants: { type: 'simple', state: 'default' },

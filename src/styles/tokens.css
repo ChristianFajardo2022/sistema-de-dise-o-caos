@@ -207,10 +207,10 @@
     --color-ds-icon-semantic-error-tertiary: var(--color-ds-primitives-color-error-r06);
     --color-ds-icon-semantic-information-tertiary: var(--color-ds-primitives-color-information-ai06);
     --color-ds-icon-acent-tertiary: var(--color-ds-primitives-color-tertiary-m06);
-    --color-ds-background-container-disabled-on-canva: var(--color-ds-primitives-color-primary-g11);
+    --color-ds-background-container-disabled-on-canva: var(--color-ds-primitives-color-primary-g14);
     --color-ds-text-neutral-white: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-neutral-black: var(--color-ds-primitives-color-primary-g14);
-    --color-ds-text-neutral-disabled-positive: var(--color-ds-primitives-color-primary-g10);
+    --color-ds-text-neutral-disabled-on-canva: var(--color-ds-primitives-color-primary-g10);
     --color-ds-text-semantic-success: var(--color-ds-primitives-color-confirmation-v06);
     --color-ds-text-semantic-alert: var(--color-ds-primitives-color-alert-y06);
     --color-ds-text-semantic-error: var(--color-ds-primitives-color-error-r06);
@@ -277,7 +277,7 @@
     --color-ds-border-button-secondary-high-inactive: var(--color-ds-primitives-color-primary-g10);
     --color-ds-border-button-secondary-high-focus: var(--color-ds-primitives-color-primary-g06);
     --color-ds-border-button-secondary-high-default: var(--color-ds-primitives-color-primary-g07);
-    --color-ds-text-neutral-disabled-negative: var(--color-ds-primitives-color-primary-g08);
+    --color-ds-text-neutral-disabled-on-card: var(--color-ds-primitives-color-primary-g09);
     --color-ds-background-field-surface-secondary: var(--color-ds-primitives-color-primary-g12);
     --color-ds-background-field-surface-tertiary: var(--color-ds-primitives-color-primary-g03);
     --color-ds-background-field-active-high-contrast: var(--color-ds-primitives-color-primary-g02);
@@ -373,7 +373,7 @@
     --color-ds-icon-general-gray-high-contrast: var(--color-ds-primitives-color-primary-g07);
     --color-ds-background-container-default-on-canva: var(--color-ds-primitives-color-primary-g14);
     --color-ds-background-container-default-unicolor: var(--color-ds-primitives-color-primary-g13);
-    --color-ds-background-icon-low-unicolor: var(--color-ds-primitives-color-primary-g13);
+    --color-ds-background-icon-disable-on-canva: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-icon-default-on-card: var(--color-ds-primitives-color-primary-g12);
     --color-ds-background-general-white-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-icon-general-black-unicolor: var(--color-ds-primitives-color-primary-g13);
@@ -394,7 +394,7 @@
     --color-ds-background-acent-secondary-opacity: color-mix(in srgb, var(--color-ds-primitives-color-tertiary-m02) 30%, transparent);
     --color-ds-background-general-black: var(--color-ds-primitives-color-primary-g14);
     --color-ds-background-general-black-unicolor: var(--color-ds-primitives-color-primary-g14);
-    --color-ds-background-container-disabled-on-card: var(--color-ds-primitives-color-primary-g10);
+    --color-ds-background-container-disabled-on-card: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-container-hover-on-canva: var(--color-ds-primitives-color-primary-g12);
     --color-ds-background-field-active-purpple: var(--color-ds-primitives-color-tertiary-m03);
     --color-ds-background-effect-button: var(--color-ds-primitives-color-primary-g08);
@@ -451,7 +451,7 @@
     --color-ds-background-field-disabled-negative: var(--color-ds-primitives-color-primary-g07);
     --color-ds-background-container-hover-unicolor: var(--color-ds-primitives-color-primary-g13);
     --color-ds-border-general-black: var(--color-ds-primitives-color-primary-g14);
-    --color-ds-background-icon-high-unicolor: var(--color-ds-primitives-color-primary-g12);
+    --color-ds-background-icon-disable-on-card: var(--color-ds-primitives-color-primary-g12);
     --color-ds-background-effect-filter-hover: color-mix(in srgb, var(--color-ds-primitives-color-primary-g14) 70%, transparent);
     --color-ds-background-graphic-acent-tertiary-opacity: color-mix(in srgb, var(--color-ds-primitives-color-tertiary-m04) 20%, transparent);
     --color-ds-background-effect-shadow-shadow-on-canva-md-tablet: color-mix(in srgb, var(--color-ds-primitives-color-primary-n01) 0%, transparent);
@@ -529,7 +529,7 @@
     --color-ds-background-container-disabled-on-canva: var(--color-ds-primitives-color-primary-g05);
     --color-ds-text-neutral-white: var(--color-ds-primitives-color-primary-g14);
     --color-ds-text-neutral-black: var(--color-ds-primitives-color-primary-b01);
-    --color-ds-text-neutral-disabled-positive: var(--color-ds-primitives-color-primary-g10);
+    --color-ds-text-neutral-disabled-on-canva: var(--color-ds-primitives-color-primary-g10);
     --color-ds-text-semantic-success: var(--color-ds-primitives-color-confirmation-v06);
     --color-ds-text-semantic-alert: var(--color-ds-primitives-color-alert-y06);
     --color-ds-text-semantic-error: var(--color-ds-primitives-color-error-r06);
@@ -596,7 +596,7 @@
     --color-ds-border-button-secondary-high-inactive: var(--color-ds-primitives-color-primary-g08);
     --color-ds-border-button-secondary-high-focus: var(--color-ds-primitives-color-primary-g11);
     --color-ds-border-button-secondary-high-default: var(--color-ds-primitives-color-primary-g08);
-    --color-ds-text-neutral-disabled-negative: var(--color-ds-primitives-color-primary-g08);
+    --color-ds-text-neutral-disabled-on-card: var(--color-ds-primitives-color-primary-g08);
     --color-ds-background-field-surface-secondary: var(--color-ds-primitives-color-primary-g03);
     --color-ds-background-field-surface-tertiary: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-field-active-high-contrast: var(--color-ds-primitives-color-primary-g13);
@@ -692,7 +692,7 @@
     --color-ds-icon-general-gray-high-contrast: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-container-default-on-canva: var(--color-ds-primitives-color-primary-b01);
     --color-ds-background-container-default-unicolor: var(--color-ds-primitives-color-primary-g13);
-    --color-ds-background-icon-low-unicolor: var(--color-ds-primitives-color-primary-g13);
+    --color-ds-background-icon-disable-on-canva: var(--color-ds-primitives-color-primary-g13);
     --color-ds-background-icon-default-on-card: var(--color-ds-primitives-color-primary-g04);
     --color-ds-background-general-white-unicolor: var(--color-ds-primitives-color-primary-b01);
     --color-ds-icon-general-black-unicolor: var(--color-ds-primitives-color-primary-g12);
@@ -770,7 +770,7 @@
     --color-ds-background-field-disabled-negative: var(--color-ds-primitives-color-primary-g10);
     --color-ds-background-container-hover-unicolor: var(--color-ds-primitives-color-primary-g13);
     --color-ds-border-general-black: var(--color-ds-primitives-color-primary-b01);
-    --color-ds-background-icon-high-unicolor: var(--color-ds-primitives-color-primary-g12);
+    --color-ds-background-icon-disable-on-card: var(--color-ds-primitives-color-primary-g12);
     --color-ds-background-effect-filter-hover: color-mix(in srgb, var(--color-ds-primitives-color-primary-g11) 60%, transparent);
     --color-ds-background-graphic-acent-tertiary-opacity: color-mix(in srgb, var(--color-ds-primitives-color-tertiary-m04) 20%, transparent);
     --color-ds-background-effect-shadow-shadow-on-canva-md-tablet: color-mix(in srgb, var(--color-ds-primitives-color-primary-g08) 24%, transparent);
@@ -1331,7 +1331,7 @@
   --color-ds-background-container-disabled-on-canva: var(--color-ds-background-container-disabled-on-canva);
   --color-ds-text-neutral-white: var(--color-ds-text-neutral-white);
   --color-ds-text-neutral-black: var(--color-ds-text-neutral-black);
-  --color-ds-text-neutral-disabled-positive: var(--color-ds-text-neutral-disabled-positive);
+  --color-ds-text-neutral-disabled-on-canva: var(--color-ds-text-neutral-disabled-on-canva);
   --color-ds-text-semantic-success: var(--color-ds-text-semantic-success);
   --color-ds-text-semantic-alert: var(--color-ds-text-semantic-alert);
   --color-ds-text-semantic-error: var(--color-ds-text-semantic-error);
@@ -1402,7 +1402,7 @@
   --radius-ds-radius-general-md: var(--ds-responsive-radius-general-md);
   --radius-ds-radius-general-lg: var(--ds-responsive-radius-general-lg);
   --radius-ds-radius-general-xl: var(--ds-responsive-radius-general-xl);
-  --color-ds-text-neutral-disabled-negative: var(--color-ds-text-neutral-disabled-negative);
+  --color-ds-text-neutral-disabled-on-card: var(--color-ds-text-neutral-disabled-on-card);
   --color-ds-background-field-surface-secondary: var(--color-ds-background-field-surface-secondary);
   --color-ds-background-field-surface-tertiary: var(--color-ds-background-field-surface-tertiary);
   --color-ds-background-field-active-high-contrast: var(--color-ds-background-field-active-high-contrast);
@@ -1510,7 +1510,7 @@
   --color-ds-icon-general-gray-high-contrast: var(--color-ds-icon-general-gray-high-contrast);
   --color-ds-background-container-default-on-canva: var(--color-ds-background-container-default-on-canva);
   --color-ds-background-container-default-unicolor: var(--color-ds-background-container-default-unicolor);
-  --color-ds-background-icon-low-unicolor: var(--color-ds-background-icon-low-unicolor);
+  --color-ds-background-icon-disable-on-canva: var(--color-ds-background-icon-disable-on-canva);
   --color-ds-background-icon-default-on-card: var(--color-ds-background-icon-default-on-card);
   --color-ds-background-general-white-unicolor: var(--color-ds-background-general-white-unicolor);
   --color-ds-icon-general-black-unicolor: var(--color-ds-icon-general-black-unicolor);
@@ -1609,7 +1609,7 @@
   --color-ds-background-field-disabled-negative: var(--color-ds-background-field-disabled-negative);
   --color-ds-background-container-hover-unicolor: var(--color-ds-background-container-hover-unicolor);
   --color-ds-border-general-black: var(--color-ds-border-general-black);
-  --color-ds-background-icon-high-unicolor: var(--color-ds-background-icon-high-unicolor);
+  --color-ds-background-icon-disable-on-card: var(--color-ds-background-icon-disable-on-card);
   --color-ds-background-effect-filter-hover: var(--color-ds-background-effect-filter-hover);
   --color-ds-background-graphic-acent-tertiary-opacity: var(--color-ds-background-graphic-acent-tertiary-opacity);
   --color-ds-background-effect-shadow-shadow-on-canva-md-tablet: var(--color-ds-background-effect-shadow-shadow-on-canva-md-tablet);

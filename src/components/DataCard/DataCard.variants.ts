@@ -54,7 +54,7 @@ export const dataCardTitleVariants = cva(
     'text-ds-primitives-typography-size-6xl leading-ds-typography-heading-line-height-3xl',
   ].join(' '),
   {
-    variants: { inactive: { true: 'text-ds-text-neutral-disabled-positive', false: 'text-ds-text-neutral-heading' } },
+    variants: { inactive: { true: 'text-ds-text-neutral-disabled-on-canva', false: 'text-ds-text-neutral-heading' } },
     defaultVariants: { inactive: false },
   }
 );
@@ -66,7 +66,7 @@ export const dataCardDescriptionVariants = cva(
     'text-ds-typography-body-size-lg leading-ds-typography-body-line-height-large-lg',
   ].join(' '),
   {
-    variants: { inactive: { true: 'text-ds-text-neutral-disabled-positive', false: 'text-ds-text-neutral-body' } },
+    variants: { inactive: { true: 'text-ds-text-neutral-disabled-on-canva', false: 'text-ds-text-neutral-body' } },
     defaultVariants: { inactive: false },
   }
 );

@@ -79,8 +79,8 @@ export const switchTrackTextVariants = cva(
     textBase,
     'text-ds-text-neutral-white',
     'group-data-checked:text-ds-text-field-placeholder',
-    'group-data-disabled:text-ds-text-neutral-disabled-positive',
-    'group-data-checked:group-data-disabled:text-ds-text-neutral-disabled-positive',
+    'group-data-disabled:text-ds-text-neutral-disabled-on-canva',
+    'group-data-checked:group-data-disabled:text-ds-text-neutral-disabled-on-canva',
   ].join(' ')
 );
 
@@ -89,7 +89,7 @@ export const switchLabelVariants = cva(
   [
     textBase,
     'text-ds-text-neutral-white',
-    'data-disabled:text-ds-text-neutral-disabled-positive',
-    'data-checked:data-disabled:text-ds-text-neutral-disabled-negative',
+    'data-disabled:text-ds-text-neutral-disabled-on-canva',
+    'data-checked:data-disabled:text-ds-text-neutral-disabled-on-card',
   ].join(' ')
 );

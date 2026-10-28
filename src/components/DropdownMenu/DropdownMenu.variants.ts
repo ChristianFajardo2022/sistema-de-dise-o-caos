@@ -84,7 +84,7 @@ export const dropdownMenuItemVariants = cva(
         default: 'bg-transparent text-ds-text-neutral-white hover:bg-ds-background-field-hover focus-visible:bg-ds-background-field-hover',
         hover: 'bg-ds-background-field-hover text-ds-text-neutral-white',
         select: 'bg-ds-background-field-active-slow-contrast text-ds-text-neutral-white',
-        disabled: 'bg-transparent text-ds-text-neutral-disabled-positive',
+        disabled: 'bg-transparent text-ds-text-neutral-disabled-on-canva',
       },
       interactive: {
         true: 'cursor-pointer',

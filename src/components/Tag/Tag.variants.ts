@@ -52,7 +52,7 @@ export const tagVariants = cva(
         focus: `bg-[color:var(--tag-bg-focus,var(--tag-bg-hover))] text-[color:var(--tag-fg-hover,var(--tag-fg))] outline-2 outline-offset-2 outline-solid outline-ds-border-field-active`,
         press: 'bg-(color:--tag-bg-press) text-(color:--tag-fg-press)',
         inactive:
-          'bg-ds-background-general-gray-sixth text-ds-text-neutral-disabled-negative cursor-not-allowed',
+          'bg-ds-background-general-gray-sixth text-ds-text-neutral-disabled-on-card cursor-not-allowed',
       },
       interactive: {
         true: [
@@ -61,7 +61,7 @@ export const tagVariants = cva(
           'focus-visible:bg-[color:var(--tag-bg-focus,var(--tag-bg-hover))] focus-visible:text-[color:var(--tag-fg-hover,var(--tag-fg))]',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
           'disabled:cursor-not-allowed',
-          'disabled:bg-ds-background-general-gray-sixth disabled:text-ds-text-neutral-disabled-negative',
+          'disabled:bg-ds-background-general-gray-sixth disabled:text-ds-text-neutral-disabled-on-card',
         ].join(' '),
         false: '',
       },

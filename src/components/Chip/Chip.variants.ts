@@ -54,7 +54,7 @@ export const chipVariants = cva(
           '[--chip-bg:var(--color-ds-background-general-gray-sixth)] [--chip-stroke:var(--color-ds-border-general-gray-tertiary)] outline-2 outline-offset-2 outline-solid outline-ds-border-field-active',
         select: '[--chip-bg:var(--color-ds-background-general-gray-sixth)] [--chip-stroke:transparent]',
         inactive:
-          '[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] [--chip-stroke:var(--color-ds-border-general-disabled)] [--chip-fg:var(--color-ds-text-neutral-disabled-negative)] [--chip-ic:var(--color-ds-icon-general-disabled-negative)]',
+          '[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] [--chip-stroke:var(--color-ds-border-general-disabled)] [--chip-fg:var(--color-ds-text-neutral-disabled-on-card)] [--chip-ic:var(--color-ds-icon-general-disabled-negative)]',
       },
       interactive: {
         true: 'transition-[background-color,box-shadow] duration-200 ease-out',
@@ -174,7 +174,7 @@ export const chipPlusVariants = cva(
     'focus-visible:[--chip-bg:var(--color-ds-background-general-gray-sixth)]',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
     'aria-expanded:[--chip-bg:var(--color-ds-background-general-gray-sixth)] aria-expanded:[--chip-stroke:transparent]',
-    'disabled:cursor-not-allowed disabled:[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] disabled:[--chip-stroke:transparent] disabled:[--chip-fg:var(--color-ds-text-neutral-disabled-negative)]',
+    'disabled:cursor-not-allowed disabled:[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] disabled:[--chip-stroke:transparent] disabled:[--chip-fg:var(--color-ds-text-neutral-disabled-on-card)]',
   ].join(' '),
   {
     variants: {
@@ -185,7 +185,7 @@ export const chipPlusVariants = cva(
           '[--chip-bg:var(--color-ds-background-general-gray-sixth)] outline-2 outline-offset-2 outline-solid outline-ds-border-field-active',
         select: '[--chip-bg:var(--color-ds-background-general-gray-sixth)] [--chip-stroke:transparent]',
         inactive:
-          '[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] [--chip-stroke:transparent] [--chip-fg:var(--color-ds-text-neutral-disabled-negative)] cursor-not-allowed',
+          '[--chip-bg:var(--color-ds-background-container-disabled-on-canva)] [--chip-stroke:transparent] [--chip-fg:var(--color-ds-text-neutral-disabled-on-card)] cursor-not-allowed',
       },
     },
     defaultVariants: { state: 'default' },

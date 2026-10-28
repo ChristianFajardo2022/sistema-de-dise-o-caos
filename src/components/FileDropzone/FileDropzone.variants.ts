@@ -72,7 +72,7 @@ export const fileDropzoneIconVariants = cva('shrink-0', {
 
 export const fileDropzoneTitleVariants = cva(headingBase, {
   variants: {
-    disabled: { true: 'text-ds-text-neutral-disabled-negative', false: 'text-ds-text-neutral-white' },
+    disabled: { true: 'text-ds-text-neutral-disabled-on-card', false: 'text-ds-text-neutral-white' },
   },
   defaultVariants: { disabled: false },
 });
@@ -93,7 +93,7 @@ export const fileDropzoneSpecsVariants = cva(infoBase, {
 
 export const fileDropzoneMaxVariants = cva(`${infoBase} [font-weight:var(--ds-primitives-typography-weight-semibold)]`, {
   variants: {
-    disabled: { true: 'text-ds-text-neutral-disabled-negative', false: 'text-ds-text-neutral-white' },
+    disabled: { true: 'text-ds-text-neutral-disabled-on-card', false: 'text-ds-text-neutral-white' },
   },
   defaultVariants: { disabled: false },
 });

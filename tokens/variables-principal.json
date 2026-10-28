@@ -3556,7 +3556,7 @@
    ],
    "valores": {
     "11040:0": {
-     "alias": "color/primary/G11"
+     "alias": "color/primary/G14"
     },
     "11040:1": {
      "alias": "color/primary/G05"
@@ -3596,7 +3596,7 @@
    }
   },
   {
-   "nombre": "text/neutral/disabled-positive",
+   "nombre": "text/neutral/disabled-on-canva",
    "tipo": "COLOR",
    "coleccion": "VariableCollectionId:11040:10114",
    "scopes": [
@@ -4772,7 +4772,7 @@
    }
   },
   {
-   "nombre": "text/neutral/disabled-negative",
+   "nombre": "text/neutral/disabled-on-card",
    "tipo": "COLOR",
    "coleccion": "VariableCollectionId:11040:10114",
    "scopes": [
@@ -4780,7 +4780,7 @@
    ],
    "valores": {
     "11040:0": {
-     "alias": "color/primary/G08"
+     "alias": "color/primary/G09"
     },
     "11040:1": {
      "alias": "color/primary/G08"
@@ -6523,7 +6523,7 @@
    }
   },
   {
-   "nombre": "background/icon/low-unicolor",
+   "nombre": "background/icon/disable-on-canva",
    "tipo": "COLOR",
    "coleccion": "VariableCollectionId:11040:10114",
    "scopes": [
@@ -6978,7 +6978,7 @@
    ],
    "valores": {
     "11040:0": {
-     "alias": "color/primary/G10"
+     "alias": "color/primary/G13"
     },
     "11040:1": {
      "alias": "color/primary/G03"
@@ -8345,7 +8345,7 @@
    }
   },
   {
-   "nombre": "background/icon/high-unicolor",
+   "nombre": "background/icon/disable-on-card",
    "tipo": "COLOR",
    "coleccion": "VariableCollectionId:11040:10114",
    "scopes": [

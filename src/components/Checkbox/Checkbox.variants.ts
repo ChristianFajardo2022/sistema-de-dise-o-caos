@@ -78,12 +78,12 @@ export const checkboxTextVariants = cva(
       contrast: {
         positive: [
           'text-ds-text-neutral-white',
-          'peer-disabled:text-ds-text-neutral-disabled-positive',
-          'peer-checked:peer-disabled:text-ds-text-neutral-disabled-negative',
+          'peer-disabled:text-ds-text-neutral-disabled-on-canva',
+          'peer-checked:peer-disabled:text-ds-text-neutral-disabled-on-card',
         ],
         negative: [
           'text-ds-text-neutral-black',
-          'peer-disabled:text-ds-text-neutral-disabled-negative',
+          'peer-disabled:text-ds-text-neutral-disabled-on-card',
         ],
       },
     },

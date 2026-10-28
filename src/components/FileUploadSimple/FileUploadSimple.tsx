@@ -261,7 +261,7 @@ export const FileUploadSimple = forwardRef<HTMLInputElement, FileUploadSimplePro
                   <span
                     id={nameId}
                     data-figma-part="Heading"
-                    className={cn(fileUploadSimpleNameClass, dim && 'text-ds-text-neutral-disabled-negative')}
+                    className={cn(fileUploadSimpleNameClass, dim && 'text-ds-text-neutral-disabled-on-card')}
                   >
                     {fileName}
                   </span>
