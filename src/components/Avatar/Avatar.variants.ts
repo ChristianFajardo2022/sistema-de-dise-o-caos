@@ -56,7 +56,7 @@ export const avatarCircleVariants = cva(
         blue: 'bg-ds-background-semantic-information-secondary text-ds-text-semantic-information',
         green: 'bg-ds-background-semantic-success-secondary text-ds-text-semantic-success',
         red: 'bg-ds-background-semantic-error-secondary text-ds-text-semantic-error',
-        disabled: 'bg-ds-background-container-disabled-on-card text-ds-text-neutral-disabled-negative',
+        disabled: 'bg-ds-background-container-disabled-on-card text-ds-text-neutral-disabled-on-card',
         none: '',
       },
     },
@@ -138,7 +138,7 @@ const ON_CANVA_HOVER = 'bg-ds-background-icon-hover-on-canva';
 const ON_CANVA_SELECT = 'bg-ds-background-icon-select-on-canva';
 const ON_CARD_HOVER = 'bg-ds-background-icon-hover-on-card';
 const ON_CARD_SELECT = 'bg-ds-background-icon-select-on-card';
-const ON_CARD_INACTIVE = 'bg-ds-background-icon-low-unicolor';
+const ON_CARD_INACTIVE = 'bg-ds-background-icon-disable-on-card';
 
 /**
  * Píldora de brand e icon: la raíz del avatar. El padding (y por tanto el recuadro interior) depende del tamaño.

@@ -13,7 +13,7 @@ import { cornerShadowClass } from '../_internal/shadows';
 
 const VARIANTS: ButtonCornerVariant[] = ['icon', 'dots', 'radiobutton', 'checkbox', 'favorite'];
 const CONTRASTS: ButtonCornerContrast[] = ['on-canva', 'on-card', 'unicolor-canva'];
-const STATES: ButtonCornerState[] = ['default', 'hover', 'select'];
+const STATES: ButtonCornerState[] = ['default', 'hover', 'select', 'inactive'];
 const SIZES: ButtonCornerSize[] = ['sm', 'md'];
 
 const LABELS: Record<ButtonCornerVariant, string> = {
@@ -57,7 +57,7 @@ const meta: Meta<ButtonCornerArgs> = {
       control: 'radio',
       options: STATES,
       description:
-        'Solo documentación: fuerza Hover o Select. En uso real el hover es CSS y Select sale de pressed o aria-expanded. Unicolor no tiene Hover ni Select.',
+        'Solo documentación: fuerza Hover, Select o Inactive. En uso real el hover es CSS, Select sale de pressed o aria-expanded e Inactive de disabled. Unicolor no tiene Hover, Select ni Inactive.',
     },
     status: {
       type: { name: 'enum', value: CONTRASTS },
@@ -84,7 +84,7 @@ const meta: Meta<ButtonCornerArgs> = {
     disabled: {
       type: { name: 'boolean' },
       control: 'boolean',
-      description: 'disabled nativo (sin aspecto propio en Figma)',
+      description: 'disabled nativo: aspecto State=Inactive de Figma (On canva y On card; Unicolor no lo define)',
     },
     'aria-label': {
       type: { name: 'string' },
@@ -184,16 +184,17 @@ const FIGMA_CONTRAST: Record<ButtonCornerContrast, string> = {
   'on-card': 'On card',
   'unicolor-canva': 'Unicolor canva',
 };
-const FIGMA_STATE: Record<ButtonCornerState, string> = { default: 'Default', hover: 'Hover', select: 'Select' };
+const FIGMA_STATE: Record<ButtonCornerState, string> = { default: 'Default', hover: 'Hover', select: 'Select', inactive: 'Inactive' };
 
-/** Las 65 combinaciones del set: Hover y Select solo existen en md, On canva y On card */
+/** Las 70 combinaciones del set: Hover, Select e Inactive solo existen en md (Select solo en On canva; el set ya no trae Select en On card, que el código sigue admitiendo) */
 const FIGMA_ROWS: { contrast: ButtonCornerContrast; state: ButtonCornerState; size: ButtonCornerSize; stroke: boolean }[] = [
   { contrast: 'on-canva', state: 'default', size: 'md', stroke: false },
   { contrast: 'on-canva', state: 'hover', size: 'md', stroke: true },
   { contrast: 'on-canva', state: 'select', size: 'md', stroke: true },
   { contrast: 'on-card', state: 'default', size: 'md', stroke: false },
+  { contrast: 'on-canva', state: 'inactive', size: 'md', stroke: true },
+  { contrast: 'on-card', state: 'inactive', size: 'md', stroke: false },
   { contrast: 'on-card', state: 'hover', size: 'md', stroke: true },
-  { contrast: 'on-card', state: 'select', size: 'md', stroke: false },
   { contrast: 'unicolor-canva', state: 'default', size: 'md', stroke: true },
   { contrast: 'on-canva', state: 'default', size: 'sm', stroke: false },
   { contrast: 'on-canva', state: 'default', size: 'sm', stroke: true },
@@ -214,7 +215,7 @@ const figmaName = (v: ButtonCornerVariant, r: (typeof FIGMA_ROWS)[number]) =>
   `Type=${FIGMA_TYPE[v]}, Contrast=${FIGMA_CONTRAST[r.contrast]}, State=${FIGMA_STATE[r.state]}, Size=${r.size}, Stroke=${r.stroke ? 'Yes' : 'No'}`;
 
 /**
- * Las 65 variantes del component set, una vez cada una, con `data-figma` = nombre de Figma (para el comparador).
+ * Las 70 variantes del component set, una vez cada una, con `data-figma` = nombre de Figma (para el comparador).
  * La sombra effect/shadow sm la pone quien coloca el botón (`cornerShadowClass`); aquí se aplica para medirla.
  * En On card, el relleno Default coincide con la superficie de tarjeta: que se funda es esperable.
  */
@@ -331,5 +332,24 @@ export const SelectStateTest: Story = {
     // state="select" solo cambia el aspecto: no inventa aria-pressed
     await expect(c.getByRole('button', { name: 'Forzado' })).not.toHaveAttribute('aria-pressed');
     await expect(bg('Alias')).toBe(bg('Reposo'));
+  },
+};
+
+/** Test: `disabled` real se ve igual que State=Inactive forzado y no responde al clic */
+export const InactiveTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div className="flex gap-4">
+      <ButtonCorner aria-label="Real" disabled onClick={fn()} />
+      <ButtonCorner aria-label="Forzado" state="inactive" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const real = c.getByRole('button', { name: 'Real' });
+    const bg = (name: string) => getComputedStyle(c.getByRole('button', { name })).backgroundColor;
+    await expect(real).toBeDisabled();
+    await expect(bg('Real')).toBe(bg('Forzado'));
+    await expect(getComputedStyle(real).boxShadow).toBe('none');
   },
 };

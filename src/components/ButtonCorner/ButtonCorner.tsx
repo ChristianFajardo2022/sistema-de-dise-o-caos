@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import type { ButtonCornerProps } from './ButtonCorner.types';
 import {
   buttonCornerFavoriteColor,
+  buttonCornerFavoriteInactive,
+  buttonCornerInactiveRing,
   buttonCornerFavoritePressed,
   buttonCornerUnicolorRing,
   buttonCornerVariants,
@@ -52,6 +54,8 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
     // `status` es el nombre viejo de Contrast (deprecado); si llegan los dos, manda `contrast`
     const contrast = contrastProp ?? status ?? 'on-canva';
     const unicolor = contrast === 'unicolor-canva';
+    // Inactive: `disabled` real o forzado con state="inactive" (Unicolor canva no lo define)
+    const inactive = !unicolor && (state === 'inactive' || Boolean(restProps.disabled));
     const hasPressed = variant === 'checkbox' || variant === 'radiobutton' || variant === 'favorite';
 
     let content: ReactNode;
@@ -72,7 +76,7 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
         break;
       case 'favorite':
         content = (
-          <IconSlot className={buttonCornerFavoriteColor[contrast]} data-figma-part="Favorite (Atom)">
+          <IconSlot className={inactive ? buttonCornerFavoriteInactive[contrast] : buttonCornerFavoriteColor[contrast]} data-figma-part="Favorite (Atom)">
             <FavoriteIcon />
           </IconSlot>
         );
@@ -83,7 +87,11 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
           <span
             aria-hidden="true"
             data-figma-part="Selection"
-            className={cn(checkboxControlVariants({ contrast: 'positive' }), unicolor && buttonCornerUnicolorRing)}
+            className={cn(
+              checkboxControlVariants({ contrast: 'positive' }),
+              unicolor && buttonCornerUnicolorRing,
+              inactive && buttonCornerInactiveRing
+            )}
           />
         );
         break;
@@ -92,7 +100,11 @@ export const ButtonCorner = forwardRef<HTMLButtonElement, ButtonCornerProps>(
           <span
             aria-hidden="true"
             data-figma-part="Selection"
-            className={cn(radioControlVariants({ contrast: 'positive' }), unicolor && buttonCornerUnicolorRing)}
+            className={cn(
+              radioControlVariants({ contrast: 'positive' }),
+              unicolor && buttonCornerUnicolorRing,
+              inactive && buttonCornerInactiveRing
+            )}
           />
         );
         break;

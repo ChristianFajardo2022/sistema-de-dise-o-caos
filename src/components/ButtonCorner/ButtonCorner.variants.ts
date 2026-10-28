@@ -19,6 +19,10 @@ import type { ButtonCornerContrast, ButtonCornerIconSize, ButtonCornerSize, Butt
  * - Hover real solo en `<button>` habilitado (`:enabled`), para que las piezas decorativas que reutilizan
  *   estas clases en un `<span>` no reaccionen. Select real con `aria-pressed="true"` o `aria-expanded="true"`.
  * - Sombra effect/shadow sm (0 4 12): la pone quien coloca el botón en la muesca (`cornerShadowClass`).
+ * - Inactive (State=Inactive, solo On canva y On card): relleno background/container/disabled-on-canva (On canva) o
+ *   background/icon/disable-on-card (On card), ícono icon/general/disabled-positive, sin trazo. Sale de `disabled`
+ *   o se fuerza con `state="inactive"`. Unicolor canva no tiene Inactive.
+ * - Unicolor canva md usa el relleno background/icon/disable-on-card; sm usa background/container/hover-unicolor.
  * - Foco con teclado: no existe en Figma; se agrega un outline de 2px (WCAG 2.4.7).
  */
 
@@ -38,6 +42,18 @@ const forced = {
     hover: 'bg-ds-background-container-hover-on-card [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-lg)_var(--color-ds-border-general-hover-on-card)]',
     select: 'bg-ds-background-container-select-on-card [box-shadow:inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-select-on-card)]',
   },
+};
+
+/** State=Inactive forzado (prop `state`) por superficie */
+const inactiveForced = {
+  'on-canva': 'bg-ds-background-container-disabled-on-canva text-ds-icon-general-disabled-positive [box-shadow:none]',
+  'on-card': 'bg-ds-background-icon-disable-on-card text-ds-icon-general-disabled-positive [box-shadow:none]',
+};
+
+/** State=Inactive real: `<button disabled>` */
+const inactiveNative = {
+  'on-canva': 'disabled:bg-ds-background-container-disabled-on-canva disabled:text-ds-icon-general-disabled-positive disabled:[box-shadow:none]',
+  'on-card': 'disabled:bg-ds-background-icon-disable-on-card disabled:text-ds-icon-general-disabled-positive disabled:[box-shadow:none]',
 };
 
 /** State=Default: hover real (sin pisar Select) y Select ligado a aria-pressed / aria-expanded */
@@ -73,7 +89,7 @@ const buttonCornerCva = cva(
         'on-card': 'bg-ds-background-container-default-on-card text-ds-icon-general-default',
         'unicolor-canva': 'bg-ds-background-container-hover-unicolor text-ds-icon-general-default-unicolor',
       },
-      state: { default: '', hover: '', select: '' },
+      state: { default: '', hover: '', select: '', inactive: '' },
       size: {
         md: 'size-[40px]',
         sm: 'size-[32px]',
@@ -93,12 +109,16 @@ const buttonCornerCva = cva(
       { stroke: true, contrast: ['on-canva', 'on-card'], className: strokeRest.surface },
       { stroke: true, contrast: 'unicolor-canva', className: strokeRest.unicolor },
       // Los estados van después del trazo de reposo para reemplazarlo (cn deja la última clase de box-shadow)
-      { state: 'default', contrast: 'on-canva', className: interactive['on-canva'] },
-      { state: 'default', contrast: 'on-card', className: interactive['on-card'] },
+      { state: 'default', contrast: 'on-canva', className: [interactive['on-canva'], inactiveNative['on-canva']] },
+      { state: 'default', contrast: 'on-card', className: [interactive['on-card'], inactiveNative['on-card']] },
       { state: 'hover', contrast: 'on-canva', className: forced['on-canva'].hover },
       { state: 'hover', contrast: 'on-card', className: forced['on-card'].hover },
       { state: 'select', contrast: 'on-canva', className: forced['on-canva'].select },
       { state: 'select', contrast: 'on-card', className: forced['on-card'].select },
+      { state: 'inactive', contrast: 'on-canva', className: inactiveForced['on-canva'] },
+      { state: 'inactive', contrast: 'on-card', className: inactiveForced['on-card'] },
+      // Unicolor canva md: Figma pinta el relleno con background/icon/disable-on-card (sm usa hover-unicolor)
+      { contrast: 'unicolor-canva', size: 'md', className: 'bg-ds-background-icon-disable-on-card' },
     ],
     defaultVariants: { contrast: 'on-canva', state: 'default', size: 'md', dots: false, stroke: false, iconSize: 16 },
   }
@@ -143,3 +163,13 @@ export const buttonCornerFavoritePressed = {
 
 /** Checkbox y Radiobutton en Unicolor: el contorno del control pasa a icon/general/white-unicolor */
 export const buttonCornerUnicolorRing = '[--ring:var(--color-ds-icon-general-default-unicolor)]';
+
+/** Favorite inactivo: border/general/gray-secondary en On canva y white-unicolor en On card (así lo dibuja Figma) */
+export const buttonCornerFavoriteInactive = {
+  'on-canva': 'text-ds-border-general-gray-secondary',
+  'on-card': 'text-ds-border-general-white-unicolor',
+  'unicolor-canva': 'text-ds-border-general-white-unicolor',
+} as const;
+
+/** Checkbox y Radiobutton inactivos: contorno background/field/disabled (Selection Disabled Default) */
+export const buttonCornerInactiveRing = '[--ring:var(--color-ds-background-field-disabled)]';

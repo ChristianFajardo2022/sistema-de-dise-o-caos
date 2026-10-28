@@ -10,11 +10,11 @@ export type ButtonCornerContrast = 'on-canva' | 'on-card' | 'unicolor-canva';
 export type ButtonCornerStatus = ButtonCornerContrast;
 
 /**
- * State de Figma: Default, Hover y Select. Solo para forzar el aspecto en documentación;
- * en uso real el hover sale de CSS y Select de `aria-pressed="true"` o `aria-expanded="true"`.
- * Unicolor canva no define Hover ni Select (se queda en Default).
+ * State de Figma: Default, Hover, Select e Inactive. Solo para forzar el aspecto en documentación;
+ * en uso real el hover sale de CSS, Select de `aria-pressed="true"` o `aria-expanded="true"` e Inactive de `disabled`.
+ * Unicolor canva no define Hover, Select ni Inactive (se queda en Default).
  */
-export type ButtonCornerState = 'default' | 'hover' | 'select';
+export type ButtonCornerState = 'default' | 'hover' | 'select' | 'inactive';
 
 /** Size de Figma: md 40 · sm 32 */
 export type ButtonCornerSize = 'md' | 'sm';

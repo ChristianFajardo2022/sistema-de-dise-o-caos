@@ -121,6 +121,8 @@ export const buttonVariants = cva(
         iconOnly: false,
         class: 'px-ds-space-button-2xl py-ds-space-button-lg',
       },
+      // Load xs: Figma lo dibuja con ancho 92 (como md y sm), aunque en reposo mida 76
+      { variant: ['primary', 'secondary'], size: 'xs', state: 'load', iconOnly: false, class: 'min-w-[92px]' },
       // Secondary: el trazo de Figma es interior y no suma a la caja; el borde de CSS sí, así que se descuenta del padding
       // (también el vertical: con alto mínimo, xs quedaría en 34)
       {
