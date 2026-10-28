@@ -1,4 +1,4 @@
-import { Children, forwardRef, isValidElement, useCallback, useEffect, useId, useRef } from 'react';
+import { Children, forwardRef, isValidElement, useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { CSSProperties, KeyboardEvent, MouseEvent } from 'react';
 import { NavBarContext, useNavBar } from './NavBar.context';
 import type { NavBarItemProps, NavBarProps } from './NavBar.types';
@@ -115,7 +115,8 @@ export const NavBar = forwardRef<HTMLElement, NavBarProps>(
 
     const rootRef = useRef<HTMLElement | null>(null);
     const moreRef = useRef<HTMLButtonElement | null>(null);
-    const sheetRef = useRef<HTMLDivElement | null>(null);
+    // El foco entra en la hoja solo si la abrió la persona con el botón (no con `defaultMoreOpen` ni desde fuera)
+    const [focusOnOpen, setFocusOnOpen] = useState(false);
     const menuId = useId();
     const mergedRef = useMergedRefs<HTMLElement>(ref, rootRef);
 
@@ -146,35 +147,20 @@ export const NavBar = forwardRef<HTMLElement, NavBarProps>(
       return () => {
         document.removeEventListener('keydown', onKey);
         document.removeEventListener('pointerdown', onPointer);
+        // Cerrada por cualquier vía: la próxima apertura desde fuera no mueve el foco
+        setFocusOnOpen(false);
       };
     }, [sheetOpen, close]);
 
     const toggleMore = () => {
       const next = !open;
+      setFocusOnOpen(next);
       setOpen(next);
-      if (next) {
-        // Al abrir con una acción del usuario el foco entra en el primer ítem
-        requestAnimationFrame(() => sheetRef.current?.querySelector<HTMLElement>('[role="menuitem"]:not([aria-disabled])')?.focus());
-      }
     };
 
+    // Las flechas, Inicio, Fin y la letra inicial son de DropdownMenuList; Tab cierra la hoja y el foco sigue su curso
     const onSheetKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-      const list = Array.from(sheetRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]:not([aria-disabled])') ?? []);
-      if (!list.length) return;
-      const at = list.indexOf(document.activeElement as HTMLElement);
-      let next: HTMLElement | undefined;
-      if (event.key === 'ArrowDown') next = list[(at + 1) % list.length];
-      else if (event.key === 'ArrowUp') next = list[(at - 1 + list.length) % list.length];
-      else if (event.key === 'Home') next = list[0];
-      else if (event.key === 'End') next = list[list.length - 1];
-      else if (event.key === 'Tab') {
-        close(false);
-        return;
-      }
-      if (next) {
-        event.preventDefault();
-        next.focus();
-      }
+      if (event.key === 'Tab') close(false);
     };
 
     const n = Math.max(values.length, 1);
@@ -196,8 +182,14 @@ export const NavBar = forwardRef<HTMLElement, NavBarProps>(
         style={style}
       >
         {sheetOpen && (
-          <div ref={sheetRef} data-figma-part="Bottom sheet" className={navBarSheetVariants()} onKeyDown={onSheetKeyDown}>
-            <DropdownMenuList id={menuId} aria-label={moreLabel} onClose={() => close(true)} className="flex flex-col gap-2.5">
+          <div data-figma-part="Bottom sheet" className={navBarSheetVariants()} onKeyDown={onSheetKeyDown}>
+            <DropdownMenuList
+              id={menuId}
+              aria-label={moreLabel}
+              initialFocus={focusOnOpen ? 'first' : 'none'}
+              onClose={() => close(true)}
+              className="flex flex-col gap-2.5"
+            >
               {moreItems?.map((item) => (
                 <DropdownMenuItem
                   key={item.value}

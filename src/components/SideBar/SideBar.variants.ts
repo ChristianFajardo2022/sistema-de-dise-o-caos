@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority';
+import { dividerClass } from '../_internal/dividerClass';
 
 /**
  * CAOS Design System — SideBar Variants
@@ -110,14 +111,10 @@ export const sideBarSubmenuClass = [
 export const sideBarSubItemClass = 'm-0 flex list-none flex-col gap-ds-space-general-lg p-0';
 
 /**
- * Divisor de 0.5 bajo cada subenlace (border/divider/md de Figma no está en tokens.css: stroke dm de 0.5). Como en
- * Figma, la línea no ocupa alto: la caja mide 0 y la raya es un pseudo-elemento centrado en ella.
+ * Divisor de 0.5 bajo cada subenlace.
+ * @deprecated SideBarSubItem usa el divisor compartido (`_internal/Divider`, misma clase); se conserva por compatibilidad.
  */
-export const sideBarDividerClass = [
-  'relative block h-0 w-full shrink-0',
-  'before:absolute before:inset-x-0 before:top-0 before:h-(--ds-primitives-stroke-dm) before:-translate-y-1/2',
-  "before:bg-ds-border-general-default-on-card before:content-['']",
-].join(' ');
+export const sideBarDividerClass = dividerClass;
 
 // ───────────────────────── escritorio ─────────────────────────
 

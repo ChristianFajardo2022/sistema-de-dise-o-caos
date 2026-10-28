@@ -2,7 +2,6 @@ import { forwardRef, useId } from 'react';
 import type { MouseEvent } from 'react';
 import type { SideBarItemProps, SideBarSubItemProps } from './SideBar.types';
 import {
-  sideBarDividerClass,
   sideBarItemCornerBadgeClass,
   sideBarItemIconClass,
   sideBarItemLabelClass,
@@ -14,9 +13,10 @@ import {
   sideBarSubmenuClass,
 } from './SideBar.variants';
 import { Badge } from '../Badge';
-import { dropdownMenuItemTextVariants, dropdownMenuItemVariants } from '../DropdownMenu/DropdownMenu.variants';
+import { DropdownMenuItem, DropdownMenuNavList } from '../DropdownMenu';
 import { Icon } from '../Icon';
 import { Tooltip } from '../Tooltip';
+import { Divider } from '../_internal/Divider';
 import { cn } from '../../utils/cn';
 
 /**
@@ -26,7 +26,7 @@ import { cn } from '../../utils/cn';
  * - Sin submenú: la fila es un `<a href>` (navegación real, con Cmd/Ctrl/clic medio) o un `<button>`; la sección actual
  *   lleva `aria-current="page"` (`selected`).
  * - Con submenú (Type `dropdown`): la fila es un botón disclosure (`aria-expanded`, `aria-controls`) y la lista de
- *   `SideBarSubItem` va justo debajo, en el orden de Tab.
+ *   `SideBarSubItem` (una `DropdownMenuNavList`) va justo debajo, en el orden de Tab.
  * - `single-icon`: solo el ícono; el texto pasa a ser el nombre accesible y un `Tooltip` a la derecha (con puntero o
  *   foco). El badge se dibuja en la esquina del ícono y su cantidad entra en el nombre.
  */
@@ -135,9 +135,9 @@ export const SideBarItem = forwardRef<HTMLLIElement, SideBarItemProps>(
           {control}
         </Tooltip>
         {renderSubmenu && (
-          <ul id={submenuId} hidden={!expanded} className={sideBarSubmenuClass} data-figma-part="List items">
+          <DropdownMenuNavList id={submenuId} hidden={!expanded} className={sideBarSubmenuClass} data-figma-part="List items">
             {submenu}
-          </ul>
+          </DropdownMenuNavList>
         )}
       </li>
     );
@@ -147,32 +147,19 @@ export const SideBarItem = forwardRef<HTMLLIElement, SideBarItemProps>(
 SideBarItem.displayName = 'SideBarItem';
 
 /**
- * Subenlace del submenú (fila "Dropdown list" de Figma con su divisor). Reutiliza el aspecto del ítem de `DropdownMenu`
- * pero es un `<a>` o `<button>` de navegación, no un `menuitem`: la barra es una navegación con disclosure, no un menú.
+ * Subenlace del submenú (fila "Dropdown list" de Figma con su divisor). Es un `DropdownMenuItem` dentro de la
+ * `DropdownMenuNavList` del ítem: un `<a>` (o `<button>` sin `href`) de navegación, no un `menuitem`, porque la barra
+ * es una navegación con disclosure, no un menú. El divisor es el compartido (`_internal/Divider`, 0.5 sin alto).
  */
 export const SideBarSubItem = forwardRef<HTMLLIElement, SideBarSubItemProps>(
-  ({ children, href, selected = false, onSelect, className, ...rest }, ref) => {
-    const linkClass = cn(dropdownMenuItemVariants({ state: selected ? 'select' : 'default' }), 'no-underline');
-    const text = (
-      <span className={dropdownMenuItemTextVariants()} data-figma-part="Text item">
+  ({ children, href, selected = false, onSelect, className, ...rest }, ref) => (
+    <li {...rest} ref={ref} className={cn(sideBarSubItemClass, className)}>
+      <DropdownMenuItem href={href} selected={selected} onSelect={onSelect} data-figma-part="Dropdown list">
         {children}
-      </span>
-    );
-    return (
-      <li {...rest} ref={ref} className={cn(sideBarSubItemClass, className)}>
-        {href ? (
-          <a href={href} aria-current={selected ? 'page' : undefined} onClick={onSelect} className={linkClass} data-figma-part="Dropdown list">
-            {text}
-          </a>
-        ) : (
-          <button type="button" aria-current={selected ? 'page' : undefined} onClick={onSelect} className={linkClass} data-figma-part="Dropdown list">
-            {text}
-          </button>
-        )}
-        <span aria-hidden="true" className={sideBarDividerClass} data-figma-part="Vector" />
-      </li>
-    );
-  }
+      </DropdownMenuItem>
+      <Divider data-figma-part="Vector" />
+    </li>
+  )
 );
 
 SideBarSubItem.displayName = 'SideBarSubItem';

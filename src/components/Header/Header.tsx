@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useId, useRef } from 'react';
+import { forwardRef, useId, useRef } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import type { HeaderProps } from './Header.types';
 import {
@@ -18,6 +18,7 @@ import { AvatarMenu } from '../AvatarMenu';
 import { IconMenu } from '../IconMenu';
 import { Input } from '../Input';
 import { Logo } from '../Logo';
+import { useMobileSheet } from '../_internal/useMobileSheet';
 import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 import { useMergedRefs } from '../../utils/refs';
@@ -100,24 +101,9 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
     const [menuOpen, setMenuOpen] = useControllableState(menuOpenProp, defaultMenuOpen, onMenuOpenChange, 'Header (menuOpen)');
     const sheetId = `${uid}-menu`;
 
-    const menuButtonRef = useRef<HTMLButtonElement | null>(null);
-    const closeMenu = useCallback(() => setMenuOpen(false), [setMenuOpen]);
     const sheetOpen = !desktop && menuOpen;
-
-    // Móvil: Escape cierra el menú desplegable y, si el foco estaba en la cabecera, vuelve al botón de menú
-    useEffect(() => {
-      if (!sheetOpen) return;
-      const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key !== 'Escape' || event.defaultPrevented) return;
-        const header = headerRef.current;
-        const active = document.activeElement;
-        if (header && active && active !== document.body && !header.contains(active)) return;
-        setMenuOpen(false);
-        menuButtonRef.current?.focus();
-      };
-      document.addEventListener('keydown', onKeyDown);
-      return () => document.removeEventListener('keydown', onKeyDown);
-    }, [sheetOpen, setMenuOpen]);
+    // Móvil: Escape cierra la hoja y devuelve el foco al botón de menú; activar un enlace también la cierra
+    const { buttonRef: menuButtonRef, sheetProps } = useMobileSheet({ open: sheetOpen, setOpen: setMenuOpen, containerRef: headerRef });
 
     const handleSearch = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -221,9 +207,9 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
               {/* La hoja va en el DOM justo después de su botón (Tab entra a ella sin pasar por logo, campana y avatar);
                   se coloca respecto del <header>, de todo el ancho bajo la barra. */}
               {menuOpen && (
-                <div id={sheetId} className={cn(headerSheetClass, menuClassName)} data-figma-part="Dropdown">
+                <div id={sheetId} {...sheetProps} className={cn(headerSheetClass, menuClassName)} data-figma-part="Dropdown">
                   {searchField(true)}
-                  {items.length > 0 && <HeaderMobileMenu items={items} navLabel={navLabel} onNavigate={closeMenu} />}
+                  {items.length > 0 && <HeaderMobileMenu items={items} navLabel={navLabel} />}
                 </div>
               )}
               {logoNode}

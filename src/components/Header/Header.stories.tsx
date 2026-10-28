@@ -337,9 +337,24 @@ export const ProfileTest: Story = {
   },
 };
 
+/** Los enlaces de ejemplo no navegan en los tests (el iframe del test se cerraría). */
+const noNavigation: Story['decorators'] = [
+  (Story) => (
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    <div
+      onClick={(event) => {
+        if ((event.target as HTMLElement).closest('a[href]')) event.preventDefault();
+      }}
+    >
+      <Story />
+    </div>
+  ),
+];
+
 /** Test: el botón del menú móvil alterna el menú, Tab entra a la hoja y Escape la cierra con el foco en el botón. */
 export const MobileMenuTest: Story = {
   tags: ['!autodocs'],
+  decorators: noNavigation,
   args: { ...FULL, layout: 'mobile' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -360,5 +375,11 @@ export const MobileMenuTest: Story = {
     await userEvent.click(toggle);
     await userEvent.click(canvas.getByRole('button', { name: 'Cerrar menú' }));
     await expect(canvas.queryByRole('link', { name: 'Mensajes' })).toBeNull();
+    // Activar un enlace de la hoja también la cierra; los enlaces no son ítems de menú
+    await userEvent.click(toggle);
+    await expect(canvas.queryByRole('menuitem')).toBeNull();
+    await userEvent.click(canvas.getByRole('link', { name: 'Facturas' }));
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(canvas.queryByRole('link', { name: 'Facturas' })).toBeNull();
   },
 };

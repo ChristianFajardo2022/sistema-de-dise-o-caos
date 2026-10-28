@@ -3,6 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { DropdownMenu } from './DropdownMenu';
 import { DropdownMenuItem } from './DropdownMenuItem';
+import { DropdownMenuList } from './DropdownMenuList';
+import { DropdownMenuNavList } from './DropdownMenuNavList';
 import { DropdownMenuPanel } from './DropdownMenuPanel';
 import type {
   DropdownMenuItemState,
@@ -52,7 +54,7 @@ function SampleItems({ itemType, secondSelected = false }: { itemType: DropdownM
 const meta = {
   title: 'Overlays/Dropdown menu',
   component: DropdownMenu,
-  subcomponents: { DropdownMenuPanel, DropdownMenuItem },
+  subcomponents: { DropdownMenuPanel, DropdownMenuItem, DropdownMenuList, DropdownMenuNavList },
   parameters: { layout: 'centered' },
   tags: ['autodocs'],
   argTypes: {
@@ -169,6 +171,52 @@ export const InfoList: Story = {
         </DropdownMenu>
       </div>
     </div>
+  ),
+};
+
+/** Ítems con `href`: enlaces reales (`<a role="menuitem">`), con Cmd/Ctrl/clic medio; Enter o Espacio los siguen y cierran. */
+export const ItemLinks: Story = {
+  render: (args) => (
+    <div className="flex min-h-72 w-[28rem] max-w-full justify-end p-4">
+      <DropdownMenu {...args} aria-label="Ayuda" trigger={<Button variant="secondary" size="sm">Ayuda</Button>}>
+        <DropdownMenuItem type="icon" icon="add-circle" href="#guia">Guía de uso</DropdownMenuItem>
+        <DropdownMenuItem href="#preguntas">Preguntas frecuentes</DropdownMenuItem>
+        <DropdownMenuItem href="#contacto" disabled>Contacto</DropdownMenuItem>
+      </DropdownMenu>
+    </div>
+  ),
+};
+
+/**
+ * `DropdownMenuList`: la lista de menú sin superficie ni disparador, para otra tarjeta (menú de perfil, hoja de NavBar).
+ * Trae el teclado del menú (flechas, Inicio, Fin, letra inicial) y `initialFocus` para el foco al abrir.
+ */
+export const StandaloneList: Story = {
+  render: () => (
+    <div className="w-[310px] rounded-ds-radius-field-md bg-ds-background-field-surface p-ds-space-field-sm">
+      <DropdownMenuList aria-label="Opciones de la cuenta" className="flex flex-col gap-1">
+        <DropdownMenuItem type="icon" icon="add-circle">Mi perfil</DropdownMenuItem>
+        <DropdownMenuItem type="icon" icon="add-circle" disabled>Facturación</DropdownMenuItem>
+        <DropdownMenuItem type="icon" icon="add-circle" href="#ajustes">Ajustes</DropdownMenuItem>
+        <DropdownMenuItem type="icon" icon="add-circle">Cerrar sesión</DropdownMenuItem>
+      </DropdownMenuList>
+    </div>
+  ),
+};
+
+/**
+ * `DropdownMenuNavList`: enlaces de navegación de sitio con el aspecto de "Dropdown list" (submenús de Header y SideBar).
+ * Sin roles de menú: un `<ul>` de enlaces en el orden de Tab; `selected` marca la página actual (`aria-current="page"`).
+ */
+export const NavigationList: Story = {
+  render: () => (
+    <nav aria-label="Pagos" className="w-70 bg-ds-background-container-surface p-ds-space-general-lg">
+      <DropdownMenuNavList className="gap-1">
+        <li><DropdownMenuItem href="#historial">Historial de pagos</DropdownMenuItem></li>
+        <li><DropdownMenuItem href="#facturas" selected>Facturas</DropdownMenuItem></li>
+        <li><DropdownMenuItem href="#metodos">Métodos de pago</DropdownMenuItem></li>
+      </DropdownMenuNavList>
+    </nav>
   ),
 };
 
@@ -364,5 +412,110 @@ export const DismissTest: Story = {
     await userEvent.click(plus);
     await waitFor(() => expect(plus).toHaveAttribute('aria-expanded', 'true'));
 
+  },
+};
+
+/** Test: `DropdownMenuList` con su propio teclado (flechas con vuelta, salta deshabilitados, Inicio, Fin, letra) y foco inicial. */
+export const ListKeyboardTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <DropdownMenuList aria-label="Opciones de la cuenta" initialFocus="first" className="flex w-[310px] flex-col gap-1">
+      <DropdownMenuItem>Mi perfil</DropdownMenuItem>
+      <DropdownMenuItem disabled>Facturación</DropdownMenuItem>
+      <DropdownMenuItem href="#ajustes">Ajustes</DropdownMenuItem>
+      <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
+    </DropdownMenuList>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const menu = canvas.getByRole('menu', { name: 'Opciones de la cuenta' });
+    const perfil = within(menu).getByRole('menuitem', { name: 'Mi perfil' });
+    const ajustes = within(menu).getByRole('menuitem', { name: 'Ajustes' });
+    const salir = within(menu).getByRole('menuitem', { name: 'Cerrar sesión' });
+    // Foco inicial en el primero
+    await waitFor(() => expect(perfil).toHaveFocus());
+    // El enlace es un menuitem real con href, fuera del orden de Tab
+    expect(ajustes.tagName).toBe('A');
+    expect(ajustes).toHaveAttribute('href', '#ajustes');
+    expect(ajustes).toHaveAttribute('tabindex', '-1');
+    await userEvent.keyboard('{ArrowDown}');
+    expect(ajustes).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(salir).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(perfil).toHaveFocus();
+    await userEvent.keyboard('{ArrowUp}');
+    expect(salir).toHaveFocus();
+    await userEvent.keyboard('{Home}');
+    expect(perfil).toHaveFocus();
+    await userEvent.keyboard('{End}');
+    expect(salir).toHaveFocus();
+    await userEvent.keyboard('a');
+    expect(ajustes).toHaveFocus();
+  },
+};
+
+/** Los enlaces de ejemplo no navegan en los tests (el iframe del test se cerraría). */
+const noNavigation: Story['decorators'] = [
+  (Story) => (
+    // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    <div
+      onClick={(event) => {
+        if ((event.target as HTMLElement).closest('a[href]')) event.preventDefault();
+      }}
+    >
+      <Story />
+    </div>
+  ),
+];
+
+/** Test: ítem con `href` dentro de `DropdownMenu`: enlace con rol `menuitem`; activarlo cierra y devuelve el foco. */
+export const LinkItemTest: Story = {
+  ...ItemLinks,
+  tags: ['!autodocs'],
+  decorators: noNavigation,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Ayuda' });
+    button.focus();
+    await userEvent.keyboard('{Enter}');
+    const guia = await waitFor(() => {
+      const el = canvas.getByRole('menuitem', { name: 'Guía de uso' });
+      expect(el).toHaveFocus();
+      return el;
+    });
+    expect(guia).toHaveAttribute('href', '#guia');
+    const contacto = canvas.getByRole('menuitem', { name: 'Contacto' });
+    expect(contacto).toHaveAttribute('aria-disabled', 'true');
+    expect(contacto).not.toHaveAttribute('href');
+    // Salta el deshabilitado
+    await userEvent.keyboard('{ArrowDown}');
+    expect(canvas.getByRole('menuitem', { name: 'Preguntas frecuentes' })).toHaveFocus();
+    await userEvent.keyboard('{End}');
+    expect(canvas.getByRole('menuitem', { name: 'Preguntas frecuentes' })).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await waitFor(() => expect(button).toHaveAttribute('aria-expanded', 'false'));
+    expect(button).toHaveFocus();
+  },
+};
+
+/** Test: `DropdownMenuNavList` es una lista de enlaces sin roles de menú; la página actual lleva `aria-current="page"`. */
+export const NavigationListTest: Story = {
+  ...NavigationList,
+  tags: ['!autodocs'],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const nav = canvas.getByRole('navigation', { name: 'Pagos' });
+    expect(within(nav).queryByRole('menu')).toBeNull();
+    expect(within(nav).queryByRole('menuitem')).toBeNull();
+    expect(within(within(nav).getByRole('list')).getAllByRole('listitem')).toHaveLength(3);
+    const facturas = within(nav).getByRole('link', { name: 'Facturas' });
+    expect(facturas).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getByRole('link', { name: 'Historial de pagos' })).not.toHaveAttribute('aria-current');
+    // En el orden de Tab
+    await userEvent.tab();
+    expect(within(nav).getByRole('link', { name: 'Historial de pagos' })).toHaveFocus();
+    await userEvent.tab();
+    expect(facturas).toHaveFocus();
   },
 };

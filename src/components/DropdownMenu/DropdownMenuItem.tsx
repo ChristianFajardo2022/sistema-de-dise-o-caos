@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import type { MouseEvent } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import { useDropdownMenu } from './DropdownMenu.context';
 import type { DropdownMenuItemProps, DropdownMenuItemState } from './DropdownMenu.types';
 import {
@@ -14,8 +14,11 @@ import { cn } from '../../utils/cn';
 
 /**
  * Ítem del menú ("Dropdown list" de Figma).
- * - Modo `menu` (por defecto): `<button role="menuitem | menuitemcheckbox | menuitemradio">`, activable.
+ * - Modo `menu` (por defecto): `<button role="menuitem | menuitemcheckbox | menuitemradio">`, activable. Con `href`
+ *   (solo `simple`, `icon`, `avatar`) es un `<a href role="menuitem">`: enlace real, Enter o Espacio lo siguen y cierra.
  * - Modo `list` (dentro de un panel `mode="list"`): `<li>` informativo, sin acción ni foco.
+ * - Dentro de `DropdownMenuNavList`: enlace de navegación `<a href>` sin rol de menú (o `<button>` sin `href`), en el
+ *   orden de Tab; `selected` = `aria-current="page"`. El `<li>` lo pone quien compone.
  */
 export const DropdownMenuItem = forwardRef<HTMLElement, DropdownMenuItemProps>(
   (
@@ -31,6 +34,9 @@ export const DropdownMenuItem = forwardRef<HTMLElement, DropdownMenuItemProps>(
       disabled = false,
       onSelect,
       closeOnSelect,
+      href,
+      target,
+      rel,
       children,
       className,
       onClick,
@@ -40,6 +46,7 @@ export const DropdownMenuItem = forwardRef<HTMLElement, DropdownMenuItemProps>(
   ) => {
     const { mode, close } = useDropdownMenu();
     const isList = mode === 'list';
+    const isNav = mode === 'navigation';
     const isToggle = type === 'checkbox' || type === 'radio';
     const [innerChecked, setInnerChecked] = useState(defaultChecked);
     const isChecked = isToggle && (state ? state === 'select' : (checked ?? innerChecked));
@@ -56,7 +63,7 @@ export const DropdownMenuItem = forwardRef<HTMLElement, DropdownMenuItemProps>(
         onCheckedChange?.(next);
       }
       onSelect?.();
-      if (closeOnSelect ?? type !== 'checkbox') close();
+      if (!isNav && (closeOnSelect ?? type !== 'checkbox')) close();
     };
 
     const content = (
@@ -114,6 +121,72 @@ export const DropdownMenuItem = forwardRef<HTMLElement, DropdownMenuItemProps>(
         >
           {content}
         </li>
+      );
+    }
+
+    const isLink = href !== undefined && !isToggle;
+    if (isNav) {
+      const current = selected ? ('page' as const) : undefined;
+      if (isLink) {
+        return (
+          <a
+            {...(restProps as object)}
+            ref={ref as React.Ref<HTMLAnchorElement>}
+            href={isDisabled ? undefined : href}
+            target={target}
+            rel={rel}
+            data-item-type={type}
+            aria-current={current}
+            aria-disabled={isDisabled || undefined}
+            onClick={handleClick}
+            className={classes}
+          >
+            {content}
+          </a>
+        );
+      }
+      return (
+        <button
+          {...(restProps as object)}
+          ref={ref as React.Ref<HTMLButtonElement>}
+          type="button"
+          data-item-type={type}
+          aria-current={current}
+          disabled={isDisabled || undefined}
+          onClick={handleClick}
+          className={classes}
+        >
+          {content}
+        </button>
+      );
+    }
+
+    if (isLink) {
+      // Un enlace no se activa con Espacio por sí solo; en un menú sí (como los demás ítems)
+      const handleLinkKeyDown = (event: KeyboardEvent<HTMLAnchorElement>) => {
+        (restProps.onKeyDown as ((e: KeyboardEvent<HTMLAnchorElement>) => void) | undefined)?.(event);
+        if (event.defaultPrevented || event.key !== ' ') return;
+        event.preventDefault();
+        event.currentTarget.click();
+      };
+      return (
+        <a
+          {...(restProps as object)}
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          href={isDisabled ? undefined : href}
+          target={target}
+          rel={rel}
+          role="menuitem"
+          data-item-type={type}
+          tabIndex={-1}
+          aria-current={selected ? 'true' : undefined}
+          aria-disabled={isDisabled || undefined}
+          onClick={handleClick}
+          onKeyDown={handleLinkKeyDown}
+          className={classes}
+        >
+          {content}
+        </a>
       );
     }
 

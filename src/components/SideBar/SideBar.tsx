@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useId, useRef } from 'react';
+import { forwardRef, useCallback, useId, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { SideBarItemData, SideBarProps } from './SideBar.types';
 import { SideBarItem, SideBarSubItem } from './SideBarItem';
@@ -21,6 +21,7 @@ import { Icon } from '../Icon';
 import { IconMenu } from '../IconMenu';
 import { Logo } from '../Logo';
 import { ScrollArea } from '../ScrollArea';
+import { useMobileSheet } from '../_internal/useMobileSheet';
 import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 import { useMergedRefs } from '../../utils/refs';
@@ -88,7 +89,6 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
     const mobile = layout === 'auto' ? isMobileViewport : layout === 'mobile';
     const rootRef = useRef<HTMLDivElement | null>(null);
     const mergedRef = useMergedRefs(rootRef, ref);
-    const menuButtonRef = useRef<HTMLButtonElement | null>(null);
 
     const [value, setValue] = useControllableState<string | null>(valueProp, defaultValue, undefined, 'SideBar (value)');
     const [openItems, setOpenItems] = useControllableState<string[]>(
@@ -117,20 +117,12 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
       setOpenItems(next ? [...openItems, id] : openItems.filter((open) => open !== id));
     };
 
-    // Móvil: Escape cierra el menú y, si el foco estaba en la barra (o se perdió), vuelve al botón de menú
-    useEffect(() => {
-      if (!sheetOpen) return;
-      const onKeyDown = (event: KeyboardEvent) => {
-        if (event.key !== 'Escape' || event.defaultPrevented) return;
-        const root = rootRef.current;
-        const active = document.activeElement;
-        if (root && active && active !== document.body && !root.contains(active)) return;
-        setMenuOpen(false);
-        menuButtonRef.current?.focus();
-      };
-      document.addEventListener('keydown', onKeyDown);
-      return () => document.removeEventListener('keydown', onKeyDown);
-    }, [sheetOpen, setMenuOpen]);
+    // Móvil: Escape cierra la hoja y devuelve el foco al botón de menú; activar un enlace también la cierra
+    const { buttonRef: menuButtonRef, close: closeMenu, sheetProps } = useMobileSheet({
+      open: sheetOpen,
+      setOpen: setMenuOpen,
+      containerRef: rootRef,
+    });
 
     const renderItems = (mode: 'collapsed' | 'expanded', onNavigate?: () => void) =>
       items.map((item) => {
@@ -160,7 +152,8 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
                 ? undefined
                 : () => {
                     select(item.id);
-                    onNavigate?.();
+                    // Los enlaces cierran la hoja por `sheetProps`; los botones que navegan, aquí
+                    if (!item.href) onNavigate?.();
                   }
             }
             submenu={
@@ -172,7 +165,7 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
                       selected={value === sub.id}
                       onSelect={() => {
                         select(sub.id);
-                        onNavigate?.();
+                        if (!sub.href) onNavigate?.();
                       }}
                     >
                       {sub.label}
@@ -201,7 +194,6 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
       );
 
     if (mobile) {
-      const closeMenu = () => setMenuOpen(false);
       return (
         <div {...rest} ref={mergedRef} className={cn(sideBarMobileClass, className)}>
           <div className={sideBarMobileBarClass} data-figma-part="Header mobile">
@@ -219,7 +211,7 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
               </button>
               {/* La hoja va en el DOM justo después de su botón: Tab entra en ella sin pasar por el logo ni las acciones */}
               {menuOpen && (
-                <div id={sheetId} className={cn(sideBarSheetClass, menuClassName)} data-figma-part="Dropdown">
+                <div id={sheetId} {...sheetProps} className={cn(sideBarSheetClass, menuClassName)} data-figma-part="Dropdown">
                   <nav aria-label={navLabel} className="flex min-h-0 flex-1 flex-col">
                     <ScrollArea aria-label={navLabel} className="min-h-0 flex-1">
                       <ul className={sideBarListVariants({ collapsed: false })} data-figma-part="List items">

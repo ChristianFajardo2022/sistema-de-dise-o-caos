@@ -1,45 +1,46 @@
-import type { ReactNode } from 'react';
-import { headerLinkClass, headerSheetListClass } from './Header.variants';
+import { headerSheetListClass } from './Header.variants';
 import type { HeaderNavItem } from './Header.types';
-import { dropdownMenuItemVariants } from '../DropdownMenu/DropdownMenu.variants';
-import { notificationPanelDividerVariants } from '../NotificationPanel/NotificationPanel.variants';
+import { DropdownMenuItem, DropdownMenuNavList } from '../DropdownMenu';
+import { dropdownMenuItemTextVariants, dropdownMenuItemVariants } from '../DropdownMenu/DropdownMenu.variants';
+import { Divider } from '../_internal/Divider';
 import { cn } from '../../utils/cn';
 
-const linkClass = (current?: boolean) => cn(dropdownMenuItemVariants({ state: current ? 'select' : 'default' }), headerLinkClass);
-
-/** Lista de enlaces del menú móvil: cada sección es un enlace y sus subenlaces van debajo, con sangría. Separada por divisores. */
-export function HeaderMobileMenu({ items, navLabel, onNavigate }: { items: HeaderNavItem[]; navLabel: string; onNavigate: () => void }) {
-  const rows: ReactNode[] = [];
-  items.forEach((item) => {
-    rows.push(
-      <li key={item.id} data-figma-part="Dropdown list">
-        {item.href ? (
-          <a href={item.href} aria-current={item.current ? 'page' : undefined} onClick={onNavigate} className={linkClass(item.current)}>
-            <span className="min-w-0 flex-1 truncate" data-figma-part="Text item">{item.label}</span>
-          </a>
-        ) : (
-          <span className={cn(dropdownMenuItemVariants({ interactive: false }), 'text-ds-text-neutral-white')}>
-            <span className="min-w-0 flex-1 truncate" data-figma-part="Text item">{item.label}</span>
-          </span>
-        )}
-        {item.items && (
-          <ul className="m-0 flex list-none flex-col p-0 pl-ds-space-general-2xl">
-            {item.items.map((link) => (
-              <li key={link.href + String(link.label)}>
-                <a href={link.href} aria-current={link.current ? 'page' : undefined} onClick={onNavigate} className={linkClass(link.current)}>
-                  <span className="min-w-0 flex-1 truncate" data-figma-part="Text item">{link.label}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </li>
-    );
-    rows.push(<li key={`${item.id}-divider`} aria-hidden="true" className="list-none"><div className={notificationPanelDividerVariants()} /></li>);
-  });
+/**
+ * Lista de enlaces del menú móvil (`DropdownMenuNavList`): cada sección es un enlace y sus subenlaces van debajo, con
+ * sangría. Separada por divisores. Activar un enlace cierra la hoja (lo resuelve `useMobileSheet` en Header).
+ */
+export function HeaderMobileMenu({ items, navLabel }: { items: HeaderNavItem[]; navLabel: string }) {
   return (
     <nav aria-label={navLabel}>
-      <ul className={headerSheetListClass}>{rows}</ul>
+      <DropdownMenuNavList className={headerSheetListClass}>
+        {items.flatMap((item) => [
+          <li key={item.id} data-figma-part="Dropdown list">
+            {item.href ? (
+              <DropdownMenuItem href={item.href} selected={item.current}>
+                {item.label}
+              </DropdownMenuItem>
+            ) : (
+              <span className={cn(dropdownMenuItemVariants({ interactive: false }), 'text-ds-text-neutral-white')}>
+                <span className={dropdownMenuItemTextVariants()} data-figma-part="Text item">
+                  {item.label}
+                </span>
+              </span>
+            )}
+            {item.items && (
+              <DropdownMenuNavList className="pl-ds-space-general-2xl">
+                {item.items.map((link) => (
+                  <li key={link.href + String(link.label)}>
+                    <DropdownMenuItem href={link.href} selected={link.current}>
+                      {link.label}
+                    </DropdownMenuItem>
+                  </li>
+                ))}
+              </DropdownMenuNavList>
+            )}
+          </li>,
+          <Divider key={`${item.id}-divider`} as="li" />,
+        ])}
+      </DropdownMenuNavList>
     </nav>
   );
 }

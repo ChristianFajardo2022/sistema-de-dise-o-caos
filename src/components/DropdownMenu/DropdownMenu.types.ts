@@ -1,4 +1,4 @@
-import type { HTMLAttributes, LiHTMLAttributes, ReactElement, ReactNode, Ref, RefObject } from 'react';
+import type { AnchorHTMLAttributes, HTMLAttributes, LiHTMLAttributes, ReactElement, ReactNode, Ref, RefObject } from 'react';
 import type { IconName } from '../Icon/Icon.types';
 
 /** Type del set "Dropdown menu" de Figma: panel simple o con campo de búsqueda arriba. */
@@ -39,12 +39,26 @@ export interface DropdownMenuTriggerProps {
   onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => void;
 }
 
+/**
+ * Foco al montar la lista suelta: `first` = el ítem elegido (`selected` o radio marcado) o, si no hay, el primero;
+ * `last` = el último; `none` = no se mueve (p. ej. la superficie se abrió abierta de entrada, no por la persona).
+ */
+export type DropdownMenuListInitialFocus = 'first' | 'last' | 'none';
+
 /** Props de la lista de ítems suelta (`DropdownMenuList`). */
 export interface DropdownMenuListProps extends HTMLAttributes<HTMLDivElement> {
   /** Nombre accesible del menú (obligatorio). */
   'aria-label': string;
   /** Cierra la superficie que contiene la lista al activar un ítem. Sin él, la lista suelta no cierra nada. */
   onClose?: () => void;
+  /** Foco al montar (ver `DropdownMenuListInitialFocus`). Por defecto `none`. */
+  initialFocus?: DropdownMenuListInitialFocus;
+  children?: ReactNode;
+}
+
+/** Props de la lista de navegación (`DropdownMenuNavList`): enlaces con el aspecto de "Dropdown list", sin roles de menú. */
+export interface DropdownMenuNavListProps extends HTMLAttributes<HTMLUListElement> {
+  /** Ítems: un `<li>` por fila con un `DropdownMenuItem` (con `href`) dentro; el `<li>` admite subniveles o divisores. */
   children?: ReactNode;
 }
 
@@ -123,7 +137,10 @@ export interface DropdownMenuItemProps
   defaultChecked?: boolean;
   /** Cambia el marcado de `checkbox` / `radio`. */
   onCheckedChange?: (checked: boolean) => void;
-  /** Aspecto "Select" en `simple`, `icon` y `avatar` (en `checkbox` y `radio` sale de `checked`). */
+  /**
+   * Aspecto "Select" en `simple`, `icon` y `avatar` (en `checkbox` y `radio` sale de `checked`). En un menú es
+   * `aria-current="true"`; dentro de `DropdownMenuNavList`, la página actual (`aria-current="page"`).
+   */
   selected?: boolean;
   /** Fuerza el aspecto de un State, solo para documentación. */
   state?: DropdownMenuItemState;
@@ -133,6 +150,16 @@ export interface DropdownMenuItemProps
   onSelect?: () => void;
   /** Cierra el panel al activar. Por defecto `true`, salvo en `checkbox` (se puede marcar varios). Solo modo `menu`. */
   closeOnSelect?: boolean;
+  /**
+   * Destino del ítem: lo vuelve un enlace real (`<a href>`, con Cmd/Ctrl/clic medio). En un menú lleva `role="menuitem"`
+   * y cierra al activarse; dentro de `DropdownMenuNavList` es un enlace de navegación (`aria-current="page"` con
+   * `selected`). Solo `simple`, `icon` y `avatar`.
+   */
+  href?: string;
+  /** `target` del enlace (con `href`). */
+  target?: AnchorHTMLAttributes<HTMLAnchorElement>['target'];
+  /** `rel` del enlace (con `href`). Con `target="_blank"` se recomienda `noopener noreferrer`. */
+  rel?: string;
   /** Texto del ítem (prop "Text item" de Figma). */
   children?: ReactNode;
   className?: string;

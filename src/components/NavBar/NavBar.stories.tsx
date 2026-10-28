@@ -175,7 +175,7 @@ export const LinkTest: Story = {
   },
 };
 
-/** Test: el botón "más" abre la hoja, el foco entra, las flechas se mueven y Escape cierra devolviendo el foco. */
+/** Test: el botón "más" abre la hoja, el foco entra, las flechas, Inicio, Fin y la letra se mueven y Escape cierra devolviendo el foco. */
 export const MoreMenuTest: Story = {
   tags: ['!autodocs'],
   args: { items: ITEMS.slice(0, 3), moreItems: MORE, onMoreSelect: fn() },
@@ -192,6 +192,13 @@ export const MoreMenuTest: Story = {
     await expect(canvas.getByRole('menuitem', { name: 'Galería' })).toHaveFocus();
     await userEvent.keyboard('{End}');
     await expect(canvas.getByRole('menuitem', { name: 'Tienda' })).toHaveFocus();
+    // Con vuelta, Inicio y letra inicial (teclado de DropdownMenuList)
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(canvas.getByRole('menuitem', { name: 'Favoritos' })).toHaveFocus();
+    await userEvent.keyboard('{End}{Home}');
+    await expect(canvas.getByRole('menuitem', { name: 'Favoritos' })).toHaveFocus();
+    await userEvent.keyboard('n');
+    await expect(canvas.getByRole('menuitem', { name: 'Notas' })).toHaveFocus();
     await userEvent.keyboard('{Escape}');
     await expect(canvas.queryByRole('menu')).not.toBeInTheDocument();
     await expect(more).toHaveFocus();

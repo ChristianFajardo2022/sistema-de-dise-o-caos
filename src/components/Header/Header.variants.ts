@@ -19,7 +19,7 @@ import { cva } from 'class-variance-authority';
  * - Barra: padding 20 (space/general/3xl, token que vale lo mismo que space/container/default), gap 12, fila de 32:
  *   Icon menu (32) + Logo (32), a la derecha campana xs (32) y avatar sm (32), gap 8.
  * - Menú desplegable: hoja de todo el ancho bajo la barra con padding 20, gap 20; buscador de 40 y la lista de enlaces
- *   (34 de alto) separados por divisores, gap 8.
+ *   (34 de alto) separados por divisores (border/divider/md de 0.5 que no ocupa alto, `_internal/Divider`), gap 8.
  */
 export const headerVariants = cva('relative box-border block w-full');
 
@@ -71,5 +71,8 @@ export const headerSheetClass =
 
 export const headerSheetListClass = 'm-0 flex w-full list-none flex-col gap-ds-space-general-lg p-0';
 
-/** Enlace de submenú (Dropdown list): reutiliza el estilo del ítem de DropdownMenu. */
+/**
+ * Enlace de submenú (Dropdown list).
+ * @deprecated Los enlaces de submenú son `DropdownMenuItem` dentro de `DropdownMenuNavList` (el ítem ya quita el subrayado).
+ */
 export const headerLinkClass = 'no-underline';

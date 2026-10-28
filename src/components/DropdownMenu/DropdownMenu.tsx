@@ -1,6 +1,7 @@
 import { cloneElement, forwardRef, isValidElement, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent, ReactElement, Ref, SyntheticEvent } from 'react';
 import { DropdownMenuContext } from './DropdownMenu.context';
+import { MENU_SELECTED_SELECTOR, createTypeahead, getMenuItems, handleMenuNavigation } from './DropdownMenu.keyboard';
 import type { DropdownMenuProps, DropdownMenuTriggerProps } from './DropdownMenu.types';
 import { DropdownMenuPanel } from './DropdownMenuPanel';
 import { TOP_LAYER_CLASS, TOP_LAYER_MAX_WIDTH } from '../_internal/overlay';
@@ -10,7 +11,6 @@ import { assignRef } from '../../utils/refs';
 /** Separación por defecto entre el disparador y el panel, y margen mínimo con el borde de la pantalla. */
 const OFFSET = 4;
 const MARGIN = 8;
-const TYPEAHEAD_RESET_MS = 600;
 
 interface TriggerElementProps {
   onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
@@ -19,10 +19,6 @@ interface TriggerElementProps {
 }
 
 type FocusIntent = 'first' | 'last' | 'none';
-
-const ITEM_SELECTOR = '[role^="menuitem"]:not([aria-disabled="true"])';
-/** Ítem elegido (aspecto Select o radio marcado): recibe el foco al abrir en lugar del primero. */
-const SELECTED_SELECTOR = '[aria-current="true"], [role="menuitemradio"][aria-checked="true"]';
 
 /**
  * Panel con disparador, sobre el atributo nativo `popover` (capa superior, clic fuera y Esc los resuelve el navegador).
@@ -65,7 +61,7 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
     const popoverRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLElement | null>(null);
     const intentRef = useRef<FocusIntent>('first');
-    const typeaheadRef = useRef({ text: '', timer: 0 });
+    const typeaheadRef = useRef(createTypeahead());
     const isMenu = mode === 'menu';
 
     const setPopoverRef = useCallback(
@@ -83,7 +79,7 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
     const getAnchor = useCallback(() => anchorRef?.current ?? triggerRef.current, [anchorRef]);
     const place = useAnchoredPosition(open, popoverRef, getAnchor, { align, side, offset, margin: MARGIN });
 
-    const items = () => Array.from(popoverRef.current?.querySelectorAll<HTMLElement>(ITEM_SELECTOR) ?? []);
+    const items = () => getMenuItems(popoverRef.current);
 
     const closePanel = useCallback((returnFocus: boolean) => {
       const pop = popoverRef.current;
@@ -96,7 +92,7 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       const pop = popoverRef.current;
       const search = pop?.querySelector<HTMLInputElement>('input[type="search"]');
       const list = items();
-      const selected = pop?.querySelector<HTMLElement>(SELECTED_SELECTOR);
+      const selected = pop?.querySelector<HTMLElement>(MENU_SELECTED_SELECTOR);
       if (intentRef.current === 'last' && list.length) list[list.length - 1].focus();
       else if (search) search.focus();
       else if (selected && list.includes(selected)) selected.focus();
@@ -128,19 +124,6 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
       if (next !== open) onOpenChange?.(next);
     };
 
-    const typeahead = (key: string) => {
-      const t = typeaheadRef.current;
-      window.clearTimeout(t.timer);
-      t.text += key.toLowerCase();
-      t.timer = window.setTimeout(() => (t.text = ''), TYPEAHEAD_RESET_MS);
-      const list = items();
-      const current = list.indexOf(document.activeElement as HTMLElement);
-      // Con una sola letra repetida se avanza al siguiente que empiece igual
-      const order = [...list.slice(current + 1), ...list.slice(0, current + 1)];
-      const found = order.find((el) => el.textContent?.trim().toLowerCase().startsWith(t.text));
-      found?.focus();
-    };
-
     const handlePanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
       if (!isMenu) return;
       if (event.key === 'Escape') {
@@ -153,42 +136,18 @@ export const DropdownMenu = forwardRef<HTMLDivElement, DropdownMenuProps>(
         closePanel(true);
         return;
       }
-      const target = event.target as HTMLElement;
       const list = items();
-      if (target.tagName === 'INPUT') {
+      if ((event.target as HTMLElement).tagName === 'INPUT') {
         if (event.key === 'ArrowDown' && list.length) {
           event.preventDefault();
           list[0].focus();
         }
         return;
       }
-      const index = list.indexOf(target.closest<HTMLElement>('[role^="menuitem"]') as HTMLElement);
-      const move = (el?: HTMLElement) => {
-        event.preventDefault();
-        el?.focus();
-      };
-      switch (event.key) {
-        case 'ArrowDown':
-          move(list[(index + 1) % list.length]);
-          break;
-        case 'ArrowUp': {
-          const search = popoverRef.current?.querySelector<HTMLInputElement>('input[type="search"]');
-          if (index === 0 && search) move(search);
-          else move(list[(index - 1 + list.length) % list.length]);
-          break;
-        }
-        case 'Home':
-          move(list[0]);
-          break;
-        case 'End':
-          move(list[list.length - 1]);
-          break;
-        default:
-          if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && event.key !== ' ') {
-            event.preventDefault();
-            typeahead(event.key);
-          }
-      }
+      handleMenuNavigation(event, popoverRef.current, {
+        typeahead: typeaheadRef.current,
+        beforeFirst: () => popoverRef.current?.querySelector<HTMLInputElement>('input[type="search"]'),
+      });
     };
 
     const handleTriggerKeyDown = (event: KeyboardEvent<HTMLElement>) => {

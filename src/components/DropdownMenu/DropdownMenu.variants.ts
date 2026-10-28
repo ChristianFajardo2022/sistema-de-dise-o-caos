@@ -72,7 +72,7 @@ export const dropdownMenuSearchClass = [
 export const dropdownMenuItemVariants = cva(
   [
     'box-border flex w-full min-w-0 items-center gap-ds-space-general-lg p-ds-space-general-lg m-0 border-0',
-    'rounded-ds-radius-field-sm text-left list-none',
+    'rounded-ds-radius-field-sm text-left list-none no-underline',
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
     '[font-weight:var(--ds-primitives-typography-weight-regular)]',
     'text-ds-typography-field-size-sm leading-(--ds-responsive-typography-field-line-height-sm)',
@@ -95,6 +95,9 @@ export const dropdownMenuItemVariants = cva(
     defaultVariants: { state: 'default', interactive: true },
   }
 );
+
+/** Lista de navegación (`DropdownMenuNavList`): `ul` sin estilos de lista; el gap y el ancho los pone quien la usa. */
+export const dropdownMenuNavListClass = 'm-0 flex list-none flex-col p-0';
 
 export const dropdownMenuItemTextVariants = cva('min-w-0 flex-1 truncate select-none');
 

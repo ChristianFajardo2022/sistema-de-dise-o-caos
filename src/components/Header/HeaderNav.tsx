@@ -1,10 +1,9 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { FocusEvent, RefObject } from 'react';
-import { headerBandClass, headerBandListClass, headerLinkClass, headerNavListClass } from './Header.variants';
+import { headerBandClass, headerBandListClass, headerNavListClass } from './Header.variants';
 import type { HeaderNavItem } from './Header.types';
 import { ButtonMenu } from '../ButtonMenu';
-import { dropdownMenuItemVariants } from '../DropdownMenu/DropdownMenu.variants';
-import { cn } from '../../utils/cn';
+import { DropdownMenuItem, DropdownMenuNavList } from '../DropdownMenu';
 
 interface HeaderNavProps {
   items: HeaderNavItem[];
@@ -17,7 +16,7 @@ interface HeaderNavProps {
 
 /**
  * Navegación principal de escritorio (patrón WAI-ARIA "Disclosure Navigation Menu"): cada sección con submenú es un
- * botón con `aria-expanded` y `aria-controls` que muestra una lista de enlaces en la banda bajo la barra.
+ * botón con `aria-expanded` y `aria-controls` que muestra una lista de enlaces (`DropdownMenuNavList`) en la banda bajo la barra.
  * - La lista va en el DOM justo después de su botón (dentro del mismo `<li>` y del `<nav>`): Tab entra del botón a sus
  *   enlaces. La banda se coloca respecto del `<header>` (todo el ancho, bajo la barra).
  * - Escape cierra y devuelve el foco al botón; un clic fuera de la cabecera o el foco que sale de la navegación cierran.
@@ -94,23 +93,20 @@ export function HeaderNav({ items, navLabel, openItem, onOpenItemChange, headerR
               </ButtonMenu>
               {expanded && item.items && (
                 <div className={headerBandClass} data-figma-part="Dropdown">
-                  <ul id={listId} className={headerBandListClass} style={{ marginInlineStart: left }} data-figma-part="Options">
+                  <DropdownMenuNavList id={listId} className={headerBandListClass} style={{ marginInlineStart: left }} data-figma-part="Options">
                     {item.items.map((link) => (
                       <li key={link.href + String(link.label)}>
-                        <a
+                        <DropdownMenuItem
                           href={link.href}
-                          aria-current={link.current ? 'page' : undefined}
-                          onClick={() => onOpenItemChange(null)}
-                          className={cn(dropdownMenuItemVariants({ state: link.current ? 'select' : 'default' }), headerLinkClass)}
+                          selected={link.current}
+                          onSelect={() => onOpenItemChange(null)}
                           data-figma-part="Dropdown list"
                         >
-                          <span className="min-w-0 flex-1 truncate" data-figma-part="Text item">
-                            {link.label}
-                          </span>
-                        </a>
+                          {link.label}
+                        </DropdownMenuItem>
                       </li>
                     ))}
-                  </ul>
+                  </DropdownMenuNavList>
                 </div>
               )}
             </li>
