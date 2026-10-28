@@ -1,0 +1,20 @@
+{
+  "name": "PageHeader",
+  "component": "PageHeader",
+  "description": "Encabezado de página del sistema de diseño CAOS, fiel al component set Page Header de Figma (17265:93494, 1 variante). Es un <header> con una fila (flecha de volver chevron-left de 24, título) y una descripción opcional. El título es un heading real (h1 por defecto, cambia con headingLevel): Prospero semibold, heading 2xl (32/36 en escritorio, 24/32 en móvil). La descripción usa body lg regular en text/neutral/body. La flecha de volver es un botón nativo de 24×24 con nombre accesible (backLabel, por defecto \"Volver\") y foco con outline de 2px (agregado, no está en Figma). Las migas (breadcrumb) y las acciones a la derecha no están en Figma: son slots opcionales; usa Breadcrumb para las migas. Los espacios de Figma enlazan gap/general/lg, que no existe en tokens.css: se usa space/general/xl (12).",
+  "category": "Navigation",
+  "props": {
+    "title": { "type": "ReactNode", "required": true, "description": "Text header de Figma. Se dibuja como heading." },
+    "headingLevel": { "type": "1 | 2 | 3 | 4 | 5 | 6", "default": "1", "description": "Nivel del heading del título." },
+    "description": { "type": "ReactNode", "required": false, "description": "Text description. Sin valor no se dibuja (Description=false)." },
+    "onBack": { "type": "() => void", "required": false, "description": "Dibuja la flecha de volver como botón." },
+    "backLabel": { "type": "string", "default": "'Volver'", "description": "Nombre accesible del botón de volver." },
+    "breadcrumb": { "type": "ReactNode", "required": false, "description": "Migas sobre el título (no está en Figma)." },
+    "actions": { "type": "ReactNode", "required": false, "description": "Acciones a la derecha del título (no está en Figma)." }
+  },
+  "examples": [
+    { "title": "Básico", "code": "<PageHeader title=\"Encabezado\" description=\"Descripción de la página\" />" },
+    { "title": "Con volver", "code": "<PageHeader title=\"Detalle\" onBack={() => history.back()} />" },
+    { "title": "Con migas y acciones", "code": "<PageHeader title=\"Cuenta\" breadcrumb={<Breadcrumb>…</Breadcrumb>} actions={<Button size=\"sm\">Guardar</Button>} />" }
+  ]
+}
