@@ -60,7 +60,7 @@ const meta = {
       type: { name: 'enum', value: ['default', 'hover', 'select', 'inactive'] },
       description: 'Fuerza el State de icon (solo documentación)',
     },
-    badge: { control: 'boolean', type: { name: 'boolean' }, description: 'Indicador de estado (lg y md)' },
+    badge: { control: 'boolean', type: { name: 'boolean' }, description: 'Indicador de estado (lg, md y sm)' },
     name: { control: 'text', type: { name: 'string' }, description: 'Nombre completo: iniciales y nombre accesible' },
     alt: { control: 'text', type: { name: 'string' }, description: 'Texto alternativo de photo' },
     label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible de user, brand e icon' },
@@ -268,7 +268,7 @@ export const FigmaMatrixAvatarColors: Story = {
   ),
 };
 
-/** Set "Avatar photo": Size xs-lg con indicador en lg y md. */
+/** Set "Avatar photo": Size xs-lg con indicador en lg, md y sm (de 8). */
 export const FigmaMatrixAvatarPhoto: Story = {
   parameters: { layout: 'padded' },
   render: () => (
@@ -602,7 +602,7 @@ export const GroupOverflowMenuTest: Story = {
   },
 };
 
-/** Test: sin desbordar no hay "+N"; el indicador solo existe en lg y md y no en disabled */
+/** Test: sin desbordar no hay "+N"; el indicador existe en lg y md (12) y sm (8), no en xs ni en disabled */
 export const BadgeRulesTest: Story = {
   tags: ['!autodocs'],
   render: () => (
@@ -613,6 +613,7 @@ export const BadgeRulesTest: Story = {
       </AvatarGroup>
       <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" size="md" data-testid="md" />
       <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" size="sm" data-testid="sm" />
+      <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" size="xs" data-testid="xs" />
       <Avatar name="Ana Bernal" badge badgeLabel="Ocupada" disabled data-testid="disabled" />
       <Avatar name="Ana Bernal" badge badgeLabel="En línea" badgeState="success" size="md" data-testid="online" />
     </div>
@@ -621,7 +622,11 @@ export const BadgeRulesTest: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.queryByRole('button')).toBeNull();
     await expect(canvas.getByTestId('md')).toHaveTextContent('Ocupada');
-    await expect(canvas.getByTestId('sm')).not.toHaveTextContent('Ocupada');
+    // sm lleva el punto de 8; xs no lleva indicador
+    await expect(canvas.getByTestId('sm')).toHaveTextContent('Ocupada');
+    const smDot = canvas.getByTestId('sm').querySelector('[data-figma-part="Badge"]')!.getBoundingClientRect();
+    await expect([smDot.width, smDot.height]).toEqual([8, 8]);
+    await expect(canvas.getByTestId('xs')).not.toHaveTextContent('Ocupada');
     await expect(canvas.getByTestId('disabled')).not.toHaveTextContent('Ocupada');
     // badgeState cambia el color del indicador; sin él queda el de siempre
     const dot = (id: string) => getComputedStyle(canvas.getByTestId(id).querySelector('[data-figma-part="Badge"] [data-figma-part="Badge"]')!).backgroundColor;

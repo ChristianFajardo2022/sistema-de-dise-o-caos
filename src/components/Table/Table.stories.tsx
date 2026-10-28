@@ -133,7 +133,7 @@ function PeopleTable({ label, layout, rows = PEOPLE }: { label: string; layout?:
           expandLabel={`Ver más datos de ${p.name}`}
         >
           <TableMobileField label="Nombre">
-            <TableProfile avatar={<Avatar variant="initials" size="sm" name={p.name} />} name={p.name} description={p.role} />
+            <TableProfile avatar={<Avatar variant="initials" size="sm" name={p.name} />} badge name={p.name} description={p.role} />
           </TableMobileField>
           <TableMobileField label="Área">
             <TableText description={p.city}>{p.area}</TableText>
@@ -185,7 +185,7 @@ function PeopleTable({ label, layout, rows = PEOPLE }: { label: string; layout?:
               />
             </TableCell>
             <TableCell sticky="start" stickyOffset="3rem">
-              <TableProfile avatar={<Avatar variant="initials" size="sm" name={p.name} />} name={p.name} description={p.status} />
+              <TableProfile avatar={<Avatar variant="initials" size="sm" name={p.name} />} badge name={p.name} description={p.status} />
             </TableCell>
             <TableCell>
               <TableText description="Rol">{p.role}</TableText>
@@ -267,7 +267,7 @@ function ExpandableDemo() {
             <Fragment key={p.id}>
               <TableRow>
                 <TableCell>
-                  <TableProfile avatar={<Avatar variant="initials" size="sm" name={p.name} />} name={p.name} description={p.role} />
+                  <TableProfile avatar={<Avatar variant="initials" size="sm" name={p.name} />} badge name={p.name} description={p.role} />
                 </TableCell>
                 <TableCell>
                   <TableText description={p.city}>{p.area}</TableText>
@@ -324,7 +324,7 @@ function RowCardSummary() {
       <span data-figma-part="Filename" className="w-43 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)] text-ds-typography-body-size-sm leading-ds-typography-body-line-height-large-sm text-ds-text-neutral-gray-2">
         $ 1.326.000
       </span>
-      <Chip icon={false}>Adjuntos</Chip>
+      <Chip badge={2} badgeLabel="pendientes">Adjuntos</Chip>
     </>
   );
 }
@@ -493,7 +493,7 @@ const ROW_STATES: { figma: string; state: TableRowState }[] = [
 const label = 'text-xs text-ds-text-neutral-body';
 
 function ProfileItem() {
-  return <TableProfile avatar={<Avatar variant="initials" size="sm" name="Hugo García" />} name={ITEM} description={DESC} />;
+  return <TableProfile avatar={<Avatar variant="initials" size="sm" name="Hugo García" />} badge name={ITEM} description={DESC} />;
 }
 
 /** Acciones del Type=Button (fila de 40): Button con contador, editar, eliminar, más opciones y chevron. */

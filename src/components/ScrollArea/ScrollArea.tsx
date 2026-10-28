@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { ScrollAreaProps } from './ScrollArea.types';
-import { scrollAreaVariants } from './ScrollArea.variants';
+import { scrollAreaGapVariants, scrollAreaVariants } from './ScrollArea.variants';
 import { cn } from '../../utils/cn';
 
 /**
@@ -11,11 +11,11 @@ import { cn } from '../../utils/cn';
  */
 export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
   (
-    { orientation = 'vertical', maxHeight, className, style, children, role, tabIndex, 'aria-label': ariaLabel, ...restProps },
+    { orientation = 'vertical', maxHeight, scrollbarGap = 'none', className, style, children, role, tabIndex, 'aria-label': ariaLabel, ...restProps },
     ref
   ) => {
     const innerRef = useRef<HTMLDivElement | null>(null);
-    const [overflows, setOverflows] = useState(false);
+    const [overflow, setOverflow] = useState({ vertical: false, horizontal: false });
 
     const setRefs = useCallback(
       (node: HTMLDivElement | null) => {
@@ -32,7 +32,9 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
       const measure = () => {
         const vertical = el.scrollHeight > el.clientHeight;
         const horizontal = el.scrollWidth > el.clientWidth;
-        setOverflows(orientation === 'vertical' ? vertical : orientation === 'horizontal' ? horizontal : vertical || horizontal);
+        setOverflow((prev) =>
+          prev.vertical === vertical && prev.horizontal === horizontal ? prev : { vertical, horizontal }
+        );
       };
       measure();
       if (typeof ResizeObserver === 'undefined') return;
@@ -42,6 +44,11 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
       return () => observer.disconnect();
     }, [orientation, maxHeight, children]);
 
+    const overflows =
+      orientation === 'vertical' ? overflow.vertical : orientation === 'horizontal' ? overflow.horizontal : overflow.vertical || overflow.horizontal;
+    const vertical = orientation !== 'horizontal' && overflow.vertical;
+    const horizontal = orientation !== 'vertical' && overflow.horizontal;
+    const gapAxis = vertical && horizontal ? 'both' : vertical ? 'vertical' : horizontal ? 'horizontal' : 'none';
     const resolvedRole = role ?? (overflows ? 'region' : undefined);
     const resolvedTabIndex = tabIndex ?? (overflows ? 0 : undefined);
 
@@ -53,7 +60,14 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
         tabIndex={resolvedTabIndex}
         aria-label={resolvedRole ? ariaLabel : undefined}
         style={maxHeight === undefined ? style : { maxHeight, ...style }}
-        className={cn(scrollAreaVariants({ orientation }), className)}
+        className={cn(
+          scrollAreaVariants({ orientation }),
+          scrollAreaGapVariants({
+            gap: scrollbarGap,
+            axis: gapAxis,
+          }),
+          className
+        )}
       >
         {children}
       </div>

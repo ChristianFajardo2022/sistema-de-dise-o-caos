@@ -1,6 +1,7 @@
 import { forwardRef, useContext } from 'react';
 import type { AvatarProps } from './Avatar.types';
 import {
+  avatarBadgeSmClass,
   avatarCircleVariants,
   avatarLogoVariants,
   avatarPillVariants,
@@ -83,7 +84,8 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
     }
 
     const tone = variant === 'photo' ? 'none' : disabled ? 'disabled' : color;
-    const showBadge = badge && !disabled && (size === 'lg' || size === 'md');
+    // Figma: lg y md no lo dibujan en disabled; sm sí; xs nunca.
+    const showBadge = badge && size !== 'xs' && (!disabled || size === 'sm');
     // Foto sin texto alternativo: decorativa. Initials y user sin nombre: también.
     const decorative = variant === 'photo' ? !alt && !label : !accessibleName;
     // Foto con `children`: el círculo es la imagen con nombre y los hijos quedan ocultos.
@@ -124,7 +126,13 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(
             ))}
         </span>
         {showBadge && (
-          <Badge type="simple" state={badgeState} label={badgeLabel} className="absolute right-0 bottom-0" data-figma-part="Badge" />
+          <Badge
+            type="simple"
+            state={badgeState}
+            label={badgeLabel}
+            className={cn('absolute right-0 bottom-0', size === 'sm' && avatarBadgeSmClass)}
+            data-figma-part="Badge"
+          />
         )}
       </span>
     );

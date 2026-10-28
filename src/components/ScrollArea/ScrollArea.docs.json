@@ -5,6 +5,7 @@
   "category": "Layout",
   "props": {
     "orientation": { "type": "'vertical' | 'horizontal' | 'both'", "default": "'vertical'", "description": "Eje de desplazamiento." },
+    "scrollbarGap": { "type": "'none' | 'md' | 'lg' | 'xl'", "default": "none", "description": "Espacio entre el contenido y la barra (tokens space/general/*; Figma deja 8: lg). Solo se aplica cuando el eje desborda." },
     "maxHeight": { "type": "string | number", "required": false, "description": "Alto máximo; sin él el área crece con su contenido." },
     "aria-label": { "type": "string", "required": true, "description": "Nombre accesible de la región." },
     "children": { "type": "ReactNode", "required": false, "description": "Contenido desplazable." },

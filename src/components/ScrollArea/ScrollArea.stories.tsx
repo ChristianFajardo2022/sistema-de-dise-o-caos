@@ -28,6 +28,13 @@ const meta = {
       type: { name: 'enum', value: ORIENTATION_OPTIONS },
       description: 'Eje de desplazamiento',
     },
+    scrollbarGap: {
+      name: 'scrollbarGap',
+      control: 'radio',
+      options: ['none', 'md', 'lg', 'xl'],
+      type: { name: 'enum', value: ['none', 'md', 'lg', 'xl'] },
+      description: 'Espacio entre el contenido y la barra (solo con desborde)',
+    },
     maxHeight: { control: 'text', type: { name: 'string' }, description: 'Alto máximo (CSS)' },
     'aria-label': { control: 'text', type: { name: 'string' }, description: 'Nombre accesible de la región' },
   },
@@ -142,5 +149,25 @@ export const KeyboardScrollTest: Story = {
     await expect(region).toHaveFocus();
     await userEvent.keyboard('{PageDown}');
     await expect(region.scrollHeight).toBeGreaterThan(region.clientHeight);
+  },
+};
+
+/** Test: `scrollbarGap` deja el espacio del lado de la barra solo cuando el eje desborda. */
+export const ScrollbarGapTest: Story = {
+  tags: ['!autodocs'],
+  render: () => (
+    <div>
+      <ScrollArea maxHeight="120px" scrollbarGap="lg" aria-label="Con desborde" data-testid="over">
+        <Content />
+      </ScrollArea>
+      <ScrollArea maxHeight="2000px" scrollbarGap="lg" aria-label="Sin desborde" data-testid="fits">
+        <Content />
+      </ScrollArea>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(getComputedStyle(canvas.getByTestId('over')).paddingRight).toBe('8px');
+    await expect(getComputedStyle(canvas.getByTestId('fits')).paddingRight).toBe('0px');
   },
 };

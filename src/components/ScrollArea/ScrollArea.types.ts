@@ -1,11 +1,19 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
+/** Espacio entre el contenido y la barra: tokens `space/general/*` (`none` 0, `md` 4, `lg` 8, `xl` 12). */
+export type ScrollAreaGap = 'none' | 'md' | 'lg' | 'xl';
+
 /** Ejes con desplazamiento: vertical, horizontal o ambos. */
 export type ScrollAreaOrientation = 'vertical' | 'horizontal' | 'both';
 
 export interface ScrollAreaProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Eje de desplazamiento. Por defecto vertical. */
   orientation?: ScrollAreaOrientation;
+  /**
+   * Espacio entre el contenido y la barra (el Scroll bar de Figma deja 8: `lg`). Solo se aplica cuando el eje
+   * desborda, para no robar ancho a un contenido que no tiene barra. Por defecto `none`.
+   */
+  scrollbarGap?: ScrollAreaGap;
   /**
    * Alto máximo del área (cualquier valor CSS: "20rem", "314px", "50vh").
    * Sin él, el área crece con su contenido y no hay desplazamiento vertical

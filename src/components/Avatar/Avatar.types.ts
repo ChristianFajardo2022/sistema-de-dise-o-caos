@@ -80,7 +80,7 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'chil
   label?: string;
   /**
    * Indicador de estado (Badge simple) abajo a la derecha. Figma lo define solo en
-   * `initials`, `user` y `photo` de tamaño lg y md, y no en disabled: en los demás casos no se dibuja.
+   * `initials`, `user` y `photo` de tamaño lg y md (punto de 12) y sm (punto de 8). No se dibuja en xs ni en disabled de lg y md (en sm sí, como Figma).
    */
   badge?: boolean;
   /** Texto sr-only del indicador (p. ej. "En línea"). Sin él, el indicador es decorativo (el color solo no basta). */

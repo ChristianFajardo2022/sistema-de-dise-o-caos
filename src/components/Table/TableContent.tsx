@@ -1,4 +1,5 @@
-import { forwardRef } from 'react';
+import { cloneElement, forwardRef, isValidElement } from 'react';
+import type { AvatarProps } from '../Avatar/Avatar.types';
 import type {
   TableActionsProps,
   TableBadgeTextProps,
@@ -25,9 +26,9 @@ import { cn } from '../../utils/cn';
 
 /** Type=Profile: avatar (32) + nombre semibold y descripción, gap 8. */
 export const TableProfile = forwardRef<HTMLDivElement, TableProfileProps>(
-  ({ avatar, name, description, className, ...restProps }, ref) => (
+  ({ avatar, badge, badgeState, badgeLabel, name, description, className, ...restProps }, ref) => (
     <div ref={ref} className={cn('flex min-w-0 flex-1 items-center gap-ds-space-general-lg', className)} {...restProps}>
-      {avatar}
+      {badge && isValidElement<AvatarProps>(avatar) ? cloneElement(avatar, { badge, badgeState, badgeLabel }) : avatar}
       <div className={tableTextBlockClass} data-figma-part="Text Container">
         <span className={tableProfileNameClass} data-figma-part="Filename">
           {name}

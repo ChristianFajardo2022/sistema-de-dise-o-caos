@@ -93,6 +93,11 @@ export const WithColor: Story = {
   args: { type: 'primary-color', color: 'green', colorLabel: 'Verde', children: 'Disponible' },
 };
 
+/** Slot de Badge numérico (como en el Card tabla de Figma): ocupa el lugar del ícono. */
+export const WithBadge: Story = {
+  args: { badge: 3, badgeLabel: 'pendientes', children: 'Adjuntos' },
+};
+
 /** `primary-box`: rectangular, el texto se parte en varias líneas cuando falta ancho. */
 export const Box: Story = {
   args: { type: 'primary-box', children: 'Entrega en horario extendido con firma del destinatario' },

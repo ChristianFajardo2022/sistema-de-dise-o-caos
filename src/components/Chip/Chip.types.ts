@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, KeyboardEvent, MouseEvent, ReactElement, ReactNode } from 'react';
+import type { BadgeState } from '../Badge/Badge.types';
 import type { IconName } from '../Icon/Icon.types';
 
 /**
@@ -47,6 +48,15 @@ export interface ChipProps
   icon?: boolean;
   /** Ícono de la biblioteca CAOS (INSTANCE_SWAP de Figma). Por defecto `clock`. */
   iconName?: IconName;
+  /**
+   * Slot de Badge numérico (Badge Type Number, 16 de alto) a la izquierda, en el lugar del ícono: en `primary` y
+   * `primary-box`. Recibe el contenido del Badge (p. ej. `3`, `"99+"`). Si se pasa, el ícono no se dibuja.
+   */
+  badge?: ReactNode;
+  /** Color semántico del Badge numérico (State del Badge). Por defecto `default`, el de Figma. */
+  badgeState?: BadgeState;
+  /** Texto para lectores de pantalla tras el número del Badge (p. ej. "pendientes"). Se lee dentro del nombre del chip. */
+  badgeLabel?: string;
   /**
    * Avatar de `primary-avatar` (p. ej. `<Avatar variant="initials" name="Ana Pérez" />`). El chip lo pasa a
    * tamaño `xs` y a `disabled` cuando está inactivo, y lo marca decorativo: el nombre ya va en el texto.

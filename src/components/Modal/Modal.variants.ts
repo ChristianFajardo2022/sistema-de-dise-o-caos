@@ -98,10 +98,10 @@ export const modalDescriptionClass = [
 
 /**
  * Contenido (slot Container): ocupa el alto libre y se desplaza (ScrollArea). Con desborde deja 8 entre el contenido y la
- * barra (space/general/lg), como el Scroll bar de Figma.
+ * barra (ScrollArea `scrollbarGap="lg"`, space/general/lg), como el Scroll bar de Figma.
  */
 export const modalBodyVariants = cva(
-  'flex min-h-0 flex-1 flex-col gap-ds-space-general-4xl [&[role=region]]:pr-ds-space-general-lg',
+  'flex min-h-0 flex-1 flex-col gap-ds-space-general-4xl',
   {
     variants: {
       lateral: {

@@ -9,6 +9,7 @@ import {
   chipTextVariants,
   chipVariants,
 } from './Chip.variants';
+import { Badge } from '../Badge';
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
@@ -17,6 +18,7 @@ import { cn } from '../../utils/cn';
  * - Sin `onClick` ni selección: el cuerpo es un `<span>` (chip informativo, como un valor de entrada).
  * - Con `onClick`: `<button>` de acción. Con `selected`/`defaultSelected`/`onSelectedChange`: botón de alternancia
  *   (`aria-pressed`). Dentro de un `ChipGroup` con selección única es un `role="radio"` (`aria-checked`).
+ * - `badge`: slot de Badge numérico a la izquierda (en `primary` y `primary-box`), en el lugar del ícono; el ícono no se dibuja.
  * - Quitar es un botón aparte "Quitar <texto>" (no anidado en el cuerpo); Supr o Retroceso sobre el cuerpo hacen lo mismo.
  * - Interactivo: toda la cápsula (con su padding) es el área de clic del cuerpo; Quitar queda encima, con 24 de área.
  * Hover, foco y selección salen de CSS y del estado; `state` solo fuerza el aspecto en documentación.
@@ -29,6 +31,9 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref)
     label,
     icon = true,
     iconName = 'clock',
+    badge,
+    badgeState = 'default',
+    badgeLabel,
     avatar,
     color = 'purple',
     tone = 'soft',
@@ -104,6 +109,10 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref)
         <span aria-hidden="true" data-figma-part="Ellipse 1" className={chipDotVariants({ color, tone })} />
         {colorLabel && <span className="sr-only">{colorLabel}: </span>}
       </>
+    ) : (type === 'primary' || type === 'primary-box') && badge !== undefined && badge !== null && badge !== false ? (
+      <Badge type="number" state={badgeState} label={badgeLabel} className="shrink-0">
+        {badge}
+      </Badge>
     ) : (type === 'primary' || type === 'primary-box') && icon ? (
       <Icon
         name={iconName}

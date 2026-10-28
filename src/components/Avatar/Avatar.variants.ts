@@ -14,7 +14,7 @@ import { cva } from 'class-variance-authority';
  *   radius/general/full (detalle en avatarPillVariants). Brand: logo de 32 (56 y 48) o 24 (32), color
  *   background/logo/default. Icon: ícono de 24, color icon/general/default . Disabled (brand) e Inactive (icon):
  *   el logo y el ícono pasan a icon/general/disabled-positive.
- * - Indicador: Badge simple de 12 en la esquina inferior derecha (lg y md).
+ * - Indicador: Badge simple en la esquina inferior derecha: de 12 en lg y md, de 8 en sm (avatarBadgeSmClass).
  * - Anillo del grupo: trazo border/general/white-unicolor de border/general/md (0.5) hacia dentro.
  */
 
@@ -32,6 +32,9 @@ export const avatarRootVariants = cva('relative inline-flex shrink-0 align-middl
 
 const RING =
   'after:pointer-events-none after:absolute after:inset-0 after:rounded-full after:shadow-[inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-white-unicolor)]';
+
+/** Punto del indicador en `sm` (32): Figma lo dibuja de 8 (en lg y md es el Badge de 12). Redimensiona la raíz y la elipse. */
+export const avatarBadgeSmClass = 'size-2 [&>[data-figma-part=Badge]]:size-2';
 
 /** Anillo de grupo; se mezcla en círculo y píldora. */
 export const avatarRingClass = RING;
@@ -140,7 +143,8 @@ const ON_CARD_INACTIVE = 'bg-ds-background-icon-low-unicolor';
 /**
  * Píldora de brand e icon: la raíz del avatar. El padding (y por tanto el recuadro interior) depende del tamaño.
  * Icon (set "Avatar icon", Contrast × Size × State): 56 / 48 / 40 con ícono de 24 y padding 16 / 12 / 8
- * (Figma md / sm / xs = aquí lg / md / sm). `xs` (24, ícono de 16) no existe en Figma y se conserva derivado.
+ * (Figma md / sm / xs = aquí lg / md / sm). En móvil (< 48rem) los tokens dimention/avatar bajan lg a 48 y md a 40, y el
+ * padding baja con ellos (12 y 8) para que el ícono siga en 24. `xs` (24, ícono de 16) no existe en Figma y se conserva derivado.
  * Brand (set "Avatar brand"): State Default o Disabled; en Figma su On Canva usa el fondo "on-card" del set Icon y su
  * On Card el "on-canva".
  */
@@ -164,8 +168,8 @@ export const avatarPillVariants = cva(
       { variant: 'brand', size: 'lg', class: 'p-ds-space-general-xl' },
       { variant: 'icon', size: 'xs', class: 'p-ds-space-general-md' },
       { variant: 'icon', size: 'sm', class: 'size-10 p-ds-space-general-lg' },
-      { variant: 'icon', size: 'md', class: 'p-ds-space-general-xl' },
-      { variant: 'icon', size: 'lg', class: 'p-ds-space-general-2xl' },
+      { variant: 'icon', size: 'md', class: 'p-ds-space-general-xl mobile:p-ds-space-general-lg' },
+      { variant: 'icon', size: 'lg', class: 'p-ds-space-general-2xl mobile:p-ds-space-general-xl' },
       // Colores del glifo
       { variant: 'brand', state: ['default', 'hover', 'select'], class: 'text-ds-background-logo-default' },
       { variant: 'icon', state: ['default', 'hover', 'select'], class: 'text-ds-icon-general-default' },

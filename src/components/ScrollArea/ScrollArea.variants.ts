@@ -36,3 +36,23 @@ export const scrollAreaVariants = cva(
     defaultVariants: { orientation: 'vertical' },
   }
 );
+
+/**
+ * Espacio entre contenido y barra: relleno del lado de la barra (derecho en vertical, inferior en horizontal),
+ * con tokens `space/general/*`. `axis` es el eje que desborda de verdad; sin desborde no hay relleno.
+ */
+export const scrollAreaGapVariants = cva('', {
+  variants: {
+    gap: { none: '', md: '', lg: '', xl: '' },
+    axis: { none: '', vertical: '', horizontal: '', both: '' },
+  },
+  compoundVariants: [
+    { gap: 'md', axis: ['vertical', 'both'], class: 'pr-ds-space-general-md' },
+    { gap: 'lg', axis: ['vertical', 'both'], class: 'pr-ds-space-general-lg' },
+    { gap: 'xl', axis: ['vertical', 'both'], class: 'pr-ds-space-general-xl' },
+    { gap: 'md', axis: ['horizontal', 'both'], class: 'pb-ds-space-general-md' },
+    { gap: 'lg', axis: ['horizontal', 'both'], class: 'pb-ds-space-general-lg' },
+    { gap: 'xl', axis: ['horizontal', 'both'], class: 'pb-ds-space-general-xl' },
+  ],
+  defaultVariants: { gap: 'none', axis: 'none' },
+});

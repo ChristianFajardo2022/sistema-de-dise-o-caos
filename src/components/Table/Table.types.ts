@@ -121,6 +121,15 @@ export interface TableEmptyProps extends HTMLAttributes<HTMLTableRowElement> {
 export interface TableProfileProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Avatar (normalmente `<Avatar variant="initials" size="sm" name="…" />`). */
   avatar?: ReactNode;
+  /**
+   * Indicador de estado (Badge simple de 8) en el avatar, abajo a la derecha, como en Figma. Se lo pasa al `avatar`
+   * (que debe ser un `<Avatar>` de tamaño `sm`; Avatar lo dibuja en `sm`, `md` y `lg`, no en `xs` ni disabled).
+   */
+  badge?: boolean;
+  /** Color semántico del indicador (State del Badge). Por defecto el del Badge (`default`). */
+  badgeState?: BadgeState;
+  /** Texto sr-only del indicador (p. ej. "En línea"). Sin él, el indicador es decorativo. */
+  badgeLabel?: string;
   /** Nombre (prop "Item name text" de Figma). */
   name: ReactNode;
   /** Descripción (prop Description). Sin ella no se dibuja. */

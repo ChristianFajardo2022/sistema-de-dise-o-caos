@@ -25,7 +25,6 @@ import { ScrollArea } from '../ScrollArea';
 import { ModalDialog } from '../_internal/ModalDialog';
 import { NotchedSurface } from '../_internal/NotchedSurface';
 import { useControllableState } from '../../utils/controllableState';
-import { useIsMobile } from '../../utils/useMediaQuery';
 import { cn } from '../../utils/cn';
 
 const has = (node: unknown) => node !== undefined && node !== null && node !== false && node !== '';
@@ -60,7 +59,6 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(
     },
     ref
   ) => {
-    const isMobile = useIsMobile();
     const Heading = `h${headingLevel}` as const;
     const withHeader = has(title) || has(description) || icon !== undefined;
     const withActions = has(actions) || Boolean(primaryAction || secondaryAction || tertiaryAction);
@@ -68,7 +66,7 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(
     const header = withHeader && (
       <div className={modalHeaderClass} data-figma-part="Header">
         {icon !== undefined && (
-          <Avatar variant="icon" icon={icon} contrast="on-card" size={isMobile ? 'sm' : 'md'} data-figma-part="Avatar" />
+          <Avatar variant="icon" icon={icon} contrast="on-card" size="md" data-figma-part="Avatar" />
         )}
         {(has(title) || has(description)) && (
           <div className={modalInfoClass} data-figma-part="Info">
@@ -126,7 +124,7 @@ export const ModalPanel = forwardRef<HTMLDivElement, ModalPanelProps>(
               data-figma-part="Button corner "
             />
           )}
-          <ScrollArea aria-label={bodyLabel} className={modalBodyVariants({ lateral })} data-figma-part="Container">
+          <ScrollArea aria-label={bodyLabel} scrollbarGap="lg" className={modalBodyVariants({ lateral })} data-figma-part="Container">
             {children}
           </ScrollArea>
           {withActions && (
