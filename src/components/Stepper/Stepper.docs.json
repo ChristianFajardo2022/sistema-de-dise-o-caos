@@ -1,0 +1,29 @@
+{
+  "name": "Stepper",
+  "component": "Stepper",
+  "description": "Indicador de progreso por pasos del sistema de diseño CAOS, fiel a los component sets Stepper (13965:5884, Orientation Vertical | Horizontal) e Indicators (Atom) (13804:20926, Propiedad 1 Incomplete | In progress | Complete | Error × Orientation). Vertical: barra de 2 a la izquierda de cada paso y contenido con padding vertical de 12. Horizontal: barra de 2 arriba, pasos en fila. Título 14/18 semibold con ícono (info-circle, tick-circle, close-circle) o aro de 12 en curso, y texto de apoyo 14/18 regular. Semántica: lista ordenada (ol), el paso en curso lleva aria-current=\"step\" y cada paso incluye un texto oculto con su estado (Pendiente, En curso, Completado, Con error), de modo que el estado no depende del color ni del ícono. Con onStepClick el contenido de cada paso es un botón con foco visible de 2px (agregado, no está en Figma). No tiene animaciones.",
+  "category": "Feedback",
+  "props": {
+    "steps": { "type": "{ title?, description?, status? }[]", "required": false, "description": "Pasos como datos. Alternativa: StepperStep como children." },
+    "current": { "type": "number", "required": false, "description": "Índice del paso en curso: los anteriores quedan completos y los siguientes incompletos." },
+    "orientation": { "type": "'vertical' | 'horizontal'", "default": "'vertical'", "description": "Orientation de Figma." },
+    "onStepClick": { "type": "(index: number) => void", "required": false, "description": "Vuelve navegables los pasos: cada uno es un botón." },
+    "statusLabels": { "type": "Partial<Record<StepperStatus, string>>", "required": false, "description": "Textos de estado para lectores de pantalla (por defecto en español)." },
+    "aria-label": { "type": "string", "required": false, "description": "Nombre de la lista; recomendado cuando hay más de una en la página." }
+  },
+  "stepProps": {
+    "status": { "type": "'incomplete' | 'in-progress' | 'complete' | 'error'", "default": "'incomplete'", "description": "Propiedad 1 de Figma. Dentro de Stepper lo deriva current salvo que se fuerce." },
+    "title": { "type": "ReactNode", "required": false, "description": "Título con ícono (Title de Figma)." },
+    "description": { "type": "ReactNode", "required": false, "description": "Texto de apoyo (Text de Figma)." },
+    "current": { "type": "boolean", "required": false, "description": "Marca aria-current=\"step\"; por defecto lo es el paso in-progress." },
+    "statusLabel": { "type": "string", "required": false, "description": "Texto de estado para lector de pantalla de este paso." },
+    "onClick": { "type": "() => void", "required": false, "description": "Convierte el contenido en botón." }
+  },
+  "examples": [
+    { "title": "Con datos", "code": "<Stepper aria-label=\"Registro\" current={1} steps={[{ title: 'Datos', description: 'Contacto' }, { title: 'Pago' }, { title: 'Revisión' }]} />" },
+    { "title": "Un paso con error", "code": "<Stepper current={2} steps={[{ title: 'Uno' }, { title: 'Dos', status: 'error' }, { title: 'Tres' }]} />" },
+    { "title": "Horizontal", "code": "<Stepper orientation=\"horizontal\" current={0} steps={pasos} />" },
+    { "title": "Composición", "code": "<Stepper current={1}><StepperStep title=\"Uno\" /><StepperStep title=\"Dos\" /></Stepper>" },
+    { "title": "Navegable", "code": "<Stepper current={paso} steps={pasos} onStepClick={setPaso} />" }
+  ]
+}
