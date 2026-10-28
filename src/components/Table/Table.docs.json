@@ -1,0 +1,45 @@
+{
+  "name": "Table",
+  "component": "Table",
+  "description": "Tabla de datos del sistema de diseño CAOS, fiel a la página Table de Figma: set Table (13751:23691, Type Table | Empty state, columnas fijas Sticky 1 y 2), Header table (13544:69540), Cell table (13544:69578), Item table (Atom) (13544:69501) e Item table (13059:16129), Dropdown table (13544:69601), Row mobile (13544:69614) y Card tabla (20231:8418). Composición semántica sobre un <table> real: Table, TableHeader, TableBody, TableRow, TableHead (th scope=col) y TableCell. Las filas se separan 8 (border-spacing) y cada fila se dibuja como una pastilla: radio 16 y trazo lateral en la primera y la última celda, trazo de 1 arriba y abajo. La fila fija el aspecto de sus celdas: Default (background/table/default), Hover (cursor o foco dentro de la fila: background/table/hover + border/table/hover) y Select (prop selected: background/table/select + border/table/select). Cabecera de 48 (56 en móvil), texto 12/18 semibold. Selección por fila con Checkbox (la cabecera usa el estado mixto; useTableSelection lleva el estado). Orden por columna con un botón en el encabezado y aria-sort. Columnas fijas con position: sticky (sticky + stickyOffset). Desplazamiento horizontal con ScrollArea: si la tabla no cabe, el área es una región con el nombre de la tabla que recibe foco para desplazarse con las flechas. Estado vacío con TableEmpty + EmptyState (la cabecera se conserva). En móvil (layout auto, menos de 48rem) dibuja la versión mobile: TableMobileList con TableMobileRow (casilla, etiqueta, acciones y campos dt/dd; los campos de más se abren con TableDisclosure). TableRowCard es la fila como tarjeta con resumen y detalle desplegable. Contenido de celda por Type de Figma: TableProfile, TableText, TableHighlightedText, TableBadgeText y TableActions; Link, Tag, Progress bar, Checkbox, Toggle, Raiting y Button usan los componentes de CAOS tal cual (ButtonLink, Tag, ProgressBar, Checkbox, Switch, StarRating / NumberRating, Button y Dots). Foco visible de 2px en botones de orden y chevrons (no está en Figma).",
+  "category": "Data Display",
+  "props": {
+    "label": { "type": "string", "required": true, "description": "Table: nombre accesible de la tabla y de la región de desplazamiento horizontal." },
+    "layout": { "type": "'auto' | 'table' | 'mobile'", "default": "'auto'", "description": "Table: auto dibuja la tabla y, en móvil, `mobile` si se pasa; table o mobile lo fuerzan." },
+    "mobile": { "type": "ReactNode", "required": false, "description": "Table: versión móvil (TableMobileList con TableMobileRow)." },
+    "scrollClassName": { "type": "string", "required": false, "description": "Table: clases del ScrollArea que envuelve la tabla." },
+    "selected": { "type": "boolean", "default": false, "description": "TableRow: aspecto Select de sus celdas. La selección la anuncia la casilla de la fila (aria-selected no es válido en una tabla estática)." },
+    "state": { "type": "'default' | 'hover' | 'select'", "required": false, "description": "TableRow: fuerza el aspecto, solo para documentación." },
+    "type": { "type": "'text' | 'checkbox' (TableHead) · 'default' | 'checkbox' (TableCell)", "default": "'text' / 'default'", "description": "Columna de selección de 48: la casilla va como children." },
+    "align": { "type": "'start' | 'center' | 'end'", "default": "'start'", "description": "TableHead / TableCell: alineación del contenido. Figma centra la columna de acciones." },
+    "sticky": { "type": "'start' | 'end'", "required": false, "description": "TableHead / TableCell: columna fija al desplazar en horizontal (Sticky 1 y 2)." },
+    "stickyOffset": { "type": "string | number", "required": false, "description": "Distancia al borde de la columna fija, para fijar varias (p. ej. '3rem' detrás de la casilla de 48)." },
+    "sort": { "type": "'none' | 'ascending' | 'descending'", "required": false, "description": "TableHead: con valor el texto es un botón con el ícono de orden (transfer2, oculto en móvil) y la celda lleva aria-sort cuando ordena." },
+    "onSortChange": { "type": "(next: 'ascending' | 'descending') => void", "required": false, "description": "TableHead: recibe la dirección siguiente al activar el botón de orden." },
+    "colSpan": { "type": "number", "required": true, "description": "TableEmpty: cantidad de columnas que ocupa la celda del estado vacío." },
+    "expanded / defaultExpanded / onExpandedChange": { "type": "boolean / boolean / (expanded: boolean) => void", "required": false, "description": "TableDisclosure, TableMobileRow y TableRowCard: abierto, controlado o no (patrón APG Disclosure con aria-expanded y aria-controls)." },
+    "visibleFields": { "type": "number", "required": false, "description": "TableMobileRow: campos visibles con la fila cerrada; los demás se abren con la fila desplegable." },
+    "tag / actions": { "type": "ReactNode", "required": false, "description": "TableMobileRow: etiqueta de estado (Tag sm) y acciones de la cabecera." },
+    "selectionLabel": { "type": "string", "default": "'Seleccionar fila'", "description": "TableMobileRow: nombre accesible de la casilla." },
+    "summary / footer": { "type": "ReactNode", "required": false, "description": "TableRowCard: campos del resumen (siempre visibles) y pie de la tarjeta abierta." },
+    "badgeLabel": { "type": "string", "required": false, "description": "TableBadgeText: texto sr-only del punto; sin él el punto es decorativo (el color solo no basta)." }
+  },
+  "examples": [
+    {
+      "title": "Tabla con selección y orden",
+      "code": "const sel = useTableSelection(rows.map((r) => r.id));\n<Table label=\"Personas\">\n  <TableHeader>\n    <TableRow selected={sel.allSelected}>\n      <TableHead type=\"checkbox\" sticky=\"start\"><Checkbox aria-label=\"Seleccionar todas las filas\" checked={sel.allSelected} indeterminate={sel.someSelected} onChange={sel.toggleAll} /></TableHead>\n      <TableHead sticky=\"start\" stickyOffset=\"3rem\" sort={sort} onSortChange={setSort}>Nombre</TableHead>\n      <TableHead align=\"center\" sticky=\"end\">Acciones</TableHead>\n    </TableRow>\n  </TableHeader>\n  <TableBody>\n    {rows.map((r) => (\n      <TableRow key={r.id} selected={sel.isSelected(r.id)}>\n        <TableCell type=\"checkbox\" sticky=\"start\"><Checkbox aria-label={`Seleccionar a ${r.name}`} checked={sel.isSelected(r.id)} onChange={(e) => sel.toggle(r.id, e.target.checked)} /></TableCell>\n        <TableCell sticky=\"start\" stickyOffset=\"3rem\"><TableProfile avatar={<Avatar variant=\"initials\" size=\"sm\" name={r.name} />} name={r.name} description={r.role} /></TableCell>\n        <TableCell align=\"center\" sticky=\"end\"><TableActions><Dots size=\"xs\" label={`Más opciones de ${r.name}`} /></TableActions></TableCell>\n      </TableRow>\n    ))}\n  </TableBody>\n</Table>"
+    },
+    {
+      "title": "Estado vacío",
+      "code": "<TableBody>\n  <TableEmpty colSpan={4}>\n    <EmptyState type=\"first-use\" title=\"Todavía no hay personas\" description=\"Cuando agregues a alguien, aparecerá aquí.\" />\n  </TableEmpty>\n</TableBody>"
+    },
+    {
+      "title": "Versión móvil",
+      "code": "<Table label=\"Personas\" mobile={\n  <TableMobileList aria-label=\"Personas\">\n    <TableMobileRow onSelectedChange={setSel} selectionLabel=\"Seleccionar a Ana Pérez\" tag={<Tag size=\"sm\" iconLeft={false}>Activo</Tag>} actions={<Dots size=\"xs\" />} visibleFields={3}>\n      <TableMobileField label=\"Nombre\"><TableText>Ana Pérez</TableText></TableMobileField>\n    </TableMobileRow>\n  </TableMobileList>\n}>…</Table>"
+    },
+    {
+      "title": "Tarjeta de fila",
+      "code": "<TableRowCard summary={<><span>REF-2041</span><span>12 elementos</span></>} footer={<Button variant=\"tertiary\" size=\"sm\">Ver más</Button>}>\n  …detalle…\n</TableRowCard>"
+    }
+  ]
+}
