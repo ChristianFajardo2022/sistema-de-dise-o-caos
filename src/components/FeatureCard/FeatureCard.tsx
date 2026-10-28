@@ -142,7 +142,7 @@ export const FeatureCard = forwardRef<HTMLElement, FeatureCardProps>(
               {title}
             </Heading>
             {has(eyebrow) && (
-              <p data-figma-part="Titulo" className={featureCardEyebrowClass}>
+              <p data-figma-part="Subtítulo" className={featureCardEyebrowClass}>
                 {eyebrow}
               </p>
             )}

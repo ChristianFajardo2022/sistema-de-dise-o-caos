@@ -65,8 +65,8 @@ export const listItemTitleVariants = cva(
       disabled: { true: '', false: 'text-ds-text-neutral-heading' },
     },
     compoundVariants: [
-      { variant: 'complex', disabled: true, class: 'text-ds-text-neutral-disabled-positive' },
-      { variant: 'simple', disabled: true, class: 'text-ds-text-neutral-disabled-negative' },
+      { variant: 'complex', disabled: true, class: 'text-ds-text-neutral-disabled-on-canva' },
+      { variant: 'simple', disabled: true, class: 'text-ds-text-neutral-disabled-on-card' },
     ],
     defaultVariants: { variant: 'complex', disabled: false },
   }
@@ -90,9 +90,9 @@ export const listItemDescriptionVariants = cva(
     },
     compoundVariants: [
       { variant: 'complex', disabled: false, class: 'text-ds-text-neutral-gray' },
-      { variant: 'complex', disabled: true, class: 'text-ds-text-neutral-disabled-positive' },
+      { variant: 'complex', disabled: true, class: 'text-ds-text-neutral-disabled-on-canva' },
       { variant: 'simple', disabled: false, class: 'text-ds-text-neutral-body' },
-      { variant: 'simple', disabled: true, class: 'text-ds-text-neutral-disabled-negative' },
+      { variant: 'simple', disabled: true, class: 'text-ds-text-neutral-disabled-on-card' },
     ],
     defaultVariants: { variant: 'complex', disabled: false },
   }
@@ -103,7 +103,7 @@ export const listItemCategoryVariants = cva(
   `min-w-0 truncate ${fontPrimary} text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md`,
   {
     variants: {
-      disabled: { true: 'text-ds-text-neutral-disabled-negative', false: 'text-ds-text-acent-firts' },
+      disabled: { true: 'text-ds-text-neutral-disabled-on-card', false: 'text-ds-text-acent-firts' },
     },
     defaultVariants: { disabled: false },
   }

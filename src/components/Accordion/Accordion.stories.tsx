@@ -5,6 +5,7 @@ import { Accordion, AccordionItem } from './Accordion';
 import type { AccordionContrast, AccordionProps } from './Accordion.types';
 import { Button } from '../Button';
 import { ButtonLink } from '../ButtonLink';
+import { Icon } from '../Icon';
 
 const TABLE_CELLS = ['8937484782', 'Nombre del item', 'Nombre del item', 'Nombre del item', 'Nombre del item'];
 
@@ -23,7 +24,12 @@ function SampleContent() {
         </a>
       </p>
       <div className="self-stretch">
-        <ButtonLink href="#boton" iconRight data-figma-part="Button">
+        <ButtonLink
+          href="#boton"
+          iconRight
+          icon={<Icon name="export2" variant="line" size={12} data-figma-part="Icon-sizes" />}
+          data-figma-part="Button"
+        >
           Button
         </ButtonLink>
       </div>

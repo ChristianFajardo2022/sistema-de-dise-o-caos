@@ -17,6 +17,7 @@ import {
   interactiveCardCornerClass,
   interactiveCardCornerSlotClass,
   interactiveCardHoverShadowClass,
+  interactiveCardSimpleAvatarClass,
   interactiveCardStatClass,
   interactiveCardTextVariants,
   interactiveCardVariants,
@@ -164,7 +165,15 @@ export const InteractiveCard = forwardRef<HTMLInputElement, InteractiveCardProps
             <>
               <div data-figma-part="Container" className="flex min-h-12 min-w-0 flex-1 items-center gap-ds-space-general-2xl">
                 {leading === undefined ? (
-                  <Avatar data-figma-part="Avatar" variant="icon" size="sm" contrast="on-card" icon={icon} inactive={isDisabled} />
+                  <Avatar
+                    data-figma-part="Avatar"
+                    variant="icon"
+                    size="sm"
+                    contrast="on-canva"
+                    icon={icon}
+                    inactive={isDisabled}
+                    className={interactiveCardSimpleAvatarClass}
+                  />
                 ) : (
                   leading
                 )}
@@ -218,7 +227,7 @@ export const InteractiveCardHeader = forwardRef<HTMLDivElement, InteractiveCardH
             data-figma-part="Avatar"
             variant="icon"
             size="lg"
-            contrast={disabled ? 'on-card' : 'on-canva'}
+            contrast={disabled ? 'on-canva' : 'on-card'}
             icon={icon}
             inactive={disabled}
             className={interactiveCardAvatarCheckedClass}

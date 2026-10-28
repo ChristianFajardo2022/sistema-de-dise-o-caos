@@ -313,7 +313,7 @@ function MatrixCards({ figma }: { figma: boolean }) {
             }
           />
         </div>
-        <div className="w-[321px]">
+        <div className="w-[317px]">
           <ProfileCard
             data-figma={d('Type=Qualification')}
             {...FIGMA}

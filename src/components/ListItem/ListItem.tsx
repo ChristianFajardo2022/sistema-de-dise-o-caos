@@ -26,7 +26,7 @@ import { cn } from '../../utils/cn';
  * Fila de una lista (set "List (Atom)" de Figma). Es un `<li>`: va dentro de un `<ul>` u `<ol>`.
  * Lo opcional de Figma se resuelve así: `leading` es un slot (avatar, grupo de avatares, ícono),
  * y los controles de la derecha aparecen solo si se pasa su callback o su contenido
- * (`onEdit`, `onDelete`, `menu`), en vez de un booleano por cada pieza. Con `onNavigate` o `href` la fila es una
+ * (`onView`, `onEdit`, `onDelete`, `menu`), en vez de un booleano por cada pieza. Con `onNavigate` o `href` la fila es una
  * acción de navegación: el título es el control (botón o enlace) estirado sobre la fila y lleva `chevron-right`.
  */
 export const ListItem = forwardRef<HTMLLIElement, ListItemProps>(
@@ -41,8 +41,10 @@ export const ListItem = forwardRef<HTMLLIElement, ListItemProps>(
       selected,
       defaultSelected,
       onSelectedChange,
+      onView,
       onEdit,
       onDelete,
+      viewLabel,
       editLabel,
       deleteLabel,
       menu,
@@ -59,7 +61,7 @@ export const ListItem = forwardRef<HTMLLIElement, ListItemProps>(
     const titleId = useId();
     const isComplex = variant === 'complex';
     const navigable = onNavigate !== undefined || href !== undefined;
-    const hasActions = Boolean(onEdit || onDelete || menu || navigable);
+    const hasActions = Boolean(onView || onEdit || onDelete || menu || navigable);
     const hasDescription = description != null && description !== false;
     const hasCategory = isComplex && category != null && category !== false;
     const nameForMenu = menuLabel ?? `Más opciones de ${title}`;
@@ -153,6 +155,19 @@ export const ListItem = forwardRef<HTMLLIElement, ListItemProps>(
           )}
           {hasActions && (
             <div data-figma-part="Actions Block" className={cn(listItemActionsClass, navigable && 'relative')}>
+              {onView && (
+                <Button
+                  data-figma-part="Button"
+                  variant="tertiary"
+                  size="xs"
+                  iconOnly
+                  disabled={disabled}
+                  aria-label={viewLabel ?? `Ver ${title}`}
+                  onClick={onView}
+                >
+                  <Icon name="eye" variant="fill" size={20} data-figma-part="Icon-sizes" />
+                </Button>
+              )}
               {onEdit && (
                 <Button
                   data-figma-part="Button"

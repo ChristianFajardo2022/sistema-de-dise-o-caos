@@ -13,12 +13,12 @@ import { cva } from 'class-variance-authority';
  *   Button corner md (40) arriba a la derecha: `NotchedSurface notch="md"`. El Button corner (Checkbox, On canva) usa
  *   background/container/hover-on-canva en la instancia. En horizontal el bloque de nombre deja 56 a la derecha para
  *   no pasar bajo el Button corner.
- * - Full (ancho fluido × 210): raíz con effect/shadow sm y el marco Desktop con background/container/default-on-canva,
+ * - Full (ancho fluido × 210, nombre en una fila de 24 con padding superior 4): raíz con effect/shadow sm y el marco Desktop con background/container/default-on-canva,
  *   radio 24, padding 32 (space/container/on-canva) y gap 24. Fila 1: avatar brand, texto, acciones
  *   (Icon buttons, ocultas por defecto) y Dots-moreoptions sm (48), gap 16. Fila 2: etiquetas y contadores, gap 8.
  *   Bajo 42rem de contenedor: versión Mobile (avatar y acciones arriba, texto con nombre 20/24 y etiquetas debajo,
  *   contadores a todo el ancho).
- * - Qualification (321×438): centrada, superficie default-on-canva con radio 24 y effect/shadow sm, padding 32 (on-canva) y gap 24.
+ * - Qualification (317×438): centrada, superficie default-on-canva con radio 24 y effect/shadow sm, padding 32 (on-canva) y gap 24.
  * - Texto: nombre Prospero semibold heading/size/sm de Figma (16/20; en tokens.css es heading md), recortado a una línea
  *   en un cuadro de 18; datos 12/16 y descripción 14/18 en "text/neutral/gray 2" de Figma (G07), que en tokens.css es
  *   text/neutral/gray. Cifras de los contadores heading/size/md de Figma (20/24; en tokens.css heading lg).
@@ -98,8 +98,9 @@ export const profileCardTitleVariants = cva(
       layout: {
         vertical: '',
         horizontal: '',
-        // Mobile: heading/size/md de Figma (20/24) sin recorte de cuadro
-        hero: '@max-2xl:my-0 @max-2xl:text-ds-typography-heading-size-lg @max-2xl:leading-ds-typography-heading-line-height-lg',
+        // Desktop: el nombre va en un marco con padding superior space/general/md (4) y cuadro de 20 (fila de 24 junto
+        // al "Icon tooltip"). Mobile: heading/size/md de Figma (20/24) sin recorte de cuadro
+        hero: 'my-0 pt-ds-space-general-md @max-2xl:pt-0 @max-2xl:text-ds-typography-heading-size-lg @max-2xl:leading-ds-typography-heading-line-height-lg',
         centered: '',
       },
     },

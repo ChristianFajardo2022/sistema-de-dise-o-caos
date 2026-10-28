@@ -28,10 +28,14 @@ export interface ListItemProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 'ti
   defaultSelected?: boolean;
   /** Cambia la selección. */
   onSelectedChange?: (selected: boolean) => void;
+  /** Botón de ícono "ver" (`eye`, parte de `Group icon button` de Figma). Solo se dibuja si se pasa; va antes de editar. */
+  onView?: () => void;
   /** Botón de ícono "editar" (parte de `Group icon button` de Figma). Solo se dibuja si se pasa. */
   onEdit?: () => void;
   /** Botón de ícono "eliminar" (parte de `Group icon button` de Figma). Solo se dibuja si se pasa. */
   onDelete?: () => void;
+  /** Nombre accesible completo del botón ver. Por defecto "Ver" + título. */
+  viewLabel?: string;
   /** Nombre accesible completo del botón editar. Por defecto "Editar" + título. */
   editLabel?: string;
   /** Nombre accesible completo del botón eliminar. Por defecto "Eliminar" + título. */

@@ -127,7 +127,7 @@ function ComplexSections({ disabled = false, figma = false }: { disabled?: boole
           description={t('Descripción', 'Actualizado hoy')}
           leading={folder}
           disabled={disabled}
-          onEdit={() => {}}
+          onView={() => {}}
           onDelete={() => {}}
         />
         <ListItem
@@ -323,7 +323,7 @@ export const NestedControlsTest: Story = {
     await clickAt(canvas.getByRole('button', { name: 'Abrir proyecto web' }));
     await expect(args.onCornerClick).toHaveBeenCalled();
     await expect(radio).not.toBeChecked();
-    await clickAt(canvas.getByRole('button', { name: 'Editar Brief inicial' }));
+    await clickAt(canvas.getByRole('button', { name: 'Ver Brief inicial' }));
     await expect(radio).not.toBeChecked();
     await clickAt(canvas.getByText('Rediseño del sitio con nuevas páginas de producto y un flujo de compra más corto.'));
     await expect(radio).toBeChecked();

@@ -15,7 +15,7 @@ import { cva } from 'class-variance-authority';
  *   - incoming: background/general/gray-seventh, texto text/neutral/gray y hora text/neutral/gray 2.
  *   - outgoing: background/acent/secondary, texto text/neutral/black-unicolor y hora text/acent/secondary (unicolor:
  *     no cambian con el tema).
- * - Texto: 12/16 Semibold (typography/size/sm, weight/Semibold). Hora visible: 10/14 regular (body/size/xs).
+ * - Texto: 14/18 Semibold (typography/size/md, body/line-height-short/md, weight/Semibold). Hora visible: 10/14 regular (body/size/xs).
  * - `type="audio"`: la burbuja se estira (FILL) y lleva el marco "Reproductor" (`ChatAudioPlayer`, con la hora de
  *   duración a la izquierda de la onda).
  */
@@ -33,7 +33,7 @@ export const chatMessageBubbleVariants = cva(
   [
     'flex min-w-0 flex-col gap-ds-space-general-sm rounded-ds-radius-general-xl',
     'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
-    'text-ds-primitives-typography-size-sm leading-ds-typography-body-line-height-short-sm [overflow-wrap:anywhere]',
+    'text-ds-primitives-typography-size-md leading-ds-typography-body-line-height-short-md [overflow-wrap:anywhere]',
   ].join(' '),
   {
     variants: {

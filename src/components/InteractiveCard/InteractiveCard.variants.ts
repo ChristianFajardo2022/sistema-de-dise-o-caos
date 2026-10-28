@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
  * - Raíz transparente; el relleno vive en la superficie interna común (`NotchedSurface`, marco "Canva" de Figma),
  *   radius/general/2xl (24), con las variables `--surface-fill` y `--surface-edge`.
  * - Simple: fila, padding space/container/second-level (16 → space/general/2xl), gap space/general/2xl (16), alto 80.
- *   Avatar icon de 32 (On Card), título (heading 16/20) y subtítulo (body 14/20) con gap space/badge/sm (2); radio de 16.
+ *   Avatar icon de 40 (default-on-canva; default-on-card en Hover y Select), título (heading 16/20) y subtítulo (body 14/20) con gap space/badge/sm (2); radio de 16.
  *   Default background/container/default-on-card · Hover hover-on-card + effect/shadow md (box-shadow
  *   `shadow-ds-on-canva-md`, con el spread −2 de Figma) · Select select-on-card +
  *   trazo interior de 1 (border/general/lg) en border/general/default-on-card · Inactive default-on-card y textos
@@ -18,7 +18,9 @@ import { cva } from 'class-variance-authority';
  *   Grupo "Content" con gap space/general/2xl (16). Silueta con muesca de 48 y Button corner md (40) arriba a la derecha.
  *   Default background/container/default-on-canva · Hover + trazo de 1 en border/general/default-on-card (y Button corner
  *   con trazo) · Select background/general/gray-seventh + trazo en border/general/gray-tertiary (Button corner On card
- *   con trazo, avatar del encabezado On Card) · Inactive default-on-canva y textos deshabilitados.
+ *   con trazo) · Inactive default-on-canva y textos deshabilitados. Avatar del encabezado: icon/default-on-card en
+ *   Default y Hover, default-on-canva en Select e Inactive.
+ * - Bloques de dato (Box text): padding 24 (space/container/on-card) sobre background/container/hover-on-canva.
  * - Complex: sombra effect/shadow sm (0 4 12) en la superficie: drop-shadow si hay muesca (sigue la silueta) y
  *   box-shadow `shadow-ds-on-card` si no. Alfa 0 en oscuro.
  * - Los estados salen de CSS: `:hover` (o `data-state="hover"` para documentación), `:checked` del input de la tarjeta
@@ -81,6 +83,15 @@ export const interactiveCardVariants = cva(
   }
 );
 
+/**
+ * Avatar de la Simple: background/icon/default-on-canva en Default e Inactive (contrast on-canva) y default-on-card en
+ * Hover y Select.
+ */
+export const interactiveCardSimpleAvatarClass = [
+  'group-[:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]/card:bg-ds-background-icon-default-on-card',
+  'group-has-[[data-card-control]:checked]/card:bg-ds-background-icon-default-on-card',
+].join(' ');
+
 /** Simple: sombra effect/shadow md solo en hover (real o forzado), sobre la superficie. */
 export const interactiveCardHoverShadowClass =
   'group-[:is(:hover,[data-state=hover]):not([data-disabled]):not(:has([data-card-control]:checked))]/card:shadow-ds-on-canva-md';
@@ -99,8 +110,11 @@ export const interactiveCardCornerClass =
 /** Posición del Button corner: arriba a la derecha, dentro de la muesca de 48. */
 export const interactiveCardCornerSlotClass = 'absolute top-0 right-0 z-[1] flex';
 
-/** Avatar del encabezado: On Card cuando la tarjeta está seleccionada. */
-export const interactiveCardAvatarCheckedClass = 'group-has-[[data-card-control]:checked]/card:bg-ds-background-icon-default-on-card';
+/**
+ * Avatar del encabezado de la Complex: background/icon/default-on-card en Default y Hover; default-on-canva en Select
+ * (esta clase) e Inactive (contrast on-canva).
+ */
+export const interactiveCardAvatarCheckedClass = 'group-has-[[data-card-control]:checked]/card:bg-ds-background-icon-default-on-canva';
 
 const semibold = '[font-weight:var(--ds-primitives-typography-weight-semibold)]';
 const regular = '[font-weight:var(--ds-primitives-typography-weight-regular)]';
@@ -125,7 +139,7 @@ export const interactiveCardTextVariants = cva('m-0 min-w-0', {
       value: `${primary} text-ds-primitives-typography-size-2xl leading-ds-primitives-typography-line-height-3xl`,
     },
     tone: { strong: '', body: '' },
-    disabled: { true: 'text-ds-text-neutral-disabled-positive', false: '' },
+    disabled: { true: 'text-ds-text-neutral-disabled-on-canva', false: '' },
   },
   compoundVariants: [
     { tone: 'strong', disabled: false, class: 'text-ds-text-neutral-white' },
@@ -134,6 +148,9 @@ export const interactiveCardTextVariants = cva('m-0 min-w-0', {
   defaultVariants: { kind: 'body', tone: 'body', disabled: false },
 });
 
-/** Bloque de dato (Box text de Figma): padding 16, gap 4, radius/general/xl (16), background/general/gray-sixth. */
+/**
+ * Bloque de dato (marco "Text" del slot Box text de Figma): padding space/container/on-card (24), gap 4,
+ * radius/general/xl (16), background/container/hover-on-canva.
+ */
 export const interactiveCardStatClass =
-  'flex min-w-0 flex-1 flex-col gap-ds-space-general-md rounded-ds-radius-general-xl bg-ds-background-general-gray-sixth p-ds-space-general-2xl';
+  'flex min-w-0 flex-1 flex-col gap-ds-space-general-md rounded-ds-radius-general-xl bg-ds-background-container-hover-on-canva p-ds-space-container-on-card';

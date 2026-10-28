@@ -58,7 +58,7 @@ export const FigmaMatrix: Story = {
   render: () => (
     <div className="flex w-fit items-start gap-6 bg-ds-background-general-black p-6">
       {STATUSES.map((s) => (
-        <div key={s} className="flex w-[287.6px] flex-col gap-2">
+        <div key={s} className="flex w-[230.2px] flex-col gap-2">
           <span className="text-xs text-ds-text-neutral-body">{FIGMA[s].figma}</span>
           <FileUploadItem
             status={s}

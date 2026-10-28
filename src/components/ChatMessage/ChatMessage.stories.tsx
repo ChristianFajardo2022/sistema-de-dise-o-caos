@@ -126,7 +126,7 @@ export const FigmaMatrix: Story = {
   decorators: [(Story) => <Story />],
   render: () => (
     <div className="bg-ds-background-general-black p-6">
-      <ul className="m-0 flex w-[266px] list-none flex-col gap-6 p-0">
+      <ul className="m-0 flex w-[381px] list-none flex-col gap-6 p-0">
         {FIGMA.map((v) => (
           <ChatMessage
             key={v.name}

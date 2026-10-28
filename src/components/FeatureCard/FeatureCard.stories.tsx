@@ -173,7 +173,7 @@ function MatrixCards({ figma }: { figma: boolean }) {
         data-figma={figma ? 'Type=2' : undefined}
         className="w-[612px]"
         variant="cutout"
-        eyebrow="Titulo"
+        eyebrow="Subtítulo"
         title={'Best Full Body\nHome Gym Machines'}
       />
       <FeatureCard

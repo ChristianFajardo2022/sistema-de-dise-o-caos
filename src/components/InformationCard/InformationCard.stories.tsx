@@ -24,7 +24,7 @@ const meta = {
       parameters.fullWidth ? (
         <Story />
       ) : (
-        <div className="w-full max-w-[498px]">
+        <div className="w-full max-w-[402.33px]">
           <Story />
         </div>
       ),
@@ -122,7 +122,8 @@ function ItemList({ figma = false }: { figma?: boolean }) {
           {...item}
           selectable
           leading={<Avatar name="Hugo García" size="sm" />}
-          onEdit={() => {}}
+          onView={i === 0 ? () => {} : undefined}
+          onEdit={i === 0 ? undefined : () => {}}
           onDelete={() => {}}
         />
       ))}
@@ -280,7 +281,7 @@ export const FigmaMatrix: Story = {
   render: () => (
     <div className="bg-ds-background-general-black p-6">
       <div role="region" tabIndex={0} aria-label="Matriz de InformationCard" className="max-w-full overflow-x-auto">
-        <div className="grid w-max grid-cols-[repeat(3,498px)] items-start gap-6">
+        <div className="grid w-max grid-cols-[repeat(3,402.33px)] items-start gap-6">
           <MatrixCards figma />
           <InformationCard
             data-figma="Type=Simple"
@@ -291,7 +292,7 @@ export const FigmaMatrix: Story = {
           />
         </div>
         <p className="mt-6 mb-2 text-xs text-ds-text-neutral-body">Revisión a ojo sobre background/container/default-on-card (sin data-figma)</p>
-        <div className="grid w-max grid-cols-[repeat(3,498px)] items-start gap-6 bg-ds-background-container-default-on-card p-6">
+        <div className="grid w-max grid-cols-[repeat(3,402.33px)] items-start gap-6 bg-ds-background-container-default-on-card p-6">
           <MatrixCards figma={false} />
         </div>
       </div>

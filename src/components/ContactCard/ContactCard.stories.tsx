@@ -101,17 +101,17 @@ function MatrixCards({ figma }: { figma: boolean }) {
   );
 }
 
-/** Las tres variantes de Figma (498 de ancho), con los textos de Figma. */
+/** Las tres variantes de Figma (402.33 de ancho), con los textos de Figma. */
 export const FigmaMatrix: Story = {
   parameters: { fullWidth: true },
   render: () => (
     <div className="bg-ds-background-general-black p-6">
       <div role="region" tabIndex={0} aria-label="Matriz de ContactCard" className="max-w-full overflow-x-auto">
-        <div className="flex flex-wrap items-start gap-6 [&>*]:w-[498px]">
+        <div className="flex flex-wrap items-start gap-6 [&>*]:w-[402.33px]">
           <MatrixCards figma />
         </div>
         <p className="mt-6 mb-2 text-xs text-ds-text-neutral-body">Revisión a ojo sobre background/container/default-on-card (sin data-figma)</p>
-        <div className="flex flex-wrap items-start gap-6 bg-ds-background-container-default-on-card p-6 [&>*]:w-[498px]">
+        <div className="flex flex-wrap items-start gap-6 bg-ds-background-container-default-on-card p-6 [&>*]:w-[402.33px]">
           <MatrixCards figma={false} />
         </div>
       </div>

@@ -8,8 +8,8 @@ import { cva } from 'class-variance-authority';
  * - Raíz: fila centrada, padding space/general/xl (12), gap space/general/3xl (24), radius/general/xl (16).
  *   Default transparente; Active (`selected`) con background/container/select-on-card.
  * - Fila interna: avatar de 48 y texto, gap 16 (space/general/2xl). Texto: gap 4; título Prospero semibold 16/20
- *   (heading/size/md) en text/neutral/heading, descripción 14/18 en text/neutral/gray.
- * - Meta a la derecha: gap 8, alineada al final; hora 12/16 en text/neutral/gray y Badge número.
+ *   (heading/size/md) en text/neutral/heading, descripción 14/18 regular en text/neutral/gray.
+ * - Meta a la derecha: gap 8, alineada al final; hora 12/16 semibold (weight/Semibold) en text/neutral/gray y Badge número.
  * - El control (botón o enlace) es el título, estirado con `::after` sobre toda la tarjeta; lo demás es visual.
  *   Foco visible: outline de 2px en la raíz (el control es pequeño).
  * - Los botones de la fila de Figma (Frame 1984080549, x=1218, fuera del cuadro de 767) no se ven en el set: son el
@@ -53,7 +53,7 @@ export const chatCardControlVariants = cva(
 
 export const chatCardDescriptionVariants = cva(
   [
-    'm-0 min-w-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
+    'm-0 min-w-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
     'text-ds-primitives-typography-size-md leading-ds-typography-body-line-height-short-md text-ds-text-neutral-gray',
   ].join(' '),
   {
@@ -72,7 +72,7 @@ export const chatCardMetaVariants = cva('flex shrink-0 flex-col items-end justif
 
 export const chatCardTimeVariants = cva(
   [
-    'm-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
+    'm-0 font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-semibold)]',
     'text-ds-primitives-typography-size-sm leading-ds-typography-body-line-height-short-sm text-ds-text-neutral-gray',
   ].join(' ')
 );

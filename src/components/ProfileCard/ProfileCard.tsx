@@ -167,7 +167,7 @@ export const ProfileCard = forwardRef<HTMLElement, ProfileCardProps>(
       ) : null;
 
     const titleNode = (
-      <Heading id={titleId} data-figma-part="Filename" className={profileCardTitleVariants({ layout })}>
+      <Heading id={titleId} data-figma-part="Filename" className={cn(profileCardTitleVariants({ layout }))}>
         {title}
       </Heading>
     );
