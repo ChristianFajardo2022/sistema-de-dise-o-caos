@@ -43,6 +43,24 @@
  *   su padding o gap valen 0, se acepta el de ese hijo cuando coincide con Figma.
  *   Los hijos de GROUP / BOOLEAN_OPERATION traen x/y en el espacio del padre del grupo.
  *
+ * Reglas de la tanda de deuda 2 (E5, 28-oct):
+ * - R46 Nodos ocultos en Figma (una prop booleana apagada, p. ej. `Btn tertiary` del modal o `Button` de la Profile card,
+ *   aunque la spec los traiga con medidas): nunca se comparan. Sus textos se guardan aparte con su lugar en el orden
+ *   completo (visibles + ocultos; un oculto dentro de otro oculto no cuenta). Si en el ámbito del texto (H1) el DOM trae
+ *   exactamente tantos candidatos como textos visibles + ocultos, y no solo los visibles, el DOM muestra lo que Figma
+ *   oculta: los visibles se emparejan saltando el lugar de los ocultos (antes se corría el orden y salían colores de otro
+ *   botón) y queda el aviso "oculto en Figma pero visible en Storybook". Con cualquier otro conteo no cambia nada.
+ * - R49 Íconos dibujados en un svg de ilustración (ScanGuide): si el svg que le toca a un ícono de Figma (o, sin svg, el
+ *   que contiene su caja) no es un ícono de la biblioteca (`data-icon`), contiene la caja del ícono (holgura max(1 px,
+ *   15 %)) y mide al menos 4 veces su área, se buscan dentro de esa caja trazos visibles del svg (path, rect, circle...,
+ *   con display, visibility y opacidad acumulada > 0, que pinten relleno o trazo). Si su unión cubre al menos la mitad de
+ *   la caja en un eje, el ícono se acepta ("presente (trazos dentro de un svg de ilustración...)", sin comparar tamaño,
+ *   color ni dibujo) y queda el aviso "ícono dibujado dentro de un svg". Sin trazos en la caja sigue siendo diferencia
+ *   ("presente: svg no encontrado (solo un svg de ilustración...)"), en una sola línea en vez de ancho/alto/dibujo contra
+ *   el svg entero. Además: los íconos con opacidad acumulada 0 en Figma (fotograma inicial) no se comparan ni compiten
+ *   por los svg; la posición de los íconos corrige los hijos de GROUP / BOOLEAN_OPERATION; y una instancia escalada en
+ *   Figma (caja distinta de su `Size`) vale si el svg mide su Size o la caja que se ve.
+ *
  * Lee .qa/figma/componentes/<carpeta>/spec.json (generado por extraer.js), abre la historia
  * FigmaMatrix en Storybook y compara cada variante (`[data-figma="<nombre>"]`) contra la spec.
  * Escribe comparacion.json, comparacion.html y capturas/<tema>/<slug>.png en la misma carpeta.
@@ -476,6 +494,7 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
       nHijos: raiz.children.length,
     },
     textos: {},
+    ocultos: {},
     iconos: {},
     conteos: {},
     partesPresentes: [...raiz.querySelectorAll('[data-figma-part]')].map((e) => e.getAttribute('data-figma-part')),
@@ -488,7 +507,7 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
   const alcanceDe = (cadena) => {
     for (const [k, a] of (cadena || []).entries()) {
       const els = marcados(a.b);
-      if (els.length && els.length === a.cnt) return { el: els[a.idx], ord: a.ordEn, k, tot: a.tot };
+      if (els.length && els.length === a.cnt) return { el: els[a.idx], ord: a.ordEn, k, tot: a.tot, ordH: a.ordEnH, nVis: a.nVis, nH: a.nH };
     }
     return null;
   };
@@ -541,7 +560,10 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
       contenido: (campo ? el.value || el.placeholder : el.textContent).trim().slice(0, 40),
     };
   };
-  for (const t of partes.textos) {
+  // R46: textos ocultos en Figma (prop booleana apagada) que el DOM sí muestra. Si dentro del ámbito el DOM trae tantos
+  // candidatos como textos visibles + ocultos de Figma (y no solo los visibles), los ocultos conservan su lugar en el orden
+  // (`ordH`) y los visibles se emparejan saltándolos; el elemento del oculto se mide aparte (aviso, no se compara).
+  const elegirTexto = (t, oculto) => {
     let el = null;
     let todos = marcados(busca(t));
     // H3: un texto del mismo nombre que vive dentro de otra parte marcada es otro elemento (p. ej. el "+2" de un
@@ -562,28 +584,50 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
       const nSpec = partes.textos.filter((x) => x.nombre === t.nombre).length;
       if (propios.length >= nSpec) todos = propios;
     }
-    out.conteos[t.nombre] = todos.length;
+    if (!oculto) out.conteos[t.nombre] = todos.length;
     // H1: candidatos solo dentro del ancestro marcado más cercano (y el ordinal se cuenta dentro de él); si ahí no
     // hay ninguno se vuelve al comportamiento de toda la variante
     let ordT = t.ord;
+    let ordTH = t.ordH;
+    let nVis = partes.textos.filter((x) => x.nombre === t.nombre).length;
+    let nH = nVis + (partes.ocultos || []).filter((x) => x.nombre === t.nombre).length;
     const alc = alcanceDe(t.cadena);
     if (alc) {
       const dentro = todos.filter((x) => alc.el.contains(x));
       if (dentro.length) {
         todos = dentro;
         ordT = alc.ord;
+        ordTH = alc.ordH;
+        nVis = alc.nVis;
+        nH = alc.nH;
       }
     }
+    let usaH = false;
     if (t.parte) {
       // Un nombre puede repetirse en elementos que no son este texto (p. ej. un botón de otra parte llamado
       // igual): para un nodo TEXT solo se emparejan los marcados con texto propio y sin hijos marcados iguales
       const conTexto = todos.filter((x) => primerTexto(x) && !x.querySelector(sel(busca(t))));
-      const e = (conTexto.length >= 1 && conTexto.length < todos.length ? conTexto : todos)[ordT] || null;
+      const lista = conTexto.length >= 1 && conTexto.length < todos.length ? conTexto : todos;
+      usaH = nH > nVis && lista.length === nH;
+      if (oculto && !usaH) return null;
+      const e = lista[usaH ? ordTH : ordT] || null;
       el = e && (primerTexto(e) || e);
     }
+    if (oculto) return el;
     if (!el && t.primero && todos.length === 0) el = primerTexto(raiz);
+    return el;
+  };
+  for (const t of partes.textos) {
+    const el = elegirTexto(t, false);
     if (el) {
       out.textos[t.nombre + '#' + t.ord] = medirTexto(el);
+      pareados.add(el);
+    }
+  }
+  for (const t of partes.ocultos || []) {
+    const el = elegirTexto(t, true);
+    if (el) {
+      out.ocultos[t.nombre + '#' + t.ordH] = medirTexto(el);
       pareados.add(el);
     }
   }
@@ -658,11 +702,56 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
     if (!todos.length) return libresDe(ic);
     return todos.map((e) => (e.tagName.toLowerCase() === 'svg' ? e : e.querySelector('svg'))).filter(Boolean);
   };
+  // R49: caja del ícono de Figma en la página (posición respecto de la raíz) con holgura max(1 px, 15 % del lado)
+  const cajaIcono = (ic) => {
+    const t = Math.max(1, 0.15 * Math.max(ic.w, ic.h));
+    return { x1: r.left + ic.pos.x - t, y1: r.top + ic.pos.y - t, x2: r.left + ic.pos.x + ic.w + t, y2: r.top + ic.pos.y + ic.h + t };
+  };
+  // svg de ilustración: no es un ícono de la biblioteca (`data-icon`), contiene la caja del ícono y mide al menos 4
+  // veces su área (un svg propio de tamaño parecido sigue comparándose como ícono)
+  const esIlustracion = (sv, ic) => {
+    if (sv.hasAttribute('data-icon') || sv.closest('[data-icon]')) return false;
+    const b = sv.getBoundingClientRect();
+    const c = cajaIcono(ic);
+    return b.width * b.height >= 4 * ic.w * ic.h && b.left <= c.x1 + 1 && b.top <= c.y1 + 1 && b.right >= c.x2 - 1 && b.bottom >= c.y2 - 1;
+  };
+  // Trazos del svg que caen enteros dentro de la caja del ícono, visibles (display, visibility y opacidad acumulada
+  // hasta el svg) y que pintan algo (relleno o trazo). Cuenta si su unión cubre al menos la mitad de la caja en un eje.
+  const trazosEn = (cont, ic) => {
+    const c = cajaIcono(ic);
+    const dentro = [];
+    for (const f of cont.querySelectorAll('path, rect, circle, ellipse, line, polyline, polygon, use')) {
+      if (f.closest('[data-icon]')) continue;
+      const b = f.getBoundingClientRect();
+      if (!(b.width > 0 || b.height > 0)) continue;
+      if (b.left < c.x1 || b.top < c.y1 || b.right > c.x2 || b.bottom > c.y2) continue;
+      let op = 1;
+      for (let a = f; a && a !== cont.parentElement; a = a.parentElement) {
+        const ca = getComputedStyle(a);
+        if (ca.display === 'none' || ca.visibility === 'hidden') {
+          op = 0;
+          break;
+        }
+        op *= parseFloat(ca.opacity);
+      }
+      if (!(op > 0.01)) continue;
+      const cf = getComputedStyle(f);
+      const pinta = (cf.fill && cf.fill !== 'none' && parseFloat(cf.fillOpacity) > 0) || (cf.stroke && cf.stroke !== 'none' && px(cf.strokeWidth) > 0);
+      if (pinta) dentro.push(b);
+    }
+    if (!dentro.length) return null;
+    const x1 = Math.min(...dentro.map((b) => b.left));
+    const y1 = Math.min(...dentro.map((b) => b.top));
+    const w = Math.max(...dentro.map((b) => b.right)) - x1;
+    const h = Math.max(...dentro.map((b) => b.bottom)) - y1;
+    if (Math.max(w / ic.w, h / ic.h) < 0.5) return null;
+    return { trazos: dentro.length, union: { x: x1 - r.left, y: y1 - r.top, w, h } };
+  };
   const asignado = new Map();
   {
     // Con una sola parte marcada el emparejamiento ya es trivial; con varias (o ninguna) se usa la posición
     // R30: los íconos recortados en Figma no compiten por los svg (no se comparan)
-    const pend = partes.iconos.map((ic, i) => ({ ic, i })).filter(({ ic }) => marcados(busca(ic)).length !== 1 && ic.pos && !ic.recortado);
+    const pend = partes.iconos.map((ic, i) => ({ ic, i })).filter(({ ic }) => marcados(busca(ic)).length !== 1 && ic.pos && !ic.recortado && !ic.invisible);
     const pares = [];
     for (const { ic, i } of pend) {
       for (const sv of candidatos(ic)) {
@@ -688,6 +777,19 @@ function medirEnPagina({ nombre, k = 0, partes, conocidos = [] }) {
     if (!svg && todos.length === 0) {
       // Respaldo por posición (H3: se ignoran los svg que viven dentro de otra parte marcada con otro nombre)
       svg = asignado.get(i) || libresDe(ic)[i] || null;
+    }
+    // R49: el svg elegido no es un ícono sino una ilustración que contiene la caja del ícono (o no hay svg y una
+    // ilustración la contiene): se buscan trazos visibles del svg dentro de esa caja
+    if (!ic.invisible && ic.pos && ic.w > 0 && ic.h > 0 && (svg ? esIlustracion(svg, ic) : todos.length === 0)) {
+      const cont = svg || svgs.find((x) => esIlustracion(x, ic));
+      if (cont) {
+        const bc = cont.getBoundingClientRect();
+        const d = trazosEn(cont, ic);
+        out.iconos[ic.nombre + '#' + ic.ord] = d
+          ? { dibujado: true, svgW: bc.width, svgH: bc.height, ...d }
+          : { ilustracionSinTrazos: true, svgW: bc.width, svgH: bc.height };
+        return;
+      }
     }
     if (!svg) return;
     const b = svg.getBoundingClientRect();
@@ -989,11 +1091,35 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
   }
 
   // íconos
+  const dibujados = [];
   m.__iconos.forEach((ic) => {
     const sb = m.iconos[ic.nombre + '#' + ic.ord];
     const pre = `ícono "${ic.nombre}" `;
     if (ic.recortado) {
       if (sb && sb.w > 0 && sb.h > 0) recortadosVisibles.push(`ícono "${ic.nombre}"`);
+      return;
+    }
+    // R49: ícono con opacidad acumulada 0 en Figma (fotograma inicial de una animación): no se ve, no se compara
+    if (ic.invisible) {
+      lista.push({ propiedad: `${pre}(opacidad 0 en Figma: no se ve, no se compara)`, figma: 'opacidad 0', storybook: '—', ok: true });
+      return;
+    }
+    const esperadoDibujo = MANIFEST_POR_SET[ic.nodo.icono.figmaSetId] ?? ic.nodo.icono.nombre;
+    const fx = (x) => +(+x).toFixed(2);
+    // R49: dibujado como trazos dentro de un svg de ilustración: se acepta (no es diferencia) y queda un aviso
+    if (sb && sb.dibujado) {
+      const u = sb.union;
+      lista.push({
+        propiedad: `${pre}presente (trazos dentro de un svg de ilustración de ${fx(sb.svgW)}×${fx(sb.svgH)}, no es <Icon>)`,
+        figma: `${esperadoDibujo} ${fx(ic.nodo.w)}×${fx(ic.nodo.h)} en ${fx(ic.pos.x)},${fx(ic.pos.y)}`,
+        storybook: `${sb.trazos} trazos en ${fx(u.x)},${fx(u.y)} ${fx(u.w)}×${fx(u.h)}`,
+        ok: true,
+      });
+      dibujados.push(`${esperadoDibujo} (${fx(ic.nodo.w)}×${fx(ic.nodo.h)})`);
+      return;
+    }
+    if (sb && sb.ilustracionSinTrazos) {
+      lista.push({ propiedad: `${pre}presente`, figma: 'sí', storybook: `svg no encontrado (solo un svg de ilustración de ${fx(sb.svgW)}×${fx(sb.svgH)} sin trazos en la caja del ícono)`, ok: false });
       return;
     }
     if (!sb) {
@@ -1002,8 +1128,15 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
       return;
     }
     const tam = ic.size ?? ic.nodo.w;
-    num(`${pre}ancho`, tam, sb.w);
-    num(`${pre}alto`, tam, sb.h);
+    // R49: instancia escalada en Figma (la caja no mide su Size): vale el Size o la caja que se ve
+    const escalada = ic.size !== undefined && (Math.abs(ic.nodo.w - ic.size) > tol || Math.abs(ic.nodo.h - ic.size) > tol);
+    if (escalada && Math.abs(sb.w - tam) > tol && Math.abs(sb.w - ic.nodo.w) <= tol && Math.abs(sb.h - ic.nodo.h) <= tol) {
+      num(`${pre}ancho (instancia escalada en Figma: caja ${fx(ic.nodo.w)}, Size ${ic.size})`, ic.nodo.w, sb.w);
+      num(`${pre}alto (instancia escalada en Figma: caja ${fx(ic.nodo.h)}, Size ${ic.size})`, ic.nodo.h, sb.h);
+    } else {
+      num(`${pre}ancho`, tam, sb.w);
+      num(`${pre}alto`, tam, sb.h);
+    }
     const c = R.colorPintura(ic.nodo.icono.color);
     if (c) col(`${pre}color`, c, sb.color);
     // Dibujo: el nombre sale del manifest por figmaSetId (en Figma hay nombres repetidos)
@@ -1031,6 +1164,23 @@ function compararVariante(variante, m, spec, tema, tol, modo) {
     avisos.push({
       propiedad: 'marco fuera de la vista',
       detalle: `vista ${modo} de ${m.vista.ancho} px; el marco va de ${+m.vista.izq.toFixed(1)} a ${+m.vista.der.toFixed(1)} px: la captura y las medidas pueden salir cortadas (revisar el padding de la historia)`,
+    });
+  }
+  if (dibujados.length) {
+    avisos.push({
+      propiedad: 'ícono dibujado dentro de un svg',
+      detalle: `${dibujados.length} íconos de Figma son trazos de un svg de ilustración en Storybook (no <Icon>; no se comparan tamaño, color ni dibujo): ${dibujados.join(', ')}`,
+    });
+  }
+  // R46: textos ocultos en Figma que el DOM muestra (emparejados por su lugar en el orden)
+  const ocultosVisibles = (m.__ocultos || []).filter((t) => {
+    const o = m.ocultos && m.ocultos[t.nombre + '#' + t.ordH];
+    return o && o.visible;
+  });
+  if (ocultosVisibles.length) {
+    avisos.push({
+      propiedad: 'oculto en Figma pero visible en Storybook',
+      detalle: `${ocultosVisibles.length} textos que Figma oculta (prop booleana o capa oculta) se ven en el DOM y no se comparan: ${ocultosVisibles.map((t) => `texto "${t.nombre}" ("${m.ocultos[t.nombre + '#' + t.ordH].contenido}")`).join(', ')}`,
     });
   }
   const nRecortados = [...m.__textos, ...m.__iconos, ...(m.__formas || [])].filter((x) => x.recortado).length;
@@ -1210,14 +1360,19 @@ async function main() {
   };
   const variantes = spec.variantes.map((v) => {
     const textos = [];
+    const ocultos = [];
     const iconos = [];
     const formas = [];
     const recortados = recortadosDe(v);
     // H1/H3: cadena de ancestros (la raíz de la variante no cuenta) con el índice de cada uno entre los de su nombre y
     // los ordinales de los textos / formas dentro de él
     const idxAnc = {};
-    const cadenaDe = (ancs, clave) =>
-      ancs.slice().reverse().map((a) => ({ a, clave, ordEn: (a.conteo[clave] = (a.conteo[clave] ?? -1) + 1) }));
+    // R46: `ordEnH` cuenta también los textos ocultos (los ocultos no tienen `ordEn`)
+    const cadenaDe = (ancs, clave, oculto = false) =>
+      ancs
+        .slice()
+        .reverse()
+        .map((a) => ({ a, clave, ordEn: oculto ? null : (a.conteo[clave] = (a.conteo[clave] ?? -1) + 1), ordEnH: (a.conteoH[clave] = (a.conteoH[clave] ?? -1) + 1) }));
     const esForma = (n) =>
       ['ELLIPSE', 'RECTANGLE', 'VECTOR', 'POLYGON', 'STAR', 'LINE', 'BOOLEAN_OPERATION'].includes(n.tipo) &&
       !n.icono &&
@@ -1226,27 +1381,40 @@ async function main() {
     let primero = true;
     const ords = {};
     const ordDe = (n) => (ords[n] = (ords[n] ?? -1) + 1);
-    const visitar = (nodo, x, y, anc = [], ancs = []) => {
-      if (nodo.oculto) return;
-      if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
-        textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre), anc, cadena: cadenaDe(ancs, 't:' + nodo.nombre), recortado: recortados.has(nodo) });
-        primero = false;
+    // R46: `oc` = dentro de un nodo oculto (el primero de la rama). Sus textos se guardan aparte (`ocultos`) con su
+    // ordinal en la secuencia completa (visibles + ocultos, `ordH`); un oculto dentro de otro oculto no cuenta.
+    // R49: `op` = opacidad acumulada de los ancestros; `x`/`y` corrigen los hijos de GROUP / BOOLEAN_OPERATION.
+    const visitar = (nodo, x, y, anc = [], ancs = [], op = 1, oc = false) => {
+      if (nodo.oculto) {
+        if (oc) return;
+        oc = true;
       }
-      if (esForma(nodo) && R0.primerSolido(nodo.rellenos)?.var) {
+      const opN = op * (nodo.opacidad ?? 1);
+      if (nodo.tipo === 'TEXT' && nodo.texto?.segmentos?.length) {
+        if (oc) {
+          ocultos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, ordH: ordDe('th:' + nodo.nombre), anc, cadena: cadenaDe(ancs, 't:' + nodo.nombre, true) });
+        } else {
+          textos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, parte: true, primero, ord: ordDe('t:' + nodo.nombre), ordH: ordDe('th:' + nodo.nombre), anc, cadena: cadenaDe(ancs, 't:' + nodo.nombre), recortado: recortados.has(nodo) });
+          primero = false;
+        }
+      }
+      if (!oc && esForma(nodo) && R0.primerSolido(nodo.rellenos)?.var) {
         formas.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], nodo, w: nodo.w, h: nodo.h, cadena: cadenaDe(ancs, `f:${nodo.w}x${nodo.h}`), cadenaNombre: cadenaDe(ancs, `fn:${nodo.nombre}`), recortado: recortados.has(nodo) });
       }
-      if (nodo.icono) {
+      if (!oc && nodo.icono) {
         const size = nodo.instancia?.variante?.Size;
-        iconos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], pos: { x, y }, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined, recortado: recortados.has(nodo) });
+        iconos.push({ nombre: nodo.nombre, busca: aliasCarpeta[nodo.nombre], pos: { x, y }, nodo, ord: ordDe('i:' + nodo.nombre), size: size !== undefined && !Number.isNaN(parseFloat(size)) ? parseFloat(size) : undefined, recortado: recortados.has(nodo), invisible: opN <= 0.001 });
       }
       // Nombres de los ancestros (y su alias en código) para H3; la raíz de la variante no cuenta
       const sig = nodo === v.arbol ? anc : [...anc, nodo.nombre, ...(aliasCarpeta[nodo.nombre] ? [aliasCarpeta[nodo.nombre]] : [])];
       let sigAncs = ancs;
-      if (nodo !== v.arbol) {
+      if (nodo !== v.arbol && !oc) {
         const idx = (idxAnc[nodo.nombre] = (idxAnc[nodo.nombre] ?? -1) + 1);
-        sigAncs = [...ancs, { nombre: nodo.nombre, b: aliasCarpeta[nodo.nombre] ?? nodo.nombre, idx, conteo: {} }];
+        sigAncs = [...ancs, { nombre: nodo.nombre, b: aliasCarpeta[nodo.nombre] ?? nodo.nombre, idx, conteo: {}, conteoH: {} }];
       }
-      for (const h of nodo.hijos || []) visitar(h, x + (h.x || 0), y + (h.y || 0), sig, sigAncs);
+      const bx = esGrupo(nodo) ? x - (nodo.x || 0) : x;
+      const by = esGrupo(nodo) ? y - (nodo.y || 0) : y;
+      for (const h of nodo.hijos || []) visitar(h, bx + (h.x || 0), by + (h.y || 0), sig, sigAncs, opN, oc);
     };
     visitar(v.arbol, 0, 0);
     // Total de nodos de Figma por nombre (para saber si el DOM trae las mismas instancias de una parte)
@@ -1258,8 +1426,12 @@ async function main() {
     };
     contar(v.arbol);
     const aPlano = (lista) =>
-      lista.forEach((t) => (t.cadena = t.cadena.map(({ a, ordEn, clave }) => ({ n: a.nombre, b: a.b, idx: a.idx, cnt: totAnc[a.nombre], ordEn, tot: a.conteo[clave] }))));
+      lista.forEach(
+        (t) =>
+          (t.cadena = t.cadena.map(({ a, ordEn, ordEnH, clave }) => ({ n: a.nombre, b: a.b, idx: a.idx, cnt: totAnc[a.nombre], ordEn, tot: a.conteo[clave], ordEnH, nVis: (a.conteo[clave] ?? -1) + 1, nH: (a.conteoH[clave] ?? -1) + 1 }))),
+      );
     aPlano(textos);
+    aPlano(ocultos);
     aPlano(formas);
     // ordinal de cada forma dentro de su ancestro entre las del mismo nombre (partes marcadas)
     formas.forEach((f) => (f.ordNombre = f.cadenaNombre.map(({ ordEn }) => ordEn)));
@@ -1271,7 +1443,7 @@ async function main() {
       (n.hijos || []).forEach(nombrar);
     };
     (v.arbol.hijos || []).forEach(nombrar);
-    return { def: v, slug: slugDe(v), textos, iconos, formas, conocidos: [...conocidos] };
+    return { def: v, slug: slugDe(v), textos, ocultos, iconos, formas, conocidos: [...conocidos] };
   });
 
   // H2: nombres repetidos en la spec (sets con errores): la k-ésima con el mismo nombre se mide contra el k-ésimo
@@ -1349,7 +1521,7 @@ async function main() {
             nombre: v.def.nombre,
             k: v.k,
             conocidos: v.conocidos,
-            partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord, anc: t.anc, cadena: t.cadena })), formas: v.formas.map((f) => ({ nombre: f.nombre, busca: f.busca, w: f.w, h: f.h, cadena: f.cadena, ordNombre: f.ordNombre, totNombre: f.totNombre })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos, recortado: x.recortado })) },
+            partes: { textos: v.textos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, primero: t.primero, ord: t.ord, ordH: t.ordH, anc: t.anc, cadena: t.cadena })), ocultos: v.ocultos.map((t) => ({ nombre: t.nombre, busca: t.busca, parte: t.parte, ordH: t.ordH, anc: t.anc, cadena: t.cadena })), formas: v.formas.map((f) => ({ nombre: f.nombre, busca: f.busca, w: f.w, h: f.h, cadena: f.cadena, ordNombre: f.ordNombre, totNombre: f.totNombre })), iconos: v.iconos.map((x) => ({ nombre: x.nombre, busca: x.busca, ord: x.ord, pos: x.pos, w: x.nodo.w, h: x.nodo.h, recortado: x.recortado, invisible: x.invisible })) },
           });
           if (!m) {
             salida[tema] = { encontrada: false, comparaciones: [] };
@@ -1357,6 +1529,7 @@ async function main() {
             continue;
           }
           m.__textos = v.textos;
+          m.__ocultos = v.ocultos;
           m.__iconos = v.iconos;
           m.__formas = v.formas;
           const comparaciones = compararVariante(v.def, m, spec, tema, tol, v.modo);
