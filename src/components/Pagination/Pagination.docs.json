@@ -1,0 +1,33 @@
+{
+  "name": "Pagination",
+  "component": "Pagination",
+  "description": "Paginación del sistema de diseño CAOS, fiel al component set Pagination de Figma (12048:7622): Type numeric | input | More × Pages initial | middle | final, más la pieza Page (Atom) (11953:4965, State Default | Hover | Select), exportada como PaginationPage. Numeric: texto \"Página x de y\" y una fila de Button secondary xs de solo ícono (anterior y siguiente, 32 × 32) con una ventana de 5 páginas circulares de 32 (siblingCount 2, boundaryCount 0); con boundaryCount ≥ 1 aparecen puntos suspensivos. Input: \"Página [campo] de y\" con el campo numérico de DigitInput (40 × 32) que valida el rango y confirma con Enter, más anterior y siguiente. More: texto de estado y Button primary md \"Mostrar más\" (ancho completo en móvil). Semántica: nav con aria-label y lista; la página actual lleva aria-current=\"page\"; anterior y siguiente quedan deshabilitados en los extremos; el hover y el foco con teclado (outline de 2px, agregado) salen de CSS. Funciona controlado (page) y no controlado (defaultPage). Todos los textos se pueden reemplazar con labels. Categoría: Navigation.",
+  "category": "Navigation",
+  "props": {
+    "type": { "type": "'numeric' | 'input' | 'more'", "default": "'numeric'", "description": "Type de Figma." },
+    "page": { "type": "number", "required": false, "description": "Página actual (controlada), de 1 a totalPages." },
+    "defaultPage": { "type": "number", "default": 1, "description": "Página inicial (no controlada)." },
+    "totalPages": { "type": "number", "required": true, "description": "Total de páginas." },
+    "onPageChange": { "type": "(page: number) => void", "required": false, "description": "Se llama al cambiar de página con botones, número, campo (Enter) o Mostrar más." },
+    "siblingCount": { "type": "number", "default": 2, "description": "Type numeric: páginas a cada lado de la actual." },
+    "boundaryCount": { "type": "number", "default": 0, "description": "Type numeric: páginas fijas en los extremos; con 1 o más aparecen puntos suspensivos (ocultos al lector)." },
+    "labels": { "type": "PaginationLabels", "required": false, "description": "Textos: navigation (\"Paginación\"), previous, next, page(n), status(page, total), loadMore, pageWord, ofTotal(total), input, outOfRange(total)." }
+  },
+  "subcomponents": {
+    "PaginationPage": {
+      "description": "Pieza Page (Atom). Button circular de 32 con el número. selected la marca como actual (aria-current=\"page\"); state (default | hover | select) solo fuerza el aspecto para documentación. El hover real sale de CSS.",
+      "props": {
+        "number": { "type": "number", "required": true, "description": "Número que se muestra." },
+        "selected": { "type": "boolean", "default": false, "description": "Página actual." },
+        "state": { "type": "'default' | 'hover' | 'select'", "required": false, "description": "Fuerza el aspecto, solo documentación." }
+      }
+    }
+  },
+  "examples": [
+    { "title": "Controlado", "code": "<Pagination page={page} totalPages={20} onPageChange={setPage} />" },
+    { "title": "Con puntos suspensivos", "code": "<Pagination totalPages={50} boundaryCount={1} siblingCount={1} />" },
+    { "title": "Campo de número", "code": "<Pagination type=\"input\" totalPages={20} onPageChange={ir} />" },
+    { "title": "Mostrar más", "code": "<Pagination type=\"more\" totalPages={8} onPageChange={cargar} />" },
+    { "title": "Textos en inglés", "code": "<Pagination totalPages={8} labels={{ navigation: 'Pagination', previous: 'Previous', next: 'Next', page: (p) => `Page ${p}`, status: (p, t) => `Page ${p} of ${t}` }} />" }
+  ]
+}
