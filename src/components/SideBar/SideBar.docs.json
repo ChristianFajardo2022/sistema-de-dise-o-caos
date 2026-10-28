@@ -1,0 +1,34 @@
+{
+  "name": "SideBar",
+  "component": "SideBar",
+  "description": "Barra lateral de navegación del sistema de diseño CAOS, fiel a la página Side bar de Figma: sets Menu desktop (13328:3630, Type Default contraída de 63 | Select expandida de 298), Menu mobile (13738:92956, Type Default | Menu list) y el ítem Hamburguer menu (Atom) (13328:3609, Type With text | Dropdown | Single icon × State Default | Hover | Select), exportado como SideBarItem, con los subenlaces SideBarSubItem (fila Dropdown list). Escritorio: relleno background/container/default-on-canva, logo de 80 (Logo md, símbolo contraída), opciones con gap 8 dentro de ScrollArea y pie con acciones (slot footer, p. ej. el botón de modo) y la flecha que contrae y expande. Ítem: fila de 44, padding 12, gap 12, radio 8, ícono de 20 y texto 16/20; Hover background/field/hover y Select background/field/active-slow-contrast con texto e ícono text/acent/firts; en Dropdown y Single icon la selección lleva la barra de 4 background/acent/tertiary. Móvil: barra de 72 con IconMenu, Logo icon sm y acciones (NotificationBell, Avatar), y el menú abierto como hoja bajo la barra con efecto glass. Accesibilidad: <nav> con nombre y lista; enlaces reales con aria-current=\"page\" en la sección actual; los ítems con submenú son botones disclosure (aria-expanded, aria-controls) con la lista justo debajo en el orden de Tab; contraída, cada ítem se nombra con su texto (Tooltip como nombre, con la cantidad del badge) y un ítem con submenú expande la barra con su lista abierta sin perder el foco. En móvil el botón de menú tiene aria-expanded, la hoja sigue al botón en el orden de Tab, Escape la cierra y devuelve el foco al botón y activar un enlace la cierra. Foco visible con outline de 2px (no está en Figma). Con layout auto cambia a móvil por debajo de 48rem (useMediaQuery).",
+  "category": "Navigation",
+  "props": {
+    "items": { "type": "SideBarItemData[]", "required": true, "description": "Ítems: { id, label, icon, href?, badge?, badgeLabel?, items?: { id, label, href? }[] }. Con items el ítem es Type Dropdown." },
+    "layout": { "type": "'auto' | 'desktop' | 'mobile'", "default": "'auto'", "description": "Menu desktop, Menu mobile o según el ancho (móvil por debajo de 48rem)." },
+    "value": { "type": "string | null", "required": false, "description": "Id del ítem o subenlace actual (controlado): aria-current=\"page\" y State Select." },
+    "defaultValue": { "type": "string | null", "required": false, "description": "Id actual al inicio (no controlado)." },
+    "onValueChange": { "type": "(id: string) => void", "required": false, "description": "Se activa un ítem o subenlace (también los que tienen href)." },
+    "openItems": { "type": "string[]", "required": false, "description": "Ítems con el submenú abierto (controlado). defaultOpenItems / onOpenItemsChange para no controlado; por defecto abre la sección del value inicial." },
+    "collapsed": { "type": "boolean", "required": false, "description": "Escritorio contraída a solo íconos (Type Default de Menu desktop). defaultCollapsed / onCollapsedChange." },
+    "collapsible": { "type": "boolean", "default": true, "description": "Prop Arrow de Figma: botón de flecha que contrae y expande (collapseLabel / expandLabel)." },
+    "logo": { "type": "ReactNode", "required": false, "description": "Slot del logo. Por defecto Logo de la marca (md completo o símbolo en escritorio, icon sm en móvil). homeHref lo envuelve en un enlace con homeLabel (por defecto \"Inicio\")." },
+    "footer": { "type": "ReactNode", "required": false, "description": "Slot Options bottom: acciones del pie sobre la flecha (prop Mode de Figma: el botón de modo claro/oscuro)." },
+    "navLabel": { "type": "string", "default": "'Navegación principal'", "description": "Nombre accesible del <nav>." },
+    "open": { "type": "boolean", "required": false, "description": "Móvil: menú abierto (Type Menu list). defaultOpen / onOpenChange." },
+    "mobileActions": { "type": "ReactNode", "required": false, "description": "Móvil, prop Avatar+icon button: acciones a la derecha de la barra (NotificationBell, Avatar o AvatarMenu). Como en Figma, no se ven con el menú abierto." },
+    "openMenuLabel": { "type": "string", "default": "'Abrir menú'", "description": "Nombre del botón de menú cerrado; closeMenuLabel (\"Cerrar menú\") con el menú abierto." },
+    "menuClassName": { "type": "string", "required": false, "description": "Móvil: clases de la hoja del menú (por defecto llega hasta el final de la pantalla)." }
+  },
+  "subcomponents": {
+    "SideBarItem": "Ítem (Hamburguer menu): <li> con fila <a href> o <button>. Props type ('with-text' | 'dropdown' | 'single-icon'), state (solo documentación), icon, badge, badgeLabel, selected, href, onSelect, expanded, onExpandedChange, submenu (SideBarSubItem) y children (el texto).",
+    "SideBarSubItem": "Subenlace (fila Dropdown list con divisor de 0.5): <li> con <a href> o <button>, selected y onSelect."
+  },
+  "examples": [
+    { "title": "Escritorio", "code": "<SideBar items={items} defaultValue=\"mensajes\" homeHref=\"/\" footer={<Button iconOnly variant=\"secondary\" contrast=\"low\" size=\"xs\" aria-label=\"Cambiar a modo claro\"><Icon name=\"sun\" size={16} variant=\"fill\" /></Button>} />" },
+    { "title": "Contraída", "code": "<SideBar items={items} collapsed={collapsed} onCollapsedChange={setCollapsed} />" },
+    { "title": "Con submenú", "code": "const items = [{ id: 'pagos', label: 'Pagos', icon: 'wallet', items: [{ id: 'facturas', label: 'Facturas', href: '/facturas' }] }];" },
+    { "title": "Móvil", "code": "<SideBar layout=\"mobile\" items={items} mobileActions={<><NotificationBell count={2} /><Avatar size=\"sm\" name=\"Hugo García\" /></>} />" },
+    { "title": "Ítem suelto", "code": "<ul><SideBarItem icon=\"home1\" href=\"/\" selected>Inicio</SideBarItem></ul>" }
+  ]
+}
