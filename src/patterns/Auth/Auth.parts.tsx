@@ -132,7 +132,7 @@ export function AuthDivider({ children }: { children: ReactNode }) {
       <span aria-hidden="true" className={line} />
       <span
         data-figma-part={typeof children === 'string' ? children : undefined}
-        className="font-ds-primitives-typography-family-primary text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md text-ds-text-neutral-body"
+        className="font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)] text-ds-typography-body-size-md leading-ds-typography-body-line-height-short-md text-ds-text-neutral-body"
       >
         {children}
       </span>

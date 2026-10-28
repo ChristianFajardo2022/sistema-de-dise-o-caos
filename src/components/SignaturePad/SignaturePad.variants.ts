@@ -10,7 +10,7 @@ import { cva } from 'class-variance-authority';
  * por dentro (box-shadow inset: Chrome redondea border-width), padding space/general/2xl (16) arriba y abajo y
  * space/general/xl (12) a los lados, gap 10. Filas de 24 con los íconos al final: arriba "maximize" (oculto por defecto),
  * abajo "rotate-left" y "trash" (24; blancos icon/general/white con firma, y grises sin ella: Figma usa
- * background/container/disabled-on-card, #7e8187 en Dark y #f0f2f4 en Light; aquí text/neutral/disabled-positive, el mismo gris en Dark y legible en Light). Texto guía 16/22 (typography/body size lg, line-height-large lg) en
+ * background/container/disabled-on-card, que desde el 28-oct vale #2e3033 en Dark y #f0f2f4 en Light, o sea el mismo color que el relleno de la tarjeta: el ícono quedaría invisible; aquí text/neutral/disabled-on-canva, #7e8187 en ambos temas: para diseño). Texto guía 16/22 (typography/body size lg, line-height-large lg) en
  * text/neutral/disabled-positive, centrado en una franja de 76.
  *
  * Vertical (376 × 812): la interfaz horizontal girada −90° dentro de una pantalla de celular, sin relleno; padding
@@ -60,8 +60,8 @@ export const signaturePadCanvasVariants = cva(
 export const signaturePadPlaceholderVariants = cva(
   [
     'pointer-events-none flex items-center justify-center text-center',
-    'font-ds-primitives-typography-family-primary text-ds-typography-body-size-lg leading-ds-typography-body-line-height-large-lg',
-    'text-ds-text-neutral-disabled-positive',
+    'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)] text-ds-typography-body-size-lg leading-ds-typography-body-line-height-large-lg',
+    'text-ds-text-neutral-disabled-on-canva',
   ].join(' '),
   {
     variants: {
@@ -83,7 +83,7 @@ export const signaturePadIconButtonVariants = cva(
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-ds-border-field-active',
     "before:absolute before:-inset-2 before:content-['']", // área táctil de 40 px (WCAG 2.5.8)
     // Sin firma (o deshabilitado) los íconos de acción se apagan, como en Figma Default, y no reaccionan al hover
-    'aria-disabled:cursor-default aria-disabled:bg-transparent aria-disabled:[--btn-icon:var(--color-ds-text-neutral-disabled-positive)]',
+    'aria-disabled:cursor-default aria-disabled:bg-transparent aria-disabled:[--btn-icon:var(--color-ds-text-neutral-disabled-on-canva)]',
   ].join(' ')
 );
 
@@ -92,5 +92,5 @@ export const signaturePadRowVariants = cva('pointer-events-none flex h-6 w-full 
 
 /** Texto de nombre y documento del firmante: 16/20 en text/neutral/white. */
 export const signaturePadSignerVariants = cva(
-  'min-w-0 truncate font-ds-primitives-typography-family-primary text-ds-typography-body-size-lg leading-ds-typography-body-line-height-short-lg text-ds-text-neutral-white'
+  'min-w-0 truncate font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)] text-ds-typography-body-size-lg leading-ds-typography-body-line-height-short-lg text-ds-text-neutral-white'
 );

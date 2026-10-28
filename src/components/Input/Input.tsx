@@ -2,9 +2,6 @@ import { forwardRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import type { InputProps } from './Input.types';
 import { inputControlVariants, inputFieldVariants } from './Input.variants';
-import { EyeIcon } from '../../icons/EyeIcon';
-import { EyeSlashIcon } from '../../icons/EyeSlashIcon';
-import { InfoCircleIcon } from '../../icons/InfoCircleIcon';
 import { cn } from '../../utils/cn';
 import { Icon } from '../Icon';
 import { FIELD_FOCUS_RING, FIELD_ICON_SLOT, FieldLabel, FieldMessage, FieldRow, useField } from '../Field';
@@ -61,7 +58,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div {...rootProps} className={cn('flex flex-col', fullWidth ? 'w-full' : 'w-[320px] max-w-full', rootProps?.className, className)}>
-        <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled, icon: <InfoCircleIcon /> } : null}>
+        <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled, icon: <Icon name="info-circle" size={16} variant="fill" /> } : null}>
           <div className={inputFieldVariants({ variant, state: visualState })}>
             {leading && (
               <span
@@ -110,7 +107,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 onClick={() => setShowPassword((v) => !v)}
                 className={cn(FIELD_ICON_SLOT, 'cursor-pointer rounded-sm border-0 bg-transparent p-0', FIELD_FOCUS_RING, 'disabled:cursor-not-allowed')}
               >
-                {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
+                <Icon name={showPassword ? 'eye-slash' : 'eye'} size={16} variant="fill" data-figma-part="Icon Right" />
               </button>
             )}
           </div>

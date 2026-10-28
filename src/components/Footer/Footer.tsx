@@ -217,7 +217,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
                     </span>
                   )}
                   {has(copyright) && (
-                    <p className="m-0 min-w-0" data-figma-part={figmaName(copyright)}>
+                    <p className="m-0 min-w-0 [font-weight:var(--ds-primitives-typography-weight-regular)]" data-figma-part={figmaName(copyright)}>
                       {copyright}
                     </p>
                   )}
@@ -227,7 +227,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
             ) : (
               <>
                 {has(copyright) && (
-                  <p className="m-0 flex-1" data-figma-part={figmaName(copyright)}>
+                  <p className="m-0 flex-1 [font-weight:var(--ds-primitives-typography-weight-regular)]" data-figma-part={figmaName(copyright)}>
                     {copyright}
                   </p>
                 )}

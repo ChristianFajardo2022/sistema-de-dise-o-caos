@@ -11,7 +11,8 @@ import { cva } from 'class-variance-authority';
  *   (dimention/field/Calendar/calendar min y max) y hasta 460 en móvil.
  * - Celda de día (Only date): círculo con padding space/field/day-cells/sm (4), radio field/full, 14/18.
  *   Default: background/field/default (negro 40 %); Hover: background/field/hover; Select: background/field/active-purpple
- *   con texto white-unicolor; Disabled: sin relleno y texto text/neutral/disabled-positive.
+ *   con texto white-unicolor; Disabled: sin relleno y texto text/neutral/disabled-on-canva (Figma usa
+ *   además color/text/field/day-cells/disabled en los días fuera del mes: no existe en tokens.css, para diseño).
  * - Celda de rango: marco transparente (padding space/field/xs: 4, móvil 2) con el "Number Item" dentro. Los extremos
  *   y el tramo usan la banda background/acent/tertiary-opacity (púrpura 20 %): Active firts y Active finish llevan el
  *   círculo púrpura y la banda al lado interior; Left/Right curve cierran la banda en el borde de la fila; Half active
@@ -67,7 +68,7 @@ const CELL_FILL = {
   default: 'bg-ds-background-field-default text-ds-text-neutral-white',
   hover: 'bg-ds-background-field-hover text-ds-text-neutral-white',
   select: 'bg-ds-background-field-active-purpple text-ds-text-neutral-white-unicolor',
-  disabled: 'text-ds-text-neutral-disabled-positive',
+  disabled: 'text-ds-text-neutral-disabled-on-canva',
 } as const;
 
 /** Celda de día de `Only date` (set "Number cell (Only day)"): State Default, Hover, Select y Disabled. */
