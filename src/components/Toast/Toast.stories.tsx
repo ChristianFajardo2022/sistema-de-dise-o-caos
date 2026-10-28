@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Toast } from './Toast';
+import { Snackbar } from './Snackbar';
 import { Toaster } from './Toaster';
+import { useToastQueue } from './useToastQueue';
 import type { ToastType } from './Toast.types';
 import { Button } from '../Button';
 
@@ -120,5 +122,60 @@ export const A11yTest: Story = {
     await userEvent.keyboard('{Enter}');
     await userEvent.keyboard('{Escape}');
     await expect(onCloseSpy).toHaveBeenCalledTimes(2);
+  },
+};
+
+function QueueDemo() {
+  const { items, add, remove, clear } = useToastQueue({ limit: 3 });
+  const n = useRef(0);
+  return (
+    <div className="relative h-96 w-full bg-ds-background-general-black p-6">
+      <div className="flex gap-2">
+        <Button variant="secondary" size="xs" onClick={() => add({ type: 'success', title: `Aviso ${++n.current}`, description: 'Se cierra solo.', duration: 5000 })}>
+          Agregar toast
+        </Button>
+        <Button variant="secondary" size="xs" onClick={() => add({ kind: 'snackbar', type: 'info', title: `Snackbar ${++n.current}`, action: { label: 'Deshacer' } })}>
+          Agregar snackbar
+        </Button>
+        <Button variant="tertiary" size="xs" onClick={() => items[0] && remove(items[0].id)}>
+          Quitar el primero
+        </Button>
+        <Button variant="tertiary" size="xs" onClick={clear}>
+          Quitar todos
+        </Button>
+      </div>
+      <Toaster position="absolute" placement="bottom-end">
+        {items.map((i) => (i.kind === 'snackbar' ? <Snackbar key={i.id} {...i.props} /> : <Toast key={i.id} {...i.props} />))}
+      </Toaster>
+    </div>
+  );
+}
+
+/** `useToastQueue`: agregar, quitar y límite de 3 visibles. Cada aviso sale con `animate-caos-toast-out` y se desmonta al terminar. */
+export const WithQueue: Story = {
+  parameters: { layout: 'fullscreen' },
+  render: () => <QueueDemo />,
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const add = c.getByRole('button', { name: 'Agregar toast' });
+    for (let i = 0; i < 4; i += 1) await userEvent.click(add);
+    // Al cuarto, el más antiguo empieza a salir (data-state="closed") y luego se desmonta
+    await expect(canvasElement.querySelectorAll('[data-state="open"]')).toHaveLength(3);
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-state]')).toHaveLength(3), { timeout: 2000 });
+    await userEvent.click(c.getByRole('button', { name: 'Quitar todos' }));
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-state]')).toHaveLength(0), { timeout: 2000 });
+  },
+};
+
+const onExitedSpy = fn();
+
+/** Test: `open={false}` marca `data-state="closed"` y llama a `onExited` una sola vez al terminar la salida. */
+export const ExitTest: Story = {
+  tags: ['!autodocs'],
+  render: () => <Toast type="info" title="Saliendo" open={false} onExited={onExitedSpy} data-testid="t-exit" />,
+  play: async ({ canvasElement }) => {
+    onExitedSpy.mockClear();
+    await expect(within(canvasElement).getByTestId('t-exit')).toHaveAttribute('data-state', 'closed');
+    await waitFor(() => expect(onExitedSpy).toHaveBeenCalledTimes(1), { timeout: 2000 });
   },
 };

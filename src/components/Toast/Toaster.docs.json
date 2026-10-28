@@ -25,10 +25,14 @@
       "description": "Toasts y Snackbars."
     }
   },
+  "hook": {
+    "name": "useToastQueue({ limit = 3 })",
+    "description": "Cola sencilla para el Toaster. Devuelve { items, add, remove, clear }. add(toast) agrega un aviso (props de Toast, o de Snackbar con kind: 'snackbar'; id opcional) y devuelve su id; con un id ya abierto no duplica. remove(id) y clear() inician la salida animada. Al pasar el límite de avisos abiertos, el más antiguo empieza a salir. Cada item trae { id, kind, props }: props se esparce sobre <Toast> o <Snackbar> e incluye open, onClose (llama también al onClose que pasaste) y onExited (desmonta al terminar la salida). Un Toast agregado sin onClose recibe igualmente el botón de cierre."
+  },
   "examples": [
     {
-      "title": "Pila",
-      "code": "<Toaster>{items.map((i) => <Toast key={i.id} {...i} onClose={() => remove(i.id)} />)}</Toaster>"
+      "title": "Pila con useToastQueue",
+      "code": "const { items, add } = useToastQueue({ limit: 3 });\nadd({ type: 'success', title: 'Guardado', duration: 5000 });\n<Toaster>{items.map((i) => (i.kind === 'snackbar' ? <Snackbar key={i.id} {...i.props} /> : <Toast key={i.id} {...i.props} />))}</Toaster>"
     }
   ]
 }

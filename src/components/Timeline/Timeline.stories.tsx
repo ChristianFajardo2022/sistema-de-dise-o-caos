@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
+import { Icon } from '../Icon';
 import { StatusTracker } from './StatusTracker';
 import { Timeline } from './Timeline';
 import { TimelineItem } from './TimelineItem';
@@ -235,5 +236,50 @@ export const TestStatusTracker: Story = {
     const button = c.getByRole('button', { name: 'Ver historial' });
     await userEvent.tab();
     await expect(button).toHaveFocus();
+  },
+};
+
+/** Slot `icon` en el nodo: decorativo, centrado sobre el punto o el anillo sin cambiar su huella. */
+export const WithNodeIcons: Story = {
+  render: (args) => (
+    <Timeline {...args}>
+      <TimelineItem status="complete" title="Recibido" icon={<Icon name="tick-circle" size={12} variant="line" className="text-ds-icon-general-default-unicolor" />} />
+      <TimelineItem status="current" title="En proceso" icon={<Icon name="clock" size={12} variant="line" className="text-ds-icon-general-default-unicolor" />} />
+      <TimelineItem status="incomplete" title="Listo" />
+    </Timeline>
+  ),
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await expect(c.getAllByRole('listitem')).toHaveLength(3);
+    // El ícono es decorativo: no aparece en el árbol de accesibilidad
+    await expect(c.queryByRole('img')).toBeNull();
+    await expect(canvasElement.querySelectorAll('[data-figma-part="Icon"] svg[aria-hidden="true"]')).toHaveLength(2);
+  },
+};
+
+function LiveDemo() {
+  const [step, setStep] = useState(0);
+  const items = TRACKER_ITEMS.map((i, n): TimelineItemData => ({ ...i, status: n < step ? 'complete' : n === step ? 'current' : 'incomplete' }));
+  return (
+    <div className="flex w-[900px] max-w-full flex-col gap-6">
+      <StatusTracker items={items} live="polite" />
+      <button type="button" onClick={() => setStep((s) => Math.min(s + 1, items.length - 1))} className="text-ds-text-neutral-white underline">
+        Avanzar
+      </button>
+    </div>
+  );
+}
+
+/** `live="polite"`: una región `aria-live` oculta dice "Estado actual: En curso: <paso>" cuando cambia el paso. */
+export const StatusTrackerLive: Story = {
+  tags: ['!autodocs'],
+  render: () => <LiveDemo />,
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const region = canvasElement.querySelector('[aria-live="polite"]');
+    await expect(region).not.toBeNull();
+    await expect(region).toHaveTextContent(`Estado actual: En curso: ${TRACKER_ITEMS[0].title}`);
+    await userEvent.click(c.getByRole('button', { name: 'Avanzar' }));
+    await expect(region).toHaveTextContent(`Estado actual: En curso: ${TRACKER_ITEMS[1].title}`);
   },
 };

@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import type { ToastProps } from './Toast.types';
-import { defaultRole, escapeCloses, useAutoClose } from './Toast.shared';
+import { defaultRole, escapeCloses, useExit, useAutoClose } from './Toast.shared';
 import { ToastIcon, ToastInformation } from './ToastParts';
 import { toastVariants } from './Toast.variants';
 import { ButtonCorner } from '../ButtonCorner';
@@ -16,10 +16,11 @@ import { cn } from '../../utils/cn';
  */
 export const Toast = forwardRef<HTMLDivElement, ToastProps>(
   (
-    { type = 'success', title, description, icon, label, role, duration, onClose, closeLabel = 'Cerrar notificación', className, onKeyDown, onMouseEnter, onMouseLeave, onFocus, onBlur, ...rest },
+    { type = 'success', title, description, icon, label, role, duration, onClose, open = true, onExited, onAnimationEnd, closeLabel = 'Cerrar notificación', className, onKeyDown, onMouseEnter, onMouseLeave, onFocus, onBlur, ...rest },
     ref
   ) => {
-    const timer = useAutoClose(duration, onClose);
+    const timer = useAutoClose(open ? duration : undefined, onClose);
+    const exit = useExit(open, onExited);
     const close = escapeCloses(onClose);
     return (
       <div
@@ -27,9 +28,14 @@ export const Toast = forwardRef<HTMLDivElement, ToastProps>(
         ref={ref}
         role={role ?? defaultRole(type)}
         aria-atomic="true"
+        data-state={exit['data-state']}
         data-theme="dark"
         data-type={type}
         className={cn(toastVariants({ surface: 'notched' }), className)}
+        onAnimationEnd={(e) => {
+          exit.onAnimationEnd(e);
+          onAnimationEnd?.(e);
+        }}
         onMouseEnter={(e) => {
           timer.onMouseEnter();
           onMouseEnter?.(e);

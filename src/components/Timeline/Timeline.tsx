@@ -29,6 +29,7 @@ export const Timeline = forwardRef<HTMLOListElement, TimelineProps>(
                   status={item.status}
                   progress={item.progress}
                   statusLabel={item.statusLabel}
+                  icon={item.icon}
                 />
               ))
             : children}

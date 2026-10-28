@@ -1,6 +1,7 @@
 import { forwardRef, useId } from 'react';
 import type { StatusTrackerProps, TimelineItemData } from './Timeline.types';
 import { Timeline } from './Timeline';
+import { DEFAULT_STATUS_LABELS } from './TimelineContext';
 import { Button } from '../Button';
 import {
   statusTrackerHeaderClass,
@@ -26,7 +27,7 @@ function currentIndex(items: TimelineItemData[]): number {
 /**
  * Seguimiento de estado (Status tracker de Figma, 13770:10884): resumen del estado actual, línea de tiempo
  * horizontal y botón de historial opcional. En móvil la barra queda sin textos y se resume el paso actual debajo.
- * Los pasos van sin descripción (como en Figma).
+ * Los pasos van sin descripción (como en Figma). Con `live` anuncia los cambios de estado (región `aria-live`).
  */
 export const StatusTracker = forwardRef<HTMLDivElement, StatusTrackerProps>(
   (
@@ -39,6 +40,7 @@ export const StatusTracker = forwardRef<HTMLDivElement, StatusTrackerProps>(
       historyLabel = 'Ver historial',
       historyAction,
       statusLabels,
+      live,
       className,
       ...restProps
     },
@@ -48,6 +50,17 @@ export const StatusTracker = forwardRef<HTMLDivElement, StatusTrackerProps>(
     const current = Math.max(0, currentIndex(items));
     const step = items[current];
     const rows = items.map(({ description: _description, ...rest }) => rest);
+    // Texto del anuncio: título + estado + paso actual (la región solo existe si se pide `live`)
+    const announcement =
+      live && step
+        ? [
+            typeof title === 'string' ? title : null,
+            step.statusLabel ?? statusLabels?.[step.status] ?? DEFAULT_STATUS_LABELS[step.status],
+            typeof step.title === 'string' ? step.title : null,
+          ]
+            .filter(Boolean)
+            .join(': ')
+        : null;
     const action =
       historyAction ??
       (onShowHistory ? (
@@ -88,6 +101,11 @@ export const StatusTracker = forwardRef<HTMLDivElement, StatusTrackerProps>(
               </p>
             )}
           </div>
+        )}
+        {live && (
+          <p className="sr-only" aria-live={live} aria-atomic="true">
+            {announcement}
+          </p>
         )}
         {action}
       </div>

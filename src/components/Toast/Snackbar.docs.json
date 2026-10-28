@@ -44,6 +44,16 @@
       "required": false,
       "description": "Cierre: botón (Toast), Escape con el foco dentro, fin de duration."
     },
+    "open": {
+      "type": "boolean",
+      "default": "true",
+      "description": "false inicia la animación de salida (data-state=\"closed\", utilidad animate-caos-toast-out de index.css: 200 ms con desplazamiento de 8 px; solo fundido de 150 ms con prefers-reduced-motion). El aviso sigue montado hasta que termina."
+    },
+    "onExited": {
+      "type": "() => void",
+      "required": false,
+      "description": "Termina la salida (animationend o plazo de respaldo de 400 ms): desmonta el aviso aquí. useToastQueue ya lo hace."
+    },
     "className": {
       "type": "string",
       "required": false,

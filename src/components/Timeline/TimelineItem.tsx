@@ -17,7 +17,7 @@ import { cn } from '../../utils/cn';
 
 /**
  * Paso de una línea de tiempo (Indicator de Figma): nodo, segmento de barra y texto.
- * Va dentro de `Timeline`. El nodo y la barra son decorativos; el estado se anuncia en texto.
+ * Va dentro de `Timeline`. El nodo y la barra son decorativos (también el slot `icon`); el estado se anuncia en texto.
  */
 export const TimelineItem = forwardRef<HTMLLIElement, TimelineItemProps>(
   (
@@ -30,6 +30,7 @@ export const TimelineItem = forwardRef<HTMLLIElement, TimelineItemProps>(
       status = 'incomplete',
       progress,
       statusLabel,
+      icon,
       orientation: orientationProp,
       position,
       className,
@@ -47,6 +48,12 @@ export const TimelineItem = forwardRef<HTMLLIElement, TimelineItemProps>(
         {time != null && <span data-figma-part="8:00pm">{time}</span>}
       </>
     );
+    const nodeIcon =
+      icon != null ? (
+        <span className="absolute inset-0 flex items-center justify-center" data-figma-part="Icon">
+          {icon}
+        </span>
+      ) : null;
     const isRing = status === 'current' || status === 'warning' || status === 'error';
 
     return (
@@ -69,11 +76,14 @@ export const TimelineItem = forwardRef<HTMLLIElement, TimelineItemProps>(
           )}
         >
           {isRing ? (
-            <span className={timelineRingVariants({ status })} data-figma-part="Step indicator">
+            <span className={cn(timelineRingVariants({ status }), 'relative')} data-figma-part="Step indicator">
               <span className={timelineCoreVariants({ status })} />
+              {nodeIcon}
             </span>
           ) : (
-            <span className={timelineDotVariants({ status })} data-figma-part="Step indicator" />
+            <span className={cn(timelineDotVariants({ status }), 'relative')} data-figma-part="Step indicator">
+              {nodeIcon}
+            </span>
           )}
         </div>
         <div className={timelineTextVariants({ orientation })} data-figma-part="Text">

@@ -39,6 +39,12 @@ export interface TimelineItemData {
   progress?: TimelineProgress;
   /** Texto de estado para lector de pantalla; reemplaza al de `statusLabels`. */
   statusLabel?: string;
+  /**
+   * Slot de ícono en el nodo (Step indicator). Se centra sobre el nodo sin cambiar su huella (8 px el punto, 12 px el
+   * anillo), así que usa un `<Icon size={12} />` (o 14 como máximo) y dale color con `className`. Es decorativo
+   * (`aria-hidden`): el estado lo sigue anunciando el texto, no el ícono.
+   */
+  icon?: ReactNode;
 }
 
 export interface TimelineItemProps
@@ -80,4 +86,10 @@ export interface StatusTrackerProps extends Omit<HTMLAttributes<HTMLDivElement>,
   historyAction?: ReactNode;
   /** Textos de estado para lector de pantalla, por estado. */
   statusLabels?: TimelineStatusLabels;
+  /**
+   * Anuncia los cambios de estado a los lectores de pantalla con una región `aria-live` oculta a la vista que dice
+   * "título: estado: paso actual". Por defecto no hay región (nada se anuncia solo). Usa `polite` para avances normales
+   * y `assertive` solo para errores. El primer render no se anuncia: solo lo que cambia después.
+   */
+  live?: 'polite' | 'assertive';
 }

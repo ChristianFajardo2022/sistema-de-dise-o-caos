@@ -38,3 +38,34 @@
     transform: translate(calc(var(--dx) * 0.6), calc(var(--dy) * 0.6));
   }
 }
+
+/* CAOS — Salida de Toast y Snackbar (`data-state="closed"`): baja 8 px y se desvanece en 200 ms, espejo de la entrada.
+   Con reducción de movimiento queda solo el fundido (150 ms, sin desplazamiento). `forwards` deja el aviso invisible
+   hasta que el componente llama a `onExited` y se desmonta. */
+@keyframes caos-toast-out {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  to {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
+@keyframes caos-toast-out-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@utility animate-caos-toast-out {
+  animation: caos-toast-out 200ms ease-in forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: caos-toast-out-fade 150ms ease-in forwards;
+  }
+}

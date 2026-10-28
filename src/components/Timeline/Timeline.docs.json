@@ -15,6 +15,7 @@
     "TimelineItem.time": { "type": "ReactNode", "required": false, "description": "Hour text." },
     "TimelineItem.dateTime": { "type": "string", "required": false, "description": "Fecha y hora ISO para <time dateTime>." },
     "TimelineItem.status": { "type": "'incomplete' | 'current' | 'warning' | 'error' | 'complete'", "default": "'incomplete'", "description": "State de Figma (Incomplete, Currently, Warning, Error, Check). Solo current lleva aria-current='step'." },
+    "TimelineItem.icon": { "type": "ReactNode", "required": false, "description": "Slot de ícono en el nodo: centrado sobre el punto (8 px) o el anillo (12 px) sin cambiar su huella. Usa <Icon size={12} /> con color propio; es decorativo (aria-hidden), el estado lo anuncia el texto." },
     "TimelineItem.progress": { "type": "0 | 50 | 100", "required": false, "description": "Percentage de Figma. Por defecto sale del estado: incomplete 0, complete 100, el resto 50." },
     "TimelineItem.position": { "type": "'initial' | 'middle' | 'finally'", "required": false, "description": "Type de Figma. Por defecto sale de la posición del ítem en la lista." },
     "TimelineItem.orientation": { "type": "'vertical' | 'horizontal'", "required": false, "description": "Por defecto la de Timeline." },
@@ -24,6 +25,7 @@
     "StatusTracker.marker": { "type": "ReactNode", "required": false, "description": "Figura decorativa sobre el paso actual (aria-hidden)." },
     "StatusTracker.onShowHistory": { "type": "() => void", "required": false, "description": "Muestra el botón de historial (Button history de Figma) y lo llama al pulsarlo." },
     "StatusTracker.historyLabel": { "type": "string", "default": "'Ver historial'", "description": "Texto del botón." },
+    "StatusTracker.live": { "type": "'polite' | 'assertive'", "required": false, "description": "Activa una región aria-live (oculta a la vista) que anuncia \"título: estado: paso actual\" cuando cambia el paso. Sin valor no hay región. polite para avances, assertive solo para errores; el primer render no se anuncia." },
     "StatusTracker.historyAction": { "type": "ReactNode", "required": false, "description": "Slot que reemplaza al botón de historial." }
   },
   "examples": [

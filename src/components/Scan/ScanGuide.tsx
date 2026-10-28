@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import type { ScanGuideProps, ScanGuideType } from './Scan.types';
 import { GUIDE_DOTS, GUIDE_SHAPES, GUIDE_SPOT_TRANSFORM } from './ScanGuide.shapes';
 import type { ShapeNode } from './ScanGuide.shapes';
+import { Icon } from '../Icon';
+import type { IconName } from '../Icon';
 import { REDUCED_MOTION_QUERY, useMediaQuery } from '../../utils/useMediaQuery';
 import { cn } from '../../utils/cn';
 
@@ -22,8 +24,23 @@ const STROKE_COLOR = 'var(--color-ds-border-general-white)';
 
 const camel = (name: string) => name.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 
+/**
+ * Ícono de la biblioteca dentro de la guía (nodo `icon` de las figuras). Figma lo coloca como instancia de `Icon-sizes`
+ * (tamaño base 20 o 24) escalada y movida: aquí es `<Icon>` en un `<g>` con `translate` + `scale`, para que siga
+ * el fundido SMIL del fotograma que lo contiene. `hidden` = capa con opacidad 0 en Figma (inicio de la animación).
+ */
+function renderIcon(node: ShapeNode, key: number): ReactNode {
+  const { name, variant, size, x, y, scale, hidden } = node.a;
+  return (
+    <g key={key} transform={`translate(${x} ${y}) scale(${scale})`} opacity={hidden ? 0 : undefined} className="text-ds-icon-general-default">
+      <Icon name={name as IconName} size={Number(size) as 20 | 24} variant={variant as 'line' | 'fill'} data-figma-part="Icon-sizes" />
+    </g>
+  );
+}
+
 /** Dibuja un nodo exportado de Figma: atributos en camelCase, colores a tokens e ids con prefijo único. */
 function renderShape(node: ShapeNode, prefix: string, key: number): ReactNode {
+  if (node.t === 'icon') return renderIcon(node, key);
   const props: Record<string, unknown> = { key };
   for (const [name, raw] of Object.entries(node.a)) {
     if (name === 'xmlns') continue;
@@ -61,7 +78,8 @@ function opacityKeys(i: number, n: number): { keyTimes: string; values: string }
 /**
  * Guía animada del escaneo (`animation-scan`): rejilla de 120 puntos con foco de luz radial, visor de esquinas y la
  * figura del tipo (rostro, código de barras, documento o QR). Los trazados son los exportados de Figma (SVG de cada
- * fotograma). Con `animated` (por defecto) los fotogramas se encadenan en bucle con fundido cruzado y el foco de luz
+ * fotograma); los íconos de Id y QR (user-tag, scan-barcode) son `<Icon>` de la biblioteca, posicionados y escalados
+ * como las instancias de Figma. Con `animated` (por defecto) los fotogramas se encadenan en bucle con fundido cruzado y el foco de luz
  * se expande (SMIL); con `prefers-reduced-motion: reduce` o `animated={false}` queda fija en `frame`.
  * Decorativa salvo que se pase `label`.
  */

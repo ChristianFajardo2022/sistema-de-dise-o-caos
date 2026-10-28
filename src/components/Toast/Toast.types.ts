@@ -32,6 +32,13 @@ export interface ToastBaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
   duration?: number;
   /** Cierre: botón de cierre del Toast, Escape con el foco dentro y fin de `duration` */
   onClose?: () => void;
+  /**
+   * `false` inicia la animación de salida (`data-state="closed"`): el aviso sigue montado hasta que termina y entonces
+   * llama a `onExited`. Por defecto `true`. Quien lo use debe desmontarlo en `onExited` (con `useToastQueue` ya se hace).
+   */
+  open?: boolean;
+  /** Termina la animación de salida (o pasó su plazo): desmonta el aviso aquí. */
+  onExited?: () => void;
 }
 
 export interface ToastProps extends ToastBaseProps {

@@ -17,6 +17,7 @@ import type { IconName } from '../Icon/Icon.types';
  * - Information: columna con gap 4; Subheading Prospero semibold heading/xs (12/16) con padding superior 4;
  *   Description Helvetica Neue regular body/sm line-height-large (12/18). Texto text/neutral/white-unicolor.
  * - Entrada: opacidad y desplazamiento de 8 px solo con `motion-safe` (sin movimiento reducido, aparece de golpe).
+ * - Salida (`open={false}`, `data-state="closed"`): `animate-caos-toast-out` (200 ms, 150 ms solo fundido con movimiento reducido).
  */
 export const toastVariants = cva(
   [
@@ -25,6 +26,8 @@ export const toastVariants = cva(
     'text-ds-text-neutral-white-unicolor',
     'motion-safe:transition-[opacity,translate] motion-safe:duration-200 motion-safe:ease-out',
     'motion-safe:starting:translate-y-2 motion-safe:starting:opacity-0',
+    // Salida: ver `animate-caos-toast-out` en index.css; mientras sale ya no recibe puntero
+    'data-[state=closed]:pointer-events-none data-[state=closed]:animate-caos-toast-out',
   ],
   {
     variants: {
