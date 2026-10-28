@@ -14,6 +14,8 @@ import { cva } from 'class-variance-authority';
  * - Icon-single sin alto fijo, como Figma: padding Y space/button/lg (8), padding X space/button/3xl · 2xl · lg
  *   (md · sm · xs) y caja de contenido de 16 de ancho por dimention/button/container/lg · md · xs de alto (ver
  *   Button.tsx). Sale md 56 · sm 48 · xs 32 en escritorio y md 48 · sm 40 · xs 32 en móvil (tokens responsive).
+ * - `touchTarget` (Icon-single de 44×44, Top App Bar iOS: `tittle-header/top-app-bar`): cuadrado de 44 con el ícono de 20
+ *   centrado y sin padding; `fullWidth` pone el botón al ancho del contenedor.
  * - State: default · hover · focus · press · inactive · delete · load (tertiary sin load).
  * - Tipografía: Helvetica Neue (typography/family/Primary), peso Semibold (600),
  *   typography/button/size/md-uniform (14px fijo en todos los breakpoints), interlineado 100 %.
@@ -80,6 +82,18 @@ export const buttonVariants = cva(
 
       iconOnly: {
         true: 'py-ds-space-button-lg',
+        false: '',
+      },
+
+      // Ancho completo: ocupa el ancho del contenedor (en móvil, p. ej., "Mostrar más" de Pagination)
+      fullWidth: {
+        true: 'w-full',
+        false: '',
+      },
+
+      // Icon-single de 44×44 (botones de Top App Bar iOS): ver compoundVariants
+      touchTarget: {
+        true: '',
         false: '',
       },
     },
@@ -389,6 +403,9 @@ export const buttonVariants = cva(
       },
       { variant: 'tertiary', iconOnly: true, state: 'hover', class: 'bg-ds-background-button-tertiary-hover' },
       { variant: 'tertiary', iconOnly: true, state: ['focus', 'press'], class: 'bg-ds-background-button-tertiary-focus-press' },
+      // Icon-single de 44×44 (Top App Bar iOS): Figma fija 44 con padding 8/16 y recorta la caja de contenido; aquí el
+      // ícono (20) queda centrado en un cuadrado de 44 sin padding. Va al final para ganar a los paddings de arriba.
+      { iconOnly: true, touchTarget: true, class: 'size-11 p-0' },
     ],
 
     defaultVariants: {
@@ -398,6 +415,8 @@ export const buttonVariants = cva(
       size: 'md',
       state: 'default',
       iconOnly: false,
+      fullWidth: false,
+      touchTarget: false,
     },
   }
 );

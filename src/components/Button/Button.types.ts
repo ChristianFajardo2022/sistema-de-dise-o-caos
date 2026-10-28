@@ -32,6 +32,13 @@ export interface ButtonBaseProps extends ButtonHTMLAttributes<HTMLButtonElement>
    * tokens responsive de Figma: md 56 · sm 48 · xs 32 en escritorio y md 48 · sm 40 · xs 32 en móvil.
    */
   size?: ButtonSize;
+  /** Ocupa todo el ancho del contenedor (`w-full`). Por defecto el botón mide lo que pide su contenido. */
+  fullWidth?: boolean;
+  /**
+   * Solo con `iconOnly`: Icon-single de 44×44 de los botones de Top App Bar iOS (Figma fija 44 en lugar del 56/48/32
+   * de `size`). El ícono es de 20 y queda centrado; `size` solo decide el aspecto del tipo, no la medida.
+   */
+  touchTarget?: boolean;
   /** State forzado. `delete` es el estado de acción destructiva de cada tipo. */
   state?: ButtonState;
   /** Estado load: muestra el spinner y establece aria-busy (tertiary no tiene load) */

@@ -144,7 +144,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
               size="md"
               disabled={isLast}
               onClick={() => goTo(page + 1)}
-              className={isMobile ? 'w-full' : undefined}
+              fullWidth={isMobile}
               data-figma-part="Button"
             >
               {text.loadMore}
@@ -200,8 +200,6 @@ function PageField({
     setInvalid(false);
   };
 
-  const digits = String(totalPages).length;
-
   return (
     <>
       <span className={paginationTextClass} aria-hidden="true" data-figma-part="Página">
@@ -210,12 +208,11 @@ function PageField({
       <DigitInput
         size="32"
         value={draft}
-        maxLength={digits}
+        maxLength={String(totalPages).length}
         invalid={invalid}
         aria-label={text.input}
         aria-describedby={invalid ? messageId : undefined}
-        // 24 de relleno horizontal + los dígitos del total (mínimo el 40 de Figma)
-        style={{ width: `max(2.5rem, calc(1.5rem + ${digits}ch + 0.25rem))` }}
+        placeholder={String(page)}
         onChange={(event) => {
           setDraft(event.target.value);
           setInvalid(false);

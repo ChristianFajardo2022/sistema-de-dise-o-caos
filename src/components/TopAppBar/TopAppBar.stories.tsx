@@ -11,7 +11,7 @@ import type { IconName } from '../Icon/Icon.types';
 /** Botón de acción de la derecha: círculo blanco de 44 en Ios, botón de 48 sin relleno en Android */
 function Action({ platform, icon, label, onClick }: { platform: TopAppBarPlatform; icon: IconName; label: string; onClick?: () => void }) {
   return platform === 'ios' ? (
-    <Button variant="primary" size="sm" iconOnly aria-label={label} onClick={onClick} className="size-11 !px-0">
+    <Button variant="primary" iconOnly touchTarget aria-label={label} onClick={onClick}>
       <Icon name={icon} variant="fill" size={20} data-figma-part="Icon-sizes" />
     </Button>
   ) : (

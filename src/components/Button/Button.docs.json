@@ -59,6 +59,16 @@
       "default": false,
       "description": "Icon-single: botón cuadrado (56, 48 o 32 en escritorio; 48, 40 o 32 en móvil). Pasar el ícono como children. Con iconOnly es obligatorio aria-label o aria-labelledby (el tipo lo exige)."
     },
+    "fullWidth": {
+      "type": "boolean",
+      "default": false,
+      "description": "Ocupa todo el ancho del contenedor (w-full)."
+    },
+    "touchTarget": {
+      "type": "boolean",
+      "default": false,
+      "description": "Solo con iconOnly: Icon-single de 44×44 con ícono de 20 centrado, como los botones de Top App Bar iOS (tittle-header/top-app-bar). Sustituye la medida de size."
+    },
     "href": {
       "type": "string",
       "required": false,

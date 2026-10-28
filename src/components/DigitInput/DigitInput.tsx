@@ -17,7 +17,10 @@ export const DigitInput = forwardRef<HTMLInputElement, DigitInputProps>(
       inputMode = 'numeric',
       pattern = '[0-9]',
       maxLength = 1,
+      width,
+      placeholder,
       className,
+      style,
       onChange,
       ...restProps
     },
@@ -50,9 +53,24 @@ export const DigitInput = forwardRef<HTMLInputElement, DigitInputProps>(
       onChange?.(e);
     };
 
+    // Ancho: `width` explícito manda; si no, una casilla de un carácter mide lo de Figma (clase del tamaño) y una de
+    // varios crece con los caracteres que admite (o con el placeholder, si es más largo): 24 de padding + n dígitos
+    const chars = Math.max(maxLength, placeholder?.length ?? 0);
+    const minWidth = size === '32' ? '2.5rem' : '37px';
+    const resolvedWidth =
+      width !== undefined
+        ? typeof width === 'number'
+          ? `${width}px`
+          : width
+        : chars > 1
+          ? `max(${minWidth}, calc(1.5rem + ${chars}ch + 0.25rem))`
+          : undefined;
+
     return (
       <input
         {...restProps}
+        placeholder={placeholder}
+        style={resolvedWidth ? { width: resolvedWidth, ...style } : style}
         ref={ref}
         type="text"
         inputMode={inputMode}

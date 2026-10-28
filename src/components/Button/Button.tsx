@@ -34,8 +34,9 @@ const ICON_SIZE_CLASS: Record<ButtonIconSize, string> = {
  * Medida del ícono según Figma (Icon-sizes): con texto 20 en md y sm y 14 en xs; Icon-single 20 en md y sm y 16 en xs
  * (primary y secondary), o 24 y 20 en tertiary. `iconSize` la reemplaza.
  */
-function defaultIconSize(size: ButtonSize, variant: ButtonVariant, iconOnly: boolean): ButtonIconSize {
+function defaultIconSize(size: ButtonSize, variant: ButtonVariant, iconOnly: boolean, touchTarget = false): ButtonIconSize {
   if (!iconOnly) return size === 'xs' ? 14 : 20;
+  if (touchTarget) return 20;
   if (variant === 'tertiary') return size === 'xs' ? 20 : 24;
   return size === 'xs' ? 16 : 20;
 }
@@ -75,6 +76,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       leftIcon,
       rightIcon,
       iconOnly = false,
+      fullWidth = false,
+      touchTarget = false,
       iconSize,
       href,
       target,
@@ -104,7 +107,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const showEffect = variant === 'primary' && (computedState === 'default' || computedState === 'hover' || computedState === 'press');
 
     const icon = iconOnly ? (leftIcon ?? rightIcon ?? children) : null;
-    const iconClass = ICON_SIZE_CLASS[iconSize ?? defaultIconSize(size, variant, iconOnly)];
+    const iconClass = ICON_SIZE_CLASS[iconSize ?? defaultIconSize(size, variant, iconOnly, touchTarget && iconOnly)];
     const isLink = href !== undefined;
 
     const classes = cn(
@@ -115,6 +118,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         size,
         state: computedState,
         iconOnly,
+        fullWidth,
+        touchTarget: touchTarget && iconOnly,
       }),
       // Enlace inactivo: sin :disabled nativo, el cursor va por clase
       isLink && isDisabled && 'cursor-not-allowed',
@@ -181,7 +186,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         <span
           className={cn(
             'relative z-10 inline-flex items-center justify-center gap-ds-space-button-lg',
-            iconOnly && ICON_ONLY_CONTENT[size],
+            iconOnly && (touchTarget ? 'size-full' : ICON_ONLY_CONTENT[size]),
             isLoading && 'opacity-0'
           )}
         >

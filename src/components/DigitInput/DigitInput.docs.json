@@ -13,6 +13,8 @@
     "disabled": { "type": "boolean", "default": false, "description": "Estado Disabled." },
     "aria-label": { "type": "string", "required": true, "description": "Nombre accesible. Obligatorio (o aria-labelledby)." },
     "inputMode": { "type": "string", "default": "'numeric'", "description": "Teclado que se muestra. Con 'numeric' (por defecto) el campo solo acepta dígitos; con otro valor no filtra, para códigos alfanuméricos." },
+    "width": { "type": "number | string", "required": false, "description": "Ancho explícito (px si es número). Sin valor: 37 (Size 56) o 40 (Size 32) con un carácter; con más, crece según maxLength o placeholder." },
+    "placeholder": { "type": "string", "required": false, "description": "Texto visible con la casilla vacía; cuenta para el ancho automático." },
     "className": { "type": "string", "required": false, "description": "Clases adicionales. El resto de props nativas y el ref van al input." },
     "maxLength": { "type": "number", "required": false, "description": "Caracteres que acepta. Por defecto 1; CodeInput deja length en la primera casilla para el autocompletado one-time-code." }
   },
@@ -20,6 +22,7 @@
     { "title": "Casilla suelta", "code": "<DigitInput aria-label=\"Dígito 1 de 6\" />" },
     { "title": "Primera casilla de un código SMS", "code": "<DigitInput oneTimeCode aria-label=\"Dígito 1 de 6\" />" },
     { "title": "Error", "code": "<DigitInput invalid aria-label=\"Dígito 3 de 6\" defaultValue=\"4\" />" },
+    { "title": "Campo de varios caracteres (ancho automático)", "code": "<DigitInput size=\"32\" maxLength={3} placeholder=\"00\" aria-label=\"Número de página\" />" },
     { "title": "Tamaño pequeño", "code": "<DigitInput size=\"32\" aria-label=\"Dígito 1 de 4\" />" }
   ]
 }

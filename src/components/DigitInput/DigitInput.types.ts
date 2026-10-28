@@ -40,6 +40,16 @@ type DigitInputBaseProps = Omit<
    * el código entero del autocompletado del sistema (`one-time-code`) y repartirlo (CodeInput usa `length`).
    */
   maxLength?: number;
+  /**
+   * Ancho de la casilla: número en px o cualquier valor CSS. Sin valor, una casilla de un carácter mide lo de Figma
+   * (37 en Size 56, 40 en Size 32) y una de varios crece sola con `maxLength` (o con la longitud del `placeholder`).
+   */
+  width?: number | string;
+  /**
+   * Texto de ayuda visible mientras la casilla está vacía (nativo). Se pinta con el color de placeholder del estado
+   * y cuenta para el ancho automático.
+   */
+  placeholder?: string;
   /** Clases adicionales. */
   className?: string;
 };
