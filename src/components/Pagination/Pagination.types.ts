@@ -55,7 +55,8 @@ export interface PaginationProps extends Omit<HTMLAttributes<HTMLElement>, 'onCh
   /** Se llama al cambiar de página (botones, número, campo o "Mostrar más"). */
   onPageChange?: (page: number) => void;
   /**
-   * Type numeric: páginas a cada lado de la actual. Por defecto 2, con `boundaryCount` 0 da la ventana de 5 números de Figma.
+   * Type numeric: tamaño de la ventana (`2 × siblingCount + 1` números). Por defecto 2: con `boundaryCount` 0 da la
+   * ventana de 5 números de Figma, que empieza en la página actual y cerca del final se queda en las últimas 5.
    */
   siblingCount?: number;
   /**

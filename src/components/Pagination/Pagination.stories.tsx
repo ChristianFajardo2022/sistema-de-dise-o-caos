@@ -121,6 +121,26 @@ export const LastPageTest: Story = {
   },
 };
 
+/** Test: la ventana de números empieza en la actual y cerca del final se queda en las últimas 5 */
+export const WindowTest: Story = {
+  tags: ['!autodocs'],
+  args: { defaultPage: 6 },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const pages = () => c.getAllByRole('button').map((b) => b.getAttribute('aria-label')).filter((l) => l !== 'Anterior' && l !== 'Siguiente');
+    await expect(pages()).toEqual(['Página 6', 'Página 7', 'Página 8', 'Página 9', 'Página 10']);
+    await expect(c.getByRole('button', { name: 'Página 6' })).toHaveAttribute('aria-current', 'page');
+    await userEvent.click(c.getByRole('button', { name: 'Página 10' }));
+    await expect(pages()).toEqual(['Página 10', 'Página 11', 'Página 12', 'Página 13', 'Página 14']);
+    await userEvent.click(c.getByRole('button', { name: 'Página 14' }));
+    await userEvent.click(c.getByRole('button', { name: 'Página 15' }));
+    await userEvent.click(c.getByRole('button', { name: 'Página 16' }));
+    await userEvent.click(c.getByRole('button', { name: 'Página 17' }));
+    await expect(pages()).toEqual(['Página 16', 'Página 17', 'Página 18', 'Página 19', 'Página 20']);
+    await expect(c.getByRole('button', { name: 'Página 17' })).toHaveAttribute('aria-current', 'page');
+  },
+};
+
 /** Test: con boundaryCount aparecen puntos suspensivos ocultos al lector */
 export const EllipsisTest: Story = {
   tags: ['!autodocs'],
