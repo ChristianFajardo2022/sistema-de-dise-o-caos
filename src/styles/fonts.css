@@ -1,10 +1,11 @@
-/* Fuentes del sistema. Solo los pesos que usan los tokens (typography/weight: 400, 600, 700). */
+/* Fuentes del sistema. Pesos de los tokens (typography/weight desde el 28-oct: Regular 300, Semibold 600, Bold 800).
+   Falta el archivo Light de Helvetica Neue: mientras no esté, Regular cubre 300 y 400 (se ve más grueso que Figma). */
 
 /* typography/family/Primary — texto de UI (Button y demás) */
 @font-face {
   font-family: "Helvetica Neue";
   src: url("../assets/fonts/HelveticaNeue-Regular.woff2") format("woff2");
-  font-weight: 400;
+  font-weight: 300 400;
   font-style: normal;
   font-display: swap;
 }
@@ -19,7 +20,7 @@
 @font-face {
   font-family: "Helvetica Neue";
   src: url("../assets/fonts/HelveticaNeue-Bold.woff2") format("woff2");
-  font-weight: 700;
+  font-weight: 700 800;
   font-style: normal;
   font-display: swap;
 }
@@ -28,7 +29,7 @@
 @font-face {
   font-family: "Prospero";
   src: url("../assets/fonts/Prospero-Regular.woff2") format("woff2");
-  font-weight: 400;
+  font-weight: 300 400;
   font-style: normal;
   font-display: swap;
 }
@@ -42,7 +43,7 @@
 @font-face {
   font-family: "Prospero";
   src: url("../assets/fonts/Prospero-Bold.woff2") format("woff2");
-  font-weight: 700;
+  font-weight: 700 800;
   font-style: normal;
   font-display: swap;
 }

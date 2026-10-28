@@ -79,9 +79,9 @@
     --ds-primitives-space-11xl: 160px;
     --ds-primitives-space-12xl: 208px;
     --ds-primitives-typography-family-primary: "Helvetica Neue";
-    --ds-primitives-typography-weight-regular: 400;
+    --ds-primitives-typography-weight-regular: 300;
     --ds-primitives-typography-weight-semibold: 600;
-    --ds-primitives-typography-weight-bold: 700;
+    --ds-primitives-typography-weight-bold: 800;
     --ds-primitives-typography-size-4xl: 32px;
     --ds-primitives-typography-size-7xl: 56px;
     --ds-primitives-typography-size-5xl: 40px;
@@ -222,7 +222,7 @@
     --color-ds-text-link-default: var(--color-ds-primitives-color-secondary-a03);
     --color-ds-background-button-primary-load: var(--color-ds-primitives-color-primary-g10);
     --color-ds-background-button-primary-press: var(--color-ds-primitives-color-primary-g13);
-    --color-ds-background-button-primary-inactive: var(--color-ds-primitives-color-primary-g06);
+    --color-ds-background-button-primary-inactive: var(--color-ds-primitives-color-primary-g12);
     --color-ds-background-button-primary-hover: var(--color-ds-primitives-color-primary-g11);
     --color-ds-background-button-primary-focus: var(--color-ds-primitives-color-primary-g11);
     --color-ds-background-button-primary-default: var(--color-ds-primitives-color-primary-b01);
@@ -541,7 +541,7 @@
     --color-ds-text-link-default: var(--color-ds-primitives-color-secondary-a04);
     --color-ds-background-button-primary-load: var(--color-ds-primitives-color-primary-g10);
     --color-ds-background-button-primary-press: var(--color-ds-primitives-color-primary-g13);
-    --color-ds-background-button-primary-inactive: var(--color-ds-primitives-color-primary-g06);
+    --color-ds-background-button-primary-inactive: var(--color-ds-primitives-color-primary-g04);
     --color-ds-background-button-primary-hover: var(--color-ds-primitives-color-primary-g11);
     --color-ds-background-button-primary-focus: var(--color-ds-primitives-color-primary-g11);
     --color-ds-background-button-primary-default: var(--color-ds-primitives-color-primary-n01);
@@ -642,7 +642,7 @@
     --color-ds-text-neutral-gray: var(--color-ds-primitives-color-primary-g11);
     --color-ds-background-field-surface: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-neutral-gray-2: var(--color-ds-primitives-color-primary-g10);
-    --color-ds-text-button-primary-inactive: var(--color-ds-primitives-color-primary-g09);
+    --color-ds-text-button-primary-inactive: var(--color-ds-primitives-color-primary-g08);
     --color-ds-text-button-primary-hover-focus-press: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-button-primary-default: var(--color-ds-primitives-color-primary-b01);
     --color-ds-text-button-secondary-low-inactive: var(--color-ds-primitives-color-primary-g07);

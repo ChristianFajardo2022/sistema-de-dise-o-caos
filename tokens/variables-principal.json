@@ -595,7 +595,7 @@
     "FONT_WEIGHT"
    ],
    "valores": {
-    "358:0": 400
+    "358:0": 300
    }
   },
   {
@@ -617,7 +617,7 @@
     "FONT_WEIGHT"
    ],
    "valores": {
-    "358:0": 700
+    "358:0": 800
    }
   },
   {
@@ -3800,10 +3800,10 @@
    ],
    "valores": {
     "11040:0": {
-     "alias": "color/primary/G06"
+     "alias": "color/primary/G12"
     },
     "11040:1": {
-     "alias": "color/primary/G06"
+     "alias": "color/primary/G04"
     }
    }
   },
@@ -5538,7 +5538,7 @@
      "alias": "color/primary/G09"
     },
     "11040:1": {
-     "alias": "color/primary/G09"
+     "alias": "color/primary/G08"
     }
    }
   },
