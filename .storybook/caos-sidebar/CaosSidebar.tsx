@@ -152,12 +152,11 @@ function TopItem({
   );
 }
 
-/** List Item Dropdown: segundo nivel con historias propias (componente o resultado de búsqueda). */
+/** List Item Dropdown: resultado de búsqueda (fundamento o componente) con sus páginas o historias. */
 function BranchItem({
   branch,
   leaves,
   open,
-  meta,
   activeId,
   onToggle,
   onSelect,
@@ -165,7 +164,6 @@ function BranchItem({
   branch: Branch;
   leaves: Leaf[];
   open: boolean;
-  meta?: string;
   activeId?: string;
   onToggle: () => void;
   onSelect: (id: string) => void;
@@ -182,7 +180,6 @@ function BranchItem({
         onClick={onToggle}
       >
         <span className="caos-sb-item-text">{branch.label}</span>
-        {meta && <span className="caos-sb-item-meta">{meta}</span>}
         <IconChevronDown16 className="caos-sb-item-chevron" />
       </button>
       {open && (
@@ -214,7 +211,6 @@ export function CaosSidebar({ api, onModeChange }: Props) {
     foundations: null,
     components: null,
   });
-  const [openBranch, setOpenBranch] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState<Record<string, boolean>>({});
   const searchRef = useRef<HTMLInputElement>(null);
@@ -235,12 +231,7 @@ export function CaosSidebar({ api, onModeChange }: Props) {
   const activePath = snap.storyId ? tree.byLeaf.get(snap.storyId) : undefined;
   useEffect(() => {
     if (!activePath) return;
-    if (activePath.tab === 'foundations') {
-      setOpenTop((o) => ({ ...o, foundations: activePath.branch.key }));
-    } else {
-      setOpenTop((o) => ({ ...o, components: activePath.categoryKey }));
-      setOpenBranch(activePath.branch.key);
-    }
+    setOpenTop((o) => ({ ...o, [activePath.tab]: activePath.branch.key }));
     // Solo al cambiar de historia: después el usuario puede cerrar la ruta
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.storyId, tree]);
@@ -309,7 +300,7 @@ export function CaosSidebar({ api, onModeChange }: Props) {
     );
   };
 
-  const renderHits = (hits: SearchHit[], withCategory: boolean) =>
+  const renderHits = (hits: SearchHit[]) =>
     hits.map((hit) => {
       const open = searchOpen[hit.branch.key] ?? hit.leafMatch;
       return (
@@ -318,7 +309,6 @@ export function CaosSidebar({ api, onModeChange }: Props) {
           branch={hit.branch}
           leaves={hit.leaves}
           open={open}
-          meta={withCategory ? hit.branch.category : undefined}
           activeId={snap.storyId}
           onToggle={() => setSearchOpen((s) => ({ ...s, [hit.branch.key]: !open }))}
           onSelect={selectStory}
@@ -391,13 +381,13 @@ export function CaosSidebar({ api, onModeChange }: Props) {
               {!!results.foundations.length && (
                 <section aria-label="Fundamentos">
                   <p className="caos-sb-caption">Fundamentos ({results.foundations.length})</p>
-                  <ul className="caos-sb-sub caos-sb-sub--flush">{renderHits(results.foundations, false)}</ul>
+                  <ul className="caos-sb-sub caos-sb-sub--flush">{renderHits(results.foundations)}</ul>
                 </section>
               )}
               {!!results.components.length && (
                 <section aria-label="Componentes">
                   <p className="caos-sb-caption">Componentes ({results.components.length})</p>
-                  <ul className="caos-sb-sub caos-sb-sub--flush">{renderHits(results.components, true)}</ul>
+                  <ul className="caos-sb-sub caos-sb-sub--flush">{renderHits(results.components)}</ul>
                 </section>
               )}
             </div>
@@ -422,25 +412,20 @@ export function CaosSidebar({ api, onModeChange }: Props) {
             </ul>
           )}
 
+          {/* Una sola lista de componentes, sin categorías: componente → historias, como los fundamentos */}
           {tab === 'components' && (
             <ul className="caos-sb-list">
-              {tree.categories.map((c) => (
+              {tree.components.map((b) => (
                 <TopItem
-                  key={c.key}
-                  label={c.label}
-                  open={openTop.components === c.key}
-                  onToggle={() => setOpenTop((o) => ({ ...o, components: o.components === c.key ? null : c.key }))}
+                  key={b.key}
+                  label={b.label}
+                  open={openTop.components === b.key}
+                  onToggle={() => setOpenTop((o) => ({ ...o, components: o.components === b.key ? null : b.key }))}
                 >
-                  {c.branches.map((b) => (
-                    <BranchItem
-                      key={b.key}
-                      branch={b}
-                      leaves={b.leaves}
-                      open={openBranch === b.key}
-                      activeId={snap.storyId}
-                      onToggle={() => setOpenBranch((k) => (k === b.key ? null : b.key))}
-                      onSelect={selectStory}
-                    />
+                  {b.leaves.map((leaf) => (
+                    <li key={leaf.id}>
+                      <LeafLink leaf={leaf} active={leaf.id === snap.storyId} onSelect={selectStory} />
+                    </li>
                   ))}
                 </TopItem>
               ))}

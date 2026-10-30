@@ -340,13 +340,6 @@
   overflow-wrap: anywhere;
 }
 
-.caos-sb-item-meta {
-  flex-shrink: 0;
-  font-size: var(--ds-primitives-typography-size-sm);
-  line-height: var(--ds-responsive-typography-body-line-height-short-sm);
-  color: var(--color-ds-text-neutral-disabled-on-canva);
-}
-
 /* Buscador */
 .caos-sb-search {
   display: flex;

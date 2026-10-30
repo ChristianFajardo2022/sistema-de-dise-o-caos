@@ -1,6 +1,7 @@
 /**
  * Convierte el índice de Storybook en las dos listas del menú:
- * Fundamentos (fundamento → páginas) y Componentes (categoría → componente → historias).
+ * Fundamentos (fundamento → páginas) y Componentes (componente → historias, en una sola lista alfabética).
+ * Las categorías de los títulos (General Controls, Layout…) no se muestran: solo agrupan en el código.
  */
 
 export const FOUNDATIONS_ROOT = 'Fundamentos de diseño';
@@ -15,22 +16,15 @@ export interface Leaf {
 export interface Branch {
   key: string;
   label: string;
-  /** Nombre de la categoría (raíz) a la que pertenece. */
-  category: string;
   leaves: Leaf[];
-}
-
-export interface Category {
-  key: string;
-  label: string;
-  branches: Branch[];
 }
 
 export interface Tree {
   foundations: Branch[];
-  categories: Category[];
-  /** Hoja → rama y categoría, para marcar y abrir la ruta de la historia actual. */
-  byLeaf: Map<string, { branch: Branch; tab: 'foundations' | 'components'; categoryKey: string }>;
+  /** Todos los componentes, sin categoría, en orden alfabético. */
+  components: Branch[];
+  /** Hoja → rama, para marcar y abrir la ruta de la historia actual. */
+  byLeaf: Map<string, { branch: Branch; tab: 'foundations' | 'components' }>;
 }
 
 interface IndexEntry {
@@ -45,12 +39,11 @@ const leafName = (e: IndexEntry) => (e.type === 'docs' && e.name === 'Docs' ? 'D
 
 /**
  * Entradas del índice ya ordenadas por storySort. El título "Raíz/Grupo/Componente" da la categoría (primer segmento)
- * y la rama (el resto, unido con ›).
+ * y la rama (el resto, unido con ›). Los componentes se ordenan por nombre; las historias de cada uno, como storySort.
  */
 export function buildTree(entries: Record<string, IndexEntry> | undefined): Tree {
-  const tree: Tree = { foundations: [], categories: [], byLeaf: new Map() };
+  const tree: Tree = { foundations: [], components: [], byLeaf: new Map() };
   if (!entries) return tree;
-  const categories = new Map<string, Category>();
   const branches = new Map<string, Branch>();
   for (const e of Object.values(entries)) {
     if (e.type !== 'docs' && e.type !== 'story') continue;
@@ -58,27 +51,14 @@ export function buildTree(entries: Record<string, IndexEntry> | undefined): Tree
     const label = rest.length ? rest.join(' › ') : root;
     let branch = branches.get(e.title);
     if (!branch) {
-      branch = { key: e.title, label, category: root, leaves: [] };
+      branch = { key: e.title, label, leaves: [] };
       branches.set(e.title, branch);
-      if (root === FOUNDATIONS_ROOT) {
-        tree.foundations.push(branch);
-      } else {
-        let category = categories.get(root);
-        if (!category) {
-          category = { key: root, label: root, branches: [] };
-          categories.set(root, category);
-          tree.categories.push(category);
-        }
-        category.branches.push(branch);
-      }
+      (root === FOUNDATIONS_ROOT ? tree.foundations : tree.components).push(branch);
     }
     branch.leaves.push({ id: e.id, name: leafName(e), type: e.type });
-    tree.byLeaf.set(e.id, {
-      branch,
-      tab: root === FOUNDATIONS_ROOT ? 'foundations' : 'components',
-      categoryKey: root === FOUNDATIONS_ROOT ? branch.key : root,
-    });
+    tree.byLeaf.set(e.id, { branch, tab: root === FOUNDATIONS_ROOT ? 'foundations' : 'components' });
   }
+  tree.components.sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
   return tree;
 }
 
@@ -103,12 +83,12 @@ export function search(tree: Tree, query: string): { foundations: SearchHit[]; c
   if (!terms.length) return empty;
   const matches = (text: string) => terms.every((t) => normalize(text).includes(t));
   const hit = (b: Branch): SearchHit | null => {
-    if (matches(`${b.category} ${b.label}`)) return { branch: b, leaves: b.leaves, leafMatch: false };
-    const leaves = b.leaves.filter((l) => matches(`${b.category} ${b.label} ${l.name}`));
+    if (matches(b.label)) return { branch: b, leaves: b.leaves, leafMatch: false };
+    const leaves = b.leaves.filter((l) => matches(`${b.label} ${l.name}`));
     return leaves.length ? { branch: b, leaves, leafMatch: true } : null;
   };
   return {
     foundations: tree.foundations.map(hit).filter((h): h is SearchHit => !!h),
-    components: tree.categories.flatMap((c) => c.branches.map(hit)).filter((h): h is SearchHit => !!h),
+    components: tree.components.map(hit).filter((h): h is SearchHit => !!h),
   };
 }
