@@ -31,7 +31,8 @@ const STATES: { state: PaginationPageState; figma: string }[] = [
   { state: 'select', figma: 'Select' },
 ];
 
-/** Set `Page (Atom)` (11953:4965): State Default, Hover y Select. */
+// Figma: 11953:4965
+/** Set `Page (Atom)`: State Default, Hover y Select. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (

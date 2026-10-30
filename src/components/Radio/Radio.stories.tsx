@@ -98,7 +98,8 @@ export const StatesMatrix: Story = {
               : 'bg-ds-background-general-white p-6'
           }
         >
-          <div className="grid grid-cols-[auto_repeat(4,auto)] items-center gap-x-8 gap-y-4">
+          <div className="max-w-full overflow-x-auto">
+          <div className="grid w-max min-w-full grid-cols-[auto_repeat(4,auto)] items-center gap-x-8 gap-y-4">
             <span className="text-xs text-ds-text-neutral-body">{contrast}</span>
             {STATES.map((s) => (
               <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
@@ -111,6 +112,7 @@ export const StatesMatrix: Story = {
             {STATES.map((s) => (
               <Radio key={s} contrast={contrast} state={s}>Label</Radio>
             ))}
+          </div>
           </div>
         </div>
       ))}
@@ -133,7 +135,8 @@ function FigmaRadioMatrix({ withText }: { withText: boolean }) {
           key={contrast}
           className={contrast === 'positive' ? 'bg-ds-background-general-black p-6' : 'bg-ds-background-general-white p-6'}
         >
-          <div className="grid grid-cols-[repeat(4,auto)] items-center gap-x-8 gap-y-4">
+          <div className="max-w-full overflow-x-auto">
+          <div className="grid w-max min-w-full grid-cols-[repeat(4,auto)] items-center gap-x-8 gap-y-4">
             {FIGMA_STATES.map((s) => (
               <div
                 key={s.figma}
@@ -145,6 +148,7 @@ function FigmaRadioMatrix({ withText }: { withText: boolean }) {
                 </Radio>
               </div>
             ))}
+          </div>
           </div>
         </div>
       ))}

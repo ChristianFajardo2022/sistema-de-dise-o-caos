@@ -8,8 +8,9 @@ import { Icon } from '../Icon';
 import { NotchedSurface } from '../_internal/NotchedSurface';
 import { cn } from '../../utils/cn';
 
+// Figma: 11198:12704
 /**
- * Toast (set 11198:12704 de Figma): aviso breve y no modal, con muesca y botón de cierre.
+ * Toast (set de Figma): aviso breve y no modal, con muesca y botón de cierre.
  * Es una región viva (`role="status"` en success e info, `role="alert"` en error y alert): se anuncia
  * sin mover el foco. Se cierra con el botón, con Escape si el foco está dentro, o solo con `duration`
  * (pausado con el puntero o el foco). Para apilarlos usa `Toaster`.

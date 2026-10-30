@@ -81,13 +81,14 @@ const STATES: { v: TimelineStatus; f: string; p: TimelineProgress; fp: string }[
   { v: 'complete', f: 'Check', p: 100, fp: '100' },
 ];
 
-/** Set Indicator 13576:32508: las 30 variantes, una vez (ancho 335). */
+// Figma: 13576:32508
+/** Set Indicator: las 30 variantes, una vez (ancho 335). */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
-    <div className="flex w-fit flex-col gap-6 bg-ds-background-general-black p-6">
+    <div className="flex w-fit max-w-full flex-col gap-6 bg-ds-background-general-black p-6">
       {ORIENTATIONS.map((o) => (
-        <div key={o.v} className="grid grid-cols-[repeat(3,335px)] gap-6">
+        <div key={o.v} className="grid grid-cols-[repeat(auto-fill,335px)] gap-6">
           {STATES.flatMap((s) =>
             TYPES.map((t) => {
               const figma = `Orientation=${o.f}, Type=${t.f}, Percentage=${s.fp}, State=${s.f}`;
@@ -114,7 +115,8 @@ export const FigmaMatrix: Story = {
   ),
 };
 
-/** Timeline 13687:11466 (Propiedad 1=Vertical): inicio, tres intermedios con uno en curso y final. */
+// Figma: 13687:11466
+/** Timeline (Propiedad 1=Vertical): inicio, tres intermedios con uno en curso y final. */
 export const FigmaTimeline: Story = {
   render: () => (
     <div className="w-[335px] bg-ds-background-general-black">
@@ -148,12 +150,13 @@ const TRACKER_ITEMS: TimelineItemData[] = [
 
 const MARKER = <span className="block size-8 rounded-ds-radius-general-full bg-ds-background-acent-tertiary" />;
 
-/** Status tracker 13770:10884 (sin botón de historial, como el defecto de Figma). */
+// Figma: 13770:10884
+/** Status tracker (sin botón de historial, como el defecto de Figma). */
 export const FigmaStatusTracker: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
-    <div className="w-fit bg-ds-background-general-black p-6">
-      <div className="w-[1094px]">
+    <div className="bg-ds-background-general-black p-6">
+      <div className="w-full max-w-[1094px]">
         <StatusTracker items={TRACKER_ITEMS} marker={MARKER} reference="Ref. 1234567890" data-figma="Status tracker" />
       </div>
     </div>

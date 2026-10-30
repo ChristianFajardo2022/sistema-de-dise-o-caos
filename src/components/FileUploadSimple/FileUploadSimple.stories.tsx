@@ -19,11 +19,14 @@ const meta = {
   },
   args: { accept: '.pdf,.jpg', maxSize: 23 * 1024 ** 3 },
   decorators: [
-    (Story) => (
-      <div className="w-[352px] bg-ds-background-general-black p-6">
+    (Story, { parameters }) =>
+      parameters.sinMarco ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="w-[352px] bg-ds-background-general-black p-6">
+          <Story />
+        </div>
+      ),
   ],
 } satisfies Meta<typeof FileUploadSimple>;
 
@@ -81,18 +84,18 @@ export const Disabled: Story = { args: { disabled: true } };
 const bare = { accept: 'application/pdf,image/jpeg', maxSize: 23 * 1024 ** 3, formatsText: 'PDF, JPG', sizeText: 'Máx. 23 GB' } as const;
 
 const cell = (name: string, props: FileUploadSimpleProps) => (
-  <div key={name} className="flex w-[304px] flex-col gap-2">
+  <div key={name} className="flex w-full max-w-[304px] flex-col gap-2">
     <span className="text-xs text-ds-text-neutral-body">{name}</span>
     <FileUploadSimple {...bare} {...props} data-figma={name} />
   </div>
 );
 
-/** Set 21407:3920 (simple-2): Type Default/Uploading × State Default/Loaded. */
+// Figma: 21407:3920
+/** Set de Figma (simple-2): Type Default/Uploading × State Default/Loaded. */
 export const FigmaMatrix: Story = {
-  parameters: { layout: 'fullscreen' },
-  decorators: [],
+  parameters: { layout: 'fullscreen', sinMarco: true },
   render: () => (
-    <div className="grid w-fit grid-cols-[304px_304px] items-start gap-6 bg-ds-background-general-black p-6">
+    <div className="grid w-full max-w-[680px] grid-cols-[repeat(auto-fill,minmax(min(100%,304px),304px))] items-start gap-6 bg-ds-background-general-black p-6">
       {cell('Type=Default, State=Default', { status: 'idle' })}
       {cell('Type=Uploading, State=Loaded', { status: 'uploading', progress: 25, file: sample })}
       {cell('Type=Default, State=Loaded', { status: 'loaded', file: sample })}
@@ -108,12 +111,12 @@ const interaction: [string, FileUploadSimpleState][] = [
   ['Inactive', 'disabled'],
 ];
 
-/** Set 21412:4523 (simple): Default, Hover, Focus, Upload e Inactive × Default y Loaded. */
+// Figma: 21412:4523
+/** Set de Figma (simple): Default, Hover, Focus, Upload e Inactive × Default y Loaded. */
 export const FigmaMatrixInteraction: Story = {
-  parameters: { layout: 'fullscreen' },
-  decorators: [],
+  parameters: { layout: 'fullscreen', sinMarco: true },
   render: () => (
-    <div className="grid w-fit grid-cols-[304px_304px] items-start gap-6 bg-ds-background-general-black p-6">
+    <div className="grid w-full max-w-[680px] grid-cols-[repeat(auto-fill,minmax(min(100%,304px),304px))] items-start gap-6 bg-ds-background-general-black p-6">
       {interaction.flatMap(([type, state]) => [
         cell(`Type=${type}, State=Default`, { status: 'idle', state }),
         cell(`Type=${type}, State=Loaded`, { status: 'loaded', file: sample, state }),

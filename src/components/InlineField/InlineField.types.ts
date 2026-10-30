@@ -1,7 +1,8 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
 import type { FieldRootProps } from '../Field/Field.types';
 
-/** Size de Figma (set 18445:46293): `sm` mide 40 de alto (texto 14/18) y `md` 56 (texto 32/36). */
+// Figma: 18445:46293
+/** Size de Figma: `sm` mide 40 de alto (texto 14/18) y `md` 56 (texto 32/36). */
 export type InlineFieldSize = 'sm' | 'md';
 
 /**

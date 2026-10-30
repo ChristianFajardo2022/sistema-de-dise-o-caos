@@ -5,6 +5,9 @@ import type { IconName } from '../components/Icon/Icon.types';
 import { ScrollRegion } from '../foundations/_doc/ScrollRegion';
 import { cn } from '../utils/cn';
 import { DocDecor } from './DocDecor';
+import { DocDeviceFrame } from './DocDeviceFrame';
+import { DocSectionHeadContext, docBody as body, docInline as inline } from './docShared';
+import { DocNotchCard, DocNotchTitle } from './DocNotchCard';
 import type { DocAnatomyPart, DocCardContent, DocGalleryItem, DocInline, DocPractice } from './types';
 
 /*
@@ -21,15 +24,6 @@ import type { DocAnatomyPart, DocCardContent, DocGalleryItem, DocInline, DocPrac
  *   cabecera de tabla y el círculo de las prácticas usan background/container/hover-on-card (G03) en Light.
  */
 
-/** Texto del cuerpo con el marcado en línea permitido (`strong`, `code`, `em`). */
-const inline =
-  '[&_strong]:font-ds-primitives-typography-weight-semibold [&_strong]:text-ds-text-neutral-heading [&_code]:rounded-ds-radius-general-sm [&_code]:bg-ds-background-icon-default-on-canva [&_code]:px-ds-space-general-md [&_code]:font-mono [&_code]:text-[0.92em] [&_code]:text-ds-text-neutral-heading';
-
-const body = cn(
-  'm-0 font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-md leading-ds-primitives-typography-line-height-xl text-ds-text-neutral-body text-pretty',
-  inline,
-);
-
 /** Superficie gris de muestra (Figma: background/general/gray-sixth). */
 const sampleSurface = 'bg-ds-background-general-gray-sixth light:bg-ds-background-container-hover-on-card';
 
@@ -40,35 +34,38 @@ interface DocHeaderProps {
   icon: IconName;
   /** Nombre del componente (h1). */
   name: string;
-  /** Descripción grande: qué es y su clasificación. */
+  /** Descripción bajo el nombre. */
   summary: ReactNode;
-  /** Pestañas (normalmente `TabList`), centradas bajo el texto. */
-  tabs?: ReactNode;
 }
 
+// Figma: 14321:54945
 /**
- * Encabezado ("Header document (Atom)" 14321:54945): decorado de líneas, ícono en tarjeta de 64, nombre y descripción
- * con el estilo heading 2xl (32/36 en escritorio, 24/32 en móvil) y las pestañas. Contenido de 1024 de ancho.
+ * Encabezado ("Header document (Atom)"): degradado background/container/surface → background/degrade/nav
+ * bar/0 %, decorado de líneas, ícono en tarjeta de 64 con Shadow sm, nombre (heading 2xl, Prospero) y descripción
+ * (body lg, de hasta 726 de ancho), con 24 entre las tres piezas. Sin las pestañas (chips) de Figma por ahora.
  */
-export function DocHeader({ icon, name, summary, tabs }: DocHeaderProps) {
+export function DocHeader({ icon, name, summary }: DocHeaderProps) {
   return (
-    <header className="relative isolate overflow-hidden">
+    <header className="relative isolate overflow-hidden bg-linear-to-b from-ds-background-container-surface to-ds-background-degrade-nav-bar-0 backdrop-blur-[6px]">
       <DocDecor />
-      <div className="relative mx-auto flex max-w-[1024px] flex-col items-center gap-ds-space-general-6xl px-ds-space-canva-lateral py-ds-space-general-6xl box-content">
-        <div className="flex flex-col items-center gap-ds-primitives-space-4xl text-center">
-          <span
-            aria-hidden="true"
-            className="flex rounded-ds-radius-general-lg bg-ds-background-container-default-on-canva p-ds-space-general-2xl text-ds-icon-general-default shadow-ds-on-canva-md"
-          >
-            <Icon name={icon} size={32} variant="line" />
-          </span>
-          <div className="font-ds-primitives-typography-family-secondary text-ds-typography-heading-size-2xl leading-ds-typography-heading-line-height-2xl font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading text-balance">
-            <h1 className="m-0 text-inherit [font:inherit]">{name}</h1>
-            {/* Figma: nombre y descripción en el mismo texto, separados por una línea en blanco */}
-            <p className="m-0 mt-[1lh]">{summary}</p>
-          </div>
+      <div className="flex flex-col items-center gap-6 px-ds-space-canva-lateral-web py-ds-space-general-6xl text-center">
+        <span
+          aria-hidden="true"
+          className="flex rounded-ds-radius-general-lg bg-ds-background-container-default-on-canva p-ds-space-general-2xl text-ds-icon-general-default shadow-[0_12px_32px_-2px_var(--color-ds-effect-shadow-on-canva-sm)]"
+        >
+          <Icon name={icon} size={32} variant="line" />
+        </span>
+        <h1 className="m-0 w-full font-ds-primitives-typography-family-secondary text-ds-typography-heading-size-2xl leading-ds-typography-heading-line-height-2xl font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading text-balance">
+          {name}
+        </h1>
+        <div
+          className={cn(
+            'm-0 w-full max-w-[726px] font-ds-primitives-typography-family-primary text-ds-typography-body-size-lg leading-ds-typography-body-line-height-large-lg font-ds-primitives-typography-weight-regular text-ds-text-neutral-body text-pretty',
+            inline,
+          )}
+        >
+          {summary}
         </div>
-        {tabs}
       </div>
     </header>
   );
@@ -77,12 +74,14 @@ export function DocHeader({ icon, name, summary, tabs }: DocHeaderProps) {
 // ───────────────────────── sección ─────────────────────────
 
 interface DocSectionProps {
-  /** Número de la sección (1, 2…); se muestra con dos cifras. Sin número no hay insignia. */
+  /** Número de la sección (1, 2…); se muestra con dos cifras. Sin número no hay insignia (la plantilla v2 no lo usa). */
   number?: number;
   title: string;
   description?: DocInline;
   children?: ReactNode;
   id?: string;
+  /** El título y la bajada los dibuja la tarjeta del contenido (ver `useDocSectionHead`); aquí solo van los hijos. */
+  titleInside?: boolean;
 }
 
 /** Insignia del número de sección (Figma "Número": 4/10 de padding, radio completo, background/acent/tertiary). */
@@ -94,33 +93,39 @@ export function DocNumber({ value }: { value: number }) {
   );
 }
 
+// Figma: 22262:3649 (Sección 01 — …)
 /**
- * Sección numerada ("Sección de documentación"): insignia, título (h2) y bajada; debajo, los bloques con 32 de
- * separación. Borde inferior de 1 px entre secciones.
+ * Sección ("Sección de documentación" v2): padding X `space/general/8xl`, Y 40 y 32 entre título y contenido; título
+ * (h2) Prospero 32/36 con la bajada body 14/20 a 12 de separación; línea de 1 px al pie que separa de la siguiente.
+ * Es un contenedor de consultas (`@container`): los bloques bajan a una columna según el ancho de la sección.
  */
-export function DocSection({ number, title, description, children, id }: DocSectionProps) {
+export function DocSection({ number, title, description, children, id, titleInside = false }: DocSectionProps) {
   const headingId = useId();
   return (
     <section
       id={id}
       aria-labelledby={headingId}
-      className="flex scroll-mt-ds-space-general-4xl flex-col gap-ds-primitives-space-5xl border-b border-ds-border-general-default-on-canva px-ds-space-canva-lateral py-ds-primitives-space-6xl tablet:px-ds-primitives-space-6xl"
+      className="@container flex scroll-mt-ds-space-general-4xl flex-col gap-ds-primitives-space-5xl border-b border-ds-border-general-default-on-canva px-ds-space-general-8xl py-ds-primitives-space-6xl"
     >
-      <div className="flex flex-col items-start gap-ds-space-general-lg tablet:flex-row tablet:items-center tablet:gap-ds-space-general-2xl">
-        {number !== undefined && <DocNumber value={number} />}
-        <div className="flex min-w-0 flex-col gap-ds-space-general-lg">
-          <h2
-            id={headingId}
-            className="m-0 font-ds-primitives-typography-family-secondary text-ds-typography-heading-size-xl leading-ds-typography-heading-line-height-xl font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading text-balance desktop:text-ds-typography-heading-size-2xl desktop:leading-ds-typography-heading-line-height-2xl"
-          >
-            {title}
-          </h2>
-          {description && (
-            <p className={cn(body, 'leading-ds-primitives-typography-line-height-2xl')}>{description}</p>
-          )}
-        </div>
-      </div>
-      {children}
+      {titleInside ? (
+        <DocSectionHeadContext.Provider value={{ headingId, title, description }}>{children}</DocSectionHeadContext.Provider>
+      ) : (
+        <>
+          <div className="flex flex-col items-start gap-ds-space-general-lg tablet:flex-row tablet:items-center tablet:gap-ds-space-general-2xl">
+            {number !== undefined && <DocNumber value={number} />}
+            <div className="flex min-w-0 flex-col gap-ds-space-general-lg">
+              <h2
+                id={headingId}
+                className="m-0 font-ds-primitives-typography-family-secondary text-ds-typography-heading-size-2xl leading-ds-typography-heading-line-height-2xl font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading text-balance"
+              >
+                {title}
+              </h2>
+              {description && <p className={body}>{description}</p>}
+            </div>
+          </div>
+          {children}
+        </>
+      )}
     </section>
   );
 }
@@ -217,18 +222,19 @@ export function DocText({ children, className }: { children: DocInline | DocInli
   );
 }
 
-/** Lista de viñetas ("Punto de guía"): viñeta ● de color y texto, 10 de separación horizontal y 16 entre puntos. */
-export function DocBullets({ items, tone = 'accent' }: { items: DocInline[]; tone?: 'accent' | 'error' }) {
+/**
+ * Lista de viñetas ("Pauta"/"●" de Figma): punto blanco (`text/neutral/heading`) y texto body 14/20 con 10 de
+ * separación; la primera frase puede ir en negrita (`<strong>`). `tone` se conserva por compatibilidad: v2 usa siempre
+ * el punto blanco.
+ */
+export function DocBullets({ items }: { items: DocInline[]; tone?: 'accent' | 'error' }) {
   return (
     <ul className="m-0 flex list-none flex-col gap-ds-space-general-2xl p-0">
       {items.map((item, i) => (
         <li key={i} className="flex gap-ds-space-general-lg">
           <span
             aria-hidden="true"
-            className={cn(
-              'mt-ds-space-general-md size-2 shrink-0 translate-y-ds-space-general-sm rounded-ds-radius-general-full',
-              tone === 'error' ? 'bg-ds-icon-semantic-error-firts' : 'bg-ds-text-acent-firts',
-            )}
+            className="mt-ds-space-general-lg size-1.5 shrink-0 rounded-ds-radius-general-full bg-ds-text-neutral-heading"
           />
           <span className={body}>{item}</span>
         </li>
@@ -248,17 +254,19 @@ export function DocContentCard({ title, eyebrow, preview, previewSize, descripti
   );
 }
 
-/** "Cuándo usarlo" / "Cuándo evitarlo": dos tarjetas con viñetas violeta y roja. */
+/** "Comportamiento": "Cuándo usarlo" / "Cuándo evitarlo" en dos Cards con muesca y distintivo de éxito / error. */
 export function DocUsage({ use, avoid }: { use: DocInline[]; avoid: DocInline[] }) {
   return (
-    <DocGrid>
-      <DocCard title="Cuándo usarlo">
+    <div className="grid grid-cols-1 gap-ds-primitives-space-4xl @3xl:grid-cols-2">
+      <DocNotchCard tone="success">
+        <DocNotchTitle tone="success">Cuándo usarlo</DocNotchTitle>
         <DocBullets items={use} />
-      </DocCard>
-      <DocCard title="Cuándo evitarlo">
-        <DocBullets items={avoid} tone="error" />
-      </DocCard>
-    </DocGrid>
+      </DocNotchCard>
+      <DocNotchCard tone="error">
+        <DocNotchTitle tone="error">Cuándo evitarlo</DocNotchTitle>
+        <DocBullets items={avoid} />
+      </DocNotchCard>
+    </div>
   );
 }
 
@@ -436,9 +444,38 @@ export function DocCallout({ tone = 'info', children }: DocCalloutProps) {
   );
 }
 
-/** Una práctica ("Práctica"): círculo de 48 con ✓ verde o ✕ rojo, título (h3) y explicación. */
-export function DocPracticeCard({ kind, title, description, preview }: DocPractice) {
+/**
+ * Una práctica. Estilo v2 (`framed`): Card con muesca, título "Hacer" / "Evitar" en éxito o error, la regla en una
+ * línea y, debajo, un panel tintado (`background/semantic/success|error/firts`, radio 16, alto ~284) con el marco de
+ * dispositivo pegado abajo. Estilo v1: círculo con ✓ / ✕, título (h3) y explicación.
+ */
+export function DocPracticeCard({ kind, title, description, preview, framed }: DocPractice) {
   const isDo = kind === 'do';
+  if (framed) {
+    const tone = isDo ? 'success' : 'error';
+    return (
+      <DocNotchCard tone={tone}>
+        <div className="flex flex-col gap-ds-space-general-lg">
+          <DocNotchTitle tone={tone}>{isDo ? 'Hacer' : 'Evitar'}</DocNotchTitle>
+          <p className={body}>{description}</p>
+        </div>
+        {preview !== undefined && (
+          <div
+            role="group"
+            aria-label={`Ejemplo: ${title}`}
+            className={cn(
+              'flex min-h-72 items-end justify-center overflow-hidden rounded-ds-radius-general-xl px-ds-space-general-2xl pt-ds-space-general-4xl',
+              isDo ? 'bg-ds-background-semantic-success-firts' : 'bg-ds-background-semantic-error-firts',
+            )}
+          >
+            <DocDeviceFrame breakpoint="mobile" rounding="top" statusBar className="max-w-[376px]">
+              {preview}
+            </DocDeviceFrame>
+          </div>
+        )}
+      </DocNotchCard>
+    );
+  }
   return (
     <DocCard className="gap-ds-space-general-3xl tablet:min-h-56">
       <span className={cn('flex size-12 items-center justify-center rounded-ds-radius-general-full', sampleSurface)}>
@@ -464,7 +501,7 @@ export function DocPracticeCard({ kind, title, description, preview }: DocPracti
 /** Buenas y malas prácticas: grilla de 2 columnas con 24 de separación (1 en móvil). Orden: do, dont, do, dont… */
 export function DocPractices({ items }: { items: DocPractice[] }) {
   return (
-    <div className="grid grid-cols-1 gap-ds-primitives-space-4xl tablet:grid-cols-2">
+    <div className="grid grid-cols-1 gap-ds-primitives-space-4xl @3xl:grid-cols-2">
       {items.map((item) => (
         <DocPracticeCard key={item.title} {...item} />
       ))}

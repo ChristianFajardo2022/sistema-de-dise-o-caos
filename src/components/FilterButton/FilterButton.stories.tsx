@@ -84,7 +84,8 @@ export const MobileAndInactiveTest: Story = {
   },
 };
 
-/** Type=Default e Icon+badge del set Icon button+Filters de Figma (21923:89647). */
+// Figma: 21923:89647
+/** Type=Default e Icon+badge del set Icon button+Filters de Figma. */
 export const FigmaMatrixIconButton: Story = {
   parameters: { layout: 'padded' },
   render: () => (

@@ -32,8 +32,9 @@ function stickyStyle(offset: string | number | undefined, style: CSSProperties |
   return { ['--tbl-sticky-offset' as string]: value, ...style };
 }
 
+// Figma: 13751:23691
 /**
- * Tabla de datos de CAOS (set Table de Figma, 13751:23691). Es un `<table>` real dentro de un `ScrollArea`
+ * Tabla de datos de CAOS (set Table de Figma). Es un `<table>` real dentro de un `ScrollArea`
  * horizontal: si no cabe, el área se vuelve una región con nombre que recibe foco para desplazarse con las flechas.
  * Las filas se separan 8 (`border-spacing`); el margen negativo quita ese espacio por fuera de la primera y la última.
  * En móvil (`layout="auto"`) dibuja `mobile` si se pasa (Row mobile de Figma).

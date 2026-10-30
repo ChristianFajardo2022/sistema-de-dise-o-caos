@@ -42,8 +42,9 @@ export const TableMobileField = forwardRef<HTMLDivElement, TableMobileFieldProps
 );
 TableMobileField.displayName = 'TableMobileField';
 
+// Figma: 13544:69614
 /**
- * Fila de tabla para móvil (`Row mobile (Atom)` de Figma, 13544:69614): tarjeta con cabecera (casilla de selección,
+ * Fila de tabla para móvil (`Row mobile (Atom)` de Figma): tarjeta con cabecera (casilla de selección,
  * etiqueta y acciones) y la lista de campos. Con `visibleFields` el resto se abre con la fila desplegable de abajo.
  */
 export const TableMobileRow = forwardRef<HTMLLIElement, TableMobileRowProps>(

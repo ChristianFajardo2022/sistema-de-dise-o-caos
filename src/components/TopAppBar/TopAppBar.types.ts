@@ -15,7 +15,8 @@ export type TopAppBarPosition = 'centered' | 'left' | 'action-only' | 'title-onl
 /** Nivel del heading del título */
 export type TopAppBarHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Barra superior de pantalla (set "Top App Bar" de Figma, 17295:110677, 8 variantes). */
+// Figma: 17295:110677
+/** Barra superior de pantalla (set "Top App Bar" de Figma, 8 variantes). */
 export interface TopAppBarProps extends Omit<ComponentPropsWithoutRef<'header'>, 'title'> {
   /** Título (Title de Figma). Se dibuja como heading. */
   title?: ReactNode;

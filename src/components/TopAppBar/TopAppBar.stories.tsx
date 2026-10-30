@@ -116,7 +116,7 @@ export const FigmaMatrix: Story = {
     const Row = ({ name, children }: { name: string; children: ReactNode }) => (
       <div className="flex flex-col gap-ds-space-general-md">
         <span className={LABEL}>{name}</span>
-        <div className="w-[1440px]">{children}</div>
+        <div className="max-w-full overflow-x-auto"><div className="w-[1440px]">{children}</div></div>
       </div>
     );
     const menu = (

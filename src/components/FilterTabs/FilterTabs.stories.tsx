@@ -39,7 +39,7 @@ const meta = {
   component: FilterTabs,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],
-  decorators: [(Story) => <div className="w-80"><Story /></div>],
+  decorators: [(Story, { parameters }) => (parameters.sinMarco ? <Story /> : <div className="w-80"><Story /></div>)],
   argTypes: {
     contrast: { control: 'radio', options: ['on-canva', 'on-card'], type: { name: 'enum', value: ['on-canva', 'on-card'] } },
     showCounts: { control: 'boolean', type: { name: 'boolean' } },
@@ -61,14 +61,13 @@ const FIGMA_TABS: FilterTabsTab[] = [1, 2, 3].map((n) => ({
 
 /** Type=3/2/1 de Figma: la pestaña seleccionada. */
 export const FigmaMatrix: Story = {
-  decorators: [(Story) => <Story />],
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', sinMarco: true },
   render: () => (
     <div className="flex flex-wrap gap-6 bg-ds-background-general-black p-6">
       {(['3', '2', '1'] as const).map((type) => (
         <div key={type} className="flex flex-col gap-2">
           <span className="text-xs text-ds-text-neutral-body">Type={type}</span>
-          <FilterTabs className="w-76" tabs={FIGMA_TABS} defaultTab={type} aria-label={`Categorías ${type}`} data-figma={`Type=${type}`} />
+          <FilterTabs className="w-76 max-w-full" tabs={FIGMA_TABS} defaultTab={type} aria-label={`Categorías ${type}`} data-figma={`Type=${type}`} />
         </div>
       ))}
     </div>

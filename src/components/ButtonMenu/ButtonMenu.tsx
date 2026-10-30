@@ -5,8 +5,9 @@ import { buttonMenuIconClass, buttonMenuTextClass, buttonMenuVariants } from './
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
+// Figma: 12419:5959
 /**
- * Botón de la navegación principal ("Button menu (Atom)" de Figma, 12419:5959).
+ * Botón de la navegación principal ("Button menu (Atom)" de Figma).
  *
  * - Es un componente propio y no una variante de `Button` ni de `ButtonLink`: usa los tokens `text/button/menu/*` e
  *   `icon/button/menu/*` (gris que se aclara hasta blanco), no tiene fondo ni trazo y su caja es de 32 de alto sin

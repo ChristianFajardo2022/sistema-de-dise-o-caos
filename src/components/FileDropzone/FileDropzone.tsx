@@ -16,8 +16,9 @@ import { Icon } from '../Icon';
 import { DashedStroke } from '../_internal/DashedStroke';
 import { cn } from '../../utils/cn';
 
+// Figma: 11438:5774
 /**
- * Área para soltar o elegir archivos (component set "Input file upload (Atom)" 11438:5774 de Figma).
+ * Área para soltar o elegir archivos (component set "Input file upload (Atom)" de Figma).
  * La raíz es un `<label>` que envuelve un `<input type="file">` real (oculto de forma accesible): clic, Enter y Espacio
  * abren el selector nativo, el foco con teclado se ve en la raíz y el nombre accesible sale del título y la acción
  * ("Selecciona tu archivo"), con los tipos y el tamaño máximo como descripción. También admite arrastrar y soltar.

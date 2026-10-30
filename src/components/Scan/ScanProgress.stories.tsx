@@ -33,7 +33,8 @@ export const Interactive: Story = {};
 
 export const Complete: Story = { args: { complete: true } };
 
-/** Las 12 variantes del set 21258:21640: 0 a 100 % y el estado terminado (Variante12). */
+// Figma: 21258:21640
+/** Las 12 variantes del set de Figma: 0 a 100 % y el estado terminado (Variante12). */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (

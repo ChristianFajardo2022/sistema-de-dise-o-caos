@@ -34,8 +34,9 @@ import { cn } from '../../utils/cn';
 
 const has = (node: unknown) => node != null && node !== false;
 
+// Figma: 17080:14028
 /**
- * Tarjeta de blog (set "Cards" de Figma, 17080:14028). Es un `<article>` nombrado por su título; el título lleva el
+ * Tarjeta de blog (set "Cards" de Figma). Es un `<article>` nombrado por su título; el título lleva el
  * enlace al artículo (o lo lleva "Leer más") y ese enlace se estira sobre toda la tarjeta (un solo enlace, sin controles anidados dentro).
  * El Button corner de Figma es parte visual de ese enlace (oculto para lectores). Con el "Button" terciario
  * (`linkLabel`, "Leer más"), el enlace es ese texto visible, nombrado "título Leer más", y el título queda como texto. Lo que va sobre la foto (franja del autor,

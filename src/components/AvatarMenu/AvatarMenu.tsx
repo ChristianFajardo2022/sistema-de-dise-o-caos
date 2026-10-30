@@ -12,8 +12,9 @@ import { useMergedRefs } from '../../utils/refs';
 
 const ITEM_SELECTOR = '[role^="menuitem"]:not([aria-disabled="true"])';
 
+// Figma: 12537:1567
 /**
- * Avatar que abre el menú de perfil ("Avatar+dropdown (Atom)" de Figma, 12537:1567). Type Default = cerrado; Type
+ * Avatar que abre el menú de perfil ("Avatar+dropdown (Atom)" de Figma). Type Default = cerrado; Type
  * Dropdown = abierto (`open`).
  *
  * - Es una composición, no un átomo nuevo: el botón envuelve un `Avatar` (initials) y la tarjeta reutiliza `Avatar`,

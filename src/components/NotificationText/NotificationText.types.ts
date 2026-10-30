@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
-/** State de Figma (set 7851:2638): Error, Helper text, Confirmation e Information. */
+// Figma: 7851:2638
+/** State de Figma: Error, Helper text, Confirmation e Information. */
 export type NotificationTextState = 'error' | 'helper' | 'confirmation' | 'information';
 
 export interface NotificationTextProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {

@@ -49,7 +49,8 @@ export const Inactive: Story = {
 /** Los 5 estados del component set de Figma, con y sin ícono. */
 export const StatesMatrix: Story = {
   render: () => (
-    <div className="grid grid-cols-[auto_repeat(5,auto)] items-center gap-x-8 gap-y-4">
+    <div className="max-w-full overflow-x-auto">
+    <div className="grid w-max min-w-full grid-cols-[auto_repeat(5,auto)] items-center gap-x-8 gap-y-4">
       <span />
       {STATES.map((s) => (
         <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
@@ -64,6 +65,7 @@ export const StatesMatrix: Story = {
           ))}
         </div>
       ))}
+    </div>
     </div>
   ),
 };

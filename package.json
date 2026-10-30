@@ -12,6 +12,7 @@
     "build-storybook": "storybook build",
     "build:icons:caos": "node scripts/build-caos-icons.mjs",
     "build:tokens": "python3 -I scripts/gen-tokens.py",
+    "build:docs-breakpoints": "node scripts/gen-docs-breakpoints.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check": "npm run lint && tsc -b && npm run check:tokens && vitest run"
   },

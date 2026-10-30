@@ -54,7 +54,8 @@ export const WithMenu: Story = {
 
 const FIGMA_STATE: Record<DotsState, string> = { default: 'Default', hover: 'Hover', focus: 'Focus', press: 'Press', inactive: 'Inactive' };
 
-/** Las 15 variantes del set 11194:12200. En Press, el panel (DropdownMenuPanel en línea) queda abierto debajo, como en Figma. */
+// Figma: 11194:12200
+/** Las 15 variantes del set de Figma. En Press, el panel (DropdownMenuPanel en línea) queda abierto debajo, como en Figma. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (

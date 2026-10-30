@@ -6,8 +6,9 @@ import { FileUploadItem } from '../FileUploadItem';
 import { useMergedRefs } from '../../utils/refs';
 import { cn } from '../../utils/cn';
 
+// Figma: 11592:8647
 /**
- * Carga de archivos completa (component set "File upload (suelto)" 11592:8647 de Figma): un FileDropzone y, debajo,
+ * Carga de archivos completa (component set "File upload (suelto)" de Figma): un FileDropzone y, debajo,
  * la lista de archivos con un FileUploadItem por archivo. No sube nada ni guarda archivos: quien lo usa recibe los
  * archivos en `onFilesSelected`, hace la carga y describe el avance en `items`. Aporta lo que la composición suelta no
  * resuelve: la lista es una lista real (`ul` nombrada), las acciones llegan con el `id` del archivo y, al eliminar uno,

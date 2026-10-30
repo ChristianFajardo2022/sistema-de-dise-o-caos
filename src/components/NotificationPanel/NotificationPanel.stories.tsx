@@ -190,13 +190,13 @@ function Harness({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-[820px] w-[400px] justify-end">
+    <div className="flex min-h-[820px] w-full max-w-[400px] justify-end">
       <div data-figma={name} className={`relative box-border flex h-12 w-12 flex-col items-end ${open ? 'gap-2' : 'gap-0'}`}>
         <NotificationBell size="sm" count={notified ? 99 : 0} open={open ? true : undefined} />
         <div
           inert={!open}
           aria-hidden={!open}
-          className={`absolute right-0 w-[400px] ${open ? 'top-[calc(100%+0.5rem)]' : 'pointer-events-none top-full opacity-0'}`}
+          className={`absolute right-0 w-[400px] max-w-[calc(100vw-3rem)] ${open ? 'top-[calc(100%+0.5rem)]' : 'pointer-events-none top-full opacity-0'}`}
         >
           {children}
         </div>
@@ -209,7 +209,7 @@ function Harness({
 export const FigmaMatrixSimple: Story = {
   parameters: { fullWidth: true },
   render: () => (
-    <div className="grid w-fit grid-cols-2 gap-6 bg-ds-background-general-black p-6">
+    <div className="grid w-full max-w-[872px] grid-cols-[repeat(auto-fill,minmax(min(100%,400px),400px))] gap-6 bg-ds-background-general-black p-6">
       {SIMPLE_VARIANTS.map((v) => (
         <Harness key={v.name} {...v}>
           <NotificationPanel
@@ -240,7 +240,7 @@ const COMPLEX_TABS: NotificationPanelTab[] = [
 export const FigmaMatrixComplex: Story = {
   parameters: { fullWidth: true },
   render: () => (
-    <div className="grid w-fit grid-cols-2 gap-6 bg-ds-background-general-black p-6">
+    <div className="grid w-full max-w-[872px] grid-cols-[repeat(auto-fill,minmax(min(100%,400px),400px))] gap-6 bg-ds-background-general-black p-6">
       {SIMPLE_VARIANTS.map((v) => (
         <Harness key={v.name} {...v}>
           <NotificationPanel

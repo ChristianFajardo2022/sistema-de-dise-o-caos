@@ -11,7 +11,7 @@ const meta = {
   parameters: { layout: 'padded' },
   tags: ['autodocs'],
   // El Alert ocupa el ancho de su contenedor; aquí se muestra al ancho de Figma (344)
-  decorators: [(Story) => <div className="w-86 max-w-full"><Story /></div>],
+  decorators: [(Story, { parameters }) => (parameters.sinMarco ? <Story /> : <div className="w-86 max-w-full"><Story /></div>)],
   argTypes: {
     type: {
       name: 'type',
@@ -59,24 +59,27 @@ const TYPES: { type: AlertType; figma: string }[] = [
 
 /** Las 8 variantes de Figma (Type × Background), con título y descripción visibles. */
 export const FigmaMatrix: Story = {
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', sinMarco: true },
   render: () => (
     <div className="flex flex-col gap-4 bg-ds-background-general-black p-6">
       {TYPES.map((t) => (
-        <div key={t.type} className="flex flex-wrap items-start gap-x-8 gap-y-4">
+        <div key={t.type} className="flex items-start gap-x-8">
           <span className="w-16 shrink-0 text-xs text-ds-text-neutral-body">{t.type}</span>
-          {[true, false].map((bg) => (
-            <Alert
-              key={String(bg)}
-              type={t.type}
-              background={bg}
-              className="w-86 shrink-0"
-              title="Subheading"
-              data-figma={`Type=${t.figma}, Background=${bg ? 'True' : 'False'}`}
-            >
-              Description
-            </Alert>
-          ))}
+          {/* Con fondo y sin fondo en la misma columna: si no caben lado a lado, la segunda baja alineada con la primera */}
+          <div className="flex min-w-0 flex-1 flex-wrap items-start gap-x-8 gap-y-4">
+            {[true, false].map((bg) => (
+              <Alert
+                key={String(bg)}
+                type={t.type}
+                background={bg}
+                className="w-86 max-w-full shrink-0"
+                title="Subheading"
+                data-figma={`Type=${t.figma}, Background=${bg ? 'True' : 'False'}`}
+              >
+                Description
+              </Alert>
+            ))}
+          </div>
         </div>
       ))}
     </div>

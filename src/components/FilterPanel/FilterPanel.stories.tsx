@@ -169,7 +169,8 @@ export const Sidebar: Story = {
   ),
 };
 
-/** "Filters" de Figma (14014:6050): marco Desktop, con las cinco secciones abiertas y los textos de Figma. */
+// Figma: 14014:6050
+/** "Filters" de Figma: marco Desktop, con las cinco secciones abiertas y los textos de Figma. */
 export const FigmaMatrix: Story = {
   parameters: {
     layout: 'fullscreen',

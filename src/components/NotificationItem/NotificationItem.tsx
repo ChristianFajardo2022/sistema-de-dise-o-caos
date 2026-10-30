@@ -11,8 +11,9 @@ import { CONTROL_ATTR, hasContent } from './NotificationItem.shared';
 import { Badge } from '../Badge';
 import { cn } from '../../utils/cn';
 
+// Figma: 12571:4812
 /**
- * Fila de notificación de texto (set "Text notification (Atom)" de Figma, 12571:4812). Es un `<li>`: va dentro de una
+ * Fila de notificación de texto (set "Text notification (Atom)" de Figma). Es un `<li>`: va dentro de una
  * lista (`<ul role="list">`, como la del `NotificationPanel`).
  *
  * - Interactiva solo si se pasa `href` (título como enlace) u `onClick` (título como botón), estirado sobre toda la fila.

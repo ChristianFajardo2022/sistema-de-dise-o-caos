@@ -30,11 +30,14 @@ const meta: Meta<typeof PhoneInput> = {
   },
   args: { label: 'Teléfono', placeholder: '300 123 4567', helperText: undefined },
   decorators: [
-    (Story) => (
-      <div className="min-h-72 w-[420px] max-w-full">
+    (Story, { parameters }) =>
+      parameters.sinMarco ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="min-h-72 w-[420px] max-w-full">
+          <Story />
+        </div>
+      ),
   ],
 };
 export default meta;
@@ -94,9 +97,9 @@ const FIGMA_COUNTRIES = [
  * Active/Focus abre la lista real del prefijo (capa superior, bajo todo el control, como en Figma).
  */
 export const FigmaMatrix: Story = {
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', sinMarco: true },
   render: () => (
-    <div className={`grid w-fit grid-cols-[repeat(2,496px)] items-start gap-x-6 gap-y-10 p-6 ${SURFACE}`}>
+    <div className={`grid max-w-full grid-cols-[repeat(auto-fill,minmax(min(100%,496px),496px))] items-start gap-x-6 gap-y-10 p-6 ${SURFACE}`}>
       {FIGMA_VARIANTS.map(({ name, props }) => (
         // La lista abierta de Active/Focus va en la capa superior: se le deja sitio debajo para no tapar la fila siguiente
         <div key={name} className={`flex flex-col gap-2 ${name === 'Active/Focus' ? 'pb-24' : ''}`}>

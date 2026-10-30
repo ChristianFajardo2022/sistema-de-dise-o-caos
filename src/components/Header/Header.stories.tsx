@@ -24,12 +24,12 @@ const meta = {
       control: 'radio',
       options: ['auto', 'desktop', 'mobile'],
       type: { name: 'enum', value: ['auto', 'desktop', 'mobile'] },
-      description: 'Header desktop, Header mobile o según el ancho (64rem)',
+      description: 'Header desktop, Header mobile o según el espacio del propio Header (auto)',
     },
     search: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Searcher de Figma' },
     notificationCount: { control: { type: 'number', min: 0 }, type: { name: 'number' }, description: 'No leídas en la campana' },
   },
-  args: { layout: 'desktop', search: true },
+  args: { layout: 'auto', search: true },
 } satisfies Meta<typeof Header>;
 
 export default meta;
@@ -106,7 +106,10 @@ const FULL: Story['args'] = {
 
 // ───────────────────────── historias ─────────────────────────
 
-/** Header desktop: submenús en banda, buscador, campana con panel simple y menú de perfil. */
+/**
+ * Header desktop: submenús en banda, buscador, campana con panel simple y menú de perfil. Con `layout="auto"` (por
+ * defecto), si el lienzo es más angosto que lo que necesita la barra de escritorio, se ve la móvil.
+ */
 export const Desktop: Story = { args: FULL };
 
 /** Con el panel complejo (pestañas, tarjetas y grupos) en la campana. */
@@ -124,7 +127,10 @@ export const Mobile: Story = {
   ],
 };
 
-/** `layout="auto"` (por defecto): escritorio desde 64rem de ancho, móvil por debajo. Cambia el tamaño de la ventana. */
+/**
+ * `layout="auto"` (por defecto): la cabecera mide su propio ancho, no el de la ventana. Escritorio cuando cabe entera
+ * (logo, navegación, buscador a su mínimo y acciones), móvil cuando no. Cambia el tamaño del lienzo.
+ */
 export const Responsive: Story = { args: { ...FULL, layout: 'auto' } };
 
 /** Sin sesión: sin campana ni avatar, con acciones al final (prop Buttons de Figma). */
@@ -148,7 +154,7 @@ function ControlledDemo() {
   const [open, setOpen] = useState<string | null>('pagos');
   return (
     <div className="min-h-64">
-      <Header layout="desktop" items={ITEMS} openItem={open} onOpenItemChange={setOpen} homeHref="#inicio" />
+      <Header items={ITEMS} openItem={open} onOpenItemChange={setOpen} homeHref="#inicio" />
       <p className="px-6 py-4 text-ds-text-neutral-white">Abierto: {open ?? 'ninguno'}</p>
     </div>
   );
@@ -194,16 +200,16 @@ const DESKTOP_VARIANTS = [
 /**
  * Los siete Type de "Header desktop" de Figma (1440 de ancho): Default y Menu list1 a 6, cada uno con el submenú de la
  * sección 1 a 6 abierto en la banda (tres "Text item"). Los paneles de la campana y del avatar están cerrados, como en
- * Figma.
+ * Figma. Con `layout="auto"`: en un lienzo más angosto que lo que necesita la barra (unos 1015 con ocho secciones) se
+ * ve la composición móvil.
  */
 export const FigmaMatrixDesktop: Story = {
   parameters: { fullWidth: true },
   render: () => (
-    <div className="flex w-[1440px] flex-col gap-6 bg-ds-background-general-black">
+    <div className="flex w-full max-w-[1440px] flex-col gap-6 bg-ds-background-general-black">
       {DESKTOP_VARIANTS.map((v) => (
         <div key={v.name} style={{ height: v.height }} className="relative">
           <Header
-            layout="desktop"
             data-figma={v.name}
             items={FIGMA_ITEMS}
             openItem={v.open}
@@ -253,7 +259,7 @@ export const FigmaMatrixMobile: Story = {
 /** Test: landmarks, navegación con nombre, sección actual, buscador y submenú con teclado (disclosure). */
 export const LandmarksAndNavigationTest: Story = {
   tags: ['!autodocs'],
-  args: FULL,
+  args: { ...FULL, layout: 'desktop' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('banner')).toBeVisible();
@@ -282,7 +288,7 @@ export const LandmarksAndNavigationTest: Story = {
 /** Test: el submenú se cierra cuando el foco sale de la navegación (Tab después del último enlace). */
 export const SubmenuFocusOutTest: Story = {
   tags: ['!autodocs'],
-  args: FULL,
+  args: { ...FULL, layout: 'desktop' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const nav = canvas.getByRole('navigation', { name: 'Navegación principal' });
@@ -303,7 +309,7 @@ export const SubmenuFocusOutTest: Story = {
 /** Test: la campana abre el panel como diálogo; Escape lo cierra y el foco vuelve a la campana. */
 export const NotificationsTest: Story = {
   tags: ['!autodocs'],
-  args: FULL,
+  args: { ...FULL, layout: 'desktop' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const bell = canvas.getByRole('button', { name: 'Notificaciones, 2 sin leer' });
@@ -327,7 +333,7 @@ export const NotificationsTest: Story = {
 /** Test: el menú de perfil abre desde el avatar (nombre que empieza con las iniciales visibles) y cierra sesión. */
 export const ProfileTest: Story = {
   tags: ['!autodocs'],
-  args: FULL,
+  args: { ...FULL, layout: 'desktop' },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: 'HG, menú de perfil de Hugo García' }));

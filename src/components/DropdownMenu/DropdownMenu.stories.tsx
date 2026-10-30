@@ -83,7 +83,7 @@ type Story = StoryObj<typeof meta>;
 /** Menú de acciones con disparador (patrón Menu Button): iconos, un checkbox y un ítem deshabilitado. */
 export const Interactive: Story = {
   render: (args) => (
-    <div className="flex min-h-80 w-[28rem] max-w-full justify-end p-4">
+    <div className="flex min-h-80 w-[28rem] max-w-full items-start justify-end p-4">
       <DropdownMenu {...args}>
         <DropdownMenuItem type="icon" icon="add-circle">Nuevo archivo</DropdownMenuItem>
         <DropdownMenuItem type="icon" icon="add-circle">Duplicar</DropdownMenuItem>
@@ -97,7 +97,7 @@ export const Interactive: Story = {
 function typeStory(itemType: DropdownMenuItemType): Story {
   return {
     render: (args) => (
-      <div className="flex min-h-72 w-[28rem] max-w-full justify-end p-4">
+      <div className="flex min-h-72 w-[28rem] max-w-full items-start justify-end p-4">
         <DropdownMenu {...args} defaultOpen>
           <SampleItems itemType={itemType} secondSelected />
         </DropdownMenu>
@@ -122,7 +122,7 @@ function SearchExample(args: DropdownMenuProps) {
   const [checked, setChecked] = useState<string[]>(['Ana Pérez']);
   const shown = PEOPLE.filter((p) => p.name.toLowerCase().includes(query.trim().toLowerCase()));
   return (
-    <div className="flex min-h-96 w-[28rem] max-w-full justify-end p-4">
+    <div className="flex min-h-96 w-[28rem] max-w-full items-start justify-end p-4">
       <DropdownMenu
         {...args}
         type="search"
@@ -152,7 +152,7 @@ export const Search: Story = { render: (args) => <SearchExample {...args} /> };
 /** Modo `list`: lista informativa de los avatares ocultos de un grupo, abierta desde el "+N". */
 export const InfoList: Story = {
   render: (args) => (
-    <div className="flex min-h-72 w-[28rem] max-w-full justify-end p-4">
+    <div className="flex min-h-72 w-[28rem] max-w-full items-start justify-end p-4">
       <div className="flex items-center">
         {PEOPLE.slice(0, 3).map((p) => (
           <Avatar key={p.name} variant="photo" size="sm" src={PHOTO_SRC[p.photo]} alt={p.name} ringed className="-ml-2 first:ml-0" />
@@ -177,7 +177,7 @@ export const InfoList: Story = {
 /** Ítems con `href`: enlaces reales (`<a role="menuitem">`), con Cmd/Ctrl/clic medio; Enter o Espacio los siguen y cierran. */
 export const ItemLinks: Story = {
   render: (args) => (
-    <div className="flex min-h-72 w-[28rem] max-w-full justify-end p-4">
+    <div className="flex min-h-72 w-[28rem] max-w-full items-start justify-end p-4">
       <DropdownMenu {...args} aria-label="Ayuda" trigger={<Button variant="secondary" size="sm">Ayuda</Button>}>
         <DropdownMenuItem type="icon" icon="add-circle" href="#guia">Guía de uso</DropdownMenuItem>
         <DropdownMenuItem href="#preguntas">Preguntas frecuentes</DropdownMenuItem>
@@ -249,7 +249,7 @@ const MENU_VARIANTS: { type: DropdownMenuType; item: 'Simple' | 'Icon' | 'Checkb
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen', a11y: { config: { rules: [{ id: 'landmark-unique', enabled: false }] } } },
   render: () => (
-    <div className={`grid w-fit grid-cols-[repeat(4,310px)] items-start gap-6 p-6 ${SURFACE}`}>
+    <div className={`grid max-w-full grid-cols-[repeat(auto-fill,310px)] items-start gap-6 p-6 ${SURFACE}`}>
       {MENU_VARIANTS.map(({ type, item }) => {
         const itemType = item.toLowerCase() as DropdownMenuItemType;
         // En Figma, Checkbox y Avatar muestran su segundo ítem en Select salvo en Simple+Checkbox
@@ -288,7 +288,7 @@ const LIST_STATES: { figma: string; state: DropdownMenuItemState }[] = [
 export const FigmaMatrixList: Story = {
   parameters: { layout: 'fullscreen', a11y: { config: { rules: [{ id: 'landmark-unique', enabled: false }] } } },
   render: () => (
-    <div className={`grid w-fit grid-cols-[repeat(4,304px)] items-start gap-6 p-6 ${SURFACE}`}>
+    <div className={`grid max-w-full grid-cols-[repeat(auto-fill,304px)] items-start gap-6 p-6 ${SURFACE}`}>
       {LIST_TYPES.flatMap(({ figma, type }) =>
         LIST_STATES.map(({ figma: stateName, state }) => (
           <div key={`${figma}-${stateName}`} role="menu" aria-label={`${figma} ${stateName}`}>
@@ -311,7 +311,7 @@ export const FigmaMatrixList: Story = {
 export const KeyboardTest: Story = {
   tags: ['!autodocs'],
   render: (args) => (
-    <div className="flex min-h-72 w-[28rem] max-w-full justify-end p-4">
+    <div className="flex min-h-72 w-[28rem] max-w-full items-start justify-end p-4">
       <DropdownMenu {...args}>
         <DropdownMenuItem>Uno</DropdownMenuItem>
         <DropdownMenuItem disabled>Dos</DropdownMenuItem>

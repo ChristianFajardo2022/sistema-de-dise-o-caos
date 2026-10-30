@@ -42,8 +42,8 @@ export const Interactive: Story = {
 /** Una sola variante en Figma: Property 1=Predeterminada (1440×1080). */
 export const FigmaMatrix: Story = {
   render: () => (
-    <div className="w-[1440px] max-w-none bg-ds-background-general-black">
-      <div className="relative h-[1080px] w-[1440px] shrink-0 p-6 text-ds-text-neutral-body">
+    <div className="w-full max-w-[1440px] bg-ds-background-general-black">
+      <div className="relative h-[1080px] w-full p-6 text-ds-text-neutral-body">
         <p>Contenido detrás del backdrop.</p>
         <Backdrop position="absolute" data-figma="Property 1=Predeterminada" />
       </div>

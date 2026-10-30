@@ -3,7 +3,8 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 /** Nivel del encabezado semántico del título */
 export type PageHeaderHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Encabezado de página (set "Page Header" de Figma, 17265:93494): flecha de volver, título y descripción. */
+// Figma: 17265:93494
+/** Encabezado de página (set "Page Header" de Figma): flecha de volver, título y descripción. */
 export interface PageHeaderProps extends Omit<ComponentPropsWithoutRef<'header'>, 'title'> {
   /** Título de la página (Text header de Figma). Se dibuja como heading. */
   title: ReactNode;

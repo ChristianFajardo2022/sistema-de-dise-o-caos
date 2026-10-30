@@ -68,8 +68,8 @@ export const WithBreadcrumbAndActions: Story = {
 /** Una variante en Figma (Property 1=Default). */
 export const FigmaMatrix: Story = {
   render: () => (
-    <div className="w-[2144px]">
+    <div className="max-w-full overflow-x-auto"><div className="w-[2144px]">
       <PageHeader title="Encabezado" description={DESCRIPTION} onBack={() => {}} data-figma="Property 1=Default" />
-    </div>
+    </div></div>
   ),
 };

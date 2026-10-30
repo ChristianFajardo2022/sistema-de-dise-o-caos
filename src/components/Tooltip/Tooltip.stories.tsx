@@ -368,8 +368,8 @@ export const ToggletipTest: Story = {
 };
 
 /**
- * La página de documentación (la misma de la pestaña Docs) como historia: así las pruebas y axe la revisan. Recorre
- * las pestañas con teclado (patrón Tabs) y comprueba los encabezados numerados.
+ * La página de documentación (la misma de la pestaña Docs) como historia: así las pruebas y axe la revisan. Sin
+ * pestañas: Definición, Aplicación y Código van seguidas, con los encabezados numerados de corrido.
  */
 export const DocPageTest: Story = {
   tags: ['!autodocs'],
@@ -378,35 +378,22 @@ export const DocPageTest: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     expect(canvas.getByRole('heading', { level: 1, name: 'Tooltip' })).toBeInTheDocument();
-    const tabs = canvas.getAllByRole('tab');
-    expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Código']);
-    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
-    // Definición: secciones 01 a 05
-    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    expect(h2()).toEqual([
+    expect(canvas.queryAllByRole('tab')).toHaveLength(0);
+    // Definición (5 secciones) y Aplicación (2), seguidas y sin número
+    const h2 = canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(h2.slice(0, 7)).toEqual([
       'Definición del componente',
       'Propósito y anatomía',
       'Propiedades y variantes',
       'Estados y especificaciones de layout',
       'Estados compuestos y ejemplos base',
+      'Comportamiento y reglas de uso',
+      'Buenas y malas prácticas (Dos and Don’ts)',
     ]);
-    expect(canvas.getByText('05')).toBeInTheDocument();
-    expect(canvas.getAllByRole('table').length).toBe(4);
-    // Flecha derecha: Aplicación (activación automática), numeración continua 06 y 07
-    tabs[0].focus();
-    await userEvent.keyboard('{ArrowRight}');
-    expect(tabs[1]).toHaveFocus();
-    await waitFor(() => expect(tabs[1]).toHaveAttribute('aria-selected', 'true'));
-    expect(h2()).toEqual(['Comportamiento y reglas de uso', 'Buenas y malas prácticas (Dos and Don’ts)']);
-    expect(canvas.getByText('06')).toBeInTheDocument();
-    expect(canvas.getByText('07')).toBeInTheDocument();
+    for (const n of ['01', '05', '06', '07']) expect(canvas.queryByText(n)).not.toBeInTheDocument();
     expect(canvas.getAllByRole('img', { name: 'Buena práctica' })).toHaveLength(4);
-    // End: Código, con la tabla de props
-    await userEvent.keyboard('{End}');
-    await waitFor(() => expect(tabs[2]).toHaveAttribute('aria-selected', 'true'));
+    // Al final, la referencia de código con la tabla de props
     const props = canvas.getByRole('table', { name: 'Props de Tooltip' });
     expect(within(props).getByRole('rowheader', { name: /content/ })).toBeInTheDocument();
-    await userEvent.keyboard('{Home}');
-    await waitFor(() => expect(tabs[0]).toHaveAttribute('aria-selected', 'true'));
   },
 };

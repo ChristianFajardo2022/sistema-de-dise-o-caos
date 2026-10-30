@@ -13,8 +13,9 @@ import { Input } from '../Input';
 import { ScrollArea } from '../ScrollArea';
 import { cn } from '../../utils/cn';
 
+// Figma: 11673:7804
 /**
- * Panel visual del set "Dropdown" de Figma (11673:7804): superficie con radio 16 y sombra, campo de búsqueda opcional
+ * Panel visual del set "Dropdown" de Figma: superficie con radio 16 y sombra, campo de búsqueda opcional
  * y área de ítems con riel de scroll. No abre ni cierra nada: para eso, `DropdownMenu`.
  * Sirve también en línea (documentación, medición contra Figma).
  * Con `listProps` el área de ítems puede cambiar de rol (p. ej. `role="listbox"` con opciones propias, como Select).

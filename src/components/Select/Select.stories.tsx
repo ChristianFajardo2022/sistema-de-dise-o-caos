@@ -168,7 +168,7 @@ const FIGMA_VARIANTS: { name: string; props: Partial<ComponentProps<typeof Selec
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
-    <div className={`grid w-fit grid-cols-[repeat(2,496px)] items-start gap-x-6 gap-y-10 p-6 ${SURFACE}`}>
+    <div className={`grid max-w-full grid-cols-[repeat(auto-fill,496px)] items-start gap-x-6 gap-y-10 p-6 ${SURFACE}`}>
       {FIGMA_VARIANTS.map(({ name, props }) => (
         <div key={name} className="flex flex-col gap-2">
           <span className="text-ds-typography-body-size-xs text-ds-text-neutral-white">{name}</span>

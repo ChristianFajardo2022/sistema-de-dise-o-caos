@@ -22,8 +22,9 @@ import type { NotificationFilterValue, NotificationPanelTab } from '../../compon
 import { ScrollArea } from '../../components/ScrollArea';
 import { Tabs } from '../../components/Tabs';
 
+// Figma: 13539:83437
 /**
- * Pantalla móvil de notificaciones (set "Simple mobile notifications template" de Figma, 13539:83437, 375×798).
+ * Pantalla móvil de notificaciones (set "Simple mobile notifications template" de Figma, 375×798).
  *
  * Es una **composición**, no un componente exportado: cada producto decide a dónde vuelve la flecha, qué trae cada
  * pestaña y cómo se cargan los datos. Se arma con las piezas del sistema: `ButtonCorner` (volver), `NotificationFilter`

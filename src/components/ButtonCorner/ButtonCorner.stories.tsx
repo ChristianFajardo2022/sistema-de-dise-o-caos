@@ -140,7 +140,8 @@ export const StatesMatrix: Story = {
           className="bg-ds-primitives-color-primary-n01 p-4"
         >
           <p className="mb-3 text-xs text-ds-primitives-color-primary-b01">{contrast}</p>
-          <div className="grid grid-cols-[auto_repeat(5,auto)] items-center justify-start gap-x-6 gap-y-4">
+          <div className="max-w-full overflow-x-auto">
+          <div className="grid w-max min-w-full grid-cols-[auto_repeat(5,auto)] items-center justify-start gap-x-6 gap-y-4">
             <span />
             {VARIANTS.map((v) => (
               <span key={v} className="text-xs text-ds-text-neutral-body">{v}</span>
@@ -165,6 +166,7 @@ export const StatesMatrix: Story = {
                 </div>
               ))
             )}
+          </div>
           </div>
         </div>
       ))}

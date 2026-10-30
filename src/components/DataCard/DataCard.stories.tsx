@@ -17,7 +17,7 @@ function Sparkline() {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      className="h-auto w-48 text-ds-icon-semantic-information-secondary"
+      className="h-auto w-48 max-w-full text-ds-icon-semantic-information-secondary"
     >
       <path d="M1 44c10 0 12-6 18-22 4-10 9-10 13-2 3 6 6 7 10 2 5-6 9-16 14-16 6 0 9 12 14 24 4 9 9 12 20 12h104" />
     </svg>
@@ -49,11 +49,14 @@ const meta = {
   },
   args: { title: '1.284', description: 'Visitas esta semana', headingLevel: 3 },
   decorators: [
-    (Story) => (
-      <div className="max-w-3xl">
+    (Story, { parameters }) =>
+      parameters.sinMarco ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="max-w-3xl">
+          <Story />
+        </div>
+      ),
   ],
 } satisfies Meta<typeof DataCard>;
 
@@ -126,14 +129,16 @@ const FIGMA_STATES = [
   { name: 'Propiedad 1=Inactive', props: { inactive: true } },
 ];
 
+// Figma: 14043:59910
 /**
- * Las 4 variantes del Data card de Figma (set 14043:59910). Sus hijos Toggle, Button y Selection están ocultos en esas
+ * Las 4 variantes del Data card de Figma. Sus hijos Toggle, Button y Selection están ocultos en esas
  * variantes: en el código son el slot `action`. Los textos son los de Figma.
  */
 export const FigmaMatrix: Story = {
+  parameters: { sinMarco: true },
   render: () => (
     <div className="bg-ds-background-general-black p-6">
-      <div className="flex w-[757px] flex-col gap-6">
+      <div className="flex w-full max-w-[757px] flex-col gap-6">
         {FIGMA_STATES.map(({ name, props }) => (
           <DataCard key={name} title="Título" description="Descripción" data-figma={name} {...props}>
             {/* Solo en la matriz: el Container graphic de Figma mide 81 de alto */}

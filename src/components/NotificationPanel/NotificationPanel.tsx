@@ -21,8 +21,9 @@ import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 import { useMergedRefs } from '../../utils/refs';
 
+// Figma: 12602:6152, 15302:8832
 /**
- * Panel de notificaciones (sets "Simple notifications" 12602:6152 y "Complex notifications" 15302:8832 de Figma,
+ * Panel de notificaciones (sets "Simple notifications" y "Complex notifications" de Figma,
  * el marco "Profile card"): encabezado con título, filtro "Todas" / "No leídos" (y ajustes en `complex`), pestañas
  * opcionales, divisor y la lista dentro de un `ScrollArea`. Sin notificaciones muestra un `EmptyState`.
  *

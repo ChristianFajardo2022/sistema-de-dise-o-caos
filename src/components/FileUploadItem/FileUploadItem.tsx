@@ -32,8 +32,9 @@ const STATUS_ICON: Record<Exclude<FileUploadStatus, 'loading'>, IconName> = {
   alert: 'warning',
 };
 
+// Figma: 11557:17694
 /**
- * Ítem de carga de archivo (component set "File card" 11557:17694 de Figma). Muestra el nombre, el estado como texto
+ * Ítem de carga de archivo (component set "File card" de Figma). Muestra el nombre, el estado como texto
  * (anunciado con aria-live, no solo por color), la barra de progreso (role="progressbar", nombrada por el archivo) y
  * las acciones. Cada acción se nombra con el archivo ("Eliminar <título>", como ListItem).
  */

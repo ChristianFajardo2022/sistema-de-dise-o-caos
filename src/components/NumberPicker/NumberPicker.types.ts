@@ -1,7 +1,8 @@
 import type { InputHTMLAttributes } from 'react';
 import type { FieldRootProps } from '../Field/Field.types';
 
-/** Size de Figma (set 12609:18389): `sm` mide 56 de alto y `md` 48, tal como están en el archivo. */
+// Figma: 12609:18389
+/** Size de Figma: `sm` mide 56 de alto y `md` 48, tal como están en el archivo. */
 export type NumberPickerSize = 'sm' | 'md';
 
 /**

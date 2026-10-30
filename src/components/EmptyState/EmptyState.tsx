@@ -41,11 +41,15 @@ function ActionButton({ action, variant }: { action: EmptyStateAction; variant: 
   );
 }
 
+// Figma: component set "Empty states" 12304:6287. Acciones en el orden de Figma Desktop (secundaria, principal; el DOM y
+// el teclado van igual); en Mobile se apilan a ancho completo con la principal arriba (`flex-col-reverse`).
 /**
- * Estado vacío (component set "Empty states" 12304:6287 de Figma). Composición de cuadros con un ícono, título,
- * descripción y hasta dos acciones (Button primary y secondary). Las acciones siguen el orden de Figma Desktop
- * (secundaria a la izquierda, principal a la derecha; el DOM y el teclado van igual); en Mobile se apilan a ancho
- * completo con la principal arriba (`flex-col-reverse`). La composición de cuadros es decorativa.
+ * Mensaje que ocupa el lugar de un contenido que todavía no existe, que no tiene resultados o que no se pudo cargar.
+ * Explica qué pasa y, si se puede, ofrece una o dos acciones para seguir.
+ *
+ * Hay cuatro tipos: primer uso, sin resultados, error y sin contenido; cada uno trae su ícono. En escritorio los botones
+ * van uno al lado del otro, con la acción principal a la derecha; en el celular se apilan a todo el ancho con la
+ * principal arriba. El dibujo de cuadros es solo decorativo: los lectores de pantalla lo ignoran.
  */
 export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
   (

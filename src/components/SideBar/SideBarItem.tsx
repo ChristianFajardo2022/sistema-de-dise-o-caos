@@ -19,8 +19,9 @@ import { Tooltip } from '../Tooltip';
 import { Divider } from '../_internal/Divider';
 import { cn } from '../../utils/cn';
 
+// Figma: 13328:3609
 /**
- * Ítem de la barra lateral (set "Hamburguer menu (Atom)" de Figma, 13328:3609). Es un `<li>`: va dentro de la lista de
+ * Ítem de la barra lateral (set "Hamburguer menu (Atom)" de Figma). Es un `<li>`: va dentro de la lista de
  * `SideBar` (o de un `<ul>` propio).
  *
  * - Sin submenú: la fila es un `<a href>` (navegación real, con Cmd/Ctrl/clic medio) o un `<button>`; la sección actual

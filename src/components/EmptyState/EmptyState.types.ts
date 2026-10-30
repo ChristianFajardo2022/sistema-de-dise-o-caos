@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
 import type { IconName } from '../Icon/Icon.types';
 
 /**
- * Type de Figma (Empty states 12304:6287). Cada tipo trae su ícono y su composición:
+ * Situación que explica el mensaje. Cada tipo trae su ícono:
  * - `first-use`: primer uso, sin datos todavía (ícono add-circle).
  * - `no-results`: una búsqueda o filtro sin coincidencias (ícono search).
  * - `errors-issues`: algo falló y se puede reintentar (ícono warning).
@@ -13,24 +13,24 @@ export type EmptyStateType = 'first-use' | 'no-results' | 'errors-issues' | 'no-
 /** Nivel del encabezado del título (h2 a h6). Por defecto 3. */
 export type EmptyStateHeadingLevel = 2 | 3 | 4 | 5 | 6;
 
-/** Acción del estado vacío: un Button con texto. `label` es el texto (prop Text del Button de Figma). */
+/** Acción del mensaje: un botón con texto. `label` es el texto del botón. */
 export type EmptyStateAction = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'className'> & {
   /** Texto del botón. */
   label: ReactNode;
 };
 
 export interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
-  /** Type de Figma. Por defecto `first-use`. */
+  /** Situación que explica el mensaje; define el ícono. Por defecto `first-use`. */
   type?: EmptyStateType;
-  /** Ícono de la composición. Por defecto el del `type` (add-circle, search, warning o document). */
+  /** Ícono del dibujo. Por defecto el del `type` (add-circle, search, warning o document). */
   icon?: IconName;
-  /** Título (props Title y Title text de Figma). Sin él no se dibuja. */
+  /** Título del mensaje. Si no se pasa, no aparece. */
   title?: ReactNode;
-  /** Descripción (prop Text de Figma). Sin ella no se dibuja. */
+  /** Texto bajo el título. Si no se pasa, no aparece. */
   description?: ReactNode;
-  /** Acción principal: Button primary (prop Button primary de Figma). Se dibuja si se pasa. */
+  /** Acción principal (botón destacado). Aparece solo si se pasa. */
   primaryAction?: EmptyStateAction;
-  /** Acción secundaria: Button secondary (prop Button secondary de Figma). Se dibuja si se pasa. */
+  /** Acción secundaria (botón con borde). Aparece solo si se pasa. */
   secondaryAction?: EmptyStateAction;
   /** Nivel del encabezado del título. Por defecto 3. */
   headingLevel?: EmptyStateHeadingLevel;

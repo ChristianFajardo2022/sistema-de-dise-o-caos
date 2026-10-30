@@ -24,8 +24,9 @@ import { NotchedSurface } from '../_internal/NotchedSurface';
 import { cornerShadowClass } from '../_internal/shadows';
 import { cn } from '../../utils/cn';
 
+// Figma: 15863:66763
 /**
- * Tarjeta de producto (component set "Card producto" 15863:66763 de Figma).
+ * Tarjeta de producto (component set "Card producto" de Figma).
  * Contenedor (`<article>`) con foto, nombre, precio, calificación y tres controles: favorito (toggle con
  * `aria-pressed`), "Agregar al carrito" y, con el producto agregado (State "+"), el selector de cantidad.
  * Hover de Figma = la tarjeta se expande con hover, foco dentro o en pantallas táctiles y muestra la descripción y las

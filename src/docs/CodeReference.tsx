@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { ScrollRegion } from '../foundations/_doc/ScrollRegion';
 import { cn } from '../utils/cn';
 import { DocCard, DocSection, DocTable } from './DocParts';
@@ -37,12 +38,12 @@ function PropName({ row }: { row: DocPropRow }) {
  * Pestaña Código: importación, tabla de props reales (nombre, tipo, valor por defecto, descripción) y ejemplos.
  * Las props salen del ArgTypes de Storybook (docgen del código) o de `<Nombre>.docs.json`.
  */
-export function CodeReference({ importName, related = [], props, examples = [] }: DocCodeReference) {
+export function CodeReference({ importName, related = [], props, examples = [], interactive }: DocCodeReference & { interactive?: ReactNode }) {
   const names = [importName, ...related].join(', ');
   return (
     <>
       <DocSection
-        title="Referencia de código"
+        title="Desarrollo"
         description={
           <>
             Props de <code>{importName}</code> tal como están en el código. Las de HTML nativas que no aparecen aquí (como{' '}
@@ -51,6 +52,13 @@ export function CodeReference({ importName, related = [], props, examples = [] }
         }
       >
         <DocCodeBlock label="Importación">{`import { ${names} } from '${PACKAGE}';`}</DocCodeBlock>
+        {interactive ? (
+          // Lienzo interactivo y Controls de Storybook: cubren la tabla de props (nombre, descripción, valor por defecto, control)
+          // (con scroll horizontal propio si la tabla no cabe en pantallas angostas)
+          <ScrollRegion label="Lienzo interactivo y controles">
+            <div className="flex min-w-[600px] flex-col gap-ds-primitives-space-5xl">{interactive}</div>
+          </ScrollRegion>
+        ) : (
         <DocTable
           caption={`Props de ${importName}`}
           columns={['Prop', 'Tipo', 'Por defecto', 'Descripción']}
@@ -62,6 +70,7 @@ export function CodeReference({ importName, related = [], props, examples = [] }
             row.description ?? '',
           ])}
         />
+        )}
       </DocSection>
       {examples.length > 0 && (
         <DocSection title="Ejemplos de uso" description="Fragmentos listos para copiar.">

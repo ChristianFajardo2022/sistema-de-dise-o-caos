@@ -114,9 +114,12 @@ export const accordionPanelVariants = cva(
   }
 );
 
-/** Fundido del contenido (Tier 3: se conserva con prefers-reduced-motion, más corto). */
+/**
+ * Fundido del contenido (Tier 3: se conserva con prefers-reduced-motion, más corto). El recorte del 0fr se extiende 8 px
+ * sobre el contenido (margen negativo + padding iguales) para no cortar anillos de foco ni pulgares que sobresalen.
+ */
 export const accordionPanelInnerVariants = cva(
-  'min-h-0 overflow-hidden [transition-property:opacity] [transition-duration:300ms] motion-reduce:[transition-duration:150ms]',
+  'min-h-0 overflow-hidden -m-ds-space-general-lg p-ds-space-general-lg [transition-property:opacity] [transition-duration:300ms] motion-reduce:[transition-duration:150ms]',
   {
     variants: { open: { true: 'opacity-100', false: 'opacity-0' } },
     defaultVariants: { open: false },
@@ -129,9 +132,12 @@ export const accordionSlotClass = 'flex flex-col items-end gap-ds-space-general-
 /** Type=Table, fila de celdas (Table de Figma): celdas de igual ancho. */
 export const accordionTableRowClass = 'flex min-w-0 flex-1 items-stretch';
 
-/** Celda de la fila: padding horizontal 12 (space/general/xl), alto 42, Helvetica regular body/md 14/20. */
+/**
+ * Celda de la fila: padding horizontal 12 (space/general/xl), alto 42, Helvetica regular body/md 14/20. Si la celda es
+ * más angosta que una palabra larga (un número de guía, un código), la palabra se parte en vez de invadir la vecina.
+ */
 export const accordionCellClass = [
-  'flex min-h-10.5 min-w-0 flex-1 items-center px-ds-space-general-xl',
+  'flex min-h-10.5 min-w-0 flex-1 items-center px-ds-space-general-xl [overflow-wrap:anywhere]',
   'font-ds-primitives-typography-family-primary [font-weight:var(--ds-primitives-typography-weight-regular)]',
   'text-ds-typography-body-size-md leading-ds-typography-body-line-height-large-md text-ds-text-neutral-white',
 ].join(' ');

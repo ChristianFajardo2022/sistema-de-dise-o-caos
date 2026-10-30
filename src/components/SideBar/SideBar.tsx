@@ -33,9 +33,10 @@ function parentsOf(items: SideBarItemData[], id: string | null | undefined): str
   return items.filter((item) => item.items?.some((sub) => sub.id === id)).map((item) => item.id);
 }
 
+// Figma: 13328:3630, 13738:92956, 13328:3609
 /**
- * Barra lateral de navegación: "Menu desktop" (13328:3630) y "Menu mobile" (13738:92956) de Figma, con los ítems
- * "Hamburguer menu (Atom)" (13328:3609).
+ * Barra lateral de navegación: "Menu desktop" y "Menu mobile" de Figma, con los ítems
+ * "Hamburguer menu (Atom)".
  *
  * - Semántica: `<nav>` con nombre y una lista (`<ul>`/`<li>`). Los ítems con `href` son enlaces reales; la sección
  *   actual (`value`) lleva `aria-current="page"`. Los ítems con submenú son botones disclosure (`aria-expanded` +

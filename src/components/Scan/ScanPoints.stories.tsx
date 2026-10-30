@@ -33,7 +33,8 @@ export const Interactive: Story = {};
 /** Fotograma fijo, como queda con reducción de movimiento. */
 export const Static: Story = { args: { animated: false, step: 4 } };
 
-/** Los 9 fotogramas del set 19548:38784, uno por variante. */
+// Figma: 19548:38784
+/** Los 9 fotogramas del set de Figma, uno por variante. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (

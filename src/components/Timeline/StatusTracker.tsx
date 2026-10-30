@@ -24,8 +24,9 @@ function currentIndex(items: TimelineItemData[]): number {
   return Math.min(lastDone + 1, items.length - 1);
 }
 
+// Figma: 13770:10884
 /**
- * Seguimiento de estado (Status tracker de Figma, 13770:10884): resumen del estado actual, línea de tiempo
+ * Seguimiento de estado (Status tracker de Figma): resumen del estado actual, línea de tiempo
  * horizontal y botón de historial opcional. En móvil la barra queda sin textos y se resume el paso actual debajo.
  * Los pasos van sin descripción (como en Figma). Con `live` anuncia los cambios de estado (región `aria-live`).
  */

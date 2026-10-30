@@ -62,14 +62,15 @@ export const Interactive: Story = {
   render: (args: FileDropzoneProps) => <Demo {...args} />,
 };
 
-/** Set 11438:5774: cada estado una vez, con los textos de Figma (ancho 304). */
+// Figma: 11438:5774
+/** Set de Figma: cada estado una vez, con los textos de Figma (ancho 304). */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   decorators: [],
   render: () => (
-    <div className="flex w-fit items-start gap-6 bg-ds-background-general-black p-6">
+    <div className="flex max-w-full flex-wrap items-start gap-6 bg-ds-background-general-black p-6">
       {STATES.map((s) => (
-        <div key={s} className="flex w-[304px] flex-col gap-2">
+        <div key={s} className="flex w-[304px] shrink-0 flex-col gap-2">
           <span className="text-xs text-ds-text-neutral-body">{FIGMA[s]}</span>
           <FileDropzone
             state={s}

@@ -8,8 +8,9 @@ import {
 } from './ChatMessage.variants';
 import { cn } from '../../utils/cn';
 
+// Figma: 14948:8400
 /**
- * Mensaje de una conversación (set "Conversacion (Atom)" de Figma, 14948:8400): avatar y burbuja. Es un `<li>`: va
+ * Mensaje de una conversación (set "Conversacion (Atom)" de Figma): avatar y burbuja. Es un `<li>`: va
  * dentro de `ChatMessageList` (o de un `<ol>`). El autor no se dibuja, pero se lee antes del contenido
  * ("Ana Pérez: Hola"); la hora se ve bajo el contenido, dentro de la burbuja. El avatar es decorativo.
  */

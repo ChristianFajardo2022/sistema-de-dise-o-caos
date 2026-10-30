@@ -5,8 +5,9 @@ import { TimelineContext } from './TimelineContext';
 import { TimelineItem } from './TimelineItem';
 import { cn } from '../../utils/cn';
 
+// Figma: 13687:11466
 /**
- * Línea de tiempo (Timeline de Figma, 13687:11466): lista ordenada de pasos con barra y nodo.
+ * Línea de tiempo (Timeline de Figma): lista ordenada de pasos con barra y nodo.
  * Pasa los pasos en `items` o compón con `TimelineItem` como `children`. Dale un nombre con `aria-label`
  * o `aria-labelledby` cuando la lista no tenga un encabezado alrededor.
  */

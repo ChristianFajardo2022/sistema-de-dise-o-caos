@@ -2,8 +2,9 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import type { AlertProps } from '../Alert/Alert.types';
 import type { FileRejection } from '../FileDropzone/FileDropzone.types';
 
+// Figma: 21407:3920
 /**
- * Type + State de Figma (File upload simple-2 21407:3920) como un solo estado:
+ * Type + State de Figma (File upload simple-2) como un solo estado:
  * - `idle`: zona para soltar (Type=Default, State=Default).
  * - `uploading`: progreso dentro del recuadro (Type=Uploading).
  * - `loaded`: archivo cargado (State=Loaded).
@@ -11,8 +12,9 @@ import type { FileRejection } from '../FileDropzone/FileDropzone.types';
  */
 export type FileUploadSimpleStatus = 'idle' | 'uploading' | 'loaded' | 'error';
 
+// Figma: 21412:4523
 /**
- * State de los sets de Figma (File upload simple 21412:4523: Default, Hover, Focus, Inactive). Solo fuerza el aspecto
+ * State de los sets de Figma (File upload simple: Default, Hover, Focus, Inactive). Solo fuerza el aspecto
  * para documentación: en uso normal sale de `:hover`, `:focus-visible` y `disabled`.
  */
 export type FileUploadSimpleState = 'default' | 'hover' | 'focus' | 'disabled';

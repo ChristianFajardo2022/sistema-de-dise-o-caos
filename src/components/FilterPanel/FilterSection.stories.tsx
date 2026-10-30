@@ -271,8 +271,9 @@ const ATOMS: { type: string; className: string; render: () => ReactNode }[] = [
   { type: 'Tabs', className: 'flex-col', render: () => <FilterTabs tabs={TABS} aria-label="Pestañas" data-figma-part="Filter tabs" /> },
 ];
 
+// Figma: 13874:43337
 /**
- * Los 13 tipos del set "Atoms" (13874:43337): el contenido de una sección armado con componentes existentes.
+ * Los 13 tipos del set "Atoms": el contenido de una sección armado con componentes existentes.
  * "Weight" es un NumberPicker con unidad; "Quantity", un rango escrito (dos Input con "a" entre ellos); "Quantit 2", el
  * mismo rango con Slider de dos pulgares y las etiquetas Mín./Máx.; "Selection tree", el CheckboxTree.
  */
@@ -292,12 +293,13 @@ export const FigmaMatrix: Story = {
   ),
 };
 
-/** "Individual filter" (15489:48186): título y chips, sin tarjeta. */
+// Figma: 15489:48186
+/** "Individual filter": título y chips, sin tarjeta. */
 export const FigmaMatrixIndividual: Story = {
   parameters: { layout: 'padded' },
   render: () => (
-    <div className="w-fit bg-ds-background-general-black p-6">
-      <FilterSection id="muestra" variant="plain" title="Heading" className="w-[554px]" data-figma="Individual filter">
+    <div className="w-full max-w-[602px] bg-ds-background-general-black p-6">
+      <FilterSection id="muestra" variant="plain" title="Heading" className="w-full max-w-[554px]" data-figma="Individual filter">
         <ChipGroup aria-label="Opciones" className="flex-wrap" data-figma-part="List">
           {['Ácido', 'Ajustado'].map((t) => (
             <Chip key={t} value={t} icon={false} rootProps={{ 'data-figma-part': 'Chips' }}>

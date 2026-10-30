@@ -29,8 +29,9 @@ import { cn } from '../../utils/cn';
 
 const has = (node: unknown) => node !== undefined && node !== null && node !== false && node !== '';
 
+// Figma: 14446:66166
 /**
- * Superficie del Complex modal (set 14446:66166) sin `<dialog>`: encabezado (ícono, título y descripción), contenido
+ * Superficie del Complex modal sin `<dialog>`: encabezado (ícono, título y descripción), contenido
  * libre con desplazamiento, pie con acciones y cerrar (Button corner en la muesca, o ícono en el panel lateral).
  * `Modal` la monta dentro del diálogo; suelta sirve para documentación.
  */

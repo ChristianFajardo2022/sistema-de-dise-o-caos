@@ -135,7 +135,7 @@ const STATES: { id: string; state: InputState; helper?: boolean }[] = [
 /** Los 4 tipos × 8 estados del component set de Figma. */
 export const StatesMatrix: Story = {
   render: () => (
-    <div className="grid grid-cols-[auto_repeat(4,minmax(240px,1fr))] items-start gap-x-6 gap-y-6">
+    <div className="grid grid-cols-[auto_repeat(4,minmax(0,1fr))] items-start gap-x-6 gap-y-6">
       <span />
       {VARIANTS.map((v) => (
         <span key={v} className="text-xs text-neutral-400">
@@ -191,7 +191,7 @@ export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (
     <div className="bg-ds-background-general-black p-6">
-      <div className="grid grid-cols-[auto_repeat(4,minmax(240px,1fr))] items-start gap-x-6 gap-y-6">
+      <div className="grid grid-cols-[auto_repeat(4,minmax(0,1fr))] items-start gap-x-6 gap-y-6">
         <span />
         {FIGMA_TYPES.map((t) => (
           <span key={t.figma} className="text-xs text-ds-text-neutral-body">{t.figma}</span>

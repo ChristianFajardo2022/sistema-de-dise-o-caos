@@ -149,7 +149,7 @@ export const FigmaMatrix: Story = {
   // Dos footers en la misma página (una variante cada uno): el landmark contentinfo y el nav se repiten solo aquí
   parameters: { a11y: { config: { rules: [{ id: 'landmark-no-duplicate-contentinfo', enabled: false }, { id: 'landmark-unique', enabled: false }] } } },
   render: () => (
-    <div className="flex w-[1440px] flex-col gap-5 bg-white">
+    <div className="flex w-full max-w-[1440px] flex-col gap-5 bg-white">
       <Footer
         data-figma="Type=Portals"
         type="portals"

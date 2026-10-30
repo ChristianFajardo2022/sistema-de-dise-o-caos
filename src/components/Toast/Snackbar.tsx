@@ -11,8 +11,9 @@ import { cn } from '../../utils/cn';
 const isAction = (node: unknown): node is SnackbarAction =>
   typeof node === 'object' && node !== null && !isValidElement(node) && 'label' in node;
 
+// Figma: 11844:10443
 /**
- * Snackbar (set 11844:10443 de Figma): como el Toast pero sin botón de cierre ni muesca, con hasta dos
+ * Snackbar (set de Figma): como el Toast pero sin botón de cierre ni muesca, con hasta dos
  * acciones (Button tertiary xs unicolor) bajo el texto. Región viva con las mismas reglas que el Toast.
  * Sin botón de cierre, la salida es una acción (con `closeOnAction` llama a `onClose`), Escape o `duration`.
  */

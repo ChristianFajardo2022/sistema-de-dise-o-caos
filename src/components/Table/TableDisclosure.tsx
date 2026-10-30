@@ -6,8 +6,9 @@ import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 
+// Figma: 13544:69601
 /**
- * Fila desplegable (`Dropdown table (Atom)` de Figma, 13544:69601): una franja de 56 con un botón chevron
+ * Fila desplegable (`Dropdown table (Atom)` de Figma): una franja de 56 con un botón chevron
  * (Button tertiary xs, solo ícono) que muestra u oculta más datos. Patrón APG Disclosure: el botón lleva
  * `aria-expanded` y `aria-controls`; el nombre no cambia con el estado. Up=On (chevron arriba) = abierto.
  */

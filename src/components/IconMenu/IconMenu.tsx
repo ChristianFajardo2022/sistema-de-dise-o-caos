@@ -10,8 +10,9 @@ const LINES = [
   { part: 'Vector 26', y: 24 },
 ] as const;
 
+// Figma: 13616:14074
 /**
- * Ícono del botón de menú ("Icon menu (Atom)" de Figma, 13616:14074): tres rayas que pasan a una X.
+ * Ícono del botón de menú ("Icon menu (Atom)" de Figma): tres rayas que pasan a una X.
  *
  * - Es un componente propio y no un `Icon`: el dibujo de Figma son tres trazos de 1.5 sobre una cuadrícula de 32 que
  *   giran sobre su centro, y la biblioteca de íconos CAOS (`menu`, `close`) trae dibujos fijos de otra cuadrícula, sin

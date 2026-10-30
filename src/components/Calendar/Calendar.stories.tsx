@@ -149,8 +149,9 @@ const CALENDAR_VARIANTS = [
   { name: 'Type=Date range, Date=Year', mode: 'range', view: 'year' },
 ] as const;
 
+// Figma: 8098:2263
 /**
- * Las 6 variantes del set "Calendar" (8098:2263) con el pie visible y los datos de arriba.
+ * Las 6 variantes del set "Calendar" con el pie visible y los datos de arriba.
  * `Only date` mide 413 de ancho; `Date range` toma 740 de calendar min/max desde la tableta.
  * En `Date range`, Month y Year no cambian el cuerpo (siempre días, como Figma): activan el campo Mes o Año.
  */
@@ -167,19 +168,21 @@ export const FigmaMatrix: Story = {
             defaultMonth={MATRIX_SINGLE_MONTH}
             today={TODAY}
             showActions
-            className="w-[413.33px]"
+            className="w-[413.33px] max-w-full"
           />
         ) : (
-          <Calendar
-            key={v.name}
-            data-figma={v.name}
-            mode="range"
-            view={v.view}
-            defaultMonth={MATRIX_RANGE_MONTH}
-            isDateDisabled={isMatrixRangeBlocked}
-            today={TODAY}
-            showActions
-          />
+          // El calendario de rango mide 740 como mínimo: si el lienzo es más angosto, se desplaza dentro de su caja
+          <div key={v.name} className="max-w-full overflow-x-auto">
+            <Calendar
+              data-figma={v.name}
+              mode="range"
+              view={v.view}
+              defaultMonth={MATRIX_RANGE_MONTH}
+              isDateDisabled={isMatrixRangeBlocked}
+              today={TODAY}
+              showActions
+            />
+          </div>
         )
       )}
     </div>

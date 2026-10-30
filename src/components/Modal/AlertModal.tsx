@@ -26,8 +26,9 @@ import { cn } from '../../utils/cn';
 
 const has = (node: unknown) => node !== undefined && node !== null && node !== false && node !== '';
 
+// Figma: 11946:10227
 /**
- * Superficie del Simple modal (set 11946:10227) sin `<dialog>`: ícono semántico, título, descripciones, acciones y el
+ * Superficie del Simple modal sin `<dialog>`: ícono semántico, título, descripciones, acciones y el
  * Button corner de cerrar en la muesca. `AlertModal` la monta dentro del diálogo; suelta sirve para documentación.
  */
 export const AlertModalPanel = forwardRef<HTMLDivElement, AlertModalPanelProps>(

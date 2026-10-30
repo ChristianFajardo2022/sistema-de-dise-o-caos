@@ -51,14 +51,15 @@ export const Interactive: Story = {
   render: (args: FileUploadItemProps) => <FileUploadItem {...args} onDelete={fn()} onDownload={fn()} onRetry={fn()} />,
 };
 
-/** Set 11557:17694: cada variante una vez, con los textos de Figma (ancho 287.6). */
+// Figma: 11557:17694
+/** Set de Figma: cada variante una vez, con los textos de Figma (ancho 287.6). */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   decorators: [],
   render: () => (
-    <div className="flex w-fit items-start gap-6 bg-ds-background-general-black p-6">
+    <div className="flex max-w-full flex-wrap items-start gap-6 bg-ds-background-general-black p-6">
       {STATUSES.map((s) => (
-        <div key={s} className="flex w-[230.2px] flex-col gap-2">
+        <div key={s} className="flex w-[230.2px] shrink-0 flex-col gap-2">
           <span className="text-xs text-ds-text-neutral-body">{FIGMA[s].figma}</span>
           <FileUploadItem
             status={s}

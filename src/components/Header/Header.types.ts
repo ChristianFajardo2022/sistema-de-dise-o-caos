@@ -4,7 +4,9 @@ import type { NotificationPanelProps } from '../NotificationPanel/NotificationPa
 
 /**
  * Cómo se dibuja la cabecera: `desktop` (Header desktop de Figma, 96 de alto), `mobile` (Header mobile, 72, con menú
- * desplegable) o `auto` (escritorio desde 64rem de ancho, móvil por debajo). Por defecto `auto`.
+ * desplegable) o `auto`: la cabecera mide su propio ancho y dibuja la de escritorio cuando cabe entera (logo,
+ * navegación, buscador a su mínimo y acciones), la móvil cuando no. Por defecto `auto`. `desktop` y `mobile` fuerzan
+ * una composición aunque no quepa.
  */
 export type HeaderLayout = 'auto' | 'desktop' | 'mobile';
 

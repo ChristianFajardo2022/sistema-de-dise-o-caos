@@ -60,8 +60,9 @@ function cutoutMask(): CSSProperties {
 
 const CUTOUT_MASK = cutoutMask();
 
+// Figma: 16903:57057
 /**
- * Tarjeta para destacar (set "Cards para destacar" de Figma, 16903:57057). No es interactiva: es un `<article>`
+ * Tarjeta para destacar (set "Cards para destacar" de Figma). No es interactiva: es un `<article>`
  * nombrado por su título; lo interactivo es la acción que se le pasa (Button o Button corner) y el contenido del slot.
  * Tres tipos: `photo` (foto de fondo), `surface` (superficie con muesca y slot) y `cutout` (foto con recorte para el
  * texto). El `ref` va al `<article>`.

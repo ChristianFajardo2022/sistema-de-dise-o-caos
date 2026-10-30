@@ -20,8 +20,9 @@ import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 
+// Figma: 14963:6348
 /**
- * Grupo de notificaciones con desplegable (set "Group notification (Atom)" de Figma, 14963:6348, Type Group, Group
+ * Grupo de notificaciones con desplegable (set "Group notification (Atom)" de Figma, Type Group, Group
  * delete y Dropdown group). Es un `<li>`: va dentro de una lista (`<ul role="list">`).
  *
  * - Hora, título con el contador (Badge número) y la lista de `NotificationGroupItem`. Recogido muestra solo la

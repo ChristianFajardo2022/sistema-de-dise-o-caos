@@ -207,17 +207,18 @@ const ATOM_MISSING = new Set(['Single Icon=Yes, Size=sm, State=Inactive, Contras
 const BADGE_00 = '00';
 const label = 'text-xs text-ds-text-neutral-body';
 
+// Figma: 11666:4226
 /**
- * Set "Tab (Atom)" (11666:4226): Single Icon × Size × State × Contrast, cada Contrast sobre su superficie
+ * Set "Tab (Atom)": Single Icon × Size × State × Contrast, cada Contrast sobre su superficie
  * (background/general/black y background/container/default-on-canva). Las pestañas Default no tienen relleno y se
  * funden con la superficie, como en Figma. State forzado con `state`; Focus agrega el outline de teclado.
  */
 export const FigmaMatrixAtom: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
-    <div className="flex w-fit flex-col">
+    <div className="flex w-fit max-w-full flex-col">
       {SURFACES.map((s) => (
-        <div key={s.contrast} className={`p-6 ${SURFACE[s.contrast]}`}>
+        <div key={s.contrast} className={`relative overflow-x-auto p-6 ${SURFACE[s.contrast]}`}>
           <div className="grid grid-cols-[auto_repeat(5,auto)] items-center justify-items-start gap-x-10 gap-y-4">
             <span className={label}>Contrast={s.figma}</span>
             {ATOM_STATES.map((st) => (
@@ -264,17 +265,18 @@ const OPTIONS = [
 
 const FIGMA_SIZE: Record<TabsSize, string> = { md: 'Md', sm: 'Sm' };
 
+// Figma: 11793:14729
 /**
- * Set "Tab" (11793:14729): Options × Size × Contrast, cada Contrast sobre su superficie. La primera pestaña está
+ * Set "Tab": Options × Size × Contrast, cada Contrast sobre su superficie. La primera pestaña está
  * seleccionada. En "two" Figma envuelve el contenedor en un marco transparente (con un duplicado "mobile" que solo se
  * ve en móvil): aquí el marco lleva `data-figma` y el contenedor va dentro.
  */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
-    <div className="flex w-fit flex-col">
+    <div className="flex w-fit max-w-full flex-col">
       {SURFACES.map((s) => (
-        <div key={s.contrast} className={`flex flex-col items-start gap-4 p-6 ${SURFACE[s.contrast]}`}>
+        <div key={s.contrast} className={`relative flex flex-col items-start gap-4 overflow-x-auto p-6 ${SURFACE[s.contrast]}`}>
           <span className={label}>Contrast={s.figma}</span>
           {SIZE_OPTIONS.map((size) =>
             OPTIONS.map((o) => {

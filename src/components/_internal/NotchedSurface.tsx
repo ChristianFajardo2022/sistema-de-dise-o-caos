@@ -18,7 +18,8 @@ import { DROP_SHADOW } from './shadows';
  *   - `--surface-fill`: relleno.
  *   - `--surface-edge`: trazo interior de 1 px (border/general/lg). Sin él el trazo toma el color del relleno y no se ve.
  * - `notch`: muesca arriba a la derecha donde va el Button corner. `md` = 48 (Button corner de 40), `sm` = 40 (de 32),
- *   `lg` = 54 (un botón de 48 centrado en la muesca).
+ *   `lg` = 54 (un botón de 48 centrado en la muesca), `xl` = 64 (un círculo de 56 centrado, como el logo de la tarjeta
+ *   "Uso en Figma" de la documentación; solo se usa ahí, la derivó de la silueta del nodo).
  *   Geometría de Figma (rectángulo menos un cuadrado de N×N con las esquinas redondeadas):
  *   - `radius="2xl"`: esquinas de la muesca a N/2 (esquina convexa de N/2 antes de la muesca, curva cóncava de radio
  *     N/2 con centro a N/2 del borde derecho y del superior, y esquina convexa de N/2 al bajar por el borde derecho).
@@ -36,12 +37,12 @@ import { DROP_SHADOW } from './shadows';
  * - `DROP_SHADOW` / `cornerShadowClass`: la misma sombra para el Button corner que va en la muesca.
  */
 
-export type NotchedSurfaceNotch = 'none' | 'sm' | 'md' | 'lg';
+export type NotchedSurfaceNotch = 'none' | 'sm' | 'md' | 'lg' | 'xl';
 export type { NotchedSurfaceShadow } from './shadows';
 
 export type NotchedSurfaceRadius = 'xl' | '2xl';
 
-const NOTCH_SIZE = { sm: 40, md: 48, lg: 54 } as const;
+const NOTCH_SIZE = { sm: 40, md: 48, lg: 54, xl: 64 } as const;
 
 /** radius/general/xl (px) para la geometría de la muesca con `radius="xl"`. */
 const RADIUS_XL = 16;
@@ -61,7 +62,7 @@ const RADIUS_CLASS: Record<NotchedSurfaceRadius, { outer: string; inner: string 
 export interface NotchedSurfaceProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   /**
    * Muesca arriba a la derecha: `md` = 48 (Button corner de 40), `sm` = 40 (de 32), `lg` = 54 (aloja un botón de 48
-   * centrado, a 3 px de los bordes). Por defecto `none`.
+   * centrado, a 3 px de los bordes), `xl` = 64 (círculo de 56). Por defecto `none`.
    */
   notch?: NotchedSurfaceNotch;
   /** Sombra de la superficie (effect/shadow sm = on-card, md = on-canva). Por defecto `none`. */

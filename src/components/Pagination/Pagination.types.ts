@@ -1,10 +1,12 @@
 import type { ButtonHTMLAttributes, HTMLAttributes } from 'react';
 
-/** Type de Figma (set 12048:7622): numérico, campo de número o "Mostrar más". */
+// Figma: 12048:7622
+/** Type de Figma: numérico, campo de número o "Mostrar más". */
 export type PaginationType = 'numeric' | 'input' | 'more';
 
+// Figma: 11953:4965
 /**
- * State de Figma de la pieza Page (set 11953:4965). Solo para forzar el aspecto en documentación:
+ * State de Figma de la pieza Page. Solo para forzar el aspecto en documentación:
  * el hover real sale de CSS y la página actual de `selected`.
  */
 export type PaginationPageState = 'default' | 'hover' | 'select';

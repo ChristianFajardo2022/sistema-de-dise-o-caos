@@ -17,11 +17,14 @@ const meta = {
   },
   args: { accept: '.pdf,.jpg,.png', maxSize: 25 * 1024 ** 2, multiple: true },
   decorators: [
-    (Story) => (
-      <div className="w-[421px] bg-ds-background-general-black p-6">
+    (Story, { parameters }) =>
+      parameters.sinMarco ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="w-[421px] bg-ds-background-general-black p-6">
+          <Story />
+        </div>
+      ),
   ],
 } satisfies Meta<typeof FileUpload>;
 
@@ -69,13 +72,13 @@ export const Interactive: Story = {
   render: (args: FileUploadProps) => <SimulatedUpload {...args} />,
 };
 
-/** Set 11592:8647: una variante, con los textos de Figma (ancho 421). */
+// Figma: 11592:8647
+/** Set de Figma: una variante, con los textos de Figma (ancho 421). */
 export const FigmaMatrix: Story = {
-  parameters: { layout: 'fullscreen' },
-  decorators: [],
+  parameters: { layout: 'fullscreen', sinMarco: true },
   render: () => (
-    <div className="flex w-fit items-start gap-6 bg-ds-background-general-black p-6">
-      <div className="flex w-[421px] flex-col gap-2">
+    <div className="flex w-fit max-w-full items-start gap-6 bg-ds-background-general-black p-6">
+      <div className="flex w-[421px] max-w-full flex-col gap-2">
         <span className="text-xs text-ds-text-neutral-body">File upload</span>
         <FileUpload
           specifications="PDF, JPG. "

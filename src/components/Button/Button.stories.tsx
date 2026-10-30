@@ -7,6 +7,11 @@ import { AddIcon } from '../../icons/AddIcon';
 import { ArrowRightIcon } from '../../icons/ArrowRightIcon';
 import { TrashIcon } from '../../icons/TrashIcon';
 import { SettingIcon } from '../../icons/SettingIcon';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Button.doc';
+import docsJson from './Button.docs.json';
 
 /** Args de Storybook: props base sin la unión (los args son parciales); iconOnly sin exigir aria-label */
 type ButtonArgs = ButtonBaseProps & { iconOnly?: boolean };
@@ -18,8 +23,9 @@ const meta: Meta<ButtonArgs> = {
   title: 'General Controls/Button',
   component: Button as unknown as ComponentType<ButtonArgs>,
   tags: ['autodocs'],
+  parameters: { docs: componentDocsParameters(doc, docsJson) },
   // Tipos explícitos: con la unión discriminada de ButtonProps el docgen no los infiere y Storybook descarta los args de la URL
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     variant: {
       type: { name: 'enum', value: ['primary', 'secondary', 'tertiary'] },
       control: 'select',
@@ -64,7 +70,7 @@ const meta: Meta<ButtonArgs> = {
       control: 'boolean',
       description: 'Icon-single: botón cuadrado solo con ícono',
     },
-  },
+  }),
   args: {
     children: 'Button',
     variant: 'primary',
@@ -162,27 +168,30 @@ export const StatesMatrix: Story = {
       { label: 'Secondary high · ícono', props: { variant: 'secondary', contrast: 'high', iconOnly: true, 'aria-label': 'Agregar', children: <AddIcon /> } },
       { label: 'Tertiary · ícono', props: { variant: 'tertiary', iconOnly: true, 'aria-label': 'Agregar', children: <AddIcon /> } },
     ];
+    // Si el ancho no alcanza, la matriz se desplaza dentro de su marco en vez de salirse (-m-2 p-2: deja ver el fondo de Unicolor en los bordes)
     return (
-      <div className="grid grid-cols-[auto_repeat(7,auto)] items-center gap-4">
-        <span />
-        {STATES.map((s) => (
-          <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
-        ))}
-        {rows.map((row, i) => (
-          <div key={`${row.label}-${i}`} className="contents">
-            <span className="text-xs text-ds-text-neutral-body">{row.label}</span>
-            {STATES.map((s) =>
-              row.props.variant === 'tertiary' && s === 'load' ? (
-                <span key={s} />
-              ) : (
-                // Unicolor sobre N01 para que se lea también en modo claro
-                <div key={s} className={row.props.unicolor ? 'bg-ds-primitives-color-primary-n01 p-2' : undefined}>
-                  <Button {...row.props} state={s}>{row.props.children ?? 'Button'}</Button>
-                </div>
-              )
-            )}
-          </div>
-        ))}
+      <div className="-m-2 overflow-x-auto p-2">
+        <div className="grid w-max grid-cols-[5rem_repeat(7,auto)] items-center gap-4">
+          <span />
+          {STATES.map((s) => (
+            <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
+          ))}
+          {rows.map((row, i) => (
+            <div key={`${row.label}-${i}`} className="contents">
+              <span className="text-xs text-ds-text-neutral-body">{row.label}</span>
+              {STATES.map((s) =>
+                row.props.variant === 'tertiary' && s === 'load' ? (
+                  <span key={s} />
+                ) : (
+                  // Unicolor sobre N01 para que se lea también en modo claro; -m-2 compensa el relleno y no ensancha la columna
+                  <div key={s} className={row.props.unicolor ? '-m-2 bg-ds-primitives-color-primary-n01 p-2' : undefined}>
+                    <Button {...row.props} state={s}>{row.props.children ?? 'Button'}</Button>
+                  </div>
+                )
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     );
   },
@@ -220,6 +229,10 @@ export const Sizes: Story = {
 };
 
 export const HoverSpecifications: Story = {
+  args: {
+    variant: "primary"
+  },
+
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
@@ -237,7 +250,7 @@ export const HoverSpecifications: Story = {
         </div>
       </div>
     </div>
-  ),
+  )
 };
 
 /** Test: el clic llama a onClick */
@@ -293,5 +306,28 @@ export const InactiveTest: Story = {
     await userEvent.tab();
     await expect(button).not.toHaveFocus();
     await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+/** Test: la página Docs (plantilla v2) se dibuja con su encabezado, sus secciones y la referencia de código */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Button' })).toBeInTheDocument();
+    await expect(canvas.queryAllByRole('tab')).toHaveLength(0);
+    const h2 = canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2.slice(0, 7)).toEqual([
+      'Anatomía',
+      'Estados',
+      'Tokens y modos',
+      'Uso del componente Button en Figma:',
+      'Comportamiento',
+      'Aplicaciones de breakpoints',
+      'Do and Dont’s',
+    ]);
+    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
   },
 };

@@ -69,6 +69,11 @@
       "default": false,
       "description": "Solo con iconOnly: Icon-single de 44×44 con ícono de 20 centrado, como los botones de Top App Bar iOS (tittle-header/top-app-bar). Sustituye la medida de size."
     },
+    "type": {
+      "type": "'button' | 'submit' | 'reset'",
+      "default": "'button'",
+      "description": "Tipo nativo del botón. No aplica con href."
+    },
     "href": {
       "type": "string",
       "required": false,

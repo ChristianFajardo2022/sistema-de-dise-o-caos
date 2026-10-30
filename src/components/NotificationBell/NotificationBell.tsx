@@ -6,8 +6,9 @@ import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
+// Figma: 12978:19007
 /**
- * Botón de campana con contador de no leídas (set "Icon button+badge (Atom)" de Figma, 12978:19007). Abre el panel de
+ * Botón de campana con contador de no leídas (set "Icon button+badge (Atom)" de Figma). Abre el panel de
  * notificaciones (`NotificationPanel`).
  *
  * - Nombre accesible con la cantidad: "Notificaciones, 3 sin leer" ("más de 99 sin leer" si pasa del máximo). El Badge

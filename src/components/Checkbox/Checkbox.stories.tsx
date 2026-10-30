@@ -89,7 +89,8 @@ export const StatesMatrix: Story = {
               : 'bg-ds-background-general-white p-6'
           }
         >
-          <div className="grid grid-cols-[auto_repeat(6,auto)] items-center gap-x-8 gap-y-4">
+          <div className="max-w-full overflow-x-auto">
+          <div className="grid w-max min-w-full grid-cols-[auto_repeat(6,auto)] items-center gap-x-8 gap-y-4">
             <span className="text-xs text-ds-text-neutral-body">{contrast}</span>
             {STATES.map((s) => (
               <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
@@ -102,6 +103,7 @@ export const StatesMatrix: Story = {
             {STATES.map((s) => (
               <Checkbox key={s} contrast={contrast} state={s}>Label</Checkbox>
             ))}
+          </div>
           </div>
         </div>
       ))}
@@ -129,7 +131,8 @@ function FigmaSelectionMatrix({ withText }: { withText: boolean }) {
           key={contrast}
           className={contrast === 'positive' ? 'bg-ds-background-general-black p-6' : 'bg-ds-background-general-white p-6'}
         >
-          <div className="grid grid-cols-[auto_repeat(4,auto)] items-center gap-x-8 gap-y-4">
+          <div className="max-w-full overflow-x-auto">
+          <div className="grid w-max min-w-full grid-cols-[auto_repeat(4,auto)] items-center gap-x-8 gap-y-4">
             <span className="text-xs text-ds-text-neutral-body">{contrast}</span>
             {FIGMA_STATES.map((s) => (
               <span key={s.figma} className="text-xs text-ds-text-neutral-body">{s.figma}</span>
@@ -153,6 +156,7 @@ function FigmaSelectionMatrix({ withText }: { withText: boolean }) {
                 })}
               </div>
             ))}
+          </div>
           </div>
         </div>
       ))}

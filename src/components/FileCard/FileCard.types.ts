@@ -1,11 +1,12 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, InputHTMLAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 import type { IconName } from '../Icon/Icon.types';
 
+// Figma: 14043:59452, 15005:15958
 /**
  * Type de Figma.
- * - `photo`: tarjeta de 240 de alto con lienzo de 160 (foto o ícono) y el texto debajo (File card 14043:59452, Type=Photo).
- * - `icon`: tarjeta ancha con Avatar icon arriba y el texto debajo (File card 14043:59452, Type=Icon).
- * - `thumbnail`: miniatura cuadrada de 160 sin texto visible (File card 15005:15958). En hover o foco muestra
+ * - `photo`: tarjeta de 240 de alto con lienzo de 160 (foto o ícono) y el texto debajo (File card, Type=Photo).
+ * - `icon`: tarjeta ancha con Avatar icon arriba y el texto debajo (File card, Type=Icon).
+ * - `thumbnail`: miniatura cuadrada de 160 sin texto visible (File card). En hover o foco muestra
  *   las acciones Descargar y Eliminar.
  */
 export type FileCardType = 'photo' | 'icon' | 'thumbnail';

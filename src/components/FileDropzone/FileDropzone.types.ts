@@ -1,7 +1,8 @@
 import type { HTMLAttributes, InputHTMLAttributes, ReactNode, Ref } from 'react';
 
+// Figma: 11438:5774
 /**
- * State de Figma (Input file upload 11438:5774). Solo fuerza el aspecto para documentación: en uso normal Hover sale
+ * State de Figma (Input file upload). Solo fuerza el aspecto para documentación: en uso normal Hover sale
  * de `:hover` (o de arrastrar un archivo encima), Focus del foco con teclado del input y Disabled de `disabled`.
  * `default` fija el aspecto en reposo (sin reaccionar al puntero). `static` es igual pero sin el cursor de acción.
  */

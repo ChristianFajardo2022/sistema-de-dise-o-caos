@@ -33,11 +33,14 @@ const meta = {
   },
   args: { 'aria-label': 'Navegación principal', items: ITEMS, defaultValue: 'inicio' },
   decorators: [
-    (Story) => (
-      <div className="w-[376px] bg-ds-background-general-black">
+    (Story, { parameters }) =>
+      parameters.sinMarco ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="w-[376px] bg-ds-background-general-black">
+          <Story />
+        </div>
+      ),
   ],
 } satisfies Meta<typeof NavBar>;
 
@@ -101,10 +104,9 @@ function Variant({ style, tab }: { style: 3 | 4; tab: 1 | 2 | 3 | 4 }) {
 
 /** Las 8 variantes del set "Nav bar" (`Style` × `tab`). */
 export const FigmaMatrix: Story = {
-  parameters: { layout: 'padded' },
-  decorators: [],
+  parameters: { layout: 'padded', sinMarco: true },
   render: () => (
-    <div className="grid grid-cols-[repeat(3,376px)] items-end gap-ds-space-general-2xl bg-ds-background-general-black p-ds-space-general-2xl">
+    <div className="grid grid-cols-[repeat(auto-fill,376px)] items-end gap-ds-space-general-2xl bg-ds-background-general-black p-ds-space-general-2xl">
       {([4, 3] as const).flatMap((style) => ([1, 2, 3, 4] as const).map((tab) => <Variant key={`${style}-${tab}`} style={style} tab={tab} />))}
     </div>
   ),
@@ -112,8 +114,7 @@ export const FigmaMatrix: Story = {
 
 /** Los tres estados del átomo "Options tab bar" (`Propiedad 1`). */
 export const FigmaOptionsTabBar: Story = {
-  parameters: { layout: 'padded' },
-  decorators: [],
+  parameters: { layout: 'padded', sinMarco: true },
   render: () => (
     <div className="flex gap-ds-space-general-2xl bg-ds-background-container-default-on-canva p-ds-space-general-2xl">
       {(['default', 'focus', 'select'] as const).map((state) => (

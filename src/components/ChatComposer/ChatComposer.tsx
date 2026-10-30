@@ -14,8 +14,9 @@ import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 
+// Figma: 14894:2745
 /**
- * Campo para escribir de la conversación (set "Audio (Atom)" de Figma, 14894:2745). Es un `<form>`: Enter o el botón
+ * Campo para escribir de la conversación (set "Audio (Atom)" de Figma). Es un `<form>`: Enter o el botón
  * Enviar llaman a `onSend`; Shift+Enter hace un salto de línea (y Enter no envía mientras un IME está componiendo, también
  * en Safari). Enviar queda habilitado con el campo vacío y no hace nada (no envía mensajes vacíos). El `<textarea>` tiene
  * una etiqueta sr-only (`label`) y crece con el texto hasta 7 líneas con `field-sizing: content` (mejora progresiva: en

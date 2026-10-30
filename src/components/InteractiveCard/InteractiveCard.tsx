@@ -35,8 +35,9 @@ const useCardDisabled = () => useContext(InteractiveCardContext).disabled;
 
 const noop = () => {};
 
+// Figma: 13219:38332
 /**
- * Tarjeta seleccionable (set "Interactive card" de Figma, 13219:38332).
+ * Tarjeta seleccionable (set "Interactive card" de Figma).
  *
  * Toda la tarjeta es un radio: el control real es un `<input type="radio">` (con `name` se agrupa con otras tarjetas)
  * cuyo nombre accesible es el título. Para que toda la superficie sea clicable sin anidar botones dentro de otro

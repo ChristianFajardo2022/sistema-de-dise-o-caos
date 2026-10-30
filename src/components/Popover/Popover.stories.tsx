@@ -144,7 +144,7 @@ const figmaActions = (
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   render: () => (
-    <div className={`grid w-fit grid-cols-[repeat(4,305px)] items-start gap-x-8 gap-y-10 p-6 ${SURFACE}`}>
+    <div className={`grid max-w-full grid-cols-[repeat(auto-fill,305px)] items-start gap-x-8 gap-y-10 p-6 ${SURFACE}`}>
       {FIGMA_VARIANTS.map(({ arrow, photo, name }) => (
         <div key={name} className="flex flex-col gap-ds-space-general-lg">
           <span className={LABEL}>{name}</span>

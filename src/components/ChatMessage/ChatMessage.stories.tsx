@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 import { ChatMessage } from './ChatMessage';
@@ -7,7 +7,6 @@ import type { ChatMessageDirection, ChatMessageType } from './ChatMessage.types'
 import { Avatar } from '../Avatar';
 import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
 import type { PhotoName } from '../Avatar/Avatar.sample-data';
-import { Button } from '../Button';
 import { ChatAudioPlayer } from '../ChatAudioPlayer';
 
 const meta = {
@@ -81,16 +80,30 @@ const SEED: Item[] = [
   { id: 5, direction: 'outgoing', author: 'Tú', time: '09:16', audio: 42 },
 ];
 
-/** Registro de mensajes (`role="log"`): los nuevos se anuncian y la lista baja sola si ya estaba abajo. */
+/** Mensajes que llegan solos en la demo, uno cada 4 s. */
+const INCOMING = ['¿Te llegó mi correo?', 'Quedo atenta.', 'Gracias.'];
+
+/**
+ * Registro de mensajes (`role="log"`): los nuevos se anuncian y la lista baja sola si ya estaba abajo. La demo recibe
+ * tres mensajes, uno cada 4 s, sin controles dentro de la muestra.
+ */
 function ConversationDemo() {
   const [items, setItems] = useState(SEED);
-  const add = () =>
-    setItems((list) => [
-      ...list,
-      { id: list.length + 1, direction: 'incoming', author: 'Ana Pérez', time: '09:20', text: `Mensaje nuevo ${list.length + 1}` },
-    ]);
+  useEffect(() => {
+    let sent = 0;
+    const timer = setInterval(() => {
+      const text = INCOMING[sent];
+      sent += 1;
+      if (sent >= INCOMING.length) clearInterval(timer);
+      setItems((list) => [
+        ...list,
+        { id: list.length + 1, direction: 'incoming', author: 'Ana Pérez', time: `09:${20 + sent}`, text },
+      ]);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
   return (
-    <div className="flex h-[360px] flex-col gap-4">
+    <div className="flex h-[360px] flex-col">
       <ChatMessageList aria-label="Mensajes con Ana Pérez" className="flex-1">
         {items.map((m) => (
           <ChatMessage
@@ -105,9 +118,6 @@ function ConversationDemo() {
           </ChatMessage>
         ))}
       </ChatMessageList>
-      <Button variant="secondary" size="xs" onClick={add} className="self-start">
-        Simular mensaje recibido
-      </Button>
     </div>
   );
 }

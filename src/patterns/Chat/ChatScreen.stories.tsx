@@ -28,8 +28,9 @@ import { Tab, TabList, TabPanel, Tabs } from '../../components/Tabs';
 import { NotchedSurface } from '../../components/_internal/NotchedSurface';
 import { cn } from '../../utils/cn';
 
+// Figma: 14562:57994
 /**
- * Pantalla de chat (component set "Chat" de Figma, 14562:57994, Desktop 1286×896 y Mobile 376×750).
+ * Pantalla de chat (component set "Chat" de Figma, Desktop 1286×896 y Mobile 376×750).
  *
  * Es una **composición**, no un componente exportado: cada producto enlaza sus datos, su ruteo y su envío de forma
  * distinta, y un componente de pantalla terminaría siendo un monolito de props. Por eso vive en `Patterns`: muestra cómo
@@ -499,7 +500,7 @@ function DesktopScreen({ figma = false, frame }: { figma?: boolean; frame?: stri
   const [selectedId, setSelectedId] = useState('ana');
   const current = conversations.find((c) => c.id === selectedId) ?? conversations[0];
   return (
-    <div data-figma={frame} className="box-border flex h-[896px] w-[1286px] gap-ds-space-general-lg">
+    <div data-figma={frame} className="box-border flex h-[896px] w-full max-w-[1286px] gap-ds-space-general-lg">
       <ChatSidebar conversations={conversations} selectedId={selectedId} onSelect={setSelectedId} figma={figma} className="w-[300px] shrink-0" />
       <ConversationView
         key={current.id}

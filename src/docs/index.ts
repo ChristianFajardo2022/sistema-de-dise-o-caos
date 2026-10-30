@@ -5,7 +5,6 @@
  * - `componentDocsParameters` (en `./storybook`): une la página Docs de Storybook con la plantilla.
  */
 export { ComponentDoc, DocBlockView } from './ComponentDoc';
-export type { ComponentDocTab } from './ComponentDoc';
 export { CodeReference, DocCodeBlock } from './CodeReference';
 export { codeFromDocsJson, propsFromArgTypes } from './code';
 export type { DocsJson, ArgTypeLike } from './code';

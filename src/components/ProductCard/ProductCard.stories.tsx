@@ -62,11 +62,14 @@ const meta = {
     src: productPhoto,
   },
   decorators: [
-    (Story) => (
-      <div className="w-full max-w-[337px] bg-ds-background-general-black p-6 box-content">
+    (Story, { parameters }) =>
+      parameters.sinMarco ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="w-full max-w-[337px] bg-ds-background-general-black p-6 box-content">
+          <Story />
+        </div>
+      ),
   ],
 } satisfies Meta<typeof ProductCard>;
 
@@ -77,11 +80,10 @@ export const Interactive: Story = {};
 
 /** Las tres variantes de Figma, cada una una vez, con sus textos. Debajo, la silueta sobre la superficie de tarjeta. */
 export const FigmaMatrix: Story = {
-  parameters: { layout: 'fullscreen' },
-  decorators: [],
+  parameters: { layout: 'fullscreen', sinMarco: true },
   render: () => {
     const cards = (figma: boolean) => (
-      <div className="flex gap-6">
+      <div className="flex flex-wrap gap-6">
         {(
           [
             ['State=Default', { state: 'default' }],
@@ -89,7 +91,7 @@ export const FigmaMatrix: Story = {
             ['State=+', { defaultQuantity: 2 }],
           ] as [string, Partial<ProductCardProps>][]
         ).map(([name, props]) => (
-          <div key={name} className="flex w-[337px] shrink-0 flex-col gap-2">
+          <div key={name} className="flex w-[337px] max-w-full shrink-0 flex-col gap-2">
             <span className="text-xs text-ds-text-neutral-body">{name}</span>
             <ProductCard
               {...FIGMA}
@@ -102,7 +104,7 @@ export const FigmaMatrix: Story = {
       </div>
     );
     return (
-      <div className="flex w-fit flex-col">
+      <div className="flex w-fit max-w-full flex-col">
         <div className="bg-ds-background-general-black p-6">{cards(true)}</div>
         <div className="bg-ds-background-container-default-on-card p-6">{cards(false)}</div>
       </div>

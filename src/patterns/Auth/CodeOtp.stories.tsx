@@ -4,8 +4,9 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { CodeOtpScreen } from './CodeOtp.screens';
 import type { OtpContact, OtpInitialState } from './CodeOtp.screens';
 
+// Figma: 14375:75370
 /**
- * Verificación con código (component set "Code OTP" de Figma, 14375:75370: Type=Modal | Start × States=Select, Default,
+ * Verificación con código (component set "Code OTP" de Figma: Type=Modal | Start × States=Select, Default,
  * Focus, Filled, Loading, Check, Error).
  *
  * Es una **composición** de Alert, Button, ButtonCorner, ButtonLink, CodeInput (casillas DigitInput, "Input number

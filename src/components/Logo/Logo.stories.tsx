@@ -44,7 +44,8 @@ export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (
     <div className="bg-ds-background-general-black p-6">
-      <div className="grid grid-cols-[auto_repeat(4,auto)] items-center justify-items-start gap-x-8 gap-y-4">
+      <div className="max-w-full overflow-x-auto">
+      <div className="grid w-max min-w-full grid-cols-[auto_repeat(4,auto)] items-center justify-items-start gap-x-8 gap-y-4">
         <span />
         {SIZE_OPTIONS.map((s) => (
           <span key={s} className="text-xs text-ds-text-neutral-body">{s}</span>
@@ -57,6 +58,7 @@ export const FigmaMatrix: Story = {
             ))}
           </div>
         ))}
+      </div>
       </div>
     </div>
   ),

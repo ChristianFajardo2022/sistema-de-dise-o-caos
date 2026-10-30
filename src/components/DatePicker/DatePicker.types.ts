@@ -3,7 +3,8 @@ import type { CalendarBaseProps, DateRange } from '../Calendar';
 import type { FieldRootProps } from '../Field/Field.types';
 import type { InputState } from '../Input/Input.types';
 
-/** State de Figma (set 8096:3344), el mismo de Input. Solo para forzar el aspecto en documentación; `active` dibuja el calendario abierto en el flujo. */
+// Figma: 8096:3344
+/** State de Figma, el mismo de Input. Solo para forzar el aspecto en documentación; `active` dibuja el calendario abierto en el flujo. */
 export type DatePickerState = InputState;
 
 /** Props del Calendar que se pueden afinar desde el DatePicker (la selección, el mes y la apertura los maneja el DatePicker). */

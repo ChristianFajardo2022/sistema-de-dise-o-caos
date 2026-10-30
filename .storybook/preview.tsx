@@ -1,5 +1,6 @@
 import type { Preview, Decorator } from '@storybook/react-vite';
 import { ThemeWrapper } from './ThemeWrapper';
+import { AutoDocsContainer, AutoDocsPage } from '../src/docs/StorybookDocsPage';
 import '../src/index.css';
 
 const withThemeDecorator: Decorator = (Story, context) => (
@@ -38,6 +39,11 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    // Páginas Docs con el encabezado de CAOS (Header document); Tooltip trae su propia plantilla y la reemplaza
+    docs: {
+      container: AutoDocsContainer,
+      page: AutoDocsPage,
+    },
     backgrounds: {
       disable: true, // Usamos nuestro propio selector de tema
     },
@@ -51,19 +57,11 @@ const preview: Preview = {
     },
   },
   globalTypes: {
+    // Sin selector en la barra de herramientas: el tema se cambia desde el menú lateral (botón sol/luna)
     theme: {
       name: 'Tema',
-      description: 'Selector de tema del sistema CAOS',
+      description: 'Tema del sistema CAOS: light o dark',
       defaultValue: 'dark',
-      toolbar: {
-        icon: 'circlehollow',
-        items: [
-          { value: 'light', icon: 'sun', title: 'Modo Claro' },
-          { value: 'dark', icon: 'moon', title: 'Modo Oscuro' },
-        ],
-        showName: true,
-        dynamicTitle: true,
-      },
     },
   },
   decorators: [withThemeDecorator],

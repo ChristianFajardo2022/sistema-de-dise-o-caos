@@ -59,6 +59,100 @@ export interface DocPractice {
   description: DocInline;
   /** Ejemplo visual opcional (componente real). */
   preview?: ReactNode;
+  /**
+   * Estilo v2 (Cards con muesca): el título visible es "Hacer" / "Evitar", `description` es la regla en una línea y
+   * el ejemplo va en un panel tintado con marco de dispositivo. Con él, `title` solo nombra el ejemplo (lectores de
+   * pantalla y clave de lista).
+   */
+  framed?: boolean;
+}
+
+/** Tono de la etiqueta de una columna de estados. */
+export type DocTone = 'neutral' | 'accent' | 'success' | 'error';
+
+/** Columna del bloque `states`: un estado con su descripción y sus muestras. */
+export interface DocStateItem {
+  /** Nombre del estado (p. ej. "Hover"). */
+  label: string;
+  /** Color de la etiqueta. */
+  tone?: DocTone;
+  /** Qué significa y cuándo aparece. */
+  description: DocInline;
+  /** Muestras con el componente real, una por tile. */
+  samples: ReactNode[];
+}
+
+/**
+ * Parte señalada en un lienzo de anatomía. El marcador se coloca midiendo el elemento en el DOM.
+ */
+export interface DocAnatomyMark {
+  /** Número del marcador; debe coincidir con la pauta (1 = primera de la lista). */
+  n: number;
+  /** Selector (querySelector) dentro de la vista. */
+  selector: string;
+  /** Si el selector coincide con varios elementos: cuál (0 = primero, -1 = último). Por defecto 0. */
+  index?: number;
+  /** Lado de la parte donde queda el marcador. */
+  side: 'top' | 'bottom' | 'left' | 'right';
+}
+
+/** Cota medida del DOM: padding (violeta) o separación (verde) con su valor en px. */
+export type DocAnatomyDimension =
+  /** Padding de `selector` en el lado indicado (computado). */
+  | { kind: 'padding'; selector: string; index?: number; side: 'top' | 'bottom' | 'left' | 'right' }
+  /** Separación horizontal entre dos elementos (el borde derecho del primero y el izquierdo del segundo). */
+  | { kind: 'gap'; from: string; fromIndex?: number; to: string; toIndex?: number }
+  /** Alto de `selector`, con un corchete a la derecha. */
+  | { kind: 'height'; selector: string; index?: number };
+
+/** Lienzo con puntos de la anatomía: etiqueta, componente real, marcadores y cotas. */
+export interface DocAnatomyCanvas {
+  /** Etiqueta sobre el lienzo (p. ej. "Botón con texto"). */
+  label: string;
+  /** Componente real. */
+  preview: ReactNode;
+  /** Partes con marcador. */
+  marks: DocAnatomyMark[];
+  /** Cotas de espaciado. */
+  dimensions?: DocAnatomyDimension[];
+}
+
+/** Un grupo de la anatomía: 1 o 2 lienzos y, debajo, sus pautas numeradas. */
+export interface DocAnatomyGroup {
+  canvases: DocAnatomyCanvas[];
+  /** Pautas numeradas (1, 2, 3…) en el orden del arreglo. */
+  guidelines: DocInline[];
+}
+
+/** Entrada de la tarjeta de tokens: una parte del componente con su token de color y/o de texto. */
+export interface DocTokenEntry {
+  /** Nombre de la parte (p. ej. "Fondo"). */
+  part: string;
+  /** Token de color sin el prefijo `ds-` (p. ej. "background-button-primary-default"). Muestra su hex del modo activo. */
+  color?: string;
+  /** Token de tipografía (solo el nombre; no es un color). */
+  text?: string;
+}
+
+/** Grupo de tokens: vista del componente a la izquierda, entradas a la derecha. */
+export interface DocTokenGroup {
+  title: string;
+  /** Componente real (el interruptor de modo lo cambia con la tarjeta). */
+  preview: ReactNode;
+  entries: DocTokenEntry[];
+}
+
+/** Contenido de una tarjeta de breakpoint (Mobile o Tablet). */
+export interface DocBreakpointCard {
+  /** Viñetas bajo la vista. */
+  bullets: DocInline[];
+  /** Vista con el componente real: se dibuja en el marco del dispositivo con los valores responsive del breakpoint. */
+  preview: ReactNode;
+}
+
+/** Columna de la tarjeta Desktop: subtítulo, viñetas y vista. */
+export interface DocBreakpointColumn extends DocBreakpointCard {
+  title: string;
 }
 
 /**
@@ -74,6 +168,19 @@ export type DocBlock =
   | { type: 'usage'; use: DocInline[]; avoid: DocInline[] }
   /** Anatomía: vista del componente y lista numerada de partes. */
   | { type: 'anatomy'; title?: string; preview: ReactNode; parts: DocAnatomyPart[] }
+  /** Anatomía v2: tarjeta con lienzos de puntos (marcadores y cotas medidos del DOM) y pautas numeradas. */
+  | { type: 'anatomy'; groups: DocAnatomyGroup[] }
+  /** Estados: tarjeta con una columna por estado (etiqueta con tono, descripción y muestras). */
+  | { type: 'states'; items: DocStateItem[] }
+  /**
+   * Tokens y modos: tarjeta con el título y la bajada de la sección adentro (`titleInside`), interruptor de modo y un
+   * grupo por fila. El hex de cada token se calcula en vivo.
+   */
+  | { type: 'tokens'; groups: DocTokenGroup[] }
+  /** Breakpoints: tarjetas de Desktop (dos columnas), Mobile y Tablet con el componente en su marco de dispositivo. */
+  | { type: 'breakpoints'; desktop: { columns: DocBreakpointColumn[] }; mobile: DocBreakpointCard; tablet: DocBreakpointCard }
+  /** "Uso en Figma": tarjeta con muesca a la izquierda, logo, título y viñetas. Va en una sección `titleInside`. */
+  | { type: 'figma'; bullets: DocInline[] }
   /** Tarjeta con una grilla de ejemplos (posiciones, matriz de estados, respuesta a la interacción). */
   | { type: 'gallery'; title: string; columns?: 2 | 3 | 4; align?: 'center' | 'start'; items: DocGalleryItem[] }
   /** Nota destacada: `info` (violeta) o `warning` (amarillo). */
@@ -85,7 +192,7 @@ export type DocBlock =
   /** Escape para casos que no cubren los demás bloques. Úsalo poco: lo que se repite debe volverse un bloque. */
   | { type: 'custom'; content: ReactNode };
 
-/** Sección numerada (insignia 01, 02…). El número lo pone la plantilla según el orden. */
+/** Sección de la página (título h2 y bajada; sin número). */
 export interface DocSectionContent {
   /** Título de la sección (p. ej. "Propósito y anatomía"). */
   title: string;
@@ -93,6 +200,11 @@ export interface DocSectionContent {
   description: DocInline;
   /** Contenido. */
   blocks: DocBlock[];
+  /**
+   * El título y la bajada se dibujan dentro de la tarjeta del bloque (`tokens`, `figma`) en vez de sobre ella. La
+   * sección debe tener un solo bloque de ese tipo.
+   */
+  titleInside?: boolean;
 }
 
 /** Contenido completo de la página de un componente. */
@@ -105,9 +217,9 @@ export interface ComponentDocContent {
   classification: DocClassification;
   /** Descripción grande del encabezado: qué es y su clasificación, en una o dos frases. */
   summary: string;
-  /** Secciones de la pestaña Definición, en orden. */
+  /** Secciones de Definición, en orden. */
   definition: DocSectionContent[];
-  /** Secciones de la pestaña Aplicación, en orden. Siguen la numeración de Definición. */
+  /** Secciones de Aplicación, en orden. */
   application: DocSectionContent[];
 }
 

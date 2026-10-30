@@ -17,8 +17,9 @@ import { cn } from '../../utils/cn';
 
 const has = (node: unknown) => node != null && node !== false && node !== '';
 
+// Figma: 14857:9704
 /**
- * Tarjeta de conversación (set "Chat card" de Figma, 14857:9704). El control es el título: un `<button>` o, con `href`,
+ * Tarjeta de conversación (set "Chat card" de Figma). El control es el título: un `<button>` o, con `href`,
  * un `<a>`, estirado sobre toda la tarjeta. La conversación seleccionada (State=Active) lleva `aria-current="true"`.
  * La presencia (en línea / fuera de línea), la descripción, la hora y los mensajes sin leer son la descripción accesible del control (una
  * referencia por pieza). El título es el control, así que no hay `headingLevel`. En una lista, envolver cada tarjeta

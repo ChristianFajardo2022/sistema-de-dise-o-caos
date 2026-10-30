@@ -25,8 +25,9 @@ import { RATING_SUFFIX, formatRating } from '../../utils/format';
 
 const has = (node: unknown) => node != null && node !== false;
 
+// Figma: 18867:20091
 /**
- * Tarjeta de contacto con acción de llamada o chat (set "Call/chat card" de Figma, 18867:20091). Es un `<article>`
+ * Tarjeta de contacto con acción de llamada o chat (set "Call/chat card" de Figma). Es un `<article>`
  * nombrado por su título (el nombre de la persona); lo interactivo son sus botones (cada uno con ese nombre).
  * "Item card" (avatar + calificación) está fuera de las páginas del sistema: aquí es un marcador interno.
  * Orden del DOM: avatar, encabezado, línea corta y, al final, las acciones (las de la esquina son absolutas: no cambia

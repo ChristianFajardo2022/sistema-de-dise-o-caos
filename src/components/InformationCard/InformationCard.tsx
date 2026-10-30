@@ -22,8 +22,9 @@ import { cn } from '../../utils/cn';
 
 const has = (node: unknown) => node != null && node !== false;
 
+// Figma: 14195:31274
 /**
- * Tarjeta de información (set "Information card" de Figma, 14195:31274). No es interactiva: es un `<article>`
+ * Tarjeta de información (set "Information card" de Figma). No es interactiva: es un `<article>`
  * nombrado por su título; lo interactivo son los controles que se le pasan (botones, lista, avatares).
  * Usa la superficie interna común de las tarjetas (sin muesca).
  */

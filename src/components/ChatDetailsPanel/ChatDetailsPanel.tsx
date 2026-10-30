@@ -26,8 +26,9 @@ import { ListItem } from '../ListItem';
 import { ScrollArea } from '../ScrollArea';
 import { cn } from '../../utils/cn';
 
+// Figma: 14894:12557
 /**
- * Panel lateral de detalle de la conversación (set "Laterales (Atom)" de Figma, 14894:12557). Es un `<aside>` con
+ * Panel lateral de detalle de la conversación (set "Laterales (Atom)" de Figma). Es un `<aside>` con
  * nombre. Con `collapsible` dibuja arriba el botón de plegar (con `aria-expanded`); plegado mide 80 de ancho (riel). El
  * contenido se compone con `ChatDetailsHeader`, `ChatDetailsProfile`, `ChatDetailsLink` y `ChatDetailsGrid`.
  */

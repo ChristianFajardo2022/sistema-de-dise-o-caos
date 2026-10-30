@@ -1,4 +1,5 @@
-import { forwardRef, useId } from 'react';
+import { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import type { ReactNode } from 'react';
 import type { FooterItem, FooterProps, FooterSection } from './Footer.types';
 import {
@@ -20,7 +21,33 @@ import {
 } from './Footer.variants';
 import { Accordion, AccordionItem } from '../Accordion';
 import { cn } from '../../utils/cn';
-import { useIsMobile } from '../../utils/useMediaQuery';
+import { useMergedRefs } from '../../utils/refs';
+import { matchesMedia } from '../../utils/useMediaQuery';
+
+/** Ancho del `<footer>` (no de la ventana) desde el que va la composición de escritorio; el mismo `@5xl` de las clases. */
+const DESKTOP_REM = 64;
+
+/**
+ * `true` cuando el `<footer>` mide menos de 64rem: acordeón y acción móvil. Lo demás lo resuelven las container
+ * queries de las clases; esto cubre lo que cambia el DOM. Antes de medir usa la ventana.
+ */
+function useCompact(ref: RefObject<HTMLElement | null>): boolean {
+  const [compact, setCompact] = useState(() => matchesMedia(`(width < ${DESKTOP_REM}rem)`));
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => {
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      setCompact(el.getBoundingClientRect().width < DESKTOP_REM * rem);
+    };
+    check();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(check);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ref]);
+  return compact;
+}
 
 /** En Figma el texto del copyright es una capa con su propio texto como nombre. */
 const figmaName = (node: ReactNode) => (typeof node === 'string' ? node : undefined);
@@ -71,9 +98,9 @@ function Item({ item }: { item: FooterItem }) {
   );
 }
 
-function ItemList({ items }: { items: FooterItem[] }) {
+function ItemList({ items, className }: { items: FooterItem[]; className?: string }) {
   return (
-    <ul className={footerListClass} data-figma-part="Container">
+    <ul className={cn(footerListClass, className)} data-figma-part="Container">
       {items.map((item, i) => (
         <Item key={i} item={item} />
       ))}
@@ -84,7 +111,8 @@ function ItemList({ items }: { items: FooterItem[] }) {
 /**
  * Footer: `<footer>` (landmark contentinfo). Los grupos van dentro de un único `<nav aria-label>`,
  * cada uno como `<div>` con encabezado y lista; así no hay cinco landmarks de navegación ni de región.
- * En móvil los grupos pasan a un Accordion (APG: botón con aria-expanded).
+ * Con menos de 64rem de ancho del propio footer (no de la ventana) va la composición móvil de Figma: los grupos pasan a
+ * un Accordion (APG: botón con aria-expanded), la acción usa `mobileAction` y los sellos van en su propia fila.
  */
 export const Footer = forwardRef<HTMLElement, FooterProps>(
   (
@@ -111,7 +139,9 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
     ref
   ) => {
     const baseId = useId();
-    const mobile = useIsMobile();
+    const footerRef = useRef<HTMLElement | null>(null);
+    const mergedRef = useMergedRefs(footerRef, ref);
+    const mobile = useCompact(footerRef);
     const Heading = `h${headingLevel}` as 'h2';
     const groups: FooterSection[] = [...(contact ? [contact] : []), ...sections];
     const web = type === 'web';
@@ -143,7 +173,7 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
           </div>
         )}
         {has(about) && (
-          <div className="flex flex-col gap-ds-space-general-2xl max-md:gap-ds-space-general-xl" data-figma-part="Content">
+          <div className="flex flex-col gap-ds-space-general-2xl @max-5xl:gap-ds-space-general-xl" data-figma-part="Content">
             {has(aboutTitle) && <Heading className={footerTitleClass}>{aboutTitle}</Heading>}
             <p className="m-0">{about}</p>
           </div>
@@ -170,7 +200,8 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
           <Accordion type="single" headingLevel={headingLevel}>
             {groups.map((group, i) => (
               <AccordionItem key={i} value={`g${i}`} title={group.title} icon={false}>
-                <ItemList items={group.items} />
+                {/* El contenido del Accordion se alinea a la derecha (su botón de Figma va ahí): la lista ocupa todo el ancho */}
+                <ItemList items={group.items} className="w-full self-stretch" />
               </AccordionItem>
             ))}
           </Accordion>
@@ -181,14 +212,14 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
     );
 
     return (
-      <footer {...restProps} ref={ref} className={className}>
+      <footer {...restProps} ref={mergedRef} className={cn('@container', className)}>
         <div className={footerRootVariants()} data-figma-part="Desktop">
           <div className={footerContainerVariants()} data-figma-part="Container">
             <div className={footerContentVariants({ type })}>
               {brand}
               {links}
               {has(actionNode) && (
-                <div className="shrink-0 max-md:[&>*]:w-full" data-figma-part="Button">
+                <div className="shrink-0 @max-5xl:[&>*]:w-full" data-figma-part="Button">
                   {actionNode}
                 </div>
               )}
@@ -203,8 +234,9 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
           <div
             className={cn(
               footerBottomClass,
-              'items-center justify-between gap-ds-space-general-2xl max-md:flex-col',
-              web ? 'max-md:items-center' : 'max-md:items-start'
+              'items-center justify-between gap-ds-space-general-2xl @max-5xl:flex-col',
+              // Mobile de Figma: Web centra logo y copyright; Portals centra copyright y nota legal a todo el ancho
+              web ? '@max-5xl:items-center' : '@max-5xl:items-stretch'
             )}
             data-figma-part="Content"
           >
@@ -227,11 +259,14 @@ export const Footer = forwardRef<HTMLElement, FooterProps>(
             ) : (
               <>
                 {has(copyright) && (
-                  <p className="m-0 flex-1 [font-weight:var(--ds-primitives-typography-weight-regular)]" data-figma-part={figmaName(copyright)}>
+                  <p
+                    className="m-0 flex-1 [font-weight:var(--ds-primitives-typography-weight-regular)] @max-5xl:text-center"
+                    data-figma-part={figmaName(copyright)}
+                  >
                     {copyright}
                   </p>
                 )}
-                {has(legal) && <p className="m-0 flex-1 md:text-right">{legal}</p>}
+                {has(legal) && <p className="m-0 flex-1 @max-5xl:text-center @5xl:text-right">{legal}</p>}
               </>
             )}
           </div>

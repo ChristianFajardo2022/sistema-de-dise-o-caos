@@ -51,8 +51,9 @@ export const Disabled: Story = {
 
 const LABEL = 'text-xs text-ds-text-neutral-body';
 
+// Figma: 9335:5863
 /**
- * Los 8 Toggle de Figma (set 9335:5863): Type × State × Active.
+ * Los 8 Toggle de Figma: Type × State × Active.
  * Text = pista simple con descripción; Only = pista complex con texto dentro y sin descripción.
  * Va sobre la superficie del tema (background/general/black).
  */
@@ -96,8 +97,9 @@ export const FigmaMatrix: Story = {
   ),
 };
 
+// Figma: 9504:6567
 /**
- * Los 8 Toggle (Atom) de Figma (set 9504:6567): Type × State.
+ * Los 8 Toggle (Atom) de Figma: Type × State.
  * "Toggle" solo existe en Disabled active y es el mismo dibujo que Simple.
  */
 export const FigmaMatrixAtom: Story = {

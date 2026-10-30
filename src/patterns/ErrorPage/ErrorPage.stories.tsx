@@ -2,8 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { ErrorPage } from './ErrorPage';
 
+// Figma: 21691:376
 /**
- * Página de error 404 / 500 (component set "Error pages" de Figma, 21691:376). Solo la versión **sin juego**
+ * Página de error 404 / 500 (component set "Error pages" de Figma). Solo la versión **sin juego**
  * (`Game=No`): logo, título, texto, botón "Volver al inicio" y el número grande en gris.
  *
  * - `main` con `h1`; el número grande es decorativo (`aria-hidden`): el título ya dice el error.

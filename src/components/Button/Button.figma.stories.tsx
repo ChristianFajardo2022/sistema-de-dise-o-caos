@@ -69,37 +69,40 @@ export const FigmaMatrix: Story = {
             </div>
             <div className="flex flex-col gap-3">
               {SIZES.map((size) => (
-                <div key={size} className="flex flex-wrap items-center gap-4">
-                  <span className="w-8 text-xs text-ds-text-neutral-body">{size}</span>
-                  {states.map((s) => {
-                    const figma = `Type=${cap(b.type)}, State=${s.figma}, Size=${size}, Contrats=${cap(b.contrast)}, Icon-single=${b.iconOnly ? 'True' : 'False'}, Unicolor=${b.unicolor ? 'On' : 'Off'}`;
-                    return b.iconOnly ? (
-                      <Button
-                        key={s.figma}
-                        data-figma={figma}
-                        variant={b.type}
-                        contrast={b.contrast}
-                        size={size}
-                        state={s.state}
-                        iconOnly
-                        aria-label="Agregar"
-                      >
-                        <AddIcon />
-                      </Button>
-                    ) : (
-                      <Button
-                        key={s.figma}
-                        data-figma={figma}
-                        variant={b.type}
-                        contrast={b.contrast}
-                        unicolor={b.unicolor}
-                        size={size}
-                        state={s.state}
-                      >
-                        Button
-                      </Button>
-                    );
-                  })}
+                <div key={size} className="flex items-center gap-4">
+                  <span className="w-8 shrink-0 text-xs text-ds-text-neutral-body">{size}</span>
+                  {/* Si no caben en una línea, los botones bajan alineados entre sí, no bajo la etiqueta */}
+                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-4">
+                    {states.map((s) => {
+                      const figma = `Type=${cap(b.type)}, State=${s.figma}, Size=${size}, Contrats=${cap(b.contrast)}, Icon-single=${b.iconOnly ? 'True' : 'False'}, Unicolor=${b.unicolor ? 'On' : 'Off'}`;
+                      return b.iconOnly ? (
+                        <Button
+                          key={s.figma}
+                          data-figma={figma}
+                          variant={b.type}
+                          contrast={b.contrast}
+                          size={size}
+                          state={s.state}
+                          iconOnly
+                          aria-label="Agregar"
+                        >
+                          <AddIcon />
+                        </Button>
+                      ) : (
+                        <Button
+                          key={s.figma}
+                          data-figma={figma}
+                          variant={b.type}
+                          contrast={b.contrast}
+                          unicolor={b.unicolor}
+                          size={size}
+                          state={s.state}
+                        >
+                          Button
+                        </Button>
+                      );
+                    })}
+                  </div>
                 </div>
               ))}
             </div>

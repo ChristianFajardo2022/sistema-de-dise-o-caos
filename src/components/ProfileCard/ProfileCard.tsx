@@ -35,8 +35,9 @@ import { RATING_SUFFIX, formatRating } from '../../utils/format';
 
 const has = (node: unknown) => node != null && node !== false;
 
+// Figma: 12995:3291
 /**
- * Tarjeta de perfil (set "Profile card" de Figma, 12995:3291). Es un `<article>` nombrado por el nombre de la
+ * Tarjeta de perfil (set "Profile card" de Figma). Es un `<article>` nombrado por el nombre de la
  * persona (encabezado `h3` por defecto). No es interactiva en sí: lo interactivo son sus controles (selección real
  * en el Button corner, más opciones y las acciones que se le pasan), cada uno con un nombre que incluye a la persona.
  * El `ref` va a la raíz; el input de selección se alcanza con `selectionProps.ref`.

@@ -104,7 +104,8 @@ const ORIENTATIONS: { figma: string; value: StepperOrientation }[] = [
   { figma: 'Horizontal', value: 'horizontal' },
 ];
 
-/** `Stepper` (13965:5884): Vertical (335 de ancho) y Horizontal (617), con cinco pasos: completo, en curso y tres incompletos. */
+// Figma: 13965:5884
+/** `Stepper`: Vertical (335 de ancho) y Horizontal (617), con cinco pasos: completo, en curso y tres incompletos. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (
@@ -124,7 +125,8 @@ export const FigmaMatrix: Story = {
   ),
 };
 
-/** `Indicators (Atom)` (13804:20926): 4 estados × 2 orientaciones, un `<li>` por variante. */
+// Figma: 13804:20926
+/** `Indicators (Atom)`: 4 estados × 2 orientaciones, un `<li>` por variante. */
 export const FigmaMatrixIndicators: Story = {
   parameters: { layout: 'padded' },
   render: () => (

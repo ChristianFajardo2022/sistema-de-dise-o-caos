@@ -125,8 +125,9 @@ export const ExportAsImage: Story = {
 const POSITIONS = ['Horizontal', 'Vertical'] as const;
 const VALUES = ['Default', 'Filled'] as const;
 
+// Figma: 17805:32039
 /**
- * Las 4 variantes de "Firm" (set 17805:32039): Position × Propiedad 1. Filled lleva un trazo inventado.
+ * Las 4 variantes de "Firm": Position × Propiedad 1. Filled lleva un trazo inventado.
  * Va sobre la superficie del tema (background/general/black).
  */
 export const FigmaMatrix: Story = {

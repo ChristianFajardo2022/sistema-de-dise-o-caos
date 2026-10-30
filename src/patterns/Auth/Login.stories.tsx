@@ -3,8 +3,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { ForgotPasswordScreen, LoginScreen, RegisterScreen } from './Login.screens';
 
+// Figma: 14454:47131
 /**
- * Pantallas de acceso (component set "Login" de Figma, 14454:47131, estados Login y Register / Forgot).
+ * Pantallas de acceso (component set "Login" de Figma, estados Login y Register / Forgot).
  *
  * Son **composiciones**, no componentes exportados: cada producto enlaza su autenticación y su ruteo. Se arman con
  * Logo, PhoneInput, Input (contraseña con botón de mostrar), Button y ButtonLink.

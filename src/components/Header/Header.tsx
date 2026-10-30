@@ -14,6 +14,7 @@ import {
 import { HeaderBell } from './HeaderBell';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
 import { HeaderNav } from './HeaderNav';
+import { useHeaderFit } from './useHeaderFit';
 import { AvatarMenu } from '../AvatarMenu';
 import { IconMenu } from '../IconMenu';
 import { Input } from '../Input';
@@ -22,14 +23,10 @@ import { useMobileSheet } from '../_internal/useMobileSheet';
 import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 import { useMergedRefs } from '../../utils/refs';
-import { useMediaQuery } from '../../utils/useMediaQuery';
 
-/** Desde este ancho (64rem, donde tokens.css pasa al modo Desktop) `layout="auto"` dibuja la cabecera de escritorio. */
-const DESKTOP_QUERY = '(min-width: 64rem)';
-const useIsDesktop = () => useMediaQuery(DESKTOP_QUERY, true);
-
+// Figma: 13448:29988, 13520:81850
 /**
- * Cabecera del producto: "Header desktop" (13448:29988) y "Header mobile" (13520:81850) de Figma.
+ * Cabecera del producto: "Header desktop" y "Header mobile" de Figma.
  *
  * - Landmarks: `<header>` (rol `banner` cuando es hijo directo de `body`; dentro de otro contenedor use `role="banner"`),
  *   `<nav>` con nombre para la navegación principal y `<form role="search">` para el buscador. La sección actual lleva
@@ -39,7 +36,8 @@ const useIsDesktop = () => useMediaQuery(DESKTOP_QUERY, true);
  *   (`Input` `search-header`), campana con panel y avatar con menú de perfil (`AvatarMenu`).
  * - Móvil: botón de menú (`IconMenu`, `aria-expanded`) que despliega una hoja con el buscador y los enlaces (justo
  *   después del botón en el orden de Tab); Escape la cierra y devuelve el foco al botón. La campana y el avatar quedan
- *   en la barra. Con `layout="auto"` cambia en 64rem.
+ * en la barra. Con `layout="auto"` (por defecto) la cabecera mide su propio ancho: dibuja la de escritorio cuando
+ * cabe entera (logo, navegación, buscador a su mínimo y acciones) y la móvil cuando no, sea cual sea la ventana.
  * - Campana: `notificationPanel` (un `NotificationPanel` simple o complejo) se abre como diálogo no modal anclado a la
  *   campana; Escape y clic fuera cierran, el foco vuelve a la campana.
  * - `ref` y las props nativas van al `<header>`.
@@ -82,10 +80,12 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
     ref
   ) => {
     const uid = useId();
-    const isDesktopViewport = useIsDesktop();
-    const desktop = layout === 'auto' ? isDesktopViewport : layout === 'desktop';
     const headerRef = useRef<HTMLElement | null>(null);
     const mergedRef = useMergedRefs(headerRef, ref);
+    // Lo que cambia el ancho de la barra de escritorio: al cambiar se vuelve a medir
+    const contentKey = [items.length, Boolean(search), Boolean(notificationPanel), Boolean(user), Boolean(actions), Boolean(logo)].join();
+    const fitsDesktop = useHeaderFit(headerRef, layout === 'auto', contentKey);
+    const desktop = layout === 'auto' ? fitsDesktop : layout === 'desktop';
     const [openItem, setOpenItem] = useControllableState<string | null>(
       openItemProp,
       defaultOpenItem,
@@ -173,7 +173,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
     return (
       <header {...rest} ref={mergedRef} className={cn(headerVariants(), className)}>
         {desktop ? (
-          <div className={headerBarVariants({ layout: 'desktop' })} data-figma-part="Header desktop">
+          <div className={headerBarVariants({ layout: 'desktop' })} data-header-bar="desktop" data-figma-part="Header desktop">
             <div className={headerStartVariants({ layout: 'desktop' })} data-figma-part="Logo+options">
               {logoNode}
               {items.length > 0 && (

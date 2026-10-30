@@ -93,8 +93,9 @@ export const Disabled: Story = {
 const TYPES = ['Simple', 'Simple number', 'Range', 'Range number'] as const;
 const PERCENTS = [0, 25, 50, 75, 100] as const;
 
+// Figma: 13839:56628
 /**
- * Las 20 variantes de "Slide bar" (set 13839:56628): Type × Porcentage, con el texto "00" de Figma.
+ * Las 20 variantes de "Slide bar": Type × Porcentage, con el texto "00" de Figma.
  * En Range, "Porcentage" es el ancho del tramo seleccionado, centrado (0 % = pulgares juntos al centro).
  * Va sobre la superficie del tema (background/general/black).
  */

@@ -1,17 +1,24 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Decorator, Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { EmptyState } from './EmptyState';
 import type { EmptyStateProps, EmptyStateType } from './EmptyState.types';
 
 const TYPES: EmptyStateType[] = ['first-use', 'no-results', 'errors-issues', 'no-content'];
 
-/** Variantes de Figma (set 12304:6287) con su botón y los textos que traen. */
+// Variantes del set de Figma 12304:6287 con su botón y los textos que traen.
 const FIGMA: { type: EmptyStateType; figma: string; button?: string }[] = [
   { type: 'first-use', figma: 'Type=First Use', button: 'Crear o agregar' },
   { type: 'no-results', figma: 'Type=No Results', button: 'Limpiar' },
   { type: 'errors-issues', figma: 'Type=Errors & Issues', button: 'Reintentar' },
   { type: 'no-content', figma: 'Type=No Content' },
 ];
+
+/** Marco de 326 (ancho del componente en Figma) para las historias de un solo mensaje. */
+const frame: Decorator = (Story) => (
+  <div className="w-[326px] max-w-full bg-ds-background-general-black p-6">
+    <Story />
+  </div>
+);
 
 const meta = {
   title: 'Feedback/EmptyState',
@@ -23,10 +30,10 @@ const meta = {
       control: 'select',
       options: TYPES,
       type: { name: 'enum', value: TYPES },
-      description: 'Type de Figma: define el ícono por defecto',
+      description: 'Situación que explica el mensaje; define el ícono',
     },
-    title: { control: 'text', type: { name: 'string' }, description: 'Props Title / Title text de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Prop Text de Figma' },
+    title: { control: 'text', type: { name: 'string' }, description: 'Título del mensaje' },
+    description: { control: 'text', type: { name: 'string' }, description: 'Texto bajo el título' },
     headingLevel: {
       control: 'select',
       options: [2, 3, 4, 5, 6],
@@ -40,19 +47,14 @@ const meta = {
     description: 'Crea el primero para empezar a trabajar con tu equipo.',
     headingLevel: 3,
   },
-  decorators: [
-    (Story) => (
-      <div className="w-[326px] bg-ds-background-general-black p-6">
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta<typeof EmptyState>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Mensaje con sus dos acciones. Cambia el tipo, el título o el texto desde los controles. */
 export const Interactive: Story = {
+  decorators: [frame],
   render: (args: EmptyStateProps) => (
     <EmptyState
       {...args}
@@ -62,14 +64,14 @@ export const Interactive: Story = {
   ),
 };
 
-/** Set 12304:6287: cada variante una vez, con los textos de Figma (ancho 326, modo Desktop). */
+// Figma: set 12304:6287, cada variante una vez con los textos de Figma (ancho 326, modo Desktop).
+/** Los cuatro tipos tal como están en el diseño, con sus textos de ejemplo, para compararlos con Figma. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
-  decorators: [],
   render: () => (
-    <div className="flex w-fit items-start gap-6 bg-ds-background-general-black p-6">
+    <div className="flex max-w-full flex-wrap items-start gap-6 bg-ds-background-general-black p-6">
       {FIGMA.map((v) => (
-        <div key={v.type} className="flex w-[326px] flex-col gap-2">
+        <div key={v.type} className="flex w-[326px] shrink-0 flex-col gap-2">
           <span className="text-xs text-ds-text-neutral-body">{v.figma}</span>
           <EmptyState
             type={v.type}
@@ -88,7 +90,7 @@ export const FigmaMatrix: Story = {
 /** Los cuatro tipos con textos reales y la acción que corresponde a cada uno. */
 export const Types: Story = {
   render: () => (
-    <div className="grid grid-cols-1 gap-12 sm:grid-cols-2">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,326px),1fr))] gap-12">
       <EmptyState
         type="first-use"
         title="Aún no hay archivos"
@@ -118,6 +120,7 @@ export const Types: Story = {
 
 export const TestAccessibility: Story = {
   tags: ['!autodocs'],
+  decorators: [frame],
   args: { title: 'Sin resultados', description: 'Prueba con otro filtro.', headingLevel: 2 },
   render: (args: EmptyStateProps) => (
     <EmptyState
@@ -142,6 +145,7 @@ export const TestAccessibility: Story = {
 
 export const TestActions: Story = {
   tags: ['!autodocs'],
+  decorators: [frame],
   args: {
     type: 'errors-issues',
     title: 'Error',
@@ -159,6 +163,7 @@ export const TestActions: Story = {
 
 export const TestOptionalParts: Story = {
   tags: ['!autodocs'],
+  decorators: [frame],
   args: { type: 'no-content', title: undefined, description: undefined },
   render: (args: EmptyStateProps) => <EmptyState {...args} />,
   play: async ({ canvasElement }) => {

@@ -23,8 +23,9 @@ import { Radio } from '../Radio';
 import { NotchedSurface } from '../_internal/NotchedSurface';
 import { cn } from '../../utils/cn';
 
+// Figma: 14043:59452, 15005:15958
 /**
- * Tarjeta de archivo (component sets "File card" 14043:59452 y 15005:15958 de Figma).
+ * Tarjeta de archivo (component sets "File card" y de Figma).
  * No es interactiva en sí: la interacción vive en sus controles (selección, más opciones, acciones),
  * cada uno con nombre accesible que incluye el título del archivo. Hover sale de CSS; Select, del control marcado.
  * El `ref` va a la raíz (la tarjeta es un contenedor con controles opcionales); el input de selección se alcanza con

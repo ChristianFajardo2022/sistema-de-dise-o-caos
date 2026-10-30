@@ -19,8 +19,9 @@ import {
 import { Badge } from '../Badge';
 import { cn } from '../../utils/cn';
 
+// Figma: 14914:1288
 /**
- * Fila del desplegable de un grupo (set "Dropdown group notification (Atom)" de Figma, 14914:1288). Es un `<li>` de la
+ * Fila del desplegable de un grupo (set "Dropdown group notification (Atom)" de Figma). Es un `<li>` de la
  * lista de un `NotificationGroup`.
  *
  * - Hora y descripción; `unread` añade el punto verde ("No leída" para lectores) y pone la descripción en semibold.

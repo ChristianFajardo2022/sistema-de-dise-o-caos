@@ -54,11 +54,14 @@ const meta: Meta<typeof SearchInput> = {
     onCategoryChange: fn(),
   },
   decorators: [
-    (Story) => (
-      <div className="max-w-[495px] pb-[420px]">
+    (Story, { parameters }) =>
+      parameters.sinMarco ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="max-w-[495px] pb-[420px]">
+          <Story />
+        </div>
+      ),
   ],
 };
 
@@ -139,10 +142,9 @@ const FIGMA_VARIANTS: { name: string; props: Partial<ComponentProps<typeof Searc
  * solo cambia el trazo. Active/Focus dibuja el panel en el flujo (sobre la fila siguiente, como en Figma).
  */
 export const FigmaMatrix: Story = {
-  parameters: { layout: 'fullscreen' },
-  decorators: [(Story) => <Story />],
+  parameters: { layout: 'fullscreen', sinMarco: true },
   render: () => (
-    <div className={`grid w-fit grid-cols-[repeat(2,495px)] items-start gap-x-6 gap-y-10 p-6 ${SURFACE}`}>
+    <div className={`grid max-w-full grid-cols-[repeat(auto-fill,minmax(min(100%,495px),495px))] items-start gap-x-6 gap-y-10 p-6 ${SURFACE}`}>
       {FIGMA_VARIANTS.map(({ name, props }) => (
         <div key={name} className={`flex flex-col gap-2 ${name === 'Active/Focus' ? 'pb-[396px]' : ''}`}>
           <span className="text-ds-typography-body-size-xs text-ds-text-neutral-white">{name}</span>

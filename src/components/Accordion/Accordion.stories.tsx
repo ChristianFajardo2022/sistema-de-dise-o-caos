@@ -48,11 +48,15 @@ const meta = {
   tags: ['autodocs'],
   // La tarjeta ocupa el ancho de su contenedor; Figma la muestra a 1286
   decorators: [
-    (Story) => (
-      <div className="w-full max-w-3xl">
+    // Las historias de matriz (`fullWidth`) usan todo el ancho del lienzo
+    (Story, context) =>
+      context.parameters['fullWidth'] ? (
         <Story />
-      </div>
-    ),
+      ) : (
+        <div className="w-full max-w-3xl">
+          <Story />
+        </div>
+      ),
   ],
   argTypes: {
     title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
@@ -121,9 +125,9 @@ const SURFACES: { contrast: AccordionContrast; figma: string; surface: string }[
 /** Las 6 variantes de Figma (Type × State × Contrast; Table solo existe On canva) al ancho de la muestra (1286). Cada Contrast sobre su superficie. */
 export const FigmaMatrix: Story = {
   // Las tarjetas abiertas repiten el mismo título de muestra, así que sus regiones comparten nombre
-  parameters: { layout: 'fullscreen', a11y: { config: { rules: [{ id: 'landmark-unique', enabled: false }] } } },
+  parameters: { layout: 'fullscreen', fullWidth: true, a11y: { config: { rules: [{ id: 'landmark-unique', enabled: false }] } } },
   render: () => (
-    <div className="flex w-fit flex-col">
+    <div className="flex w-full flex-col">
       {SURFACES.map((s) => (
         <div key={s.contrast} className={`flex flex-col gap-6 p-6 ${s.surface}`}>
           <span className="text-xs text-ds-text-neutral-body">Contrast={s.figma}</span>
@@ -139,7 +143,7 @@ export const FigmaMatrix: Story = {
                     open={state === 'Dropdown'}
                     title="Nombre del archivo "
                     description="Estado"
-                    className="w-[1286px]"
+                    className="w-full max-w-[1286px]"
                     data-figma={`Type=${type === 'table' ? 'Table' : 'Normal'}, State=${state}, Contrast=${s.figma}`}
                   >
                     <SampleContent />
@@ -154,10 +158,10 @@ export const FigmaMatrix: Story = {
 
 /** Componente suelto "Accordion" de Figma: lista de tarjetas con gap 8 (muestra a 1328). */
 export const FigmaMatrixAccordion: Story = {
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', fullWidth: true },
   render: () => (
-    <div className="w-fit bg-ds-background-container-default-on-canva p-6">
-      <Accordion className="w-[1328px]" contrast="on-card" defaultValue="uno" data-figma="Accordion">
+    <div className="w-full bg-ds-background-container-default-on-canva p-6">
+      <Accordion className="w-full max-w-[1328px]" contrast="on-card" defaultValue="uno" data-figma="Accordion">
         <AccordionItem value="uno" title="Nombre del archivo " description="Estado">
           <SampleContent />
         </AccordionItem>

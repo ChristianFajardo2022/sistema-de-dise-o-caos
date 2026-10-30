@@ -1,0 +1,444 @@
+/* Menú lateral de CAOS (Figma: Menu Library dev 22202:85840; List Item Dropdown 22685:15174).
+   Los tokens entran al administrador desde src/styles/tokens.css (main.ts › managerHead); data-theme elige el modo.
+   gap/field/lg, gap/general/md y padding/container/general/xs (8) no existen en tokens.css: van con space/lg. */
+
+/* El menú propio reemplaza al de Storybook: el original queda oculto y sin el tirador para cambiar su ancho */
+@media (min-width: 600px) {
+  #storybook-sidebar-region {
+    visibility: hidden;
+  }
+  [role='separator'][aria-label^='Sidebar'] {
+    display: none;
+  }
+}
+.caos-sb {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 10;
+  display: flex;
+  font-family: var(--ds-primitives-typography-family-primary), 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: var(--ds-primitives-typography-weight-regular);
+  -webkit-font-smoothing: antialiased;
+  color: var(--color-ds-text-neutral-white);
+}
+
+.caos-sb *,
+.caos-sb *::before,
+.caos-sb *::after {
+  box-sizing: border-box;
+}
+
+.caos-sb :focus-visible {
+  outline: 2px solid var(--color-ds-background-acent-tertiary);
+  outline-offset: 2px;
+}
+
+/* Riel */
+.caos-sb-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 63px;
+  height: 100%;
+  flex-shrink: 0;
+  background: var(--color-ds-background-container-default-on-canva);
+  border-right: 1px solid var(--color-ds-border-general-default-on-canva);
+}
+
+.caos-sb-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 80px;
+  padding: var(--ds-responsive-space-general-2xl);
+  flex-shrink: 0;
+  color: var(--color-ds-background-logo-default);
+  border-radius: var(--ds-responsive-radius-general-md);
+}
+
+.caos-sb-rail-tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ds-responsive-space-general-lg);
+  align-items: center;
+  padding-block: var(--ds-responsive-space-general-2xl);
+}
+
+.caos-sb-rail-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: var(--ds-responsive-space-general-xl);
+  border: 0;
+  border-radius: var(--ds-responsive-radius-general-md);
+  background: transparent;
+  color: var(--color-ds-icon-general-gray-high-contrast);
+  cursor: pointer;
+}
+
+.caos-sb-rail-btn:hover {
+  background: var(--color-ds-background-field-hover);
+}
+
+.caos-sb-rail-btn[data-state='select'] {
+  background: var(--color-ds-background-field-active-slow-contrast);
+  color: var(--color-ds-icon-acent-firts);
+  border-radius: var(--ds-responsive-radius-general-sm) var(--ds-responsive-radius-general-md)
+    var(--ds-responsive-radius-general-md) var(--ds-responsive-radius-general-sm);
+}
+
+/* Barra de acento de 4 px a la izquierda del ítem elegido */
+.caos-sb-rail-btn[data-state='select']::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--color-ds-background-acent-tertiary);
+  border-radius: var(--ds-responsive-radius-general-sm) 0 0 var(--ds-responsive-radius-general-sm);
+}
+
+.caos-sb-rail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  padding: 24px 16px;
+}
+
+/* Botón redondo Secondary low (tema y contraer) */
+.caos-sb-round {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ds-responsive-space-button-lg);
+  border: var(--ds-primitives-stroke-lg) solid var(--color-ds-border-button-secondary-low-default);
+  border-radius: var(--ds-responsive-radius-button-full);
+  background: transparent;
+  color: var(--color-ds-icon-button-secondary-low-default);
+  cursor: pointer;
+}
+
+.caos-sb-round:hover {
+  background: var(--color-ds-background-field-hover);
+}
+
+/* Con el panel abierto la flecha apunta hacia el riel (contraer) */
+.caos-sb-round[data-collapsed='false'] svg {
+  transform: rotate(180deg);
+}
+
+/* Panel */
+.caos-sb-panel {
+  display: flex;
+  width: 298px;
+  height: 100%;
+  flex-shrink: 0;
+  background: var(--color-ds-background-container-default-on-canva);
+  border-right: 1px solid var(--color-ds-border-general-default-on-canva);
+}
+
+.caos-sb-panel[hidden] {
+  display: none;
+}
+
+.caos-sb-scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: var(--ds-responsive-space-general-2xl) var(--ds-responsive-space-general-lg) var(--ds-responsive-space-general-2xl) 0;
+  padding-left: var(--ds-responsive-space-general-2xl);
+  overflow-x: clip;
+  overflow-y: auto;
+}
+
+/* Scroll bar de Figma: 6 px, riel gray-sixth y barra gray-firts. En Chrome solo ::-webkit-scrollbar la deja siempre
+   visible (scrollbar-color la vuelve superpuesta en macOS); las propiedades estándar quedan para Firefox. */
+@supports not selector(::-webkit-scrollbar) {
+  .caos-sb-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ds-background-general-gray-firts) var(--color-ds-background-general-gray-sixth);
+  }
+}
+.caos-sb-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.caos-sb-scroll::-webkit-scrollbar-track {
+  background: var(--color-ds-background-general-gray-sixth);
+  border-radius: var(--ds-responsive-radius-button-full);
+}
+.caos-sb-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-ds-background-general-gray-firts);
+  border-radius: var(--ds-responsive-radius-button-full);
+}
+
+.caos-sb-caption {
+  margin: 0;
+  font-size: var(--ds-primitives-typography-size-sm);
+  line-height: var(--ds-responsive-typography-body-line-height-short-sm);
+  color: var(--color-ds-text-neutral-disabled-on-canva);
+}
+
+.caos-sb-hint {
+  margin: 0;
+  padding: var(--ds-responsive-space-general-xl);
+  font-size: var(--ds-responsive-typography-field-size-sm);
+  line-height: var(--ds-responsive-typography-field-line-height-sm);
+  color: var(--color-ds-text-neutral-disabled-on-canva);
+}
+
+.caos-sb-list,
+.caos-sb-sub,
+.caos-sb-leaves {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.caos-sb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: var(--ds-responsive-space-general-lg);
+}
+
+/* Primer nivel: Hamburguer menu atom */
+.caos-sb-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-responsive-space-general-lg);
+}
+
+.caos-sb-top-btn {
+  position: relative;
+  display: flex;
+  gap: var(--ds-responsive-space-general-xl);
+  align-items: center;
+  width: 100%;
+  padding: var(--ds-responsive-space-general-xl);
+  border: 0;
+  border-radius: var(--ds-responsive-radius-general-md);
+  background: transparent;
+  font: inherit;
+  font-size: var(--ds-responsive-typography-field-size-md);
+  line-height: var(--ds-responsive-typography-field-line-height-md);
+  color: var(--color-ds-text-neutral-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.caos-sb-top-btn:hover {
+  background: var(--color-ds-background-field-hover);
+  color: var(--color-ds-text-neutral-white);
+}
+
+/* Desplegado: fondo activo y texto blanco, sin la barra de acento (esa queda solo en el riel) */
+.caos-sb-top-btn[data-state='select'] {
+  background: var(--color-ds-background-field-active-slow-contrast);
+  color: var(--color-ds-text-neutral-white);
+}
+
+.caos-sb-top-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* La flecha se ve siempre y gira al abrir, como en Accordion (300 ms, sin giro con movimiento reducido) */
+.caos-sb-top-chevron,
+.caos-sb-item-chevron {
+  flex-shrink: 0;
+  transition: transform 300ms ease-out;
+}
+
+.caos-sb-top-btn[aria-expanded='true'] .caos-sb-top-chevron,
+.caos-sb-item[aria-expanded='true'] .caos-sb-item-chevron {
+  transform: rotate(180deg);
+}
+
+.caos-sb-top-btn[data-state='select'] .caos-sb-top-chevron {
+  color: var(--color-ds-icon-acent-firts);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caos-sb-top-chevron,
+  .caos-sb-item-chevron {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* Segundo nivel: lista con divisores de 0,5 px (Chrome redondea border-width, por eso el divisor es una línea escalada) */
+.caos-sb-sub {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-primitives-space-lg);
+  padding: var(--ds-responsive-space-general-xl) var(--ds-responsive-space-general-xl) var(--ds-responsive-space-general-xl)
+    var(--ds-responsive-space-general-4xl);
+}
+
+.caos-sb-sub--flush {
+  padding: var(--ds-responsive-space-general-lg) 0;
+}
+
+.caos-sb-sub > li + li {
+  position: relative;
+  padding-top: var(--ds-primitives-space-lg);
+}
+
+.caos-sb-sub > li + li::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--color-ds-border-general-default-on-card);
+  transform: scaleY(0.5);
+  transform-origin: top;
+}
+
+/* Tercer nivel: historias de un componente */
+.caos-sb-leaves {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--ds-primitives-space-lg) 0 0 var(--ds-responsive-space-general-xl);
+}
+
+/* List Item simple y List Item Dropdown */
+.caos-sb-item {
+  display: flex;
+  gap: var(--ds-primitives-space-lg);
+  align-items: center;
+  width: 100%;
+  padding: var(--ds-primitives-space-lg);
+  border: 0;
+  border-radius: var(--ds-responsive-radius-field-sm);
+  background: transparent;
+  font: inherit;
+  font-size: var(--ds-responsive-typography-field-size-sm);
+  line-height: var(--ds-responsive-typography-field-line-height-sm);
+  color: var(--color-ds-text-neutral-white);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.caos-sb-item:hover {
+  background: var(--color-ds-background-field-hover);
+}
+
+.caos-sb-item[data-state='select'] {
+  background: var(--color-ds-background-field-active-slow-contrast);
+}
+
+.caos-sb-item-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.caos-sb-item-meta {
+  flex-shrink: 0;
+  font-size: var(--ds-primitives-typography-size-sm);
+  line-height: var(--ds-responsive-typography-body-line-height-short-sm);
+  color: var(--color-ds-text-neutral-disabled-on-canva);
+}
+
+/* Buscador */
+.caos-sb-search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-responsive-space-general-lg);
+  padding-right: var(--ds-responsive-space-general-lg);
+}
+
+.caos-sb-field {
+  display: flex;
+  gap: var(--ds-primitives-space-lg);
+  align-items: center;
+  padding: var(--ds-responsive-space-general-xl);
+  border: var(--ds-primitives-stroke-lg) solid var(--color-ds-border-general-gray-fourth);
+  border-radius: var(--ds-responsive-radius-field-sm);
+  color: var(--color-ds-icon-general-gray-high-contrast);
+}
+
+.caos-sb-field:focus-within {
+  border-color: var(--color-ds-background-acent-tertiary);
+}
+
+.caos-sb-field input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: var(--ds-responsive-typography-field-size-sm);
+  line-height: var(--ds-responsive-typography-field-line-height-sm);
+  color: var(--color-ds-text-neutral-white);
+}
+
+/* El foco lo marca el borde del campo (focus-within) */
+.caos-sb-field input:focus-visible {
+  outline: none;
+}
+
+.caos-sb-field input::placeholder {
+  color: var(--color-ds-text-neutral-disabled-on-canva);
+}
+
+.caos-sb-field input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.caos-sb section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-primitives-space-lg);
+  padding-top: var(--ds-responsive-space-general-lg);
+}
+
+/* En pantallas angostas Storybook usa su navegación móvil (al final para ganarle a .caos-sb) */
+@media (max-width: 599px) {
+  .caos-sb {
+    display: none;
+  }
+}
+
+/* Panel de complementos como acordeón (PanelAccordion): fuera la X y el botón de orientación; la flecha va en su lugar */
+#storybook-panel-region button[aria-keyshortcuts='alt+A'],
+#storybook-panel-region button[aria-keyshortcuts='alt+D'] {
+  display: none;
+}
+
+.caos-panel-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.caos-panel-toggle:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.caos-panel-toggle:focus-visible {
+  outline: 2px solid var(--color-ds-background-acent-tertiary);
+  outline-offset: 1px;
+}
+
+/* Contraído, la flecha apunta hacia arriba (abrir) */
+.caos-panel-toggle[data-collapsed='true'] svg {
+  transform: rotate(180deg);
+}

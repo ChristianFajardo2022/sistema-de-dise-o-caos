@@ -1,8 +1,9 @@
 import type { HTMLAttributes, MouseEventHandler, ReactNode } from 'react';
 import type { IconName } from '../Icon/Icon.types';
 
+// Figma: 11557:17694
 /**
- * State de Figma (File card 11557:17694). No es un estado de interacción: es el estado de la carga.
+ * State de Figma (File card). No es un estado de interacción: es el estado de la carga.
  * - `loading`: subiendo, con barra de progreso verde y acción Eliminar.
  * - `complete`: terminada (tick verde), Descargar y Eliminar.
  * - `error`: archivo con error (cruz roja), Descargar y Eliminar.

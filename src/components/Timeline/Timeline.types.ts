@@ -1,6 +1,7 @@
 import type { HTMLAttributes, LiHTMLAttributes, ReactNode } from 'react';
 
-/** Orientation de Figma (set Indicator 13576:32508). */
+// Figma: 13576:32508
+/** Orientation de Figma (set Indicator). */
 export type TimelineOrientation = 'vertical' | 'horizontal';
 
 /**

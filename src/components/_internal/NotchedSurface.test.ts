@@ -16,8 +16,8 @@ function legacyNotchMask(a: number, v: number) {
 }
 
 describe('notchMask', () => {
-  it('radius 2xl: misma máscara que antes en las tres muescas (exterior e interior)', () => {
-    for (const a of [40, 48, 54]) {
+  it('radius 2xl: misma máscara que antes en las cuatro muescas (exterior e interior)', () => {
+    for (const a of [40, 48, 54, 64]) {
       expect(notchMask(a, a / 2)).toEqual(legacyNotchMask(a, a / 2));
       expect(notchMask(a, a / 2, a / 2)).toEqual(legacyNotchMask(a, a / 2));
       // Capa interior: convexas v - 1, cóncava v + 1

@@ -12,8 +12,9 @@ import { Icon } from '../Icon';
 import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 
+// Figma: 20231:8418
 /**
- * Tarjeta de fila (`Card tabla` de Figma, 20231:8418): una fila presentada como tarjeta, con los campos del
+ * Tarjeta de fila (`Card tabla` de Figma): una fila presentada como tarjeta, con los campos del
  * resumen siempre visibles y un detalle que se abre con el chevron. Default = cerrada; Variant2 = abierta.
  * Patrón APG Disclosure: el chevron es un `<button>` con `aria-expanded` y `aria-controls`.
  */

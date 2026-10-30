@@ -47,8 +47,11 @@ export const emptyStateDescriptionClass = [
   'text-ds-typography-body-size-md leading-ds-typography-body-line-height-large-md text-ds-text-neutral-body',
 ].join(' ');
 
-/** Contenedor de botones: el DOM sigue el orden de Figma Desktop (secundario, principal); en Mobile se invierte para dejar el principal arriba. */
+/**
+ * Contenedor de botones: el DOM sigue el orden de Figma Desktop (secundario, principal); en Mobile se invierte para dejar
+ * el principal arriba. Si el contenedor es más angosto que los dos botones (tarjetas en grilla), bajan de línea.
+ */
 export const emptyStateActionsClass =
-  'flex w-full flex-row items-center justify-center gap-ds-space-general-2xl mobile:flex-col-reverse';
+  'flex w-full flex-row flex-wrap items-center justify-center gap-ds-space-general-2xl mobile:flex-col-reverse';
 
 export const emptyStateButtonClass = 'mobile:w-full';

@@ -144,7 +144,8 @@ const FIGMA_VARIANTS: { name: string; variant: ListItemVariant; disabled: boolea
   { name: 'Type=Simple, State=Disabled', variant: 'simple', disabled: true },
 ];
 
-/** Las 4 variantes del set 12174:13893, en el ancho de Figma (1286) con scroll horizontal si no cabe. */
+// Figma: 12174:13893
+/** Las 4 variantes del set de Figma, en el ancho de Figma (1286) con scroll horizontal si no cabe. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded', ownList: true },
   render: () => (

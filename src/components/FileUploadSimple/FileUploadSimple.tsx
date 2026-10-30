@@ -29,8 +29,9 @@ import { cn } from '../../utils/cn';
 import { useControllableState } from '../../utils/controllableState';
 import { useMergedRefs } from '../../utils/refs';
 
+// Figma: 21407:3920, 21412:4523
 /**
- * Carga de un solo archivo (sets "File upload simple-2" 21407:3920 y "File upload simple" 21412:4523 de Figma): un
+ * Carga de un solo archivo (sets "File upload simple-2" y "File upload simple" de Figma): un
  * recuadro de 304 que cambia de contenido según `status`. En `idle` es un FileDropzone (se reutiliza tal cual); en
  * `uploading` muestra el progreso dentro del recuadro (ProgressBar + botón eliminar) y en `loaded` el archivo con
  * "volver a cargar" y su tamaño. No sube nada: quien lo usa recibe el archivo en `onFileChange`, hace la carga y

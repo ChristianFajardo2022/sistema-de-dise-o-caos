@@ -528,8 +528,9 @@ function FullActions({ edit = true, chevron = true, start = false }: { edit?: bo
   );
 }
 
+// Figma: 13751:23691
 /**
- * Set `Table` (13751:23691): Type=Table (cabecera + 10 filas, columnas fijas Sticky 1 y 2) y Type=Empty state.
+ * Set `Table`: Type=Table (cabecera + 10 filas, columnas fijas Sticky 1 y 2) y Type=Empty state.
  * Superficie: background/general/black. El texto del botón "Guía" de Figma se cambia por "Detalle" (texto neutro).
  */
 export const FigmaMatrix: Story = {
@@ -604,8 +605,9 @@ export const FigmaMatrix: Story = {
   ),
 };
 
+// Figma: 13544:69540
 /**
- * Set `Header table (Atom)` (13544:69540): Type × State × Radius. Radius sale de la posición en la fila
+ * Set `Header table (Atom)`: Type × State × Radius. Radius sale de la posición en la fila
  * (On en la primera casilla y en la última columna), así que cada fila de State lleva las cuatro combinaciones.
  */
 export const FigmaMatrixHeader: Story = {
@@ -638,7 +640,8 @@ export const FigmaMatrixHeader: Story = {
   ),
 };
 
-/** Set `Cell table (Atom)` (13544:69578): State × Radius (Left = primera celda, Right = última). */
+// Figma: 13544:69578
+/** Set `Cell table (Atom)`: State × Radius (Left = primera celda, Right = última). */
 export const FigmaMatrixCell: Story = {
   render: () => (
     <div className="flex flex-col gap-ds-space-general-2xl bg-ds-background-general-black p-6">
@@ -746,16 +749,19 @@ const ITEM_ATOM_TYPES = [
   'Button',
 ];
 
+// Figma: 13544:69501
 /**
- * Set `Item table (Atom)` (13544:69501): contenido de celda por Type, sobre background/table/default. Los Type que ya
+ * Set `Item table (Atom)`: contenido de celda por Type, sobre background/table/default. Los Type que ya
  * son componentes de CAOS (Link, Tag, Progress bar, Checkbox, Toggle, Raiting, Button) se usan tal cual.
  */
 export const FigmaMatrixItemAtom: Story = { render: () => <ItemMatrix types={ITEM_ATOM_TYPES} atom /> };
 
-/** Set `Item table` (13059:16129): la versión anterior del átomo, mismo contenido (Raiting = solo estrellas). */
+// Figma: 13059:16129
+/** Set `Item table`: la versión anterior del átomo, mismo contenido (Raiting = solo estrellas). */
 export const FigmaMatrixItem: Story = { render: () => <ItemMatrix types={ITEM_TYPES} /> };
 
-/** Set `Dropdown table (Atom)` (13544:69601): State (Default, Select) × Up (Off = cerrada, On = abierta). */
+// Figma: 13544:69601
+/** Set `Dropdown table (Atom)`: State (Default, Select) × Up (Off = cerrada, On = abierta). */
 export const FigmaMatrixDropdown: Story = {
   render: () => (
     <div className="flex flex-col gap-ds-space-general-2xl bg-ds-background-general-black p-6">
@@ -773,7 +779,8 @@ export const FigmaMatrixDropdown: Story = {
   ),
 };
 
-/** Set `Row mobile (Atom)` (13544:69614): State Default y Select, con un cuarto campo detrás de la fila desplegable. */
+// Figma: 13544:69614
+/** Set `Row mobile (Atom)`: State Default y Select, con un cuarto campo detrás de la fila desplegable. */
 export const FigmaMatrixRowMobile: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },
   render: () => (
@@ -813,14 +820,15 @@ export const FigmaMatrixRowMobile: Story = {
   ),
 };
 
+// Figma: 20231:8418
 /**
- * Set `Card tabla` (20231:8418): Property 1 = Default (cerrada) y Variant2 (abierta). Textos neutros en lugar de los
+ * Set `Card tabla`: Property 1 = Default (cerrada) y Variant2 (abierta). Textos neutros en lugar de los
  * del archivo de Figma.
  */
 export const FigmaMatrixRowCard: Story = {
   render: () => (
     <div className="flex flex-col gap-ds-space-general-4xl bg-ds-background-general-black p-6">
-      <TableRowCard summary={<RowCardSummary />} data-figma="Property 1=Default" className="w-256">
+      <TableRowCard summary={<RowCardSummary />} data-figma="Property 1=Default" className="w-full max-w-256">
         <RowCardDetail title="Grupo 1" status="Pendiente" statusType="alert" />
       </TableRowCard>
       <TableRowCard
@@ -828,7 +836,7 @@ export const FigmaMatrixRowCard: Story = {
         summary={<RowCardSummary />}
         footer={<Button variant="tertiary" size="sm">Ver más</Button>}
         data-figma="Property 1=Variant2"
-        className="w-256"
+        className="w-full max-w-256"
       >
         <RowCardDetail title="Grupo 1" status="Pendiente" statusType="alert" />
         <RowCardDetail title="Grupo 2" status="Recibido" statusType="info" />

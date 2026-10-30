@@ -1,6 +1,7 @@
 import type { InputHTMLAttributes } from 'react';
 
-/** Size de Figma (set 12070:15078): alto de la casilla en px. */
+// Figma: 12070:15078
+/** Size de Figma: alto de la casilla en px. */
 export type DigitInputSize = '56' | '32';
 
 /**

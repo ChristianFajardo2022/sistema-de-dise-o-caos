@@ -195,7 +195,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           ) : (
             <>
               {leftIcon && <IconSlot sizeClass={iconClass}>{leftIcon}</IconSlot>}
-              {children && <span className="pb-ds-space-button-sm">{children}</span>}
+              {children && <span data-slot="label" className="pb-ds-space-button-sm">{children}</span>}
               {rightIcon && <IconSlot sizeClass={iconClass}>{rightIcon}</IconSlot>}
             </>
           )}

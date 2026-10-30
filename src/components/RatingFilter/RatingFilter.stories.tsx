@@ -7,7 +7,7 @@ const meta = {
   component: RatingFilter,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],
-  decorators: [(Story) => <div className="w-76"><Story /></div>],
+  decorators: [(Story, { parameters }) => (parameters.sinMarco ? <Story /> : <div className="w-76"><Story /></div>)],
   argTypes: {
     disabled: { control: 'boolean', type: { name: 'boolean' } },
     defaultValue: { control: 'number' },
@@ -24,15 +24,14 @@ export const WithoutFilter: Story = { args: { defaultValue: null } };
 
 /** Type=Default (sin filtro) y Type=1…4 de Figma (= 2…5 estrellas). */
 export const FigmaMatrix: Story = {
-  decorators: [(Story) => <Story />],
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', sinMarco: true },
   render: () => (
     <div className="flex flex-wrap gap-8 bg-ds-background-general-black p-6">
       {(['Default', '1', '2', '3', '4'] as const).map((type) => (
         <div key={type} className="flex flex-col gap-2">
           <span className="text-xs text-ds-text-neutral-body">Type={type}</span>
           <RatingFilter
-            className="w-75"
+            className="w-75 max-w-full"
             value={type === 'Default' ? null : Number(type) + 1}
             label={`Calificación ${type}`}
             data-figma={`Type=${type}`}

@@ -1,8 +1,9 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, InputHTMLAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 import type { CardHeadingLevel } from '../_internal/types';
 
+// Figma: 12995:3291
 /**
- * Disposición de la tarjeta (prop Type de Figma, set "Profile card" 12995:3291).
+ * Disposición de la tarjeta (prop Type de Figma, set "Profile card").
  * - `vertical`: Standar vertical. Avatar arriba y texto debajo, superficie con muesca para el Button corner.
  * - `horizontal`: Standar horizontal. Avatar a la izquierda y texto a la derecha, misma superficie.
  * - `full`: Full. Fila ancha (avatar, texto, acciones y más opciones) con etiquetas y contadores debajo.

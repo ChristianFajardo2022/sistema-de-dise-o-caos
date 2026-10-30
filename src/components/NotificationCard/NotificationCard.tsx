@@ -15,8 +15,9 @@ import { CONTROL_ATTR, FIGMA_LOREM, focusNeighborNotification, hasContent, notif
 import { Badge } from '../Badge';
 import { cn } from '../../utils/cn';
 
+// Figma: 14963:6348
 /**
- * Tarjeta de notificación (set "Group notification (Atom)" de Figma, 14963:6348, Type Simple y Simple delete). Es un
+ * Tarjeta de notificación (set "Group notification (Atom)" de Figma, Type Simple y Simple delete). Es un
  * `<li>`: va dentro de una lista (`<ul role="list">`, como la del `NotificationPanel`).
  *
  * - Hora, título y descripción; `unread` pinta la tarjeta con relleno y el punto verde ("No leída" para lectores).

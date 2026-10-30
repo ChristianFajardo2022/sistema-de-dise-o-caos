@@ -21,30 +21,35 @@ import { cva } from 'class-variance-authority';
  * - Menú desplegable: hoja de todo el ancho bajo la barra con padding 20, gap 20; buscador de 40 y la lista de enlaces
  *   (34 de alto) separados por divisores (border/divider/md de 0.5 que no ocupa alto, `_internal/Divider`), gap 8.
  */
-export const headerVariants = cva('relative box-border block w-full');
+/** El `<header>` es contenedor: los huecos compactos (12) siguen a su ancho (menos de 48rem), no al de la ventana. */
+export const headerVariants = cva('@container relative box-border block w-full');
 
 export const headerBarVariants = cva('box-border flex w-full items-center bg-ds-background-container-surface', {
   variants: {
     layout: {
-      desktop: 'gap-ds-space-general-2xl px-ds-space-canva-lateral py-ds-space-general-3xl max-md:gap-ds-space-general-xl',
-      mobile: 'gap-ds-space-general-2xl p-ds-space-general-3xl max-md:gap-ds-space-general-xl',
+      desktop: 'gap-ds-space-general-2xl px-ds-space-canva-lateral py-ds-space-general-3xl @max-3xl:gap-ds-space-general-xl',
+      mobile: 'gap-ds-space-general-2xl p-ds-space-general-3xl @max-3xl:gap-ds-space-general-xl',
     },
   },
   defaultVariants: { layout: 'desktop' },
 });
 
-/** Zona izquierda: logo + navegación (desktop) o ícono de menú + logo (mobile). */
-export const headerStartVariants = cva('flex min-w-0 flex-1 items-center', {
+/**
+ * Zona izquierda: logo + navegación (desktop) o ícono de menú + logo (mobile). En escritorio no encoge por debajo de su
+ * contenido: si falta sitio cede primero el buscador (hasta su mínimo) y, si aun así no cabe, `layout="auto"` pasa a la
+ * composición móvil.
+ */
+export const headerStartVariants = cva('flex flex-1 items-center', {
   variants: {
     layout: {
-      desktop: 'gap-ds-space-general-2xl max-md:gap-ds-space-general-xl',
-      mobile: 'gap-ds-space-general-lg',
+      desktop: 'gap-ds-space-general-2xl @max-3xl:gap-ds-space-general-xl',
+      mobile: 'min-w-0 gap-ds-space-general-lg',
     },
   },
   defaultVariants: { layout: 'desktop' },
 });
 
-export const headerNavListClass = 'm-0 flex list-none items-center p-0 gap-ds-space-general-2xl max-md:gap-ds-space-general-xl';
+export const headerNavListClass = 'm-0 flex list-none items-center p-0 gap-ds-space-general-2xl @max-3xl:gap-ds-space-general-xl';
 
 /** Buscador de escritorio: 334 de ancho que cede si falta sitio. */
 export const headerSearchClass = 'm-0 w-83.5 min-w-40 shrink';

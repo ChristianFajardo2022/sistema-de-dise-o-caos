@@ -42,7 +42,8 @@ export const Positioned: Story = {
   ),
 };
 
-/** Status=Icon single y With text de Figma (set 21900:67738). */
+// Figma: 21900:67738
+/** Status=Icon single y With text de Figma. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'padded' },
   render: () => (

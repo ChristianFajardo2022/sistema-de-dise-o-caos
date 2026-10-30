@@ -26,7 +26,8 @@ const meta = {
       control: 'radio',
       options: TYPES,
       type: { name: 'enum', value: TYPES },
-      description: 'Type de Figma; thumbnail = set 15005:15958',
+      // Figma: thumbnail = set 15005:15958
+      description: 'Type de Figma; thumbnail = otro set de Figma (miniatura)',
     },
     title: { control: 'text', type: { name: 'string' }, description: 'Props Title text / Tittle de Figma' },
     description: { control: 'text', type: { name: 'string' }, description: 'Capa Status de Figma' },
@@ -65,21 +66,22 @@ type Story = StoryObj<typeof meta>;
 export const Interactive: Story = {
   args: { selection: 'checkbox' },
   render: (args: FileCardProps) => (
-    <div className={args.type === 'thumbnail' ? '' : args.type === 'photo' ? 'w-[344px]' : 'w-[498px]'}>
+    <div className={args.type === 'thumbnail' ? '' : args.type === 'photo' ? 'w-full max-w-[344px]' : 'w-full max-w-[498px]'}>
       <FileCard {...args} onMoreClick={fn()} onDownload={fn()} onDelete={fn()} />
     </div>
   ),
 };
 
-/** Set 14043:59452: cada variante una vez, con los textos de Figma. */
+// Figma: 14043:59452
+/** Set de Figma: cada variante una vez, con los textos de Figma. */
 export const FigmaMatrix: Story = {
   parameters: { layout: 'fullscreen' },
   decorators: [],
   render: () => (
-    <div className="flex w-fit flex-col gap-6 bg-ds-background-general-black p-6">
-      <div className="flex gap-6">
+    <div className="flex max-w-full flex-col gap-6 bg-ds-background-general-black p-6">
+      <div className="flex flex-wrap gap-6">
         {STATES.map((s) => (
-          <div key={s} className="flex w-[344px] flex-col gap-2">
+          <div key={s} className="flex w-full max-w-[344px] flex-col gap-2">
             <span className="text-xs text-ds-text-neutral-body">Type=Photo, State={s}</span>
             <FileCard
               type="photo"
@@ -92,9 +94,9 @@ export const FigmaMatrix: Story = {
           </div>
         ))}
       </div>
-      <div className="flex gap-6">
+      <div className="flex flex-wrap gap-6">
         {STATES.map((s) => (
-          <div key={s} className="flex w-[498px] flex-col gap-2">
+          <div key={s} className="flex w-full max-w-[498px] flex-col gap-2">
             <span className="text-xs text-ds-text-neutral-body">Type=Icon, State={s}</span>
             <FileCard
               type="icon"
@@ -112,12 +114,13 @@ export const FigmaMatrix: Story = {
   ),
 };
 
-/** Set 15005:15958 (miniatura): cada variante una vez. */
+// Figma: 15005:15958
+/** Set de Figma (miniatura): cada variante una vez. */
 export const FigmaMatrixThumbnail: Story = {
   parameters: { layout: 'fullscreen' },
   decorators: [],
   render: () => (
-    <div className="flex w-fit gap-6 bg-ds-background-general-black p-6">
+    <div className="flex max-w-full flex-wrap gap-6 bg-ds-background-general-black p-6">
       {STATES.map((s) => (
         <div key={s} className="flex flex-col gap-2">
           <span className="text-xs text-ds-text-neutral-body">State={s}</span>
@@ -140,14 +143,16 @@ export const FigmaMatrixThumbnail: Story = {
 /** Photo con foto (`src`). La imagen es un marcador: el sistema no incluye fotos de muestra. */
 export const WithPhoto: Story = {
   render: () => (
-    <div className="grid w-fit grid-cols-[344px_160px] items-start gap-6">
-      <FileCard
-        type="photo"
-        title="Portada de campaña.png"
-        description="Tamaño de archivo: 840 KB"
-        src={PHOTO_PLACEHOLDER}
-        onMoreClick={() => {}}
-      />
+    <div className="flex flex-wrap items-start gap-6">
+      <div className="w-full max-w-[344px]">
+        <FileCard
+          type="photo"
+          title="Portada de campaña.png"
+          description="Tamaño de archivo: 840 KB"
+          src={PHOTO_PLACEHOLDER}
+          onMoreClick={() => {}}
+        />
+      </div>
       <FileCard type="thumbnail" title="Portada de campaña.png" src={PHOTO_PLACEHOLDER} selection="checkbox" />
     </div>
   ),
@@ -157,7 +162,7 @@ function SelectionDemo() {
   const files = ['Contrato firmado.pdf', 'Anexo técnico.docx', 'Presupuesto 2027.xlsx'];
   const [selected, setSelected] = useState<string[]>([files[0]]);
   return (
-    <div className="flex w-[498px] flex-col gap-4">
+    <div className="flex w-full max-w-[498px] flex-col gap-4">
       <p className="m-0 text-sm text-ds-text-neutral-body" data-testid="count">
         {selected.length} seleccionados
       </p>
@@ -184,7 +189,7 @@ export const MultipleSelection: Story = {
 /** Elección única: con `selection="radio"` y el mismo `name`, las flechas mueven la selección. */
 export const SingleSelection: Story = {
   render: () => (
-    <fieldset className="m-0 flex w-[498px] flex-col gap-4 border-0 p-0">
+    <fieldset className="m-0 flex w-full max-w-[498px] flex-col gap-4 border-0 p-0">
       <legend className="mb-2 text-sm text-ds-text-neutral-body">Archivo principal</legend>
       <FileCard type="icon" title="Versión A.pdf" description="Tamaño de archivo: 23 KB" selection="radio" name="principal" value="a" defaultChecked />
       <FileCard type="icon" title="Versión B.pdf" description="Tamaño de archivo: 25 KB" selection="radio" name="principal" value="b" />
@@ -195,7 +200,7 @@ export const SingleSelection: Story = {
 /** Miniaturas: Descargar y Eliminar aparecen con hover o al llegar con Tab. */
 export const Thumbnails: Story = {
   render: () => (
-    <div className="flex gap-4">
+    <div className="flex flex-wrap gap-4">
       {['Plano planta baja.png', 'Plano planta alta.png', 'Fachada.png'].map((f) => (
         <FileCard key={f} type="thumbnail" title={f} selection="checkbox" onDownload={() => {}} onDelete={() => {}} />
       ))}
