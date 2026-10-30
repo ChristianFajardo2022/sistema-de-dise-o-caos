@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from '../components/Tabs';
 import { CodeReference } from './CodeReference';
+import type { DocLive } from './DocDevelopment';
 import { DocAnatomyV2, DocBreakpointsV2, DocFigmaV2, DocStatesV2, DocTokensV2 } from './DocV2';
 import {
   DocAnatomy,
@@ -68,25 +70,54 @@ function Sections({ sections }: { sections: DocSectionContent[] }) {
 interface ComponentDocProps {
   /** Contenido del componente (`<Nombre>.doc.tsx`). */
   doc: ComponentDocContent;
-  /** Referencia de código. Sin ella esa parte no aparece. */
+  /** Referencia de código. Sin ella la pestaña Desarrollo no aparece. */
   code?: DocCodeReference;
-  /** Lienzo interactivo y Controls de Storybook (solo en la página Docs). En Desarrollo reemplazan a la tabla de props. */
-  interactive?: ReactNode;
+  /** Conexión con la historia principal (solo en la página Docs): lienzo, código generado y controles. */
+  live?: DocLive;
 }
 
 /**
- * Página de documentación de un componente (plantilla "Documentación" de Figma): encabezado con ícono, nombre y
- * descripción, y debajo, seguidas, las secciones de Definición, las de Aplicación y la referencia de código ("Desarrollo"). Las
- * pestañas (chips) del encabezado de Figma no van por ahora y las secciones no llevan número.
+ * Página de documentación de un componente (plantilla "Documentación" de Figma): encabezado con ícono, nombre,
+ * descripción y pestañas (`Tabs` de CAOS): Definición, Aplicación y Desarrollo (la referencia de código). Cada
+ * pestaña muestra sus secciones; las secciones no llevan número.
  * La raíz es un `<main>`; ocupa todo el ancho disponible (hasta 1440).
  */
-export function ComponentDoc({ doc, code, interactive }: ComponentDocProps) {
+export function ComponentDoc({ doc, code, live }: ComponentDocProps) {
   return (
     <main className="sb-unstyled mx-auto min-h-dvh w-full max-w-[1440px] bg-ds-background-container-surface font-ds-primitives-typography-family-primary text-ds-text-neutral-body">
-      <DocHeader icon={doc.icon} name={doc.name} summary={doc.summary} />
-      <Sections sections={doc.definition} />
-      <Sections sections={doc.application} />
-      {code && <CodeReference {...code} interactive={interactive} />}
+      <Tabs defaultValue="definicion" size="md" contrast="on-canva">
+        <DocHeader
+          icon={doc.icon}
+          name={doc.name}
+          summary={doc.summary}
+          tabs={
+            <TabList aria-label="Secciones de la documentación">
+              <Tab value="definicion" icon="document-text">
+                Definición
+              </Tab>
+              <Tab value="aplicacion" icon="gallery-edit">
+                Aplicación
+              </Tab>
+              {code && (
+                <Tab value="desarrollo" icon="code">
+                  Desarrollo
+                </Tab>
+              )}
+            </TabList>
+          }
+        />
+        <TabPanel value="definicion" focusable={false}>
+          <Sections sections={doc.definition} />
+        </TabPanel>
+        <TabPanel value="aplicacion" focusable={false}>
+          <Sections sections={doc.application} />
+        </TabPanel>
+        {code && (
+          <TabPanel value="desarrollo" focusable={false}>
+            <CodeReference {...code} live={live} />
+          </TabPanel>
+        )}
+      </Tabs>
     </main>
   );
 }

@@ -369,7 +369,7 @@ export const ToggletipTest: Story = {
 
 /**
  * La página de documentación (la misma de la pestaña Docs) como historia: así las pruebas y axe la revisan. Sin
- * pestañas: Definición, Aplicación y Código van seguidas, con los encabezados numerados de corrido.
+ * pestañas del encabezado (Definición, Aplicación y Desarrollo), cada una con su panel.
  */
 export const DocPageTest: Story = {
   tags: ['!autodocs'],
@@ -378,21 +378,29 @@ export const DocPageTest: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     expect(canvas.getByRole('heading', { level: 1, name: 'Tooltip' })).toBeInTheDocument();
-    expect(canvas.queryAllByRole('tab')).toHaveLength(0);
-    // Definición (5 secciones) y Aplicación (2), seguidas y sin número
-    const h2 = canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    expect(h2.slice(0, 7)).toEqual([
+    // Pestañas del encabezado: cada una muestra su panel
+    const tabs = canvas.getAllByRole('tab');
+    expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    // Definición (5 secciones), sin número
+    expect(h2()).toEqual([
       'Definición del componente',
       'Propósito y anatomía',
       'Propiedades y variantes',
       'Estados y especificaciones de layout',
       'Estados compuestos y ejemplos base',
-      'Comportamiento y reglas de uso',
-      'Buenas y malas prácticas (Dos and Don’ts)',
     ]);
     for (const n of ['01', '05', '06', '07']) expect(canvas.queryByText(n)).not.toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    expect(h2()).toEqual(['Comportamiento y reglas de uso', 'Buenas y malas prácticas (Dos and Don’ts)']);
     expect(canvas.getAllByRole('img', { name: 'Buena práctica' })).toHaveLength(4);
-    // Al final, la referencia de código con la tabla de props
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    // Referencia de código: tabla de props (de solo lectura sin Storybook)
     const props = canvas.getByRole('table', { name: 'Props de Tooltip' });
     expect(within(props).getByRole('rowheader', { name: /content/ })).toBeInTheDocument();
   },

@@ -1,44 +1,20 @@
-import type { ReactNode } from 'react';
-import { ScrollRegion } from '../foundations/_doc/ScrollRegion';
-import { cn } from '../utils/cn';
-import { DocCard, DocSection, DocTable } from './DocParts';
-import type { DocCodeExample, DocCodeReference, DocPropRow } from './types';
+import { DocCodeBlock } from './DocCodeBlock';
+import { DocDevelopment } from './DocDevelopment';
+import type { DocLive } from './DocDevelopment';
+import { DocCard, DocSection } from './DocParts';
+import type { DocCodeExample, DocCodeReference } from './types';
+
+export { DocCodeBlock };
 
 /** Nombre del paquete (package.json) para la línea de importación. */
 const PACKAGE = 'caos-design-system';
 
-const code = 'font-mono text-ds-primitives-typography-size-sm leading-ds-primitives-typography-line-height-xl text-ds-text-neutral-heading';
-
-/** Bloque de código con scroll horizontal propio (enfocable solo si desborda). */
-export function DocCodeBlock({ children, label }: { children: string; label: string }) {
-  return (
-    <ScrollRegion label={label} className={cn('rounded-ds-radius-general-lg border border-ds-border-general-default-on-canva bg-ds-background-container-surface')}>
-      <pre className={cn('m-0 w-max min-w-full p-ds-space-general-2xl', code)}>
-        <code>{children}</code>
-      </pre>
-    </ScrollRegion>
-  );
-}
-
-function PropName({ row }: { row: DocPropRow }) {
-  return (
-    <>
-      <code>{row.name}</code>
-      {row.required && (
-        <span className="text-ds-icon-semantic-error-firts">
-          <span aria-hidden="true"> *</span>
-          <span className="sr-only"> (obligatoria)</span>
-        </span>
-      )}
-    </>
-  );
-}
-
 /**
- * Pestaña Código: importación, tabla de props reales (nombre, tipo, valor por defecto, descripción) y ejemplos.
- * Las props salen del ArgTypes de Storybook (docgen del código) o de `<Nombre>.docs.json`.
+ * Pestaña Desarrollo: importación, lienzo con la historia principal, código generado de los args, tabla de props con
+ * controles (todo con componentes de CAOS, ver `DocDevelopment`) y ejemplos. Las props salen del ArgTypes de Storybook
+ * (docgen del código) o de `<Nombre>.docs.json`. Sin `live` la tabla es de solo lectura.
  */
-export function CodeReference({ importName, related = [], props, examples = [], interactive }: DocCodeReference & { interactive?: ReactNode }) {
+export function CodeReference({ importName, related = [], props, examples = [], live }: DocCodeReference & { live?: DocLive }) {
   const names = [importName, ...related].join(', ');
   return (
     <>
@@ -52,25 +28,7 @@ export function CodeReference({ importName, related = [], props, examples = [], 
         }
       >
         <DocCodeBlock label="Importación">{`import { ${names} } from '${PACKAGE}';`}</DocCodeBlock>
-        {interactive ? (
-          // Lienzo interactivo y Controls de Storybook: cubren la tabla de props (nombre, descripción, valor por defecto, control)
-          // (con scroll horizontal propio si la tabla no cabe en pantallas angostas)
-          <ScrollRegion label="Lienzo interactivo y controles">
-            <div className="flex min-w-[600px] flex-col gap-ds-primitives-space-5xl">{interactive}</div>
-          </ScrollRegion>
-        ) : (
-        <DocTable
-          caption={`Props de ${importName}`}
-          columns={['Prop', 'Tipo', 'Por defecto', 'Descripción']}
-          minWidth={720}
-          rows={props.map((row) => [
-            <PropName key="n" row={row} />,
-            row.type ? <code key="t">{row.type}</code> : '—',
-            row.defaultValue ? <code key="d">{row.defaultValue}</code> : '—',
-            row.description ?? '',
-          ])}
-        />
-        )}
+        <DocDevelopment importName={importName} props={props} live={live} />
       </DocSection>
       {examples.length > 0 && (
         <DocSection title="Ejemplos de uso" description="Fragmentos listos para copiar.">

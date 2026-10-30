@@ -36,15 +36,17 @@ interface DocHeaderProps {
   name: string;
   /** Descripción bajo el nombre. */
   summary: ReactNode;
+  /** Pestañas (`TabList` de CAOS) debajo de la descripción, centradas. Sin ellas el encabezado no las muestra. */
+  tabs?: ReactNode;
 }
 
 // Figma: 14321:54945
 /**
  * Encabezado ("Header document (Atom)"): degradado background/container/surface → background/degrade/nav
  * bar/0 %, decorado de líneas, ícono en tarjeta de 64 con Shadow sm, nombre (heading 2xl, Prospero) y descripción
- * (body lg, de hasta 726 de ancho), con 24 entre las tres piezas. Sin las pestañas (chips) de Figma por ahora.
+ * (body lg, de hasta 726 de ancho), con 24 entre las tres piezas y, si se pasan, las pestañas (`Tabs` de CAOS) a 56 del texto.
  */
-export function DocHeader({ icon, name, summary }: DocHeaderProps) {
+export function DocHeader({ icon, name, summary, tabs }: DocHeaderProps) {
   return (
     <header className="relative isolate overflow-hidden bg-linear-to-b from-ds-background-container-surface to-ds-background-degrade-nav-bar-0 backdrop-blur-[6px]">
       <DocDecor />
@@ -66,6 +68,8 @@ export function DocHeader({ icon, name, summary }: DocHeaderProps) {
         >
           {summary}
         </div>
+        {/* Figma: set "Tab" del encabezado; 56 bajo el texto (24 del gap + 32) */}
+        {tabs && <div className="mt-ds-primitives-space-5xl max-w-full">{tabs}</div>}
       </div>
     </header>
   );

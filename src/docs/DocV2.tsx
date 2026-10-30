@@ -80,14 +80,23 @@ export function DocDotsCanvas({ children, className, ...rest }: { children: Reac
   );
 }
 
-/** Marcador numerado ("Marker anatomy"): círculo de 24, fondo blanco y número semibold 12 en negro. */
-function Marker({ n, className, style }: { n: number; className?: string; style?: CSSProperties }) {
+/**
+ * Marcador numerado ("Marker anatomy"), círculo de 24 con el número bold 12. Dos aspectos, como en Figma:
+ * - `canvas` (sobre el lienzo, junto a la parte): sin relleno, borde de 1 px `border/acent/purpple` y número en
+ *   `text/acent/firts`; su línea guía va en `background/acent/tertiary`.
+ * - `list` (en las pautas numeradas): relleno `background/general/white` y número en `text/neutral/black`.
+ */
+// Figma: marcador del lienzo 22430:82308; marcador de las pautas 22458:90585
+function Marker({ n, variant, className, style }: { n: number; variant: 'canvas' | 'list'; className?: string; style?: CSSProperties }) {
   return (
     <span
       aria-hidden="true"
       style={style}
       className={cn(
-        'flex size-6 shrink-0 items-center justify-center rounded-ds-radius-general-full bg-ds-background-general-white font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm leading-ds-primitives-typography-line-height-sm font-ds-primitives-typography-weight-semibold text-ds-text-neutral-black tabular-nums',
+        'flex size-6 shrink-0 items-center justify-center rounded-ds-radius-general-full font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm leading-ds-primitives-typography-line-height-sm font-ds-primitives-typography-weight-bold tabular-nums',
+        variant === 'canvas'
+          ? 'border border-solid border-ds-border-acent-purpple text-ds-text-acent-firts'
+          : 'bg-ds-background-general-white text-ds-text-neutral-black',
         className,
       )}
     >
@@ -102,7 +111,7 @@ function Guidelines({ items }: { items: DocInline[] }) {
     <ol className="m-0 flex list-none flex-col gap-ds-space-general-3xl p-0">
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-ds-space-general-lg">
-          <Marker n={i + 1} />
+          <Marker n={i + 1} variant="list" />
           <span className={cn(docBody, 'pt-ds-space-general-sm')}>{item}</span>
         </li>
       ))}
@@ -112,8 +121,10 @@ function Guidelines({ items }: { items: DocInline[] }) {
 
 // ───────────────────────── anatomía ─────────────────────────
 
-/** Distancia (px) del marcador a su parte. */
+/** Distancia (px) del centro del marcador a su parte. */
 const GUIDE = 40;
+/** Radio del marcador: la línea guía nace en el borde del círculo, no en el número (el marcador no tiene relleno). */
+const MARKER_RADIUS = 12;
 /** Cuánto sobresalen de la parte las líneas de borde de una cota, y a qué distancia queda su etiqueta. */
 const OVERSHOOT = 8;
 const LABEL_GAP = 16;
@@ -131,7 +142,8 @@ interface Band {
   y: number;
   w: number;
   h: number;
-  tone: 'padding' | 'gap';
+  /** Eje del espacio medido: `x` horizontal (banda vertical, violeta) o `y` vertical (banda horizontal, verde). */
+  axis: 'x' | 'y';
   value: number;
   /** Líneas de borde de 1 px (extremos) y posición de la etiqueta, fuera del componente. */
   edges: [number, number, number, number][];
@@ -183,10 +195,10 @@ function measureMarkers(root: HTMLElement, view: HTMLElement, canvas: DocAnatomy
   return found.map(({ m, r }) => {
     const cx = r.l + r.w / 2;
     const cy = r.t + r.h / 2;
-    if (m.side === 'top') return { n: m.n, x: cx, y: edge.top - GUIDE, line: [cx, edge.top - GUIDE, cx, r.t] };
-    if (m.side === 'bottom') return { n: m.n, x: cx, y: edge.bottom + GUIDE, line: [cx, edge.bottom + GUIDE, cx, r.b] };
-    if (m.side === 'left') return { n: m.n, x: edge.left - GUIDE, y: cy, line: [edge.left - GUIDE, cy, r.l, cy] };
-    return { n: m.n, x: edge.right + GUIDE, y: cy, line: [edge.right + GUIDE, cy, r.r, cy] };
+    if (m.side === 'top') return { n: m.n, x: cx, y: edge.top - GUIDE, line: [cx, edge.top - GUIDE + MARKER_RADIUS, cx, r.t] };
+    if (m.side === 'bottom') return { n: m.n, x: cx, y: edge.bottom + GUIDE, line: [cx, edge.bottom + GUIDE - MARKER_RADIUS, cx, r.b] };
+    if (m.side === 'left') return { n: m.n, x: edge.left - GUIDE, y: cy, line: [edge.left - GUIDE + MARKER_RADIUS, cy, r.l, cy] };
+    return { n: m.n, x: edge.right + GUIDE, y: cy, line: [edge.right + GUIDE - MARKER_RADIUS, cy, r.r, cy] };
   });
 }
 
@@ -215,7 +227,7 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
       const vertical = d.side === 'left' || d.side === 'right';
       out.bands.push({
         ...band,
-        tone: 'padding',
+        axis: vertical ? 'x' : 'y',
         value: round1(value),
         edges: vertical
           ? [[band.x, r.t - OVERSHOOT, band.x, r.b + OVERSHOOT], [band.x + band.w, r.t - OVERSHOOT, band.x + band.w, r.b + OVERSHOOT]]
@@ -239,7 +251,8 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
         y: top,
         w,
         h: bottom - top,
-        tone: 'gap',
+        // La separación se mide entre elementos en fila: espacio horizontal
+        axis: 'x',
         value: round1(w),
         edges: [[ra.r, hr.t - OVERSHOOT, ra.r, hr.b + OVERSHOOT], [rb.l, hr.t - OVERSHOOT, rb.l, hr.b + OVERSHOOT]],
         label: { x: ra.r + w / 2, y: hr.b + OVERSHOOT + LABEL_GAP },
@@ -256,16 +269,17 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
 
 /**
  * Cifra de una cota ("Spacer" de Figma): etiqueta de radio 4 con padding 3/1 y texto blanco, fuera del componente.
- * El violeta es `background/graphic/acent-secondary`; el verde, `background/graphic/success-secondary`.
+ * Color por eje, como en Figma: espacio horizontal en violeta (`background/graphic/acent-secondary`), vertical en verde
+ * (`background/graphic/success-secondary`); los altos de Tamaños en gris.
  */
-function ValueChip({ x, y, value, tone }: { x: number; y: number; value: number; tone: 'padding' | 'gap' | 'size' }) {
+function ValueChip({ x, y, value, tone }: { x: number; y: number; value: number; tone: Band['axis'] | 'size' }) {
   return (
     <span
       className={cn(
         'absolute flex h-3.5 min-w-3.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-ds-radius-general-sm px-0.5 font-ds-primitives-typography-weight-semibold text-ds-text-neutral-white-unicolor tabular-nums',
         xs,
-        tone === 'padding' && 'bg-ds-background-graphic-acent-secondary',
-        tone === 'gap' && 'bg-ds-background-graphic-success-secondary',
+        tone === 'x' && 'bg-ds-background-graphic-acent-secondary',
+        tone === 'y' && 'bg-ds-background-graphic-success-secondary',
         tone === 'size' && 'bg-ds-background-graphic-neutral-secondary',
       )}
       style={{ left: x, top: y }}
@@ -325,28 +339,29 @@ function AnatomyCanvas({ canvas }: { canvas: DocAnatomyCanvas }) {
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-ds-text-neutral-heading">
             <svg className="absolute inset-0 size-full overflow-visible">
               {dims.bands.map((b, i) => (
-                <g key={`b${i}`} className={b.tone === 'padding' ? 'text-ds-background-graphic-acent-secondary' : 'text-ds-background-graphic-success-secondary'}>
-                  <rect x={b.x} y={b.y} width={b.w} height={b.h} className={b.tone === 'padding' ? 'fill-ds-background-graphic-acent-secondary-opacity' : 'fill-ds-background-graphic-success-secondary-opacity'} />
+                <g key={`b${i}`} className={b.axis === 'x' ? 'text-ds-background-graphic-acent-secondary' : 'text-ds-background-graphic-success-secondary'}>
+                  <rect x={b.x} y={b.y} width={b.w} height={b.h} className={b.axis === 'x' ? 'fill-ds-background-graphic-acent-secondary-opacity' : 'fill-ds-background-graphic-success-secondary-opacity'} />
                   {b.edges.map((e, k) => (
                     <line key={k} x1={e[0]} y1={e[1]} x2={e[2]} y2={e[3]} stroke="currentColor" strokeWidth={1} />
                   ))}
                 </g>
               ))}
+              {/* Línea guía del color del marcador */}
               {markers.map((m) => (
-                <line key={`l${m.n}`} x1={m.line[0]} y1={m.line[1]} x2={m.line[2]} y2={m.line[3]} stroke="currentColor" strokeWidth={1} />
+                <line key={`l${m.n}`} x1={m.line[0]} y1={m.line[1]} x2={m.line[2]} y2={m.line[3]} stroke="currentColor" strokeWidth={1} className="text-ds-background-acent-tertiary" />
               ))}
               {dims.brackets.map((b, i) => (
                 <path key={`k${i}`} d={`M${b.x - 4} ${b.y1}H${b.x}V${b.y2}H${b.x - 4}`} fill="none" stroke="currentColor" strokeWidth={1} />
               ))}
             </svg>
             {dims.bands.map((b, i) => (
-              <ValueChip key={`v${i}`} x={b.label.x} y={b.label.y} value={b.value} tone={b.tone} />
+              <ValueChip key={`v${i}`} x={b.label.x} y={b.label.y} value={b.value} tone={b.axis} />
             ))}
             {dims.brackets.map((b, i) => (
               <ValueChip key={`s${i}`} x={b.x + 14} y={(b.y1 + b.y2) / 2} value={b.value} tone="size" />
             ))}
             {markers.map((m) => (
-              <Marker key={`m${m.n}`} n={m.n} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: m.x, top: m.y }} />
+              <Marker key={`m${m.n}`} n={m.n} variant="canvas" className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: m.x, top: m.y }} />
             ))}
           </div>
         </div>

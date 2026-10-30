@@ -409,9 +409,10 @@ import {
   toogleIcon,
   gridIcon,
   rowVerticalIcon,
+  codeIcon,
 } from './icons.generated';
 
-/** Nombres de todos los íconos de la biblioteca (408) */
+/** Nombres de todos los íconos de la biblioteca (409) */
 export type IconName =
   | "ac"
   | "add"
@@ -821,9 +822,10 @@ export type IconName =
   | "toogle"
   | "grid"
   | "row-vertical"
+  | "code"
 ;
 
-/** Registro completo: importarlo arrastra los 408 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
+/** Registro completo: importarlo arrastra los 409 íconos. Para tree-shaking usa los exports sueltos de icons.generated */
 export const caosIcons: Record<IconName, CaosIconData> = {
   "ac": acIcon,
   "add": addIcon,
@@ -1233,6 +1235,7 @@ export const caosIcons: Record<IconName, CaosIconData> = {
   "toogle": toogleIcon,
   "grid": gridIcon,
   "row-vertical": rowVerticalIcon,
+  "code": codeIcon,
 };
 
 /** Categoría de cada ícono según Figma */
@@ -1645,4 +1648,5 @@ export const caosIconCategories: Record<IconName, string> = {
   "toogle": "Settings",
   "grid": "Settings",
   "row-vertical": "Settings",
+  "code": "Files",
 };

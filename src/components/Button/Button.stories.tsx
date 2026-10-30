@@ -317,17 +317,25 @@ export const DocPageTest: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('heading', { level: 1, name: 'Button' })).toBeInTheDocument();
-    await expect(canvas.queryAllByRole('tab')).toHaveLength(0);
-    const h2 = canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    await expect(h2.slice(0, 7)).toEqual([
-      'Anatomía',
-      'Estados',
-      'Tokens y modos',
-      'Uso del componente Button en Figma:',
-      'Comportamiento',
-      'Aplicaciones de breakpoints',
-      'Do and Dont’s',
-    ]);
+    // Pestañas del encabezado: Definición, Aplicación y Desarrollo; cada una muestra su panel
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Button en Figma:']);
     await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática)
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Ejemplos de uso']);
+    // Sin Storybook no hay lienzo ni código: la tabla de props queda de solo lectura con los valores por defecto
+    const props = canvas.getByRole('table', { name: 'Props de Button' });
+    await expect(within(props).getByRole('rowheader', { name: /variant/ })).toBeInTheDocument();
+    await expect(canvas.getByRole('switch', { name: 'unicolor' })).toBeDisabled();
+    await expect(canvas.queryByRole('button', { name: 'Restablecer' })).not.toBeInTheDocument();
   },
 };

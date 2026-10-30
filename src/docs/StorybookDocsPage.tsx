@@ -1,11 +1,12 @@
-import { useContext, useEffect, useMemo } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Controls, DocsContainer, DocsContext, Markdown, Primary, SourceContainer, Stories, Subtitle, useOf } from '@storybook/addon-docs/blocks';
-import { ThemeProvider } from 'storybook/theming';
-import { caosStorybookTheme } from './caosTheme';
+import { Controls, DocsContainer, DocsContext, Markdown, Primary, Stories, Story, Subtitle, useOf } from '@storybook/addon-docs/blocks';
+import { RESET_STORY_ARGS, STORY_ARGS_UPDATED, UPDATE_STORY_ARGS } from 'storybook/internal/core-events';
 import type { DocsContainerProps } from '@storybook/addon-docs/blocks';
 import type { IconName } from '../components/Icon/Icon.types';
 import { ComponentDoc } from './ComponentDoc';
+import type { DocLive } from './DocDevelopment';
+import type { LiveArgType } from './liveCode';
 import { DocHeader } from './DocParts';
 import { codeFromDocsJson, propsFromArgTypes } from './code';
 import type { ArgTypeLike, DocsJson } from './code';
@@ -32,25 +33,12 @@ function useDocsTheme(): 'dark' | 'light' {
   return globals?.['theme'] === 'light' ? 'light' : 'dark';
 }
 
-/** Tema de Storybook con los colores de CAOS, en el modo de la página (para sus bloques `Primary` y `Controls`). */
-function CaosThemeProvider({ children }: { children: ReactNode }) {
-  const mode = useDocsTheme();
-  const theme = useMemo(() => caosStorybookTheme(mode), [mode]);
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
-}
-
 /**
  * Contenedor de docs sin el envoltorio de Storybook (que limita el ancho a 1000 px y aplica su tipografía): solo el
- * contexto de docs, el contexto del código fuente (para "Show code") y el tema de CAOS, que es lo que necesitan sus bloques.
+ * contexto de docs, que es lo que necesitan `useOf` y el bloque `Story`. Ninguna interfaz de Storybook queda a la vista.
  */
 export function ComponentDocsContainer({ context, children }: DocsContainerProps & { children?: ReactNode }) {
-  return (
-    <DocsContext.Provider value={context}>
-      <SourceContainer channel={context.channel}>
-        <CaosThemeProvider>{children}</CaosThemeProvider>
-      </SourceContainer>
-    </DocsContext.Provider>
-  );
+  return <DocsContext.Provider value={context}>{children}</DocsContext.Provider>;
 }
 
 function ThemeSync() {
@@ -64,13 +52,41 @@ function ThemeSync() {
   return null;
 }
 
-/** Lienzo interactivo de la historia principal (con Show code / Copy code) y tabla de Controls enlazada a él. */
-function DevelopmentBlocks() {
-  return (
-    <>
-      <Primary />
-      <Controls />
-    </>
+/**
+ * Conexión con la historia principal (la primera con `autodocs`): la historia para dibujarla, sus args al día (canal
+ * `STORY_ARGS_UPDATED`) y cómo cambiarlos o restablecerlos (`UPDATE_STORY_ARGS` y `RESET_STORY_ARGS`).
+ */
+function useLiveStory(): DocLive | undefined {
+  const context = useContext(DocsContext);
+  const stories = context.componentStories();
+  const story = stories.find((st) => st.tags.includes('autodocs')) ?? stories[0];
+  const storyId = story?.id ?? '';
+  const [args, setArgs] = useState<Record<string, unknown>>(() => (story ? context.getStoryContext(story).args : {}));
+  useEffect(() => {
+    const onUpdated = (changed: { storyId: string; args: Record<string, unknown> }) => {
+      if (changed.storyId === storyId) setArgs(changed.args);
+    };
+    context.channel.on(STORY_ARGS_UPDATED, onUpdated);
+    return () => context.channel.off(STORY_ARGS_UPDATED, onUpdated);
+  }, [context.channel, storyId]);
+  const updateArgs = useCallback(
+    (updatedArgs: Record<string, unknown>) => context.channel.emit(UPDATE_STORY_ARGS, { storyId, updatedArgs }),
+    [context.channel, storyId],
+  );
+  const resetArgs = useCallback(() => context.channel.emit(RESET_STORY_ARGS, { storyId }), [context.channel, storyId]);
+  return useMemo(
+    () =>
+      story
+        ? {
+            storyId,
+            story: <Story of={story.moduleExport} />,
+            args,
+            argTypes: story.argTypes as Record<string, LiveArgType>,
+            updateArgs,
+            resetArgs,
+          }
+        : undefined,
+    [story, storyId, args, updateArgs, resetArgs],
   );
 }
 
@@ -80,6 +96,7 @@ export function ComponentDocsPage({ doc, docsJson }: { doc: ComponentDocContent;
   const argTypes = (meta.preparedMeta.argTypes ?? {}) as Record<string, ArgTypeLike>;
   const fromJson = docsJson ? codeFromDocsJson(docsJson) : undefined;
   const fromArgTypes = propsFromArgTypes(argTypes, docsJson);
+  const live = useLiveStory();
   const code: DocCodeReference = {
     importName: fromJson?.importName ?? doc.name,
     related: fromJson?.related,
@@ -89,7 +106,7 @@ export function ComponentDocsPage({ doc, docsJson }: { doc: ComponentDocContent;
   return (
     <>
       <ThemeSync />
-      <ComponentDoc doc={doc} code={code} interactive={<DevelopmentBlocks />} />
+      <ComponentDoc doc={doc} code={code} live={live} />
     </>
   );
 }
