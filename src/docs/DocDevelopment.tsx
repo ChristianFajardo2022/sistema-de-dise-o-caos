@@ -29,8 +29,13 @@ export interface DocLive {
   storyId: string;
   /** La historia dibujada (bloque `Story` de Storybook, sin su marco). */
   story: ReactNode;
-  /** Args actuales de la historia. */
+  /** Args actuales de la historia (los de los controles). */
   args: Record<string, unknown>;
+  /**
+   * Args con los que la historia dibuja el componente, si su `render` los ajusta (`parameters.docsLive.args`; p. ej.
+   * Button con `iconOnly` cambia el texto por un ícono). El código generado sale de estos, para que coincida con el lienzo.
+   */
+  renderedArgs?: Record<string, unknown>;
   /** ArgTypes de la historia (controles declarados). */
   argTypes: Record<string, LiveArgType>;
   /** Cambia args (llega a la historia por el canal de Storybook). */
@@ -130,12 +135,13 @@ function DocCanvas({ live }: { live: DocLive }) {
         {/*
           `zoom` escala el contenido y su espacio en el flujo; el marco del lienzo no cambia. El decorador global de tema
           (.storybook/ThemeWrapper) pinta fondo y relleno propios alrededor de la historia: aquí se anulan para que el
-          componente quede sobre el lienzo (la historia que se abre sola en otra pestaña sí los conserva).
+          componente quede sobre el lienzo (la historia que se abre sola en otra pestaña sí los conserva). El contenedor ocupa
+          todo el ancho y centra la historia: así una prop de ancho completo (`fullWidth`) llega al ancho del lienzo.
         */}
         <div
           data-doc-zoom=""
           style={{ zoom }}
-          className="max-w-full [&>.sb-story>div>div]:min-h-0! [&>.sb-story>div>div]:bg-transparent! [&>.sb-story>div>div]:p-0!"
+          className="w-full max-w-full [&>.sb-story>div>div]:flex [&>.sb-story>div>div]:justify-center [&>.sb-story>div>div]:min-h-0! [&>.sb-story>div>div]:bg-transparent! [&>.sb-story>div>div]:p-0!"
         >
           {live.story}
         </div>
@@ -491,7 +497,7 @@ export function DocDevelopment({
     if (!live) return '';
     const defaults: Record<string, string | number | boolean | undefined> = {};
     for (const row of props) defaults[row.name] = defaultValueOf(row, controlFor(live.argTypes[row.name], row.type));
-    return buildCode(importName, live.args, defaults);
+    return buildCode(importName, live.renderedArgs ?? live.args, defaults);
   }, [importName, props, live]);
 
   return (

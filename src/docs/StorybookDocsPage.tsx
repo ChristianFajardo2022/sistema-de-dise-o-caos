@@ -56,6 +56,14 @@ function ThemeSync() {
  * Conexión con la historia principal (la primera con `autodocs`): la historia para dibujarla, sus args al día (canal
  * `STORY_ARGS_UPDATED`) y cómo cambiarlos o restablecerlos (`UPDATE_STORY_ARGS` y `RESET_STORY_ARGS`).
  */
+/**
+ * `parameters.docsLive` de una historia: `args` transforma los args de los controles en los que usa su `render`, para
+ * que el código generado de la sección Desarrollo coincida con lo que se ve en el lienzo.
+ */
+export interface DocsLiveParameters {
+  args?: (args: Record<string, unknown>) => Record<string, unknown>;
+}
+
 function useLiveStory(): DocLive | undefined {
   const context = useContext(DocsContext);
   const stories = context.componentStories();
@@ -81,6 +89,7 @@ function useLiveStory(): DocLive | undefined {
             storyId,
             story: <Story of={story.moduleExport} />,
             args,
+            renderedArgs: (story.parameters as { docsLive?: DocsLiveParameters }).docsLive?.args?.(args),
             argTypes: story.argTypes as Record<string, LiveArgType>,
             updateArgs,
             resetArgs,

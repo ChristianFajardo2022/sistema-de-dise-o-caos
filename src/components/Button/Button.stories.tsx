@@ -19,11 +19,36 @@ type ButtonArgs = ButtonBaseProps & { iconOnly?: boolean };
 /** Omit que conserva la unión discriminada de ButtonProps */
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
 
+/**
+ * Args de los controles → props del botón. Lo usan el `render` y el código de la documentación (`docsLive`), así lienzo
+ * y código coinciden; las historias que ya pasan elementos no cambian.
+ * - `leftIcon` / `rightIcon` en `true` (interruptores de Personalizar) se dibujan con `AddIcon` y `ArrowRightIcon`.
+ * - Con `iconOnly` el contenido es un ícono y el nombre accesible es obligatorio: si el contenido es texto (el control
+ *   `children`), se dibuja `AddIcon` con `aria-label="Agregar"`.
+ */
+function iconOnlyArgs(args: Record<string, unknown>): Record<string, unknown> {
+  const out = { ...args };
+  if (out['leftIcon'] === true) out['leftIcon'] = <AddIcon />;
+  else if (out['leftIcon'] === false) delete out['leftIcon'];
+  if (out['rightIcon'] === true) out['rightIcon'] = <ArrowRightIcon />;
+  else if (out['rightIcon'] === false) delete out['rightIcon'];
+  if (out['iconOnly'] && typeof out['children'] === 'string') {
+    out['children'] = <AddIcon />;
+    out['aria-label'] = out['aria-label'] ?? 'Agregar';
+  }
+  return out;
+}
+
 const meta: Meta<ButtonArgs> = {
   title: 'General Controls/Button',
   component: Button as unknown as ComponentType<ButtonArgs>,
   tags: ['autodocs'],
-  parameters: { docs: componentDocsParameters(doc, docsJson) },
+  render: (args) => {
+    const button = <Button {...(iconOnlyArgs(args as Record<string, unknown>) as ButtonProps)} />;
+    // Unicolor es para fondos de foto o color: sobre N01, como en la matriz de estados, para que se lea también en claro
+    return args.unicolor ? <div className="rounded-ds-radius-general-md bg-ds-primitives-color-primary-n01 p-ds-space-general-2xl">{button}</div> : button;
+  },
+  parameters: { docs: componentDocsParameters(doc, docsJson), docsLive: { args: iconOnlyArgs } },
   // Tipos explícitos: con la unión discriminada de ButtonProps el docgen no los infiere y Storybook descarta los args de la URL
   argTypes: argTypesFromDocsJson(docsJson, {
     variant: {
@@ -70,6 +95,9 @@ const meta: Meta<ButtonArgs> = {
       control: 'boolean',
       description: 'Icon-single: botón cuadrado solo con ícono',
     },
+    // Interruptores: en true se dibujan con AddIcon / ArrowRightIcon (ver iconOnlyArgs)
+    leftIcon: { control: 'boolean' },
+    rightIcon: { control: 'boolean' },
   }),
   args: {
     children: 'Button',
