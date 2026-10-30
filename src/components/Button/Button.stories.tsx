@@ -331,11 +331,13 @@ export const DocPageTest: Story = {
     tabs[1].focus();
     await userEvent.keyboard('{ArrowRight}');
     await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
-    await expect(h2()).toEqual(['Desarrollo', 'Ejemplos de uso']);
-    // Sin Storybook no hay lienzo ni código: la tabla de props queda de solo lectura con los valores por defecto
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    // Sin Storybook no hay lienzo, código ni Personalizar: solo el bloque Props, de solo lectura y sin controles
     const props = canvas.getByRole('table', { name: 'Props de Button' });
     await expect(within(props).getByRole('rowheader', { name: /variant/ })).toBeInTheDocument();
-    await expect(canvas.getByRole('switch', { name: 'unicolor' })).toBeDisabled();
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).queryByRole('switch')).not.toBeInTheDocument();
+    await expect(canvas.queryByRole('group', { name: 'Personalizar' })).not.toBeInTheDocument();
     await expect(canvas.queryByRole('button', { name: 'Restablecer' })).not.toBeInTheDocument();
   },
 };

@@ -47,8 +47,13 @@ export type FieldChevronProps = HTMLAttributes<HTMLSpanElement> & { [K in `data-
 
 export interface SelectProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'defaultValue' | 'onChange' | 'id' | 'placeholder'> {
-  /** Texto del label flotante (obligatorio): es el nombre accesible del combobox y de la lista. */
+  /** Texto del label flotante (obligatorio): es el nombre accesible del combobox y de la lista, salvo que llegue `aria-labelledby`. */
   label: string;
+  /**
+   * Id del elemento que nombra el combobox y la lista, en lugar del label flotante (p. ej. una etiqueta visible fuera del
+   * campo). El label se sigue viendo.
+   */
+  'aria-labelledby'?: string;
   /** Agrega " | Opcional" después del label. */
   optional?: boolean;
   /** Texto que se ve en el campo, con foco o abierto, mientras no hay opción elegida. */

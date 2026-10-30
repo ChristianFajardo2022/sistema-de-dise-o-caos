@@ -19,7 +19,6 @@ export type PropControl =
   | { kind: 'boolean' }
   | { kind: 'text' }
   | { kind: 'number' }
-  | { kind: 'radio'; options: (string | number)[] }
   | { kind: 'select'; options: (string | number)[] };
 
 const NONE: PropControl = { kind: 'none' };
@@ -35,9 +34,8 @@ export function literalsFromType(type: string | undefined): (string | number)[] 
 }
 
 function choice(options: (string | number)[]): PropControl {
-  if (options.length === 0) return NONE;
-  // Hasta 3 valores caben como grupo de radios; con más, una lista
-  return options.length <= 3 ? { kind: 'radio', options } : { kind: 'select', options };
+  // Uniones de literales y números con valores fijos: siempre una lista (Select), como el dropdown de reactbits
+  return options.length === 0 ? NONE : { kind: 'select', options };
 }
 
 /**
@@ -92,7 +90,7 @@ export function defaultValueOf(row: Pick<DocPropRow, 'defaultValue'>, control: P
   const text = plainDefault(row.defaultValue);
   if (control.kind === 'boolean') return text === 'true';
   if (control.kind === 'number') return Number.isFinite(Number(text)) ? Number(text) : undefined;
-  if (control.kind === 'radio' || control.kind === 'select') {
+  if (control.kind === 'select') {
     return control.options.find((o) => String(o) === text);
   }
   return text;

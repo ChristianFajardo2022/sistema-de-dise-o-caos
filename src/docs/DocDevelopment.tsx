@@ -3,24 +3,23 @@ import type { ReactNode } from 'react';
 import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
 import { Input } from '../components/Input';
-import { Radio } from '../components/Radio';
 import { Select } from '../components/Select';
 import { Switch } from '../components/Switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/Table/Table';
 import { TableMobileField, TableMobileList, TableMobileRow } from '../components/Table/TableMobile';
-import { TableText } from '../components/Table/TableContent';
 import { Tag } from '../components/Tag';
 import { Toast, Toaster } from '../components/Toast';
 import { cn } from '../utils/cn';
 import { DocCodeBlock } from './DocCodeBlock';
-import { DocDotsCanvas } from './DocV2';
-import { buildCode, controlFor, defaultValueOf, literalsFromType } from './liveCode';
+import { DocBigCard, DocDotsCanvas } from './DocV2';
+import { buildCode, controlFor, defaultValueOf } from './liveCode';
 import type { LiveArgType, PropControl } from './liveCode';
+import { docInline } from './docShared';
 import type { DocPropRow } from './types';
 
 /*
- * Sección Desarrollo de la plantilla v2, hecha con componentes de CAOS: lienzo con barra propia (zoom y abrir la
- * historia), código generado de los args y tabla de props con un control por tipo. De Storybook solo llega la
+ * Sección Desarrollo de la plantilla v2, hecha con componentes de CAOS: lienzo con barra propia (zoom, restablecer y
+ * abrir la historia), código generado de los args, tarjeta "Personalizar" (un control por prop) y tarjeta "Props" (tabla de solo lectura). De Storybook solo llega la
  * lógica (`DocLive`, ver StorybookDocsPage): la historia ya dibujada, los args y cómo cambiarlos.
  */
 
@@ -44,8 +43,21 @@ export interface DocLive {
 
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
-/** Barra del lienzo: acercar, alejar, restablecer zoom y abrir la historia sola. Todo con `Button`. */
-function CanvasToolbar({ zoom, setZoom, storyId }: { zoom: number; setZoom: (z: number) => void; storyId: string }) {
+/**
+ * Barra del lienzo: acercar, alejar, restablecer y abrir la historia sola. Todo con `Button`. Restablecer vuelve el
+ * zoom al 100 % y las props a sus valores iniciales (`onReset`).
+ */
+function CanvasToolbar({
+  zoom,
+  setZoom,
+  onReset,
+  storyId,
+}: {
+  zoom: number;
+  setZoom: (z: number) => void;
+  onReset: () => void;
+  storyId: string;
+}) {
   const step = ZOOM_STEPS.indexOf(zoom);
   return (
     <div className="flex justify-end p-ds-space-general-lg">
@@ -80,8 +92,8 @@ function CanvasToolbar({ zoom, setZoom, storyId }: { zoom: number; setZoom: (z: 
         >
           <Icon name="add-circle" />
         </Button>
-        <Button variant="tertiary" size="xs" iconOnly iconSize={16} aria-label="Restablecer zoom" disabled={zoom === 1} onClick={() => setZoom(1)}>
-          <Icon name="refresh" />
+        <Button variant="tertiary" size="xs" iconOnly iconSize={16} aria-label="Restablecer zoom y props" onClick={onReset}>
+          <Icon name="rotate-left" />
         </Button>
         <Button
           variant="tertiary"
@@ -104,9 +116,17 @@ function CanvasToolbar({ zoom, setZoom, storyId }: { zoom: number; setZoom: (z: 
 function DocCanvas({ live }: { live: DocLive }) {
   const [zoom, setZoom] = useState(1);
   return (
-    <DocDotsCanvas>
-      <CanvasToolbar zoom={zoom} setZoom={setZoom} storyId={live.storyId} />
-      <div className="flex min-h-48 items-center justify-center overflow-auto px-ds-space-general-5xl pt-ds-space-general-lg pb-ds-primitives-space-6xl">
+    <DocDotsCanvas className="flex min-h-80 flex-col tablet:min-h-130.5">
+      <CanvasToolbar
+        zoom={zoom}
+        setZoom={setZoom}
+        onReset={() => {
+          setZoom(1);
+          live.resetArgs();
+        }}
+        storyId={live.storyId}
+      />
+      <div className="flex flex-1 items-center justify-center overflow-auto px-ds-space-general-5xl pt-ds-space-general-lg pb-ds-primitives-space-6xl">
         {/*
           `zoom` escala el contenido y su espacio en el flujo; el marco del lienzo no cambia. El decorador global de tema
           (.storybook/ThemeWrapper) pinta fondo y relleno propios alrededor de la historia: aquí se anulan para que el
@@ -149,19 +169,23 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
-/** "Ver código" / "Copiar código" y el JSX generado de los args actuales. El aviso de copiado es un `Toast`. */
+// Figma: botones de código 23024:64920
+/**
+ * "Ver código" / "Copiar código" (`Button` terciario xs con ícono de 14, separados 24, alineados a la izquierda) y el
+ * JSX generado de los args actuales. El aviso de copiado es un `Toast`.
+ */
 function DocLiveCode({ code }: { code: string }) {
   const [open, setOpen] = useState(false);
   const [notice, setNotice] = useState<{ ok: boolean; n: number } | null>(null);
   const codeId = useId();
   return (
     <div className="flex flex-col gap-ds-space-general-2xl">
-      <div className="flex flex-wrap gap-ds-space-general-lg">
+      <div className="flex flex-wrap gap-ds-primitives-space-4xl">
         <Button
-          variant="secondary"
+          variant="tertiary"
           size="xs"
-          iconSize={16}
-          leftIcon={<Icon name="code" />}
+          iconSize={14}
+          leftIcon={<Icon name="code" variant="fill" />}
           aria-expanded={open}
           aria-controls={open ? codeId : undefined}
           onClick={() => setOpen((v) => !v)}
@@ -169,10 +193,10 @@ function DocLiveCode({ code }: { code: string }) {
           {open ? 'Ocultar código' : 'Ver código'}
         </Button>
         <Button
-          variant="secondary"
+          variant="tertiary"
           size="xs"
-          iconSize={16}
-          leftIcon={<Icon name="document-copy" />}
+          iconSize={14}
+          leftIcon={<Icon name="document-copy" variant="fill" />}
           onClick={async () => setNotice({ ok: await copyText(code), n: Date.now() })}
         >
           Copiar código
@@ -199,41 +223,64 @@ function DocLiveCode({ code }: { code: string }) {
   );
 }
 
-// ───────────────────────── tabla de props ─────────────────────────
+// ───────────────────────── Personalizar ─────────────────────────
 
-/** Control de una fila según el tipo de la prop. */
+/** Título de bloque, fuera de la tarjeta: el mismo h2 de las secciones (Heading-xl-600, 32/36, `text/neutral/heading`). */
+const blockTitle =
+  'm-0 font-ds-primitives-typography-family-secondary text-ds-typography-heading-size-2xl leading-ds-typography-heading-line-height-2xl font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading text-balance';
+
+/**
+ * Bloque de Desarrollo ("Personalizar", "Props") con su título arriba, fuera de la caja, como las secciones de la
+ * plantilla: título (y a la derecha un dato opcional, p. ej. el contador), bajada y, debajo, el contenido a 32.
+ */
+function DevBlock({ title, aside, description, children }: { title: string; aside?: ReactNode; description?: ReactNode; children: ReactNode }) {
+  const headingId = useId();
+  return (
+    <section aria-labelledby={headingId} className="flex min-w-0 flex-col gap-ds-primitives-space-4xl">
+      <div className="flex flex-col gap-ds-space-general-xl">
+        <div className="flex flex-wrap items-baseline justify-between gap-ds-space-general-lg">
+          <h2 id={headingId} className={blockTitle}>
+            {title}
+          </h2>
+          {aside}
+        </div>
+        {description}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+/** Texto de apoyo de las tarjetas (Body 14/20 en `text/neutral/body`). */
+const cardBody =
+  'm-0 font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-md leading-ds-primitives-typography-line-height-xl text-ds-text-neutral-body';
+
+/**
+ * Control del tipo de la prop. `labelId` apunta a la etiqueta visible de la tarjeta, que da el nombre accesible. El
+ * `Input` y el `Select` llevan además su etiqueta flotante visible ("Texto", "Número", "Opción"), dentro del campo
+ * mientras no hay valor, como "Number" en Figma.
+ */
 function PropControlInput({
-  name,
+  labelId,
   control,
   value,
-  disabled,
   onChange,
 }: {
-  name: string;
-  control: PropControl;
+  labelId: string;
+  control: Exclude<PropControl, { kind: 'none' }>;
   value: unknown;
-  disabled: boolean;
   onChange: (value: unknown) => void;
 }) {
   switch (control.kind) {
     case 'boolean':
-      return <Switch aria-label={name} checked={value === true} disabled={disabled} onCheckedChange={onChange} />;
-    case 'radio':
-      return (
-        <div role="radiogroup" aria-label={name} className="flex flex-wrap gap-x-ds-space-general-2xl gap-y-ds-space-general-md">
-          {control.options.map((o) => (
-            <Radio key={String(o)} name={`doc-control-${name}`} checked={value === o} disabled={disabled} onChange={() => onChange(o)}>
-              {String(o)}
-            </Radio>
-          ))}
-        </div>
-      );
+      return <Switch aria-labelledby={labelId} checked={value === true} onCheckedChange={onChange} />;
     case 'select':
       return (
+        // Label visible "Opción" (como "Texto" y "Número" de Input); el nombre accesible es la etiqueta de la tarjeta
         <Select
-          label={name}
-          fullWidth
-          disabled={disabled}
+          label="Opción"
+          aria-labelledby={labelId}
+          className="w-40"
           value={value === undefined || value === null ? null : String(value)}
           onValueChange={(v) => onChange(control.options.find((o) => String(o) === v) ?? v)}
           options={control.options.map((o) => ({ value: String(o), label: String(o) }))}
@@ -242,9 +289,9 @@ function PropControlInput({
     case 'text':
       return (
         <Input
-          label={name}
-          fullWidth
-          disabled={disabled}
+          label="Texto"
+          aria-labelledby={labelId}
+          className="w-40"
           value={typeof value === 'string' ? value : ''}
           onValueChange={(v) => onChange(v === '' ? undefined : v)}
         />
@@ -252,41 +299,70 @@ function PropControlInput({
     case 'number':
       return (
         <Input
-          label={name}
+          label="Número"
           type="number"
-          fullWidth
-          disabled={disabled}
+          aria-labelledby={labelId}
+          className="w-27"
           value={typeof value === 'number' ? String(value) : ''}
           onValueChange={(v) => onChange(v === '' || Number.isNaN(Number(v)) ? undefined : Number(v))}
         />
       );
-    case 'none':
-      return <span aria-label="Sin control">—</span>;
   }
 }
 
-/** Tipo de la prop: los valores literales como `Tag`, el resto como código. */
-function PropType({ type }: { type: string | undefined }) {
-  if (!type) return null;
-  const literals = literalsFromType(type);
-  if (literals) {
-    return (
-      <span className="flex flex-wrap gap-ds-space-general-md pt-ds-space-general-md">
-        {literals.map((l) => (
-          <Tag key={String(l)} size="sm" type="neutral" iconLeft={false}>
-            {String(l)}
-          </Tag>
-        ))}
+// Figma: "Card / Simple / On canva" 23013:22633 (tarjeta de control)
+/**
+ * Tarjeta de control: superficie `default-on-card` con su radio, padding `space/container/on-card-stretch` y la
+ * etiqueta (Highlight 16/20 semibold) a la izquierda y el control a la derecha, con 10 de separación. Sin muesca:
+ * lo que dibuja la silueta "Canva" en el resto del repo es `NotchedSurface`, que con `notch="none"` queda como un
+ * rectángulo redondeado con trazo; aquí la tarjeta es plana (como en Figma), así que basta el relleno.
+ */
+function ControlCard({ name, control, value, onChange }: { name: string; control: Exclude<PropControl, { kind: 'none' }>; value: unknown; onChange: (value: unknown) => void }) {
+  const labelId = useId();
+  return (
+    <div className="flex min-w-0 flex-wrap items-center justify-between gap-2.5 rounded-ds-radius-container-on-card bg-ds-background-container-default-on-card p-ds-space-container-on-card-stretch">
+      <span
+        id={labelId}
+        className={cn(
+          'min-w-0 [overflow-wrap:anywhere] font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-lg leading-ds-primitives-typography-line-height-xl font-ds-primitives-typography-weight-semibold',
+          control.kind === 'text' || control.kind === 'number' ? 'text-ds-text-neutral-body' : 'text-ds-text-neutral-white',
+        )}
+      >
+        {name}
       </span>
-    );
-  }
-  return <code className="font-mono">{type}</code>;
+      <div className="ml-auto shrink-0">
+        <PropControlInput labelId={labelId} control={control} value={value} onChange={onChange} />
+      </div>
+    </div>
+  );
 }
 
+/**
+ * "Personalizar": título arriba y la tarjeta con una tarjeta de control por prop con control (3 columnas; 2 en tablet;
+ * 1 en móvil), como la "Tarjeta" de la pantalla Desarrollo de Figma.
+ */
+function DocCustomize({ controls, live }: { controls: { name: string; control: Exclude<PropControl, { kind: 'none' }> }[]; live: DocLive }) {
+  if (controls.length === 0) return null;
+  return (
+    <DevBlock title="Personalizar">
+      <DocBigCard className="p-ds-primitives-space-2xl tablet:p-ds-primitives-space-5xl">
+        <div className="grid grid-cols-1 gap-ds-primitives-space-4xl @2xl:grid-cols-2 @5xl:grid-cols-3">
+          {controls.map(({ name, control }) => (
+            <ControlCard key={name} name={name} control={control} value={live.args[name]} onChange={(v) => live.updateArgs({ [name]: v })} />
+          ))}
+        </div>
+      </DocBigCard>
+    </DevBlock>
+  );
+}
+
+// ───────────────────────── Props ─────────────────────────
+
+/** Nombre de la prop en código violeta claro (`text/acent/firts`); `*` si es obligatoria. */
 function PropName({ row }: { row: DocPropRow }) {
   return (
     <>
-      <code className="font-mono text-ds-primitives-typography-size-md">{row.name}</code>
+      <code className="font-mono text-ds-primitives-typography-size-md text-ds-text-acent-firts">{row.name}</code>
       {row.required && (
         <span className="text-ds-icon-semantic-error-firts">
           <span aria-hidden="true"> *</span>
@@ -297,41 +373,46 @@ function PropName({ row }: { row: DocPropRow }) {
   );
 }
 
-/**
- * Tabla de props (`Table` de CAOS): prop, descripción con su tipo, valor por defecto y un control (`Switch`, `Radio`,
- * `Select`, `Input`). Cambiar un control cambia la historia; sin `live` los controles muestran el valor por defecto y no se pueden usar.
- */
-function DocPropsTable({ importName, props, live }: { importName: string; props: DocPropRow[]; live?: DocLive }) {
-  const label = `Props de ${importName}`;
-  const rows = useMemo(
-    () =>
-      props.map((row) => {
-        const control = controlFor(live?.argTypes[row.name], row.type);
-        return { row, control, fallback: defaultValueOf(row, control) };
-      }),
-    [props, live?.argTypes],
+/** Tipo de la prop: mono en `text/neutral/body`, partido donde haga falta para que no desborde. */
+function PropType({ type }: { type: string | undefined }) {
+  return type ? <code className="font-mono [overflow-wrap:anywhere] text-ds-text-neutral-body">{type}</code> : <>—</>;
+}
+
+/** Valor por defecto como chip (`Tag` neutro). */
+function PropDefault({ value }: { value: string | undefined }) {
+  if (!value) return <>—</>;
+  return (
+    <Tag size="sm" type="neutral" iconLeft={false} className="max-w-full font-mono">
+      {value}
+    </Tag>
   );
-  const valueOf = (name: string, fallback: unknown) => (live ? live.args[name] : fallback);
+}
+
+// Figma: Table 13544:69675 (filas sueltas sobre el lienzo, sin tarjeta de fondo)
+/**
+ * "Props": título arriba con el contador a la derecha y la bajada; debajo, la `Table` de CAOS de solo lectura con todas
+ * las props (también las que no tienen control): Prop, Tipo, Por defecto y Descripción. La tabla va directamente sobre
+ * el lienzo, como en Figma: dentro de una tarjeta sus filas se confundían con el fondo.
+ */
+function DocPropsCard({ importName, props }: { importName: string; props: DocPropRow[] }) {
+  const label = `Props de ${importName}`;
+  const count = `${props.length} ${props.length === 1 ? 'propiedad' : 'propiedades'}`;
 
   const mobile = (
     <TableMobileList aria-label={label}>
-      {rows.map(({ row, control, fallback }) => (
+      {props.map((row) => (
         <TableMobileRow key={row.name}>
           <TableMobileField className="h-auto min-h-14" label="Prop">
             <PropName row={row} />
           </TableMobileField>
-          <TableMobileField className="h-auto min-h-14" label="Descripción">
-            <TableText description={<PropType type={row.type} />}>{row.description ?? ''}</TableText>
+          <TableMobileField className="h-auto min-h-14" label="Tipo">
+            <PropType type={row.type} />
           </TableMobileField>
-          <TableMobileField className="h-auto min-h-14" label="Por defecto">{row.defaultValue ? <code className="font-mono">{row.defaultValue}</code> : '—'}</TableMobileField>
-          <TableMobileField className="h-auto min-h-14" label="Control">
-            <PropControlInput
-              name={row.name}
-              control={control}
-              value={valueOf(row.name, fallback)}
-              disabled={!live}
-              onChange={(v) => live?.updateArgs({ [row.name]: v })}
-            />
+          <TableMobileField className="h-auto min-h-14" label="Por defecto">
+            <PropDefault value={row.defaultValue} />
+          </TableMobileField>
+          <TableMobileField className="h-auto min-h-14" label="Descripción">
+            {row.description ?? '—'}
           </TableMobileField>
         </TableMobileRow>
       ))}
@@ -339,44 +420,52 @@ function DocPropsTable({ importName, props, live }: { importName: string; props:
   );
 
   return (
-    <Table label={label} mobile={mobile} className="min-w-180">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Prop</TableHead>
-          <TableHead>Descripción</TableHead>
-          <TableHead>Por defecto</TableHead>
-          <TableHead className="w-72">Control</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map(({ row, control, fallback }) => (
-          <TableRow key={row.name}>
-            <TableCell role="rowheader">
-              <PropName row={row} />
-            </TableCell>
-            <TableCell>
-              <TableText description={<PropType type={row.type} />}>{row.description ?? ''}</TableText>
-            </TableCell>
-            <TableCell>{row.defaultValue ? <code className="font-mono">{row.defaultValue}</code> : '—'}</TableCell>
-            <TableCell>
-              <PropControlInput
-                name={row.name}
-                control={control}
-                value={valueOf(row.name, fallback)}
-                disabled={!live}
-                onChange={(v) => live?.updateArgs({ [row.name]: v })}
-              />
-            </TableCell>
+    <DevBlock
+      title="Props"
+      aside={<p className={cardBody}>{count}</p>}
+      description={
+        <p className={cn(cardBody, docInline)}>
+          Props de <code>{importName}</code> tal como están en el código. Las de HTML nativas que no aparecen aquí (como <code>className</code> o{' '}
+          <code>aria-*</code>) pasan al elemento raíz.
+        </p>
+      }
+    >
+      <Table label={label} mobile={mobile} className="min-w-180">
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-44">Prop</TableHead>
+            <TableHead className="w-56">Tipo</TableHead>
+            <TableHead className="w-40">Por defecto</TableHead>
+            <TableHead>Descripción</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {props.map((row) => (
+            <TableRow key={row.name}>
+              <TableCell role="rowheader">
+                <PropName row={row} />
+              </TableCell>
+              <TableCell>
+                <PropType type={row.type} />
+              </TableCell>
+              <TableCell>
+                <PropDefault value={row.defaultValue} />
+              </TableCell>
+              <TableCell>{row.description ?? '—'}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </DevBlock>
   );
 }
 
 // ───────────────────────── conjunto ─────────────────────────
 
-/** Lienzo, código generado y tabla de props con controles. Sin `live` solo dibuja la tabla, de solo lectura. */
+/**
+ * Lienzo, botones de código, tarjeta "Personalizar" (controles) y tarjeta "Props" (tabla de solo lectura). Sin `live`
+ * solo dibuja la tarjeta de props.
+ */
 export function DocDevelopment({
   importName,
   props,
@@ -388,6 +477,16 @@ export function DocDevelopment({
   live?: DocLive;
   className?: string;
 }) {
+  const controls = useMemo(
+    () =>
+      live
+        ? props.flatMap((row) => {
+            const control = controlFor(live.argTypes[row.name], row.type);
+            return control.kind === 'none' ? [] : [{ name: row.name, control }];
+          })
+        : [],
+    [props, live],
+  );
   const code = useMemo(() => {
     if (!live) return '';
     const defaults: Record<string, string | number | boolean | undefined> = {};
@@ -399,23 +498,14 @@ export function DocDevelopment({
     <div className={cn('flex min-w-0 flex-col gap-ds-primitives-space-5xl', className)}>
       {live && (
         <>
-          <DocCanvas live={live} />
-          <DocLiveCode code={code} />
+          <div className="flex min-w-0 flex-col gap-ds-space-general-2xl">
+            <DocCanvas live={live} />
+            <DocLiveCode code={code} />
+          </div>
+          <DocCustomize controls={controls} live={live} />
         </>
       )}
-      <div className="flex min-w-0 flex-col gap-ds-space-general-2xl">
-        {live && (
-          <div className="flex flex-wrap items-center justify-between gap-ds-space-general-lg">
-            <p className="m-0 font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-md leading-ds-primitives-typography-line-height-xl text-ds-text-neutral-body">
-              Cambia un valor y se actualizan el lienzo y el código.
-            </p>
-            <Button variant="secondary" size="xs" iconSize={16} leftIcon={<Icon name="rotate-left" />} onClick={live.resetArgs}>
-              Restablecer
-            </Button>
-          </div>
-        )}
-        <DocPropsTable importName={importName} props={props} live={live} />
-      </div>
+      <DocPropsCard importName={importName} props={props} />
     </div>
   );
 }

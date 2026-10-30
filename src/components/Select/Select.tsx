@@ -88,6 +88,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       rootProps,
       chevronProps,
       'aria-describedby': ariaDescribedBy,
+      'aria-labelledby': ariaLabelledBy,
       ...restProps
     },
     ref
@@ -315,7 +316,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
         maxHeight={maxHeight}
         className="w-full"
         // El listbox se nombra con aria-labelledby, que tiene prioridad sobre el aria-label que exige el panel
-        listProps={{ ref: listRef, id: listboxId, role: 'listbox', 'aria-labelledby': ids.label }}
+        listProps={{ ref: listRef, id: listboxId, role: 'listbox', 'aria-labelledby': ariaLabelledBy ?? ids.label }}
       >
           {items.map((option, index) => {
             const isSelected = index === selectedIndex;
@@ -388,7 +389,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             aria-expanded={open}
             aria-controls={listboxId}
             aria-activedescendant={open && !isInlineOpen && activeIndex >= 0 ? optionId(activeIndex) : undefined}
-            aria-labelledby={ids.label}
+            aria-labelledby={ariaLabelledBy ?? ids.label}
             aria-describedby={isField ? field.describedBy(ariaDescribedBy) : joinIds(ariaDescribedBy)}
             aria-invalid={isError || undefined}
             aria-required={required || undefined}

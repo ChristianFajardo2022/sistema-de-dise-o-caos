@@ -10,22 +10,16 @@ export { DocCodeBlock };
 const PACKAGE = 'caos-design-system';
 
 /**
- * Pestaña Desarrollo: importación, lienzo con la historia principal, código generado de los args, tabla de props con
- * controles (todo con componentes de CAOS, ver `DocDevelopment`) y ejemplos. Las props salen del ArgTypes de Storybook
- * (docgen del código) o de `<Nombre>.docs.json`. Sin `live` la tabla es de solo lectura.
+ * Pestaña Desarrollo: importación, lienzo con la historia principal, código generado de los args, tarjeta Personalizar
+ * (controles) y tarjeta Props (tabla de solo lectura) (todo con componentes de CAOS, ver `DocDevelopment`) y ejemplos. Las props salen del ArgTypes de Storybook
+ * (docgen del código) o de `<Nombre>.docs.json`. Sin `live` solo aparece la tabla.
  */
 export function CodeReference({ importName, related = [], props, examples = [], live }: DocCodeReference & { live?: DocLive }) {
   const names = [importName, ...related].join(', ');
   return (
     <>
       <DocSection
-        title="Desarrollo"
-        description={
-          <>
-            Props de <code>{importName}</code> tal como están en el código. Las de HTML nativas que no aparecen aquí (como{' '}
-            <code>className</code> o <code>aria-*</code>) pasan al elemento raíz.
-          </>
-        }
+        title={live ? 'Demostración en vivo' : 'Desarrollo'}
       >
         <DocCodeBlock label="Importación">{`import { ${names} } from '${PACKAGE}';`}</DocCodeBlock>
         <DocDevelopment importName={importName} props={props} live={live} />
