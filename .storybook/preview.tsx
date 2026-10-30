@@ -25,6 +25,7 @@ const preview: Preview = {
             'Texturas',
             'Elevaciones',
             'Iconografía',
+            'Voz y tono',
           ],
           'General Controls',
           'Form Controls',
