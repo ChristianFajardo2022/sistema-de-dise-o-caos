@@ -61,7 +61,7 @@ const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 /**
  * Barra del lienzo: acercar, alejar, restablecer y abrir la historia sola. Todo con `Button`. Restablecer vuelve el
- * zoom al 100 % y las props a sus valores iniciales (`onReset`).
+ * zoom al 100% y las props a sus valores iniciales (`onReset`).
  */
 function CanvasToolbar({
   zoom,
@@ -95,7 +95,7 @@ function CanvasToolbar({
         </Button>
         <span aria-live="polite" className="min-w-12 text-center font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm text-ds-text-neutral-heading tabular-nums">
           <span className="sr-only">Zoom </span>
-          {Math.round(zoom * 100)} %
+          {Math.round(zoom * 100)}%
         </span>
         <Button
           variant="tertiary"

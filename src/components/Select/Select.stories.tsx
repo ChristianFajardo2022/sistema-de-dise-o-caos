@@ -4,7 +4,12 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Select, SelectOption } from './Select';
 import type { SelectOptionData, SelectState } from './Select.types';
 import { Input, inputFieldVariants } from '../Input';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
 import { cn } from '../../utils/cn';
+import { doc } from './Select.doc';
+import docsJson from './Select.docs.json';
 
 const COUNTRIES: SelectOptionData[] = [
   { value: 'co', label: 'Colombia' },
@@ -15,35 +20,38 @@ const COUNTRIES: SelectOptionData[] = [
   { value: 'pa', label: 'Panamá' },
 ];
 
+const DEFAULT_VALUES = COUNTRIES.filter((o) => !o.disabled).map((o) => o.value);
+
 const STATES: SelectState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'];
 
 const meta: Meta<typeof Select> = {
   title: 'Form Controls/Select',
   component: Select,
   tags: ['autodocs'],
-  argTypes: {
-    state: {
-      control: 'select',
-      options: STATES,
-      type: { name: 'enum', value: STATES },
-      description: 'State forzado (solo para visualización). `active` dibuja la lista abierta en el flujo.',
-    },
-    frame: {
-      control: 'inline-radio',
-      options: ['field', 'none'],
-      type: { name: 'enum', value: ['field', 'none'] },
-      description: 'Campo completo o solo el disparador (controles compuestos)',
-    },
-    optional: { control: 'boolean', type: { name: 'boolean' }, description: 'Agrega " | Opcional" al label' },
-    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Estado Disabled' },
-    readOnly: { control: 'boolean', type: { name: 'boolean' }, description: 'Estado Burnt-In' },
-    required: { control: 'boolean', type: { name: 'boolean' }, description: 'aria-required' },
-    fullWidth: { control: 'boolean', type: { name: 'boolean' }, description: 'Ocupa el 100 % del contenedor' },
-    scrollbar: { control: 'boolean', type: { name: 'boolean' }, description: 'Riel de scroll del panel (prop "Scroll bar")' },
+  parameters: {
+    // La página Docs usa la plantilla de documentación (Select.doc.tsx) con la referencia de código al final
+    docs: componentDocsParameters(doc, docsJson),
+    // `open` y `defaultOpen` abren la lista en la capa superior, fuera del lienzo: sin control en Personalizar. La lista
+    // abierta se ve en el lienzo con `state="active"`, que la dibuja en el flujo
+    // `id`, `aria-labelledby` y `name` remiten a otros elementos o al formulario: con texto libre no se ve nada o se rompe
+    docsLive: { exclude: ['open', 'defaultOpen', 'id', 'aria-labelledby', 'name'] },
   },
+  // Las descripciones salen de Select.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    state: { control: 'select', options: STATES, type: { name: 'enum', value: STATES } },
+    frame: { control: 'inline-radio', options: ['field', 'none'], type: { name: 'enum', value: ['field', 'none'] } },
+    optional: { control: 'boolean', type: { name: 'boolean' } },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
+    readOnly: { control: 'boolean', type: { name: 'boolean' } },
+    required: { control: 'boolean', type: { name: 'boolean' } },
+    fullWidth: { control: 'boolean', type: { name: 'boolean' } },
+    scrollbar: { control: 'boolean', type: { name: 'boolean' } },
+    children: { control: false },
+    // Solo valores que existen en las opciones (con texto libre el label sube y el campo queda vacío)
+    defaultValue: { control: 'select', options: DEFAULT_VALUES, type: { name: 'enum', value: DEFAULT_VALUES } },
+  }),
   args: {
     label: 'País',
-    placeholder: 'Elige un país',
     options: COUNTRIES,
     state: 'default',
     frame: 'field',
@@ -77,7 +85,7 @@ function ControlledSelect(args: ComponentProps<typeof Select>) {
         value={value}
         onValueChange={setValue}
         successText={value ? 'Listo' : undefined}
-        helperText="Lo usamos para mostrarte precios en tu moneda"
+        helperText="Define la moneda y el formato de las fechas"
       />
       <p className="text-ds-typography-body-size-sm text-ds-text-neutral-white">Valor: {value ?? '—'}</p>
     </div>
@@ -86,17 +94,17 @@ function ControlledSelect(args: ComponentProps<typeof Select>) {
 
 /** Opciones como hijos `SelectOption`, con ícono. */
 export const WithChildren: Story = {
-  args: { options: undefined, label: 'Acción', placeholder: 'Elige una acción' },
+  args: { options: undefined, label: 'Ordenar por' },
   render: (args) => (
     <Select {...args}>
-      <SelectOption value="crear" icon="add-circle">
-        Crear
+      <SelectOption value="recientes" icon="clock">
+        Más recientes
       </SelectOption>
-      <SelectOption value="duplicar" icon="add-circle">
-        Duplicar
+      <SelectOption value="destacados" icon="star">
+        Destacados
       </SelectOption>
-      <SelectOption value="archivar" icon="add-circle" disabled>
-        Archivar
+      <SelectOption value="archivados" icon="folder" disabled>
+        Archivados
       </SelectOption>
     </Select>
   ),
@@ -393,5 +401,37 @@ export const ReadOnlyLabelTest: Story = {
     const label = (text: string) => within(canvasElement).getByText(text, { selector: 'label' });
     await expect(getComputedStyle(label('Sin valor')).fontSize).toBe('14px');
     await expect(getComputedStyle(label('Con valor')).fontSize).toBe('12px');
+  },
+};
+
+/** Página de documentación (plantilla v2): encabezado, 3 pestañas y secciones en orden. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Select' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Select en Figma:']);
+    // Anatomía: un marcador por pauta (5 + 5), y las vistas son ilustraciones (inert)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(2);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(10));
+    // La lista abierta de la anatomía va en el flujo (state="active"), no en la capa superior
+    await expect(views[1].querySelector('[role="listbox"]')?.closest('[popover]')).toBeNull();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Select' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

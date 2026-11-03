@@ -26,7 +26,7 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   leftIcon?: ReactNode;
   /** Ícono opcional de 16px a la derecha. */
   rightIcon?: ReactNode;
-  /** Ocupa el 100 % del ancho del contenedor. */
+  /** Ocupa el 100% del ancho del contenedor. */
   fullWidth?: boolean;
   /** Fuerza el aspecto de un estado (solo documentación). */
   state?: InputState;

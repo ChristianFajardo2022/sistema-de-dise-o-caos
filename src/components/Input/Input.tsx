@@ -59,7 +59,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div {...rootProps} className={cn('flex flex-col', fullWidth ? 'w-full' : 'w-[320px] max-w-full', rootProps?.className, className)}>
         <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled, icon: <Icon name="info-circle" size={16} variant="fill" /> } : null}>
-          <div className={inputFieldVariants({ variant, state: visualState })}>
+          <div data-slot="field" className={inputFieldVariants({ variant, state: visualState })}>
             {leading && (
               <span
                 data-slot="icon-left"

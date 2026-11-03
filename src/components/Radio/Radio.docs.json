@@ -1,28 +1,29 @@
 {
   "name": "Radio",
   "component": "Radio",
-  "description": "Radio del sistema de diseño CAOS, fiel al component set Selection de Figma (9545:6413 y 9558:6975). Control circular de 16×16. Default: anillo de 1.5. Select: disco con hueco transparente de 6.4. Disabled select: anillo de 1.5 con punto de 8. Contraste positive para superficies oscuras y negative para claras. Con texto: gap 8, 16/20 Helvetica Neue regular. Usa un input nativo oculto pero accesible: agrupa con name, las flechas del teclado mueven la selección y el foco visible es un outline de 2px (agregado, no está en Figma).",
+  "description": "Radio del sistema de diseño CAOS, fiel al component set Selection de Figma. Control circular de 16 × 16 px. Default: anillo de 1.5 px. Select: disco con hueco transparente de 6.4 px. Disabled Select: anillo de 1.5 px con punto de unos 8 px. Contrast positive para la superficie del tema y negative para la inversa. Con texto: gap de 8 px y 16/20 px en tipografía principal regular. Usa un input nativo oculto pero accesible: agrupa con name, las flechas del teclado mueven la selección y el foco visible es un contorno de 2 px (agregado, no está en Figma).",
   "category": "Form Controls",
   "props": {
     "contrast": {
       "type": "'positive' | 'negative'",
       "default": "'positive'",
-      "description": "Contrast de Figma: positive sobre superficies oscuras, negative sobre claras."
+      "description": "Contraste (Contrast en Figma): positive para la superficie del tema y negative para la inversa."
     },
-    "name": { "type": "string", "required": false, "description": "Agrupa radios; se pasa al input nativo." },
-    "value": { "type": "string", "required": false, "description": "Valor del radio." },
-    "checked": { "type": "boolean", "required": false, "description": "Seleccionado (controlado). Usar con onChange." },
-    "defaultChecked": { "type": "boolean", "required": false, "description": "Seleccionado inicial (no controlado)." },
-    "disabled": { "type": "boolean", "default": false, "description": "Estados Disabled default y Disabled select." },
-    "children": { "type": "ReactNode", "required": false, "description": "Texto junto al control. Sin texto, pasar aria-label." },
+    "name": { "type": "string", "required": false, "description": "Agrupa radios: solo uno del mismo name queda elegido. Se pasa al input nativo." },
+    "value": { "type": "string", "required": false, "description": "Valor del radio. Se pasa al input nativo." },
+    "checked": { "type": "boolean", "required": false, "description": "Elegido (controlado). Úsalo con onChange." },
+    "defaultChecked": { "type": "boolean", "required": false, "description": "Elegido al inicio (no controlado)." },
+    "disabled": { "type": "boolean", "default": false, "description": "Deshabilita la opción: Disabled Default o Disabled Select, según esté elegida." },
+    "children": { "type": "ReactNode", "required": false, "description": "Texto junto al control. Sin texto, pasa aria-label." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para la fila." },
     "state": {
       "type": "'default' | 'select' | 'disabled-default' | 'disabled-select'",
       "required": false,
-      "description": "Fuerza el aspecto, solo para documentación."
+      "description": "Estado (State en Figma). Fuerza el aspecto, solo para documentación."
     }
   },
   "examples": [
-    { "title": "Grupo", "code": "<div role=\"radiogroup\" aria-label=\"Plan\"><Radio name=\"plan\" value=\"a\" defaultChecked>Básico</Radio><Radio name=\"plan\" value=\"b\">Premium</Radio></div>" },
-    { "title": "Sobre superficie clara", "code": "<Radio contrast=\"negative\" name=\"x\">Opción</Radio>" }
+    { "title": "Grupo", "code": "<div role=\"radiogroup\" aria-label=\"Medio de contacto\"><Radio name=\"contacto\" value=\"correo\" defaultChecked>Correo</Radio><Radio name=\"contacto\" value=\"mensaje\">Mensaje</Radio></div>" },
+    { "title": "Sobre la superficie inversa", "code": "<Radio contrast=\"negative\" name=\"contacto\">Correo</Radio>" }
   ]
 }

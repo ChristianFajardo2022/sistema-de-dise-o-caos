@@ -2,6 +2,11 @@ import { useState, type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { SearchInput } from './SearchInput';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './SearchInput.doc';
+import docsJson from './SearchInput.docs.json';
 import type { SearchInputCategory, SearchInputState, SearchInputSuggestions } from './SearchInput.types';
 
 const CATEGORIES: SearchInputCategory[] = [
@@ -14,8 +19,8 @@ const KEYWORDS = ['Configuración de la cuenta', 'Cambiar contraseña', 'Método
 
 const SUGGESTIONS: SearchInputSuggestions = {
   keywords: KEYWORDS.slice(0, 3),
-  recent: ['Facturas', 'Perfil', 'Soporte'],
-  popular: ['Ofertas', 'Novedades', 'Guías'],
+  recent: ['Ajustes', 'Perfil', 'Cuenta'],
+  popular: ['Novedades', 'Ayuda', 'Guías'],
 };
 
 const STATES: SearchInputState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success', 'helper'];
@@ -25,8 +30,13 @@ const meta: Meta<typeof SearchInput> = {
   title: 'Form Controls/SearchInput',
   component: SearchInput,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
-  argTypes: {
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // Props que pasan de libres a controladas al editarlas (aviso de React) o que maneja el panel con el foco (R6)
+    docsLive: { exclude: ['value', 'category', 'defaultCategory', 'id', 'aria-labelledby', 'aria-describedby', 'open', 'defaultOpen'] },
+  },
+  argTypes: argTypesFromDocsJson(docsJson, {
     state: {
       control: 'select',
       options: STATES,
@@ -40,10 +50,10 @@ const meta: Meta<typeof SearchInput> = {
     helperText: { control: 'text', type: { name: 'string' }, description: 'Mensaje de ayuda (borde de información)' },
     errorText: { control: 'text', type: { name: 'string' }, description: 'Mensaje de error' },
     successText: { control: 'text', type: { name: 'string' }, description: 'Mensaje de éxito' },
-  },
+  }),
   args: {
     label: 'Buscar en el sitio',
-    placeholder: 'Buscar',
+    placeholder: 'Guía de inicio',
     categories: CATEGORIES,
     suggestions: SUGGESTIONS,
     state: 'default',
@@ -73,7 +83,7 @@ export const Playground: Story = {};
 /** Las palabras clave se filtran con lo escrito; cada búsqueda se suma a las recientes y la papelera las borra. */
 function InteractiveDemo(args: ComponentProps<typeof SearchInput>) {
   const [query, setQuery] = useState('');
-  const [recent, setRecent] = useState(['Facturas', 'Perfil']);
+  const [recent, setRecent] = useState(['Ajustes', 'Perfil']);
   const [last, setLast] = useState<string | null>(null);
   const keywords = KEYWORDS.filter((k) => k.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 3);
   return (
@@ -193,7 +203,7 @@ export const KeyboardTest: Story = {
     await expect(option(KEYWORDS[0])).toHaveAttribute('aria-selected', 'true');
     // 3 palabras clave y el primer chip de recientes
     await userEvent.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}');
-    await expect(combo).toHaveAttribute('aria-activedescendant', option('Facturas').id);
+    await expect(combo).toHaveAttribute('aria-activedescendant', option('Ajustes').id);
     await expect(combo).toHaveFocus();
     // Flecha arriba desde la primera vuelve al texto
     await userEvent.keyboard('{ArrowUp}{ArrowUp}{ArrowUp}{ArrowUp}');
@@ -282,7 +292,7 @@ export const StatesTest: Story = {
   render: (args) => (
     <div className="flex flex-col gap-4">
       <SearchInput {...args} label="Deshabilitado" disabled />
-      <SearchInput {...args} label="Solo lectura" readOnly defaultValue="Facturas" />
+      <SearchInput {...args} label="Solo lectura" readOnly defaultValue="Ajustes" />
       <SearchInput {...args} label="Con error" errorText="Sin resultados" />
       <SearchInput {...args} label="Sin categorías" categories={undefined} suggestions={undefined} />
     </div>
@@ -308,5 +318,26 @@ export const StatesTest: Story = {
     await expect(plain).toHaveAttribute('aria-expanded', 'false');
     // Botones: 3 de búsqueda + 3 selectores (el último no tiene)
     await expect(canvas.getAllByRole('button', { name: /^Categoría/ })).toHaveLength(3);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'SearchInput' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente SearchInput en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de SearchInput' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -3,45 +3,56 @@ import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { Radio } from './Radio';
 import type { RadioProps, RadioContrast, RadioState } from './Radio.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Radio.doc';
+import docsJson from './Radio.docs.json';
 
 const meta = {
   title: 'Form Controls/Radio',
   component: Radio,
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    // El render guarda su propio `checked`: sin control. El texto sale de los args y se edita en Personalizar.
+    docsLive: { exclude: ['checked', 'defaultChecked'] },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args que vienen por URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    children: { control: 'text' },
     contrast: {
+      type: { name: 'enum', value: ['positive', 'negative'] },
       control: 'radio',
       options: ['positive', 'negative'],
-      description: 'Contrast: positive sobre superficies oscuras, negative sobre claras',
     },
     state: {
+      type: { name: 'enum', value: ['default', 'select', 'disabled-default', 'disabled-select'] },
       control: 'select',
       options: [undefined, 'default', 'select', 'disabled-default', 'disabled-select'],
-      description: 'State forzado, solo para documentación',
     },
-    checked: { control: 'boolean', description: 'Seleccionado (controlado)' },
-    disabled: { control: 'boolean', description: 'Deshabilitado' },
-  },
+  }),
   args: { contrast: 'positive', disabled: false },
 } satisfies Meta<typeof Radio>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function InteractiveDemo(args: RadioProps) {
+function InteractiveDemo({ defaultChecked: _ignored, ...args }: RadioProps) {
   const [checked, setChecked] = useState(false);
   return (
     <Radio
       {...args}
       checked={checked}
       onChange={(e) => setChecked(e.target.checked)}
-      aria-label="Opción"
+      aria-label={args.children ? undefined : 'Opción'}
     />
   );
 }
 
 export const Interactive: Story = {
+  args: { children: 'Correo' },
   render: (args) => <InteractiveDemo {...args} />,
 };
 
@@ -228,5 +239,32 @@ export const DisabledTest: Story = {
     await expect(radio).toBeDisabled();
     await expect(radio).not.toBeChecked();
     await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Radio' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Radio en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (3 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(6);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    const props = canvas.getByRole('table', { name: 'Props de Radio' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).getByRole('rowheader', { name: /defaultChecked/ })).toBeInTheDocument();
   },
 };

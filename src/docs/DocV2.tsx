@@ -731,7 +731,8 @@ export function DocTokensV2({ groups }: { groups: DocTokenGroup[] }) {
       {/* Sondas de los tokens con modo fijo (`entry.mode`): leen el valor en ese modo, no en el de la tarjeta */}
       <span ref={darkProbeRef} aria-hidden="true" data-theme="dark" className="dark pointer-events-none invisible absolute size-0 overflow-hidden" />
       <span ref={lightProbeRef} aria-hidden="true" data-theme="light" className="light pointer-events-none invisible absolute size-0 overflow-hidden" />
-      <div className="flex items-start justify-between gap-ds-space-general-4xl">
+      {/* En secciones angostas el interruptor de modo pasa debajo del título: al lado apretaba el título y la bajada */}
+      <div className="flex flex-col items-start gap-ds-space-general-2xl @xl:flex-row @xl:justify-between @xl:gap-ds-space-general-4xl">
         <div className="flex min-w-0 flex-col gap-ds-space-general-xl">
           {head && (
             <h2

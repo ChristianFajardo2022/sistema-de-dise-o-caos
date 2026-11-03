@@ -1,29 +1,28 @@
 {
   "name": "Input",
   "component": "Input",
-  "description": "Campo de texto del sistema de diseño CAOS, fiel al component set General input de Figma. Types Text, Password, Search y Search header; label flotante (dentro del campo si está vacío y sin foco, arriba con foco o valor, resuelto en CSS sin estado en JS); estados Default, Filled, Active/Focus, Burnt-In (readOnly), Disabled, Error y Success; mensaje de ayuda, error o éxito debajo (error > éxito > ayuda); label opcional y tooltip. Alto 56 (mobile 48; Search header 48), radio 16 (Search header 12), borde de 1px por dentro. Íconos de 16px. Sin anillo de foco: el foco se ve en el borde.",
-  "figmaNodeId": "8026-2056",
+  "description": "Campo de texto de una línea y base visual de los demás campos de formulario. Tipos Text, Password, Search y Search header (Type en Figma). El label flotante va dentro del campo si está vacío y sin foco, y sube con foco o valor, resuelto en CSS. Estados Default, Filled, Active/Focus, Burnt-In (readOnly), Disabled, Error y Success. Debajo del campo va un mensaje de ayuda, éxito o error; el error gana sobre el éxito y la ayuda. Alto de 56 (48 en Mobile; Search header 48), radio de 16 (Search header 12) y trazo interior de 1 px. Íconos de 16 px. En Error y Success el foco de teclado dibuja un anillo de 2 px; en los demás estados se ve en el borde.",
   "category": "Form Controls",
   "props": {
     "variant": {
       "type": "'text' | 'password' | 'search' | 'search-header'",
       "default": "'text'",
-      "description": "Type de Figma. Password agrega el botón para mostrar u ocultar; Search y Search header agregan la lupa. Para text se puede pasar el type nativo (email, tel, url)."
+      "description": "Tipo del campo (Type en Figma). Password agrega el botón para mostrar u ocultar; Search y Search header agregan la lupa. En text puedes pasar el type nativo (email, tel, url)."
     },
     "label": {
       "type": "string",
       "required": true,
-      "description": "Texto del label flotante, asociado con htmlFor."
+      "description": "Texto del label flotante, asociado al campo con htmlFor. Es obligatorio."
     },
     "optional": {
       "type": "boolean",
       "default": false,
-      "description": "Muestra ' | Opcional' después del label."
+      "description": "Agrega \" | Opcional\" después del label."
     },
     "tooltip": {
       "type": "string",
       "required": false,
-      "description": "Ícono de información fuera del campo, a la derecha, como botón con aria-label y title con este texto."
+      "description": "Texto de apoyo en un ícono de información fuera del campo, a la derecha. Es un botón con aria-label que abre el texto con clic, toque, Enter o Espacio."
     },
     "helperText": {
       "type": "string",
@@ -38,52 +37,57 @@
     "successText": {
       "type": "string",
       "required": false,
-      "description": "Mensaje de éxito: borde y label en verde. Prioridad sobre la ayuda."
+      "description": "Mensaje de éxito: borde y label en verde. Tiene prioridad sobre la ayuda."
     },
     "leftIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Ícono de 16px a la izquierda. En search y search-header es la lupa por defecto."
+      "description": "Ícono de 16 px a la izquierda. En search y search-header es la lupa por defecto."
     },
     "rightIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Ícono de 16px a la derecha."
+      "description": "Ícono de 16 px a la derecha."
     },
     "fullWidth": {
       "type": "boolean",
       "default": false,
-      "description": "Ocupa el 100 % del ancho del contenedor."
+      "description": "Ocupa el 100% del ancho del contenedor. Por defecto mide 320 como máximo."
     },
     "disabled": {
       "type": "boolean",
       "default": false,
-      "description": "Estado Disabled: el label queda dentro y no flota (salvo que haya valor)."
+      "description": "Estado Disabled: no se puede editar ni enfocar, y el label queda dentro salvo que haya valor."
     },
     "readOnly": {
       "type": "boolean",
       "default": false,
-      "description": "Estado Burnt-In: fondo burnt-in y valor atenuado."
+      "description": "Estado Burnt-In: solo lectura, con fondo propio y valor atenuado."
     },
     "state": {
       "type": "'default' | 'filled' | 'active' | 'burnt-in' | 'disabled' | 'error' | 'success'",
       "default": "'default'",
-      "description": "Fuerza el aspecto de un estado. Solo para documentación; en uso real el estado sale del foco, el valor, disabled, readOnly y los mensajes."
+      "description": "Fuerza el aspecto de un estado (State en Figma). Solo para documentación; en uso el estado sale del foco, el valor, disabled, readOnly y los mensajes."
     },
     "onValueChange": {
       "type": "(value: string) => void",
       "required": false,
-      "description": "Cambia el valor (recibe el texto). Se llama junto con el onChange nativo."
+      "description": "Se llama con el texto del campo al cambiar el valor, junto con el onChange nativo."
     },
     "rootProps": {
       "type": "FieldRootProps",
       "required": false,
-      "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz."
+      "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz. El ref del componente va al input."
     },
-    "ref": {
-      "type": "Ref<HTMLInputElement>",
+    "className": {
+      "type": "string",
       "required": false,
-      "description": "Al <input>. Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps."
+      "description": "Clases de la raíz, junto con las de rootProps."
+    },
+    "aria-describedby": {
+      "type": "string",
+      "required": false,
+      "description": "Ids extra que se suman al mensaje del campo en aria-describedby."
     }
   },
   "accessibility": [
@@ -113,11 +117,11 @@
     },
     {
       "title": "Opcional con tooltip",
-      "code": "<Input label=\"Teléfono\" optional tooltip=\"Solo para notificaciones\" />"
+      "code": "<Input label=\"Celular\" optional tooltip=\"Solo para verificar tu cuenta\" />"
     },
     {
       "title": "Burnt-In",
-      "code": "<Input label=\"Código\" value=\"CAOS-8026\" readOnly />"
+      "code": "<Input label=\"Código\" value=\"AB-8026\" readOnly />"
     }
   ]
 }

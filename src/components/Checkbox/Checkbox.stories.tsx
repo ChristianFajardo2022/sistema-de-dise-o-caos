@@ -3,48 +3,53 @@ import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { Checkbox } from './Checkbox';
 import { Radio } from '../Radio';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Checkbox.doc';
+import docsJson from './Checkbox.docs.json';
 import type { CheckboxProps, CheckboxState, SelectionContrast, SelectionState } from './Checkbox.types';
 
 const meta = {
   title: 'Form Controls/Checkbox',
   component: Checkbox,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson),
+    // La demo guarda su propio estado marcado: defaultChecked no tendría efecto (y chocaría con checked)
+    docsLive: { exclude: ['defaultChecked'] },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
     contrast: {
       control: 'radio',
       options: ['positive', 'negative'],
-      description: 'Contrast: positive sobre superficies oscuras, negative sobre claras',
+      type: { name: 'enum', value: ['positive', 'negative'] },
     },
     state: {
       control: 'select',
       options: [undefined, 'default', 'select', 'disabled-default', 'disabled-select', 'indeterminate', 'disabled-indeterminate'],
-      description: 'State forzado, solo para documentación',
+      type: { name: 'enum', value: ['default', 'select', 'disabled-default', 'disabled-select', 'indeterminate', 'disabled-indeterminate'] },
     },
-    checked: { control: 'boolean', description: 'Marcado (controlado)' },
-    indeterminate: { control: 'boolean', type: { name: 'boolean' }, description: 'Estado mixto (no está en Figma)' },
-    disabled: { control: 'boolean', description: 'Deshabilitado' },
-  },
+    checked: { control: 'boolean', type: { name: 'boolean' } },
+    indeterminate: { control: 'boolean', type: { name: 'boolean' } },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
+    children: { control: 'text', type: { name: 'string' } },
+  }),
   args: { contrast: 'positive', disabled: false },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Con el control `checked` el valor arranca en ese arg (la clave del `render` reinicia el estado al cambiarlo). */
 function InteractiveDemo(args: CheckboxProps) {
-  const [checked, setChecked] = useState(false);
-  return (
-    <Checkbox
-      {...args}
-      checked={checked}
-      onChange={(e) => setChecked(e.target.checked)}
-      aria-label="Aceptar"
-    />
-  );
+  const [checked, setChecked] = useState(Boolean(args.checked));
+  return <Checkbox {...args} checked={checked} onChange={(e) => setChecked(e.target.checked)} />;
 }
 
 export const Interactive: Story = {
-  render: (args) => <InteractiveDemo {...args} />,
+  args: { children: 'Recibir avisos' },
+  render: (args) => <InteractiveDemo key={String(args.checked)} {...args} />,
 };
 
 export const WithText: Story = {
@@ -225,5 +230,33 @@ export const IndeterminateTest: Story = {
     await expect(args.onChange).toHaveBeenCalledTimes(1);
     // La prop sigue en true: el componente lo vuelve a fijar
     await expect(checkbox.indeterminate).toBe(true);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Checkbox' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Checkbox en Figma:']);
+    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática)
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    // Sin Storybook no hay lienzo, código ni Personalizar: solo el bloque Props, de solo lectura
+    const props = canvas.getByRole('table', { name: 'Props de Checkbox' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(canvas.queryByRole('group', { name: 'Personalizar' })).not.toBeInTheDocument();
   },
 };

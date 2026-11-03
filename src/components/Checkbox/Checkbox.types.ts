@@ -1,6 +1,6 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
 
-/** Contrast de Figma: positive sobre superficies oscuras, negative sobre claras. */
+/** Contrast de Figma: positive sobre la superficie del tema y negative sobre la inversa. */
 export type SelectionContrast = 'positive' | 'negative';
 
 /**
@@ -14,7 +14,7 @@ export type CheckboxState = SelectionState | 'indeterminate' | 'disabled-indeter
 
 export interface CheckboxProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'children'> {
-  /** Contrast: positive (superficies oscuras) o negative (superficies claras) */
+  /** Contrast: positive (superficie del tema) o negative (superficie inversa) */
   contrast?: SelectionContrast;
   /** State forzado, solo para documentación */
   state?: CheckboxState;

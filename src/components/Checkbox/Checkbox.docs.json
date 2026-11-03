@@ -1,31 +1,75 @@
 {
   "name": "Checkbox",
   "component": "Checkbox",
-  "description": "Casilla de selección del sistema de diseño CAOS, fiel al component set Selection de Figma (9545:6413 y 9558:6975). Control de 16×16 con esquina de 6 y contorno de 1.5. Default: solo contorno. Select: relleno con check de 8.05×6. Disabled usa tokens background/field/disabled. Contraste positive para superficies oscuras y negative para claras. Con texto: gap 8, 16/20 Helvetica Neue regular. Usa un input nativo oculto pero accesible: funciona controlado y no controlado, con teclado nativo (Espacio) y foco visible con outline de 2px (agregado, no está en Figma). Estado mixto con indeterminate (no está en Figma): fija la propiedad indeterminate del input (el lector anuncia mixto) y dibuja una raya de 8 × 1.5 sobre el relleno de Select; lo usa CheckboxTree.",
+  "description": "Casilla de selección del sistema de diseño CAOS (component set Selection de Figma). Control de 16 × 16 px con esquina de 6 y contorno de 1.5. Default: solo contorno. Select: relleno con check de 8.05 × 6. Disabled usa los tokens background/field/disabled. Contrast positive para la superficie del tema y negative para la inversa. Con texto: gap de 8 y tipografía de 16/20 regular. Usa un input nativo oculto pero accesible: funciona controlado y no controlado, con teclado nativo (Espacio) y foco visible con contorno de 2 px (agregado, no está en Figma). El estado mixto (indeterminate, no está en Figma) fija la propiedad indeterminate del input, que el lector anuncia como mixto, y dibuja una raya de 8 × 1.5 sobre el relleno de Select. Lo usa CheckboxTree.",
   "category": "Form Controls",
   "props": {
     "contrast": {
       "type": "'positive' | 'negative'",
       "default": "'positive'",
-      "description": "Contrast de Figma: positive sobre superficies oscuras, negative sobre claras."
+      "description": "Contraste (Contrast en Figma): positive sobre la superficie del tema y negative sobre la inversa."
     },
-    "checked": { "type": "boolean", "required": false, "description": "Marcado (controlado). Usar con onChange." },
-    "defaultChecked": { "type": "boolean", "required": false, "description": "Marcado inicial (no controlado)." },
-    "disabled": { "type": "boolean", "default": false, "description": "Estados Disabled default y Disabled select." },
-    "children": { "type": "ReactNode", "required": false, "description": "Texto junto al control. Sin texto, pasar aria-label." },
-    "indeterminate": { "type": "boolean", "default": false, "description": "Estado mixto (APG Checkbox Mixed-State). El navegador lo quita al pulsar; mientras la prop siga en true se vuelve a fijar." },
+    "checked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Marcado (controlado). Úsalo con onChange."
+    },
+    "defaultChecked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Marcado inicial (no controlado)."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Deshabilitado. Cubre Disabled default y Disabled select de Figma."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto junto al control. Sin texto, pasa aria-label."
+    },
+    "indeterminate": {
+      "type": "boolean",
+      "default": false,
+      "description": "Estado mixto (patrón APG Checkbox Mixed-State). El navegador lo quita al pulsar; mientras la prop siga en true, se vuelve a fijar."
+    },
     "state": {
       "type": "'default' | 'select' | 'disabled-default' | 'disabled-select' | 'indeterminate' | 'disabled-indeterminate'",
       "required": false,
-      "description": "Fuerza el aspecto, solo para documentación."
+      "description": "Fuerza el aspecto, solo para documentación. En uso sale de checked, indeterminate y disabled."
     },
-    "onChange": { "type": "ChangeEventHandler<HTMLInputElement>", "required": false, "description": "Va al input nativo, igual que name, value y el resto de props nativas. El ref también apunta al input." }
+    "onChange": {
+      "type": "ChangeEventHandler<HTMLInputElement>",
+      "required": false,
+      "description": "Va al input nativo, igual que name, value y el resto de props nativas. El ref también apunta al input."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para la fila (el label que envuelve control y texto)."
+    }
   },
   "examples": [
-    { "title": "Con texto", "code": "<Checkbox defaultChecked>Acepto los términos</Checkbox>" },
-    { "title": "Controlado", "code": "<Checkbox checked={ok} onChange={(e) => setOk(e.target.checked)}>Recordarme</Checkbox>" },
-    { "title": "Sobre superficie clara", "code": "<Checkbox contrast=\"negative\">Opción</Checkbox>" },
-    { "title": "Solo control", "code": "<Checkbox aria-label=\"Seleccionar fila\" />" },
-    { "title": "Mixto", "code": "<Checkbox indeterminate={algunas} checked={todas} onChange={alternarTodas}>Todas</Checkbox>" }
+    {
+      "title": "Con texto",
+      "code": "<Checkbox defaultChecked>Acepto los términos</Checkbox>"
+    },
+    {
+      "title": "Controlado",
+      "code": "<Checkbox checked={ok} onChange={(e) => setOk(e.target.checked)}>Recordarme</Checkbox>"
+    },
+    {
+      "title": "Sobre la superficie inversa",
+      "code": "<Checkbox contrast=\"negative\">Opción</Checkbox>"
+    },
+    {
+      "title": "Solo control",
+      "code": "<Checkbox aria-label=\"Seleccionar fila\" />"
+    },
+    {
+      "title": "Mixto",
+      "code": "<Checkbox indeterminate={algunas} checked={todas} onChange={alternarTodas}>Todas</Checkbox>"
+    }
   ]
 }

@@ -3,43 +3,36 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Input } from './Input';
 import type { InputState, InputVariant } from './Input.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Input.doc';
+import docsJson from './Input.docs.json';
 
 const meta: Meta<typeof Input> = {
   title: 'Form Controls/Input',
   component: Input,
   tags: ['autodocs'],
-  argTypes: {
+  parameters: { docs: componentDocsParameters(doc, docsJson), docsLive: { exclude: ['aria-describedby'] } },
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
     variant: {
+      type: { name: 'enum', value: ['text', 'password', 'search', 'search-header'] },
       control: 'select',
       options: ['text', 'password', 'search', 'search-header'],
-      description: 'Type de Figma',
     },
     state: {
+      type: { name: 'enum', value: ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'] },
       control: 'select',
-      options: [
-        'default',
-        'filled',
-        'active',
-        'burnt-in',
-        'disabled',
-        'error',
-        'success',
-      ],
-      description: 'State forzado (solo para visualización)',
+      options: ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'],
     },
-    optional: {
-      control: 'boolean',
-      description: 'Agrega " | Opcional" al label',
-    },
-    disabled: { control: 'boolean', description: 'Estado disabled' },
-    readOnly: { control: 'boolean', description: 'Estado Burnt-In' },
-    fullWidth: {
-      control: 'boolean',
-      description: 'Ocupa el 100 % del contenedor',
-    },
-  },
+    optional: { type: { name: 'boolean' }, control: 'boolean' },
+    disabled: { type: { name: 'boolean' }, control: 'boolean' },
+    readOnly: { type: { name: 'boolean' }, control: 'boolean' },
+    fullWidth: { type: { name: 'boolean' }, control: 'boolean' },
+  }),
   args: {
-    label: 'Label',
+    label: 'Correo',
     variant: 'text',
     state: 'default',
     optional: false,
@@ -55,7 +48,7 @@ type Story = StoryObj<typeof meta>;
 export const Text: Story = {
   args: {
     label: 'Nombre completo',
-    placeholder: 'Ej. Camilo Hernández',
+    placeholder: 'Ana Pérez',
     helperText: 'Como aparece en tu documento',
   },
 };
@@ -64,7 +57,6 @@ export const Password: Story = {
   args: {
     variant: 'password',
     label: 'Contraseña',
-    placeholder: 'Ingresa tu contraseña',
   },
 };
 
@@ -72,7 +64,7 @@ export const Search: Story = {
   args: {
     variant: 'search',
     label: 'Buscar',
-    placeholder: 'Buscar componente o token',
+    placeholder: 'Reporte mensual',
   },
 };
 
@@ -80,7 +72,7 @@ export const SearchHeader: Story = {
   args: {
     variant: 'search-header',
     label: 'Buscar en el portal',
-    placeholder: 'Escribe para buscar',
+    placeholder: 'Reporte mensual',
   },
 };
 
@@ -88,7 +80,7 @@ export const OptionalWithTooltip: Story = {
   args: {
     label: 'Teléfono',
     optional: true,
-    tooltip: 'Solo lo usamos para notificaciones',
+    tooltip: 'Solo para verificar tu cuenta',
     type: 'tel',
   },
 };
@@ -110,7 +102,7 @@ function InteractiveInput(args: ComponentProps<typeof Input>) {
       onChange={(e) => setValue(e.target.value)}
       errorText={invalid ? 'Escribe un correo válido' : undefined}
       successText={value.includes('@') ? 'Correo válido' : undefined}
-      helperText="Te enviaremos la confirmación"
+      helperText="Usa el correo de tu cuenta"
     />
   );
 }
@@ -224,11 +216,11 @@ export const FigmaMatrix: Story = {
 /** Test: escribir actualiza el valor y el label sigue asociado */
 export const TypingTest: Story = {
   tags: ['!autodocs'],
-  args: { label: 'Nombre completo', placeholder: 'Ej. Camilo Hernández' },
+  args: { label: 'Nombre completo', placeholder: 'Ana Pérez' },
   play: async ({ canvasElement }) => {
     const input = within(canvasElement).getByLabelText('Nombre completo');
-    await userEvent.type(input, 'Camilo Pérez');
-    await expect(input).toHaveValue('Camilo Pérez');
+    await userEvent.type(input, 'Ana Pérez');
+    await expect(input).toHaveValue('Ana Pérez');
     await expect(within(canvasElement).getByRole('textbox', { name: 'Nombre completo' })).toBe(input);
   },
 };
@@ -330,5 +322,29 @@ export const FieldBaseTest: Story = {
     await expect(canvasElement.querySelectorAll('[aria-live="polite"]')).toHaveLength(2);
     await expect(canvas.queryByRole('alert')).toBeNull();
     await expect(email).toHaveAccessibleDescription('Escribe un correo válido');
+  },
+};
+
+/** Página de documentación completa (la revisan vitest y axe). */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Input' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Input en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 3 + 4)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(13);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Input' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

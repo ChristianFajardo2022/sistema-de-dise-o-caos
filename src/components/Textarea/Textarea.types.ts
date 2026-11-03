@@ -30,7 +30,7 @@ export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaE
   state?: TextareaState;
   /**
    * Líneas visibles. Con `autoResize` es el mínimo. Por defecto 1: con el contador, el campo mide
-   * 88 de alto, como en Figma.
+   * 86 de alto (78 en Mobile). Figma dibuja 88 en Default y Disabled.
    */
   rows?: number;
   /** Con `autoResize`, número de líneas a partir del cual deja de crecer y aparece el scroll. */

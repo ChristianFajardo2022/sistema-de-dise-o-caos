@@ -3,24 +3,26 @@ import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { Switch, SwitchTrack } from './Switch';
 import type { SwitchProps } from './Switch.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Switch.doc';
+import docsJson from './Switch.docs.json';
 
 const meta = {
   title: 'Form Controls/Switch',
   component: Switch,
-  parameters: { layout: 'centered' },
+  // `checked` lo maneja el estado de la historia Interactive: sin control en Personalizar (sigue en Props)
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson), docsLive: { exclude: ['checked', 'defaultChecked'] } },
   tags: ['autodocs'],
-  argTypes: {
-    type: {
-      control: 'radio',
-      options: ['simple', 'complex'],
-      description: 'Type del átomo: simple o complex (texto dentro de la pista)',
-      type: { name: 'enum', value: ['simple', 'complex'] },
-    },
-    checked: { control: 'boolean', description: 'Encendido (controlado)', type: { name: 'boolean' } },
-    disabled: { control: 'boolean', description: 'Deshabilitado', type: { name: 'boolean' } },
-    trackLabel: { control: 'text', description: 'Texto dentro de la pista (solo complex)' },
-    children: { control: 'text', description: 'Descripción junto a la pista' },
-  },
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    type: { control: 'radio', options: ['simple', 'complex'], type: { name: 'enum', value: ['simple', 'complex'] } },
+    checked: { control: 'boolean', type: { name: 'boolean' } },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
+    trackLabel: { control: 'text' },
+    children: { control: 'text' },
+  }),
   args: { type: 'simple', disabled: false },
 } satisfies Meta<typeof Switch>;
 
@@ -197,5 +199,33 @@ export const ComplexNameTest: Story = {
     // El texto de la pista nombra al control por aria-labelledby y la pista queda oculta: no se lee dos veces
     await expect(sw).toHaveAttribute('aria-labelledby');
     await expect(canvasElement.querySelector('[data-figma-part="Toggle (Atom)"]')).toHaveAttribute('aria-hidden', 'true');
+  },
+};
+
+/** Test: la página Docs (plantilla v2) se dibuja con su encabezado, sus secciones y la referencia de código */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Switch' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Switch en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (2 grupos de 4)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(8);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    const props = canvas.getByRole('table', { name: 'Props de Switch' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).getByRole('rowheader', { name: /trackLabel/ })).toBeInTheDocument();
   },
 };

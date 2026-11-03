@@ -3,6 +3,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Textarea } from './Textarea';
 import type { TextareaResize, TextareaState } from './Textarea.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Textarea.doc';
+import docsJson from './Textarea.docs.json';
 
 const STATE_OPTIONS: TextareaState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'];
 const RESIZE_OPTIONS: TextareaResize[] = ['none', 'vertical', 'horizontal', 'both'];
@@ -10,9 +15,9 @@ const RESIZE_OPTIONS: TextareaResize[] = ['none', 'vertical', 'horizontal', 'bot
 const meta = {
   title: 'Form Controls/Textarea',
   component: Textarea,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     state: {
       name: 'state',
       control: 'select',
@@ -35,10 +40,10 @@ const meta = {
     disabled: { name: 'disabled', control: 'boolean', type: { name: 'boolean' } },
     readOnly: { name: 'readOnly', control: 'boolean', type: { name: 'boolean' }, description: 'Estado Burnt-In' },
     fullWidth: { name: 'fullWidth', control: 'boolean', type: { name: 'boolean' } },
-  },
+  }),
   args: {
     label: 'Comentario',
-    placeholder: 'Escribe tu comentario',
+    placeholder: 'Revisar el ancho de las columnas',
     rows: 3,
     maxLength: 200,
     resize: 'vertical',
@@ -222,5 +227,33 @@ export const ValueChangeTest: Story = {
     await userEvent.type(canvas.getByRole('textbox', { name: 'Comentario' }), 'Hola');
     await expect(canvas.getByTestId('valor')).toHaveTextContent('Hola');
     await expect(canvas.getByTestId('raiz')).toContainElement(canvas.getByRole('textbox', { name: 'Comentario' }));
+  },
+};
+
+/** Test: la página de documentación (plantilla v2) con sus tres pestañas. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Textarea' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Textarea en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(9);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    const props = canvas.getByRole('table', { name: 'Props de Textarea' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).getByRole('rowheader', { name: /maxRows/ })).toBeInTheDocument();
   },
 };
