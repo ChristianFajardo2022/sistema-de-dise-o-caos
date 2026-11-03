@@ -10,6 +10,11 @@ import type {
   ButtonCornerVariant,
 } from './ButtonCorner.types';
 import { cornerShadowClass } from '../_internal/shadows';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ButtonCorner.doc';
+import docsJson from './ButtonCorner.docs.json';
 
 const VARIANTS: ButtonCornerVariant[] = ['icon', 'dots', 'radiobutton', 'checkbox', 'favorite'];
 const CONTRASTS: ButtonCornerContrast[] = ['on-canva', 'on-card', 'unicolor-canva'];
@@ -38,8 +43,9 @@ const meta: Meta<ButtonCornerArgs> = {
   title: 'General Controls/Button corner',
   component: ButtonCorner as unknown as ComponentType<ButtonCornerArgs>,
   tags: ['autodocs'],
+  parameters: { docs: componentDocsParameters(doc, docsJson) },
   // Tipos explícitos: con la unión discriminada de ButtonCornerProps el docgen no los infiere y Storybook descarta los args de la URL
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     variant: {
       type: { name: 'enum', value: VARIANTS },
       control: 'select',
@@ -71,6 +77,11 @@ const meta: Meta<ButtonCornerArgs> = {
       options: SIZES,
       description: 'Size: md 40 · sm 32',
     },
+    iconSize: {
+      type: { name: 'enum', value: [16, 20] },
+      control: 'radio',
+      options: [16, 20],
+    },
     stroke: {
       type: { name: 'boolean' },
       control: 'boolean',
@@ -91,7 +102,7 @@ const meta: Meta<ButtonCornerArgs> = {
       control: 'text',
       description: 'Nombre accesible (obligatorio: aria-label o aria-labelledby)',
     },
-  },
+  }),
   args: {
     variant: 'icon',
     contrast: 'on-canva',
@@ -353,5 +364,34 @@ export const InactiveTest: Story = {
     await expect(real).toBeDisabled();
     await expect(bg('Real')).toBe(bg('Forzado'));
     await expect(getComputedStyle(real).boxShadow).toBe('none');
+  },
+};
+
+/** Test: la página Docs (plantilla v2) se dibuja con su encabezado, sus secciones y la referencia de código */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Button corner' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Button corner en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (4 grupos de 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(12);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    const props = canvas.getByRole('table', { name: 'Props de ButtonCorner' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).getByRole('rowheader', { name: /iconSize/ })).toBeInTheDocument();
+    await expect(within(props).queryByRole('switch')).not.toBeInTheDocument();
   },
 };

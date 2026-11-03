@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Icon } from '../components/Icon';
 import type { IconName } from '../components/Icon/Icon.types';
@@ -490,6 +490,39 @@ export function DocCallout({ tone = 'info', children }: DocCalloutProps) {
   );
 }
 
+/** Ancho de diseño del marco de teléfono de los Do / Don't y alto mínimo de su zona (el panel tintado mide ~288 con su padding de 32). */
+const PRACTICE_FRAME_WIDTH = 376;
+const PRACTICE_FRAME_MIN_HEIGHT = 256;
+
+/**
+ * Dibuja el contenido a su ancho de diseño y, si el espacio disponible es menor, lo reduce con `zoom` para que quepa
+ * entero (como un teléfono visto más pequeño), en vez de apretar el componente: así una muestra no se parte ni se sale
+ * de su forma en pantallas angostas. Con espacio de sobra queda a escala 1. `minHeight` también se escala, así el panel
+ * que lo rodea no queda con un hueco cuando el contenido se reduce.
+ */
+function FitToWidth({ width, minHeight, children }: { width: number; minHeight?: number; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    // ResizeObserver avisa también al empezar a observar: no hace falta medir aparte
+    const observer = new ResizeObserver(() => {
+      const available = el.clientWidth;
+      setZoom(available > 0 ? Math.min(1, available / width) : 1);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [width]);
+  return (
+    <div ref={ref} className="flex w-full min-w-0 justify-center">
+      <div style={{ width, minHeight, zoom }} className="flex shrink-0 flex-col justify-end">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 /**
  * Una práctica. Estilo v2 (`framed`): Card con muesca, título "Hacer" / "Evitar" en éxito o error, la regla en una
  * línea y, debajo, un panel tintado (`background/semantic/success|error/firts`, radio 16, alto ~284) con el marco de
@@ -510,13 +543,15 @@ export function DocPracticeCard({ kind, title, description, preview, framed }: D
             role="group"
             aria-label={`Ejemplo: ${title}`}
             className={cn(
-              'flex min-h-72 items-end justify-center overflow-hidden rounded-ds-radius-general-xl px-ds-space-general-2xl pt-ds-space-general-4xl',
+              'flex items-end justify-center overflow-hidden rounded-ds-radius-general-xl px-ds-space-general-2xl pt-ds-space-general-4xl',
               isDo ? 'bg-ds-background-semantic-success-firts' : 'bg-ds-background-semantic-error-firts',
             )}
           >
-            <DocDeviceFrame breakpoint="mobile" rounding="top" statusBar className="max-w-[376px]">
-              {preview}
-            </DocDeviceFrame>
+            <FitToWidth width={PRACTICE_FRAME_WIDTH} minHeight={PRACTICE_FRAME_MIN_HEIGHT}>
+              <DocDeviceFrame breakpoint="mobile" rounding="top" statusBar>
+                {preview}
+              </DocDeviceFrame>
+            </FitToWidth>
           </div>
         )}
       </DocNotchCard>

@@ -1,9 +1,14 @@
 {
   "name": "ButtonLink",
   "component": "ButtonLink",
-  "description": "Enlace con aspecto de botón del sistema de diseño CAOS, fiel al component set Button link de Figma (nodo 13215:4751). Con href se renderiza como <a> (navegación); sin href es un <button type=\"button\"> real con el mismo aspecto, para acciones en línea como \"Reenviar\" (Enter y Espacio nativos, disabled nativo). Alto 32 (padding Y 8, línea de 16), padding X 0, gap 4 entre texto e ícono. Texto Helvetica Neue 400, 14px fijo (typography/button/size/md-uniform), subrayado sólido 6 %. Ícono de enlace externo de 12px con color por token. Estados Default, Hover, Focus, Press e Inactive con tokens text/button/link/* e icon/button/link/*. Sin anillo de foco: cada estado usa sus tokens. Con target=\"_blank\" añade el texto sr-only \" (se abre en una pestaña nueva)\" dentro del enlace; el ícono se muestra por defecto.",
+  "description": "Enlace con aspecto de botón del sistema de diseño CAOS, fiel al component set Button link de Figma. Con href se renderiza como <a> (navegación); sin href es un <button type=\"button\"> real con el mismo aspecto, para acciones en línea como \"Reenviar\" (Enter y Espacio nativos, disabled nativo). Alto 32 (padding Y 8, línea de 16), padding X 0, gap 4 entre texto e ícono. Texto Helvetica Neue Semibold (600), 14px fijo (typography/button/size/md-uniform), subrayado sólido 6%. Ícono de enlace externo de 12px con color por token. Estados Default, Hover, Focus, Press e Inactive con tokens text/button/link/* e icon/button/link/*. Sin anillo de foco: cada estado usa sus tokens. Con target=\"_blank\" añade el texto sr-only \" (se abre en una pestaña nueva)\" dentro del enlace; el ícono se muestra por defecto.",
   "category": "General Controls",
   "props": {
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto del enlace o de la acción. Va subrayado."
+    },
     "href": {
       "type": "string",
       "required": false,
@@ -33,6 +38,21 @@
       "type": "ReactNode",
       "required": false,
       "description": "Reemplaza el ícono de enlace externo. Se dibuja a 12×12 con el token icon/button/link del estado."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para el elemento que se dibuja (`<a>` o `<button>`)."
+    },
+    "target": {
+      "type": "string",
+      "required": false,
+      "description": "Dónde se abre el enlace (por ejemplo `_blank`). Con `_blank` el nombre accesible suma \"(se abre en una pestaña nueva)\"."
+    },
+    "rel": {
+      "type": "string",
+      "required": false,
+      "description": "Relación con el destino. Con `target=\"_blank\"` usa `noopener noreferrer`."
     }
   },
   "examples": [

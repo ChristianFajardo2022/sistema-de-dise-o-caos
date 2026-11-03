@@ -19,7 +19,7 @@ interface Entry {
   category: string;
 }
 
-/** Los 404 íconos agrupados por categoría, calculado una sola vez */
+/** Todos los íconos agrupados por categoría, calculado una sola vez */
 const ENTRIES: Entry[] = (Object.keys(caosIcons) as IconName[]).map((name) => ({ name, category: caosIconCategories[name] }));
 const CATEGORIES = Array.from(new Set(ENTRIES.map((e) => e.category)));
 

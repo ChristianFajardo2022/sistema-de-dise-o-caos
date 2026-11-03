@@ -2,23 +2,25 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { NotificationBell } from './NotificationBell';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NotificationBell.doc';
+import docsJson from './NotificationBell.docs.json';
 
 const meta = {
   title: 'General Controls/NotificationBell',
   component: NotificationBell,
   tags: ['autodocs'],
-  argTypes: {
-    count: { control: { type: 'number', min: 0 }, type: { name: 'number' }, description: 'Notificaciones sin leer' },
-    max: { control: { type: 'number', min: 1 }, type: { name: 'number' }, description: 'Máximo del contador ("99+")' },
-    size: {
-      control: 'radio',
-      options: ['xs', 'sm', 'md'],
-      type: { name: 'enum', value: ['xs', 'sm', 'md'] },
-      description: 'Size del Button de Figma (xs 32, sm 48, md 56)',
-    },
-    open: { control: 'boolean', type: { name: 'boolean' }, description: 'El panel que abre está a la vista (aria-expanded y Press)' },
-    label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible base' },
-  },
+  parameters: { docs: componentDocsParameters(doc, docsJson) },
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    count: { control: { type: 'number', min: 0 }, type: { name: 'number' } },
+    max: { control: { type: 'number', min: 1 }, type: { name: 'number' } },
+    size: { control: 'radio', options: ['xs', 'sm', 'md'], type: { name: 'enum', value: ['xs', 'sm', 'md'] } },
+    open: { control: 'boolean', type: { name: 'boolean' } },
+    label: { control: 'text', type: { name: 'string' } },
+  }),
   args: { count: 3, size: 'xs' },
 } satisfies Meta<typeof NotificationBell>;
 
@@ -107,5 +109,34 @@ export const NameTest: Story = {
     await expect(open).toHaveAttribute('aria-controls', 'p');
     await userEvent.tab();
     await expect(canvas.getByRole('button', { name: 'Notificaciones, 3 sin leer' })).toHaveFocus();
+  },
+};
+
+/** Test: la página Docs (plantilla v2) se dibuja con su encabezado, sus secciones y la referencia de código */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NotificationBell' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NotificationBell en Figma:']);
+    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática)
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    // Sin Storybook no hay lienzo, código ni Personalizar: solo el bloque Props, de solo lectura
+    const props = canvas.getByRole('table', { name: 'Props de NotificationBell' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(canvas.queryByRole('group', { name: 'Personalizar' })).not.toBeInTheDocument();
   },
 };

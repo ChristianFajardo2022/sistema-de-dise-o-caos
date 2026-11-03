@@ -17,7 +17,7 @@ export const Definicion: Story = { name: 'Definición', args: { initialTab: 'def
 /** Pestaña Valores: línea, tamaños, márgenes de seguridad, zona tapeable y color */
 export const Valores: Story = { name: 'Valores', args: { initialTab: 'valores' } };
 
-/** Pestaña Catálogo: los 404 íconos con buscador, filtros y copia del código */
+/** Pestaña Catálogo: todos los íconos con buscador, filtros y copia del código */
 export const Catalogo: Story = { name: 'Catálogo', args: { initialTab: 'catalogo' } };
 
 /** Catálogo a pantalla completa, sin encabezado ni pestañas: para enlazarlo directo */

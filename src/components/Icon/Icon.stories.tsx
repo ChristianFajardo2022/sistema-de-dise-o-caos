@@ -1,9 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Icon } from './Icon';
 import { ICON_SIZES } from './Icon.types';
 import { caosIcons } from '../../icons/caos/registry.generated';
 import type { IconName } from '../../icons/caos/registry.generated';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Icon.doc';
+import docsJson from './Icon.docs.json';
 
 const NAMES = Object.keys(caosIcons) as IconName[];
 
@@ -11,8 +16,9 @@ const meta: Meta<typeof Icon> = {
   title: 'General Controls/Icon',
   component: Icon,
   tags: ['autodocs'],
-  argTypes: {
-    name: { control: 'select', options: NAMES, description: 'Nombre del ícono (404)' },
+  parameters: { docs: componentDocsParameters(doc, docsJson) },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    name: { control: 'select', options: NAMES, description: 'Nombre del ícono (409)' },
     // Tipos explícitos: sin ellos el docgen muestra `unknown[number]` para size
     size: {
       type: { name: 'enum', value: [...ICON_SIZES] },
@@ -27,7 +33,7 @@ const meta: Meta<typeof Icon> = {
       description: 'Por defecto: relleno por debajo de 24 px, línea desde 24 px',
     },
     'aria-label': { control: 'text', description: 'Sin él, el ícono es decorativo' },
-  },
+  }),
   args: { name: 'search', size: 24 },
   decorators: [
     (Story) => (
@@ -119,5 +125,32 @@ export const VariantRuleTest: Story = {
     await expect(ds(a)).toEqual(paths(caosIcons.add.fill));
     await expect(ds(b)).toEqual(paths(caosIcons.add.line));
     await expect(ds(c)).toEqual(paths(caosIcons.add.line));
+  },
+};
+
+/** Test: la página de documentación (plantilla v2) con sus pestañas y secciones */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Icon' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Icon en Figma:']);
+    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    const props = canvas.getByRole('table', { name: 'Props de Icon' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).queryByRole('switch')).not.toBeInTheDocument();
   },
 };

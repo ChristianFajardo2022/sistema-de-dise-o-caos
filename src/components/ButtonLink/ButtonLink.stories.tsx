@@ -2,12 +2,19 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { ButtonLink } from './ButtonLink';
 import type { ButtonLinkState } from './ButtonLink.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ButtonLink.doc';
+import docsJson from './ButtonLink.docs.json';
 
 const meta: Meta<typeof ButtonLink> = {
   title: 'General Controls/Button link',
   component: ButtonLink,
   tags: ['autodocs'],
-  argTypes: {
+  // La página Docs usa la plantilla de documentación (ButtonLink.doc.tsx) con la referencia de código al final
+  parameters: { docs: componentDocsParameters(doc, docsJson) },
+  argTypes: argTypesFromDocsJson(docsJson, {
     state: {
       control: 'select',
       options: ['default', 'hover', 'focus', 'press', 'inactive'],
@@ -21,9 +28,9 @@ const meta: Meta<typeof ButtonLink> = {
       control: 'boolean',
       description: 'Icon right: ícono de enlace externo después del texto',
     },
-  },
+  }),
   args: {
-    children: 'Button',
+    children: 'Ver guía',
     href: '#',
     state: 'default',
     disabled: false,
@@ -60,7 +67,7 @@ export const StatesMatrix: Story = {
           <span className="text-xs text-ds-text-neutral-body">{iconRight ? 'Icon right' : 'Sin ícono'}</span>
           {STATES.map((s) => (
             <div key={s}>
-              <ButtonLink href="#" state={s} iconRight={iconRight}>Button</ButtonLink>
+              <ButtonLink href="#" state={s} iconRight={iconRight}>Ver guía</ButtonLink>
             </div>
           ))}
         </div>
@@ -76,7 +83,7 @@ export const FigmaMatrix: Story = {
     <div className="flex flex-wrap items-center gap-8 bg-ds-background-general-black p-6">
       {STATES.map((s) => (
         <ButtonLink key={s} href="#" state={s} iconRight data-figma={`State=${s.charAt(0).toUpperCase() + s.slice(1)}`}>
-          Button
+          Ver guía
         </ButtonLink>
       ))}
     </div>
@@ -156,5 +163,33 @@ export const ActionButtonInactiveTest: Story = {
     await userEvent.tab();
     await expect(button).not.toHaveFocus();
     await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+/** Test: la página Docs (plantilla v2) se dibuja con su encabezado, sus secciones y la referencia de código */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Button link' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Button link en Figma:']);
+    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática)
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    // Sin Storybook no hay lienzo ni Personalizar: solo el bloque Props, de solo lectura
+    const props = canvas.getByRole('table', { name: 'Props de ButtonLink' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).queryByRole('switch')).not.toBeInTheDocument();
   },
 };
