@@ -4,6 +4,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { NumberPicker } from './NumberPicker';
 import type { NumberPickerSize, NumberPickerState } from './NumberPicker.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NumberPicker.doc';
+import docsJson from './NumberPicker.docs.json';
 
 const SIZE_OPTIONS: NumberPickerSize[] = ['sm', 'md'];
 const STATE_OPTIONS: NumberPickerState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled'];
@@ -11,9 +16,13 @@ const STATE_OPTIONS: NumberPickerState[] = ['default', 'filled', 'active', 'burn
 const meta = {
   title: 'Form Controls/NumberPicker',
   component: NumberPicker,
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: ['id', 'value', 'aria-labelledby', 'aria-describedby'] },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     size: {
       name: 'size',
       control: 'radio',
@@ -35,7 +44,7 @@ const meta = {
     disabled: { name: 'disabled', control: 'boolean', type: { name: 'boolean' } },
     readOnly: { name: 'readOnly', control: 'boolean', type: { name: 'boolean' }, description: 'Estado Burnt-In (solo lectura)' },
     fullWidth: { name: 'fullWidth', control: 'boolean', type: { name: 'boolean' } },
-  },
+  }),
   args: { size: 'sm', 'aria-label': 'Cantidad', defaultValue: 1, min: 0, max: 10, step: 1 },
 } satisfies Meta<typeof NumberPicker>;
 
@@ -205,5 +214,28 @@ export const MessagesTest: Story = {
     await expect(rooms).toHaveAttribute('aria-invalid', 'true');
     await expect(rooms).toHaveAccessibleDescription('Elige al menos una');
     await expect(canvasElement.querySelectorAll('[aria-live="polite"]')).toHaveLength(2);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NumberPicker' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NumberPicker en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (5 + 2)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(7);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de NumberPicker' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

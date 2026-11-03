@@ -85,6 +85,7 @@ export * from './components/Table';
 export * from './components/Tabs';
 export * from './components/Tag';
 export * from './components/Textarea';
+export * from './components/ThemeSwitch';
 export * from './components/Timeline';
 export * from './components/TimePicker';
 export * from './components/Toast';

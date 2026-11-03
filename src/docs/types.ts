@@ -57,7 +57,7 @@ export interface DocStateItem {
  *   dentro de la vista `marks` del mismo lienzo. Su línea guía lleva `data-doc-mark-line="<n>"` y termina en el borde
  *   `side` de la parte.
  * - Cada cota lleva `data-doc-dim="padding|gap|height"` y `data-doc-dim-value="<px reales>"` (sin escala), además de
- *   `data-doc-dim-selector` / `-index` / `-side` (padding y height) o `data-doc-dim-from` / `-to` / `-axis` (gap),
+ *   `data-doc-dim-selector` / `-index` / `-side` (padding y height) o `data-doc-dim-from` / `-from-index` / `-to` / `-to-index` / `-axis` (gap),
  *   resueltos en la vista `dims`.
  * - Si dos marcadores del mismo lado se pisan, el segundo se corre a lo largo de ese lado sin salirse de su parte: la
  *   línea guía sigue siendo recta y cae sobre la parte.

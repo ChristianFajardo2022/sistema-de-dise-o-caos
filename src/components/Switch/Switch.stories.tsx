@@ -215,8 +215,8 @@ export const DocPageTest: Story = {
     await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Switch en Figma:']);
-    // Marcadores de la anatomía: uno por pauta (2 grupos de 4)
-    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(8);
+    // Marcadores de la anatomía: uno por pauta (3 grupos de 4)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(12);
     await userEvent.click(tabs[1]);
     await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
     await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);

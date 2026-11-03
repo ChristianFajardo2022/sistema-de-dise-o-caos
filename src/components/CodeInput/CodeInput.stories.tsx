@@ -1,19 +1,43 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
 import { CodeInput } from './CodeInput';
+import { doc } from './CodeInput.doc';
+import docsJson from './CodeInput.docs.json';
 import type { CodeInputProps, CodeInputState } from './CodeInput.types';
 
 const STATE_OPTIONS: CodeInputState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'];
 const SIZE_OPTIONS = ['56', '32'];
 
+/**
+ * Args con los que se dibuja la historia `Interactive` y el lienzo de la documentación: `length` acotado a 2-8 y, con
+ * los estados que piden dígitos, un valor inicial de muestra acorde a `length` (`value` y `defaultValue` no tienen control).
+ */
+function liveArgs(a: Record<string, unknown>): Record<string, unknown> {
+  const length = Math.min(8, Math.max(2, Math.round(Number(a.length)) || 6));
+  const needsValue =
+    ['filled', 'burnt-in', 'disabled', 'error', 'success'].includes(String(a.state)) ||
+    a.readOnly === true ||
+    a.disabled === true ||
+    a.confirmed === true ||
+    Boolean(a.errorText) ||
+    Boolean(a.successText);
+  return { ...a, length, defaultValue: needsValue ? '48291637'.slice(0, length) : undefined };
+}
+
 const meta = {
   title: 'Form Controls/CodeInput',
   component: CodeInput,
   tags: ['autodocs'],
-  parameters: { layout: 'centered' },
-  argTypes: {
-    length: { name: 'length', control: { type: 'number', min: 2, max: 8 }, type: { name: 'number' }, description: 'Número de casillas' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson), docsLive: {
+      exclude: ['value', 'defaultValue'],
+      args: liveArgs,
+    } },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    length: { name: 'length', control: { type: 'number', min: 2, max: 8, step: 1 }, type: { name: 'number' }, description: 'Número de casillas' },
     size: {
       name: 'size',
       control: 'radio',
@@ -34,7 +58,7 @@ const meta = {
     fullWidth: { name: 'fullWidth', control: 'boolean', type: { name: 'boolean' } },
     onValueChange: { action: 'valueChange' },
     onComplete: { action: 'complete' },
-  },
+  }),
   args: {
     label: 'Código de verificación',
     length: 6,
@@ -51,7 +75,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Interactive: Story = {};
+export const Interactive: Story = {
+  render: (args) => {
+    const live = liveArgs(args as Record<string, unknown>) as unknown as CodeInputProps;
+    // `key`: el valor inicial y la cantidad de casillas solo se leen al montar
+    return <CodeInput key={`${live.length}-${live.defaultValue ?? ''}`} {...live} />;
+  },
+};
 
 function ControlledDemo(args: CodeInputProps) {
   const [code, setCode] = useState('');
@@ -261,5 +291,28 @@ export const ApiTest: Story = {
     await expect(canvas.queryByRole('alert')).toBeNull();
     await expect(cells[2]).toHaveAttribute('aria-invalid', 'true');
     await expect(cells[2]).toHaveAccessibleDescription('El código no es válido Llega por SMS');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'CodeInput' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente CodeInput en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (5 + 2)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(7);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de CodeInput' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

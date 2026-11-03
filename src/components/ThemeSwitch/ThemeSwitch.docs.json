@@ -1,0 +1,52 @@
+{
+  "name": "ThemeSwitch",
+  "component": "ThemeSwitch",
+  "description": "Interruptor para cambiar entre modo claro y oscuro, fiel al component set Switch dark/light de Figma (State Light o Dark por Contrast On canva u On card, 104 × 56). Un botón de píldora con dos casillas de ícono de 40 × 40: el sol a la izquierda y la luna a la derecha; la casilla del modo activo se pinta de blanco. Sigue el patrón APG Switch: button con role=switch y aria-checked (encendido es el modo oscuro), Espacio y Enter alternan, clic en cualquier parte alterna y el foco dibuja un contorno de 2 px (agregado, no está en Figma). Los íconos son decorativos. Funciona controlado (value y onValueChange) y no controlado (defaultValue). El nombre accesible es fijo (Modo oscuro por defecto) porque el estado lo comunica aria-checked.",
+  "category": "Form Controls",
+  "props": {
+    "value": {
+      "type": "'light' | 'dark'",
+      "required": false,
+      "description": "Modo activo (controlado). Úsalo con onValueChange."
+    },
+    "defaultValue": {
+      "type": "'light' | 'dark'",
+      "default": "'light'",
+      "description": "Modo inicial (no controlado)."
+    },
+    "onValueChange": {
+      "type": "(value: 'light' | 'dark') => void",
+      "required": false,
+      "description": "Se llama con el nuevo modo al alternar."
+    },
+    "contrast": {
+      "type": "'on-canva' | 'on-card'",
+      "default": "'on-canva'",
+      "description": "Superficie donde se apoya (Contrast en Figma): cambia el fondo del contenedor."
+    },
+    "aria-label": {
+      "type": "string",
+      "default": "'Modo oscuro'",
+      "description": "Nombre accesible. Mantenlo fijo: el estado lo anuncia aria-checked."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para el botón."
+    }
+  },
+  "examples": [
+    {
+      "title": "No controlado",
+      "code": "<ThemeSwitch defaultValue=\"dark\" />"
+    },
+    {
+      "title": "Controlado",
+      "code": "<ThemeSwitch value={mode} onValueChange={setMode} />"
+    },
+    {
+      "title": "Sobre una tarjeta",
+      "code": "<ThemeSwitch contrast=\"on-card\" />"
+    }
+  ]
+}

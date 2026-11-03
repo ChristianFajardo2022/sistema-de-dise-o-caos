@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { NotificationText } from './NotificationText';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NotificationText.doc';
+import docsJson from './NotificationText.docs.json';
 import type { NotificationTextState } from './NotificationText.types';
 
 const STATE_OPTIONS: NotificationTextState[] = ['error', 'helper', 'confirmation', 'information'];
@@ -8,9 +13,9 @@ const STATE_OPTIONS: NotificationTextState[] = ['error', 'helper', 'confirmation
 const meta = {
   title: 'Form Controls/NotificationText',
   component: NotificationText,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     state: {
       name: 'state',
       control: 'radio',
@@ -25,8 +30,8 @@ const meta = {
       description: 'Error usa role="alert" y confirmation role="status"; con false no añade rol',
     },
     children: { control: 'text', type: { name: 'string' }, description: 'Prop Text helper de Figma' },
-  },
-  args: { state: 'helper', announce: true, children: 'Texto de ayuda' },
+  }),
+  args: { state: 'helper', announce: true, children: 'Usa el correo de tu cuenta' },
   decorators: [
     (Story) => (
       <div className="w-[320px]">
@@ -91,5 +96,30 @@ export const RolesTest: Story = {
     await expect(canvas.getByTestId('helper')).not.toHaveAttribute('role');
     await expect(canvas.getByTestId('silent')).not.toHaveAttribute('role');
     await expect(canvas.getAllByRole('alert')).toHaveLength(1);
+  },
+};
+
+/** Página de documentación completa (la revisan vitest y axe). */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  decorators: [],
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NotificationText' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NotificationText en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (3 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(6);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de NotificationText' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

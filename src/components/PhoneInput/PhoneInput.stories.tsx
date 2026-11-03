@@ -3,6 +3,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { PhoneInput } from './PhoneInput';
 import type { PhoneInputState } from './PhoneInput.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './PhoneInput.doc';
+import docsJson from './PhoneInput.docs.json';
 
 const STATES: PhoneInputState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'];
 
@@ -10,7 +15,15 @@ const meta: Meta<typeof PhoneInput> = {
   title: 'Form Controls/PhoneInput',
   component: PhoneInput,
   tags: ['autodocs'],
-  argTypes: {
+  parameters: {
+    docs: componentDocsParameters(doc, docsJson),
+    // `value` y `countryCode` los controlaría el lienzo sin devolver el cambio; `open` y `defaultOpen` abren la lista en la
+    // capa superior; `id` remite a otro elemento; `defaultCountryCode` con texto libre deja el prefijo sin país
+    docsLive: {
+      exclude: ['value', 'countryCode', 'open', 'defaultOpen', 'id', 'defaultCountryCode', 'autoComplete'],
+    },
+  },
+  argTypes: argTypesFromDocsJson(docsJson, {
     state: {
       control: 'select',
       options: STATES,
@@ -22,13 +35,14 @@ const meta: Meta<typeof PhoneInput> = {
     disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Estado Disabled' },
     readOnly: { control: 'boolean', type: { name: 'boolean' }, description: 'Estado Burnt-In' },
     required: { control: 'boolean', type: { name: 'boolean' }, description: 'Número obligatorio' },
-    fullWidth: { control: 'boolean', type: { name: 'boolean' }, description: '100 % del contenedor (si no, 320)' },
+    fullWidth: { control: 'boolean', type: { name: 'boolean' }, description: '100% del contenedor (si no, 320)' },
     maxDigits: { control: 'number', type: { name: 'number' }, description: 'Máximo de dígitos' },
     helperText: { control: 'text', type: { name: 'string' } },
     errorText: { control: 'text', type: { name: 'string' } },
     successText: { control: 'text', type: { name: 'string' } },
-  },
-  args: { label: 'Teléfono', placeholder: '300 123 4567', helperText: undefined },
+  }),
+  // Con número ficticio desde el inicio para que `groupDigits` y `maxDigits` se vean en Personalizar
+  args: { label: 'Celular', placeholder: '300 000 0000', defaultValue: '3000000000', helperText: undefined },
   decorators: [
     (Story, { parameters }) =>
       parameters.sinMarco ? (
@@ -48,7 +62,7 @@ export const Interactive: Story = { args: { groupDigits: true, helperText: 'Sin 
 export const Controlled: Story = {
   render: function ControlledDemo(args) {
     const [country, setCountry] = useState<string | null>('MX');
-    const [number, setNumber] = useState('5512345678');
+    const [number, setNumber] = useState('5500000000');
     return (
       <div className="flex flex-col gap-4">
         <PhoneInput {...args} countryCode={country} onCountryCodeChange={setCountry} value={number} onValueChange={setNumber} groupDigits />
@@ -63,11 +77,11 @@ export const Controlled: Story = {
 export const WithMessages: Story = {
   render: (args) => (
     <div className="flex flex-col gap-6">
-      <PhoneInput {...args} helperText="Te enviaremos un código por mensaje" />
-      <PhoneInput {...args} errorText="El número no es válido" defaultValue="123" />
-      <PhoneInput {...args} successText="Número verificado" defaultValue="3001234567" groupDigits />
-      <PhoneInput {...args} disabled defaultValue="3001234567" />
-      <PhoneInput {...args} readOnly defaultValue="3001234567" groupDigits />
+      <PhoneInput {...args} helperText="Sin espacios ni guiones" />
+      <PhoneInput {...args} errorText="Escribe el número completo" defaultValue="300" />
+      <PhoneInput {...args} successText="Celular verificado" defaultValue="3000000000" groupDigits />
+      <PhoneInput {...args} disabled defaultValue="3000000000" />
+      <PhoneInput {...args} readOnly defaultValue="3000000000" groupDigits />
     </div>
   ),
 };
@@ -133,13 +147,13 @@ const renderTest = (args: ComponentProps<typeof PhoneInput>) => (
 /** Rol de grupo, nombres, atributos del número, elegir indicativo con teclado, escribir y valor E.164 del input oculto. */
 export const KeyboardTest: Story = {
   tags: ['!autodocs'],
-  args: { helperText: 'Sin el indicativo', groupDigits: true },
+  args: { helperText: 'Sin el indicativo', groupDigits: true, defaultValue: '' },
   render: renderTest,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const group = canvas.getByRole('group', { name: 'Teléfono' });
+    const group = canvas.getByRole('group', { name: 'Celular' });
     const prefix = within(group).getByRole('combobox', { name: 'Indicativo' });
-    const number = within(group).getByRole('textbox', { name: 'Teléfono' });
+    const number = within(group).getByRole('textbox', { name: 'Celular' });
     const form = canvasElement.querySelector('form')!;
     const e164 = () => new FormData(form).get('telefono');
 
@@ -163,9 +177,9 @@ export const KeyboardTest: Story = {
     // Escribir: solo dígitos, agrupados al mostrar
     await userEvent.tab();
     await expect(number).toHaveFocus();
-    await userEvent.keyboard('55 abc 1234-5678');
-    await expect(number).toHaveValue('551 234 5678');
-    await expect(e164()).toBe('+525512345678');
+    await userEvent.keyboard('00 abc 0000-0000');
+    await expect(number).toHaveValue('000 000 0000');
+    await expect(e164()).toBe('+520000000000');
 
     await userEvent.clear(number);
     await expect(e164()).toBe('');
@@ -175,7 +189,7 @@ export const KeyboardTest: Story = {
 /** Controlado: onCountryCodeChange y onValueChange (solo dígitos) y errorText con aria-invalid. */
 export const ControlledTest: Story = {
   tags: ['!autodocs'],
-  args: { errorText: 'El número no es válido' },
+  args: { errorText: 'Escribe el número completo', defaultValue: '' },
   render: function Demo(args) {
     const [log, setLog] = useState('');
     return (
@@ -194,9 +208,9 @@ export const ControlledTest: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const prefix = canvas.getByRole('combobox', { name: 'Indicativo' });
-    const number = canvas.getByRole('textbox', { name: 'Teléfono' });
+    const number = canvas.getByRole('textbox', { name: 'Celular' });
     await expect(number).toHaveAttribute('aria-invalid', 'true');
-    await expect(number).toHaveAccessibleDescription('El número no es válido');
+    await expect(number).toHaveAccessibleDescription('Escribe el número completo');
     await expect(prefix).toHaveTextContent('+34');
     await userEvent.click(number);
     await userEvent.keyboard('6 12');
@@ -230,5 +244,28 @@ export const CountryListTest: Story = {
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(prefix).toHaveAttribute('aria-expanded', 'false'));
     await expect(prefix).toHaveTextContent(/^\+34$/);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', sinMarco: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'PhoneInput' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente PhoneInput en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 2)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(8);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de PhoneInput' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

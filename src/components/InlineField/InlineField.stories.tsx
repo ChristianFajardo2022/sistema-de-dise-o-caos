@@ -3,6 +3,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 import { InlineField } from './InlineField';
 import type { InlineFieldSize, InlineFieldState } from './InlineField.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './InlineField.doc';
+import docsJson from './InlineField.docs.json';
 
 const SIZE_OPTIONS: InlineFieldSize[] = ['sm', 'md'];
 const STATE_OPTIONS: InlineFieldState[] = ['default', 'active', 'success', 'success-value', 'error', 'disabled'];
@@ -10,9 +15,14 @@ const STATE_OPTIONS: InlineFieldState[] = ['default', 'active', 'success', 'succ
 const meta = {
   title: 'Form Controls/InlineField',
   component: InlineField,
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    // `id` y `aria-describedby` remiten a otros elementos: con texto libre no se ve nada
+    docsLive: { exclude: ['id', 'aria-describedby'] },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     size: {
       name: 'size',
       control: 'radio',
@@ -30,12 +40,12 @@ const meta = {
     optional: { name: 'optional', control: 'boolean', type: { name: 'boolean' } },
     disabled: { name: 'disabled', control: 'boolean', type: { name: 'boolean' } },
     fullWidth: { name: 'fullWidth', control: 'boolean', type: { name: 'boolean' } },
-    suffix: { control: 'text', type: { name: 'string' }, description: 'Chip a la derecha (unidad, moneda o etiqueta)' },
-  },
+    suffix: { control: 'text', type: { name: 'string' } },
+  }),
   args: {
-    label: 'Monto',
-    placeholder: '0',
-    suffix: 'COP',
+    label: 'Altura',
+    placeholder: '170',
+    suffix: 'cm',
     size: 'sm',
     state: 'default',
     optional: false,
@@ -154,14 +164,14 @@ export const FigmaMatrix: Story = {
 /** Test: escribir actualiza el valor y el label sigue asociado */
 export const TypingTest: Story = {
   tags: ['!autodocs'],
-  args: { label: 'Monto', suffix: 'COP' },
+  args: { label: 'Altura', suffix: 'cm' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: /Monto/ });
+    const input = canvas.getByRole('textbox', { name: /Altura/ });
     await userEvent.type(input, '12500');
     await expect(input).toHaveValue('12500');
     // El chip describe el campo
-    await expect(input).toHaveAccessibleDescription('COP');
+    await expect(input).toHaveAccessibleDescription('cm');
   },
 };
 
@@ -193,16 +203,40 @@ export const ValueChangeTest: Story = {
     const [value, setValue] = useState('');
     return (
       <div className="flex flex-col gap-4 p-4">
-        <InlineField label="Monto" suffix="COP" tooltip="Sin decimales" onValueChange={setValue} />
+        <InlineField label="Altura" suffix="cm" tooltip="Sin decimales" onValueChange={setValue} />
         <output data-testid="valor">{value}</output>
       </div>
     );
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: 'Monto' });
+    const input = canvas.getByRole('textbox', { name: 'Altura' });
     await userEvent.type(input, '2500');
     await expect(canvas.getByTestId('valor')).toHaveTextContent('2500');
-    await expect(input).toHaveAccessibleDescription('Sin decimales COP');
+    await expect(input).toHaveAccessibleDescription('Sin decimales cm');
+  },
+};
+
+/** Página de documentación (plantilla v2): encabezado, 3 pestañas y secciones en orden. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'InlineField' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente InlineField en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (4 + 4)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(8);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de InlineField' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

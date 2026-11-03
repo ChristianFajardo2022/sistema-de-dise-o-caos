@@ -394,12 +394,14 @@ export const DocPageTest: Story = {
     for (const view of views) await expect(view).toHaveAttribute('inert');
     await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(8));
     // Tokens: la burbuja sólida tiene modo fijo y su hex no cambia con el interruptor
-    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    await expect(canvas.getByRole('switch', { name: 'Modo oscuro' })).toBeInTheDocument();
     const fixed = canvasElement.querySelector('[data-doc-token-mode="dark"]');
     const before = fixed?.textContent;
-    await userEvent.click(canvas.getByRole('button', { name: 'Modo claro' }));
+    // El interruptor alterna: un clic cambia de modo y otro lo devuelve
+    const modeSwitch = canvas.getByRole('switch', { name: 'Modo oscuro' });
+    await userEvent.click(modeSwitch);
     await waitFor(() => expect(canvasElement.querySelector('[data-doc-token-mode="dark"]')?.textContent).toBe(before));
-    await userEvent.click(canvas.getByRole('button', { name: 'Modo oscuro' }));
+    await userEvent.click(modeSwitch);
     await userEvent.click(tabs[1]);
     await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
     await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);

@@ -141,7 +141,7 @@ export const DocPageTest: Story = {
     await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
     await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Icon en Figma:']);
-    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    await expect(canvas.getByRole('switch', { name: 'Modo oscuro' })).toBeInTheDocument();
     await userEvent.click(tabs[1]);
     await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
     await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);

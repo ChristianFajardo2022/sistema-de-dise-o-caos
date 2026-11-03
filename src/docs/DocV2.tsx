@@ -1,8 +1,8 @@
 import { useContext, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Avatar } from '../components/Avatar';
+import { ThemeSwitch } from '../components/ThemeSwitch';
 import { Icon } from '../components/Icon';
-import type { IconName } from '../components/Icon/Icon.types';
 import { NotchedSurface } from '../components/_internal/NotchedSurface';
 import { cn } from '../utils/cn';
 import { DocDeviceFrame } from './DocDeviceFrame';
@@ -307,7 +307,14 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
       if (!a || !b) continue;
       const ra = rect(a);
       const rb = rect(b);
-      const attrs: DataAttrs = { 'data-doc-dim': 'gap', 'data-doc-dim-from': d.from, 'data-doc-dim-to': d.to, 'data-doc-dim-axis': d.axis ?? 'x' };
+      const attrs: DataAttrs = {
+        'data-doc-dim': 'gap',
+        'data-doc-dim-from': d.from,
+        'data-doc-dim-from-index': String(d.fromIndex ?? 0),
+        'data-doc-dim-to': d.to,
+        'data-doc-dim-to-index': String(d.toIndex ?? 0),
+        'data-doc-dim-axis': d.axis ?? 'x',
+      };
       if (d.axis === 'y') {
         // Separación vertical entre piezas apiladas: banda horizontal (verde) a lo ancho de las dos
         const left = Math.min(ra.l, rb.l);
@@ -720,11 +727,6 @@ export function DocTokensV2({ groups }: { groups: DocTokenGroup[] }) {
     }
   };
 
-  const options: { value: Mode; label: string; icon: IconName }[] = [
-    { value: 'light', label: 'Modo claro', icon: 'sun' },
-    { value: 'dark', label: 'Modo oscuro', icon: 'moon' },
-  ];
-
   return (
     <DocBigCard data-theme={mode} className={cn(mode, 'text-ds-text-neutral-body')}>
       <span ref={probeRef} aria-hidden="true" className="pointer-events-none invisible absolute size-0 overflow-hidden" />
@@ -744,23 +746,8 @@ export function DocTokensV2({ groups }: { groups: DocTokenGroup[] }) {
           )}
           {head?.description && <p className={docBody}>{head.description}</p>}
         </div>
-        <div role="group" aria-label="Modo de color" className="flex shrink-0 gap-ds-space-general-lg rounded-ds-radius-general-full bg-ds-background-container-default-on-card p-ds-space-general-lg shadow-ds-on-card">
-          {options.map((o) => (
-            <button
-              key={o.value}
-              type="button"
-              aria-pressed={mode === o.value}
-              aria-label={o.label}
-              onClick={() => setMode(o.value)}
-              className={cn(
-                'flex size-10 cursor-pointer items-center justify-center rounded-ds-radius-general-full border-0 p-0 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ds-border-general-white',
-                mode === o.value ? 'bg-ds-background-general-white text-ds-text-neutral-black' : 'bg-transparent text-ds-icon-general-default',
-              )}
-            >
-              <Icon name={o.icon} size={24} variant="fill" />
-            </button>
-          ))}
-        </div>
+        {/* Figma: 22357:25378 (Switch dark/light). El modo vale solo para esta tarjeta */}
+        <ThemeSwitch value={mode} onValueChange={setMode} contrast="on-card" className="shrink-0" />
       </div>
       <p role="status" aria-live="polite" className="sr-only">
         {message}

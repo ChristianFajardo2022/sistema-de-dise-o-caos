@@ -1,24 +1,85 @@
 {
   "name": "InlineField",
   "component": "InlineField",
-  "description": "Campo de texto en línea del sistema de diseño CAOS, fiel al component set Text field 2 de Figma (id 18445:46293; 14 variantes: Type Label | Label+Placeholder × State Default, Active/Filled, Success, Success placeholder y Error × Size sm | md × Inactive). Se llamó InlineField porque no tiene recuadro ni fondo: el label (con ' | Opcional'), el texto y un chip a la derecha conviven en línea; en size md el texto es grande (32/36), pensado para cifras. El chip (Container text) es una etiqueta corta junto al valor, p. ej. unidad o moneda; se expone como la prop suffix y queda asociado al campo con aria-describedby. Size sm mide 40 de alto (texto 14/18) y md 56. Label flotante resuelto en CSS (dentro del campo si está vacío y sin foco, 12/16 arriba con foco o valor). Inactive=On se mapea a disabled. Inactive=O (solo en Active/Filled md) parece un error de nombre de Figma: se ve como inactivo y se trata igual que On. Los mensajes (ayuda, error, éxito) salen debajo con NotificationText; la prop Help text de Figma no tiene nodo en ninguna variante, así que esa posición es decisión del código. El foco se ve con un contorno de 2px (border/field/active) porque el campo no tiene borde.",
+  "description": "Campo de texto en línea del sistema de diseño CAOS, fiel al component set Text field 2 de Figma (14 variantes: Type Label | Label+Placeholder × State Default, Active/Filled, Success, Success placeholder y Error × Size sm | md × Inactive). Se llamó InlineField porque no tiene recuadro ni fondo: el label (con ' | Opcional'), el texto y un chip a la derecha conviven en línea; en size md el texto es grande (32/36), pensado para cifras. El chip (Container text) es una etiqueta corta junto al valor, p. ej. una unidad; se expone como la prop suffix y queda asociado al campo con aria-describedby. Size sm mide 40 de alto (texto 14/18) y md 56. Label flotante resuelto en CSS (dentro del campo si está vacío y sin foco, 12/16 arriba con foco o valor). Inactive=On se mapea a disabled. Inactive=O (solo en Active/Filled md) parece un error de nombre de Figma: se ve como inactivo y se trata igual que On. Los mensajes (ayuda, error, éxito) salen debajo con NotificationText; la prop Help text de Figma no tiene nodo en ninguna variante, así que esa posición es decisión del código. El foco se ve con un contorno de 2px (border/field/active) porque el campo no tiene borde.",
   "figmaNodeId": "18445-46293",
   "category": "Form Controls",
   "props": {
-    "label": { "type": "string", "required": true, "description": "Texto del label flotante, asociado con htmlFor." },
-    "optional": { "type": "boolean", "default": false, "description": "Muestra ' | Opcional' después del label." },
-    "size": { "type": "'sm' | 'md'", "default": "'sm'", "description": "Size de Figma: sm (alto 40) o md (alto 56, texto grande)." },
-    "suffix": { "type": "ReactNode", "required": false, "description": "Chip a la derecha del texto (unidad, moneda o etiqueta corta). Entra en aria-describedby." },
-    "helperText": { "type": "string", "required": false, "description": "Mensaje de ayuda debajo del campo." },
-    "errorText": { "type": "string", "required": false, "description": "Mensaje de error: label en rojo, aria-invalid y prioridad sobre éxito y ayuda." },
-    "successText": { "type": "string", "required": false, "description": "Mensaje de éxito: label en verde." },
-    "fullWidth": { "type": "boolean", "default": false, "description": "Ocupa el 100 % del contenedor; si no, mide 320." },
-    "disabled": { "type": "boolean", "default": false, "description": "Inactive=On de Figma." },
-    "state": { "type": "'default' | 'active' | 'success' | 'success-value' | 'error' | 'disabled'", "default": "'default'", "description": "Fuerza el aspecto de un estado. Solo documentación. success-value es 'Success placeholder' (texto en verde)." },
-    "rootProps": { "type": "FieldRootProps", "required": false, "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz." },
-    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Cambia el valor (recibe el texto). Se llama junto con el onChange nativo." },
-    "tooltip": { "type": "string", "required": false, "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)." },
-    "ref": { "type": "Ref<HTMLInputElement>", "required": false, "description": "Al <input>. Regla común de los controles de formulario: el ref va al control enfocable (en los grupos, al primero); la raíz se alcanza con rootProps." }
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Texto del label flotante, asociado con htmlFor (Label en Figma)."
+    },
+    "optional": {
+      "type": "boolean",
+      "default": false,
+      "description": "Muestra ' | Opcional' después del label."
+    },
+    "size": {
+      "type": "'sm' | 'md'",
+      "default": "'sm'",
+      "description": "Tamaño (Size en Figma): sm con 40 de alto o md con 56 y texto grande."
+    },
+    "suffix": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Chip a la derecha del texto (unidad o etiqueta corta). Entra en aria-describedby."
+    },
+    "helperText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de ayuda debajo del campo (Help text en Figma)."
+    },
+    "errorText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de error: label en rojo, aria-invalid y prioridad sobre éxito y ayuda."
+    },
+    "successText": {
+      "type": "string",
+      "required": false,
+      "description": "Mensaje de éxito: label en verde."
+    },
+    "fullWidth": {
+      "type": "boolean",
+      "default": false,
+      "description": "Ocupa el 100% del contenedor; si no, mide 320."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "No editable ni enfocable (Inactive=On en Figma)."
+    },
+    "state": {
+      "type": "'default' | 'active' | 'success' | 'success-value' | 'error' | 'disabled'",
+      "default": "'default'",
+      "description": "Fuerza el aspecto de un estado. Solo documentación. success-value es Success placeholder (valor en verde)."
+    },
+    "rootProps": {
+      "type": "FieldRootProps",
+      "required": false,
+      "description": "Atributos para la raíz (data-*, style, ref…). className también va a la raíz. El ref del componente va al input."
+    },
+    "onValueChange": {
+      "type": "(value: string) => void",
+      "required": false,
+      "description": "Cambia el valor (recibe el texto). Se llama junto con el onChange nativo."
+    },
+    "tooltip": {
+      "type": "string",
+      "required": false,
+      "description": "Texto de ayuda en un ícono de información a la derecha del campo (se suma a aria-describedby)."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases de la raíz, junto con las de rootProps."
+    },
+    "aria-describedby": {
+      "type": "string",
+      "required": false,
+      "description": "Ids extra que se suman al mensaje y al chip del campo en aria-describedby."
+    }
   },
   "accessibility": [
     "<input> nativo con label asociado por htmlFor y useId",
@@ -28,8 +89,17 @@
     "el color no es el único cue de estado: hay mensaje con ícono y texto"
   ],
   "examples": [
-    { "title": "Monto con moneda", "code": "<InlineField label=\"Monto\" suffix=\"COP\" inputMode=\"decimal\" />" },
-    { "title": "Grande y opcional", "code": "<InlineField size=\"md\" label=\"Peso\" optional suffix=\"kg\" />" },
-    { "title": "Con error", "code": "<InlineField label=\"Cantidad\" errorText=\"Escribe solo números\" />" }
+    {
+      "title": "Cifra con unidad",
+      "code": "<InlineField label=\"Altura\" suffix=\"cm\" inputMode=\"decimal\" />"
+    },
+    {
+      "title": "Grande y opcional",
+      "code": "<InlineField size=\"md\" label=\"Peso\" optional suffix=\"kg\" />"
+    },
+    {
+      "title": "Con error",
+      "code": "<InlineField label=\"Altura\" errorText=\"Escribe solo números\" />"
+    }
   ]
 }

@@ -5,13 +5,13 @@ import { cva } from 'class-variance-authority';
  *
  * Fuente: component set "Notification text" de Figma (7851:2638), State = Error · Helper text · Confirmation · Information.
  *
- * - Fila horizontal, alto según el texto (18), gap gap/field/lg (alias de space/lg = 8; tokens.css no lo publica, se usa space/general/lg), ancho 100 % del contenedor.
+ * - Fila horizontal, alto según el texto (18), gap space/general/lg (8; Figma lo llama gap/field/lg, que tokens.css no publica), ancho 100 % del contenedor.
  * - Ícono de 14 (Icon-sizes 14, relleno) + texto Helvetica Neue Semibold (typography/weight/Semibold), typography/field/size/sm (14) y line-height/sm (18).
  * - Colores por state (texto · ícono):
  *   error text/semantic/error-secondary · icon/semantic/error-firts,
- *   helper text/semantic/information-secondary · icon/semantic/information-neutral,
+ *   helper text/semantic/information-secondary · icon/semantic/information-secondary,
  *   confirmation text/semantic/success-secondary · icon/semantic/success-secondary,
- *   information text/neutral/white · icon/general/white.
+ *   information text/neutral/white · icon/general/default (Figma usa icon/general/white).
  * - El color del ícono sale de la variable local --msg-ico.
  */
 export const notificationTextVariants = cva(

@@ -2,16 +2,22 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 import { DigitInput } from './DigitInput';
 import type { DigitInputSize, DigitInputState } from './DigitInput.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './DigitInput.doc';
+import docsJson from './DigitInput.docs.json';
 
 const SIZE_OPTIONS: DigitInputSize[] = ['56', '32'];
+const INPUT_MODES = ['numeric', 'text', 'decimal', 'tel', 'search', 'email', 'url', 'none'];
 const STATE_OPTIONS: DigitInputState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'confirmation'];
 
 const meta = {
   title: 'Form Controls/DigitInput',
   component: DigitInput,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     size: {
       name: 'size',
       control: 'radio',
@@ -30,8 +36,10 @@ const meta = {
     confirmed: { name: 'confirmed', control: 'boolean', type: { name: 'boolean' }, description: 'Estado Confirmation' },
     oneTimeCode: { name: 'oneTimeCode', control: 'boolean', type: { name: 'boolean' }, description: 'autoComplete="one-time-code"' },
     disabled: { name: 'disabled', control: 'boolean', type: { name: 'boolean' } },
+    inputMode: { name: 'inputMode', control: 'select', options: INPUT_MODES, type: { name: 'enum', value: INPUT_MODES } },
+    maxLength: { name: 'maxLength', control: { type: 'number', min: 1 }, type: { name: 'number' } },
     readOnly: { name: 'readOnly', control: 'boolean', type: { name: 'boolean' }, description: 'Estado Burnt-In (solo lectura)' },
-  },
+  }),
   args: { size: '56', 'aria-label': 'Dígito 1 de 6' },
 } satisfies Meta<typeof DigitInput>;
 
@@ -116,5 +124,28 @@ export const StatesTest: Story = {
     await expect(ro).toHaveValue('4');
     const off = canvas.getByRole('textbox', { name: 'Deshabilitada' });
     await expect(off).toBeDisabled();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'DigitInput' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente DigitInput en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (2 + 2)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(4);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de DigitInput' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -3,15 +3,25 @@ import { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Slider } from './Slider';
 import type { SliderProps, SliderValue } from './Slider.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Slider.doc';
+import docsJson from './Slider.docs.json';
 
 const meta = {
   title: 'Form Controls/Slider',
   component: Slider,
-  parameters: { layout: 'padded' },
+  // `value` lo maneja el estado de la historia Interactive; las referencias a otros elementos no se editan en Personalizar
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: ['value', 'defaultValue', 'aria-labelledby', 'aria-describedby'] },
+  },
   tags: ['autodocs'],
   decorators: [
     (Story, { name }) =>
-      name === 'Figma Matrix' ? (
+      name === 'Figma Matrix' || name === 'Doc Page Test' ? (
         <Story />
       ) : (
         <div className="w-full max-w-sm py-4">
@@ -19,15 +29,16 @@ const meta = {
         </div>
       ),
   ],
-  argTypes: {
-    min: { control: 'number', description: 'Valor mínimo', type: { name: 'number' } },
-    max: { control: 'number', description: 'Valor máximo', type: { name: 'number' } },
-    step: { control: 'number', description: 'Paso', type: { name: 'number' } },
-    showValue: { control: 'boolean', description: 'Valor dentro del pulgar (Type "number")', type: { name: 'boolean' } },
-    disabled: { control: 'boolean', description: 'Deshabilitado', type: { name: 'boolean' } },
-    'aria-label': { control: 'text', description: 'Nombre accesible', type: { name: 'string' } },
-    name: { control: 'text', description: 'Nombre para formularios', type: { name: 'string' } },
-  },
+  // Tipos explícitos: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    min: { control: 'number', type: { name: 'number' } },
+    max: { control: 'number', type: { name: 'number' } },
+    step: { control: 'number', type: { name: 'number' } },
+    showValue: { control: 'boolean', type: { name: 'boolean' } },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
+    'aria-label': { control: 'text', type: { name: 'string' } },
+    name: { control: 'text', type: { name: 'string' } },
+  }),
   args: { 'aria-label': 'Volumen', min: 0, max: 100, step: 1, showValue: false, disabled: false },
 } satisfies Meta<typeof Slider>;
 
@@ -382,5 +393,28 @@ export const RtlTest: Story = {
     await expect(slider).toHaveAttribute('aria-valuenow', '24');
     await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
     await expect(slider).toHaveAttribute('aria-valuenow', '26');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Slider' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Slider en Figma:']);
+    // Anatomía: 4 + 3 + 3 pautas, una por marcador
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThanOrEqual(10);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Slider' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -40,7 +40,7 @@ export interface PhoneInputProps
   defaultValue?: string;
   /** Cambia al escribir. Recibe solo los dígitos, sin espacios de agrupación. */
   onValueChange?: (value: string) => void;
-  /** Muestra el número agrupado con espacios (3, 3, 4…). El valor entregado sigue siendo solo dígitos. */
+  /** Muestra el número agrupado con espacios (3, 3, 4…). El valor que devuelve sigue siendo solo dígitos. */
   groupDigits?: boolean;
   /** Máximo de dígitos del número. Por defecto 15. */
   maxDigits?: number;

@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 import type { ComponentDocContent, DocStateItem } from '../../docs/types';
 import { Switch } from './Switch';
+import { ThemeSwitch } from '../ThemeSwitch';
 
 /*
  * Contenido de la página de documentación de Switch (plantilla v2, `.qa/docs/plantilla-v2.md`). Manda el código
@@ -11,7 +12,7 @@ import { Switch } from './Switch';
  * código agrega un contorno de 2 px y no tiene Hover. El Type Toggle del átomo es el mismo dibujo que Simple.
  */
 
-// Figma: 9335:5863 (component set Toggle) y 9504:6567 (component set Toggle (Atom))
+// Figma: 9335:5863 (component set Toggle), 9504:6567 (component set Toggle (Atom)) y 22357:25378 (Switch dark/light)
 
 type SwitchSampleProps = Partial<ComponentProps<typeof Switch>>;
 
@@ -20,6 +21,9 @@ const simple = (props: SwitchSampleProps = {}, label: ReactNode = 'Modo oscuro')
 
 /** Switch complex: el texto va dentro de la pista y nombra al control. */
 const complex = (props: SwitchSampleProps = {}, label: ReactNode = 'Sonido') => <Switch type="complex" trackLabel={label} {...props} />;
+
+/** Switch de modo claro u oscuro (ThemeSwitch). Su nombre difiere del por defecto para no chocar con el interruptor de modo de la propia página. */
+const themeSwitch = (props: ComponentProps<typeof ThemeSwitch> = {}) => <ThemeSwitch aria-label="Modo de la interfaz" {...props} />;
 
 /** Fila de ejemplos con separación para las cotas. */
 const wideRow = (...items: ReactNode[]) => (
@@ -144,6 +148,39 @@ export const doc: ComponentDocContent = {
                 </>,
               ],
             },
+            {
+              canvases: [
+                {
+                  label: 'Switch de modo',
+                  preview: themeSwitch(),
+                  marks: [
+                    { n: 1, selector: 'button', side: 'left' },
+                    { n: 2, selector: '[data-active]', side: 'top' },
+                    { n: 3, selector: '[data-figma-part="Sun"] svg', side: 'bottom' },
+                    { n: 4, selector: '[data-figma-part="Moon"] svg', side: 'bottom' },
+                  ],
+                  dimensions: [
+                    { kind: 'padding', selector: 'button', side: 'left' },
+                    { kind: 'height', selector: 'button' },
+                    { kind: 'gap', from: '[data-figma-part="Sun"]', to: '[data-figma-part="Moon"]' },
+                  ],
+                },
+              ],
+              guidelines: [
+                <>
+                  <strong>Contenedor:</strong> píldora de 104 × 56 (<code>radius/button/full</code>) con padding de 8 (<code>space/field/sm</code>), 8 entre casillas (<code>space/general/lg</code>) y sombra suave. En Mobile el padding baja a 4 y mide 96 × 48. El fondo cambia si se apoya en el lienzo o en una tarjeta.
+                </>,
+                <>
+                  <strong>Casilla activa:</strong> círculo de 40 con fondo blanco (<code>background/general/white</code>) que marca el modo en uso.
+                </>,
+                <>
+                  <strong>Ícono de sol:</strong> 24, a la izquierda. Es el modo claro.
+                </>,
+                <>
+                  <strong>Ícono de luna:</strong> 24, a la derecha. Es el modo oscuro.
+                </>,
+              ],
+            },
           ],
         },
       ],
@@ -152,7 +189,7 @@ export const doc: ComponentDocContent = {
       title: 'Estados',
       description: (
         <>
-          Switch tiene 4 estados: apagado y encendido, cada uno habilitado o deshabilitado. Salen de <code>checked</code> (o <code>defaultChecked</code>) y <code>disabled</code>; no hay prop <code>state</code> ni Hover. El foco de teclado dibuja un contorno de 2 px.
+          Switch tiene 4 estados: apagado y encendido, cada uno habilitado o deshabilitado (el Switch de modo solo alterna entre claro y oscuro). Salen de <code>checked</code> (o <code>defaultChecked</code>) y <code>disabled</code>; no hay prop <code>state</code> ni Hover. El foco de teclado dibuja un contorno de 2 px.
         </>
       ),
       blocks: [{ type: 'states', items: states }],
@@ -197,6 +234,18 @@ export const doc: ComponentDocContent = {
                 { part: 'Texto de la pista (Complex)', color: 'text-neutral-disabled-on-canva' },
               ],
             },
+            {
+              title: 'Switch de modo',
+              preview: column(themeSwitch(), themeSwitch({ value: 'dark', contrast: 'on-card' })),
+              entries: [
+                { part: 'Contenedor (sobre el lienzo)', color: 'background-container-default-on-canva' },
+                { part: 'Contenedor (sobre una tarjeta)', color: 'background-container-default-on-card' },
+                { part: 'Casilla activa', color: 'background-general-white' },
+                { part: 'Ícono de la casilla activa', color: 'icon-general-black' },
+                { part: 'Ícono de la casilla inactiva', color: 'icon-general-default' },
+                { part: 'Contorno de foco (aparece en Focus)', color: 'border-field-active' },
+              ],
+            },
           ],
         },
       ],
@@ -219,6 +268,9 @@ export const doc: ComponentDocContent = {
               <strong>Type y State en Toggle (Atom):</strong> Simple, Complex o Toggle (<code>type</code>) y Default, Select, Disabled inactive o Disabled active, que combinan <code>checked</code> y <code>disabled</code>. Toggle es el mismo dibujo que Simple, solo existe en Disabled active y no tiene prop propia.
             </>,
             <>
+              <strong>Switch dark/light:</strong> busca el set como Switch dark/light. State (Light o Dark) es <code>value</code> (<code>&quot;light&quot;</code> o <code>&quot;dark&quot;</code>) y Contrast (On canva u On card) es <code>contrast</code> (<code>&quot;on-canva&quot;</code> o <code>&quot;on-card&quot;</code>). En código es <code>ThemeSwitch</code>.
+            </>,
+            <>
               <strong>Lo que Figma no tiene:</strong> no dibuja el foco ni el Hover. El código agrega un contorno de 2 px y no tiene Hover.
             </>,
           ],
@@ -236,6 +288,9 @@ export const doc: ComponentDocContent = {
           use: [
             <>
               <strong>Ajuste que se aplica al instante:</strong> encender o apagar notificaciones o un modo, sin botón para guardar.
+            </>,
+            <>
+              <strong>Cambiar entre modo claro y oscuro:</strong> usa <code>ThemeSwitch</code>, con sol y luna, para alternar el tema de una interfaz.
             </>,
             <>
               <strong>Dos valores excluyentes:</strong> expone <code>role=&quot;switch&quot;</code> y <code>aria-checked</code>, así que el lector anuncia encendido o apagado.
@@ -259,6 +314,9 @@ export const doc: ComponentDocContent = {
             </>,
             <>
               <strong>Texto de la pista que cambia con el estado:</strong> &quot;On&quot; y &quot;Off&quot; hacen que el nombre del control cambie al alternarlo. (Alternativa: un texto fijo en <code>trackLabel</code>, como &quot;Sonido&quot;).
+            </>,
+            <>
+              <strong>Un ajuste que no es el modo:</strong> el sol y la luna solo significan claro y oscuro. (Alternativa: un <code>Switch</code> con su descripción).
             </>,
             <>
               <strong>Una acción puntual:</strong> el Switch guarda un estado, no ejecuta algo. (Alternativa: <code>Button</code>).

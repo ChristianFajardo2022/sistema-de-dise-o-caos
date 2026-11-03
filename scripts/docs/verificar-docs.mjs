@@ -167,8 +167,9 @@ function medirAnatomia(raizSel) {
           const el = parteDe(vd, sel, idx);
           if (el) medido = el.getBoundingClientRect().height / escala;
         } else if (tipo === 'gap') {
-          const a = parteDe(vd, c.getAttribute('data-doc-dim-from') ?? '', 0);
-          const b = parteDe(vd, c.getAttribute('data-doc-dim-to') ?? '', 0);
+          // Índices de cada extremo (atributos de la plantilla; sin ellos, el primero)
+          const a = parteDe(vd, c.getAttribute('data-doc-dim-from') ?? '', Number(c.getAttribute('data-doc-dim-from-index') ?? 0));
+          const b = parteDe(vd, c.getAttribute('data-doc-dim-to') ?? '', Number(c.getAttribute('data-doc-dim-to-index') ?? 0));
           if (a && b) {
             const ra = a.getBoundingClientRect();
             const rb = b.getBoundingClientRect();
@@ -265,11 +266,14 @@ async function verificarPagina(browser, id) {
         // Anatomía (contrato de B)
         p.anatomia = await page.evaluate(medirAnatomia, panelSel);
         // Tokens y modos: el hex cambia al pasar la tarjeta a claro
-        const hayTarjeta = await page.locator(`${panelSel} [role=group][aria-label="Modo de color"]`).count();
+        // Interruptor de modo de la tarjeta: ThemeSwitch (role="switch", "Modo oscuro"; marcado = oscuro)
+        const interruptor = page.locator(`${panelSel} [role=switch][aria-label="Modo oscuro"]`).first();
+        const hayTarjeta = await interruptor.count();
         if (hayTarjeta) {
           const modos = {};
-          for (const [modo, etiqueta] of [['light', 'Modo claro'], ['dark', 'Modo oscuro']]) {
-            await page.locator(`${panelSel} button[aria-label="${etiqueta}"]`).first().click();
+          for (const modo of ['light', 'dark']) {
+            const marcado = (await interruptor.getAttribute('aria-checked')) === 'true';
+            if (marcado !== (modo === 'dark')) await interruptor.click();
             await page.waitForTimeout(400);
             modos[modo] = await page.evaluate(leerChips, panelSel);
           }
