@@ -16,6 +16,9 @@ const meta = {
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
+    // Desarrollo: el panel de notificaciones es una capa del top layer (se pinta sobre la página, fuera del lienzo, y
+    // se cierra al tocar fuera) y los default* solo cuentan al montar: sin control en Personalizar, siguen en Props
+    docsLive: { exclude: ['notificationsOpen', 'defaultNotificationsOpen', 'defaultMenuOpen'] },
     // Varias cabeceras en la misma página de documentación: el landmark banner y el nav se repiten solo allí
     a11y: { config: { rules: [{ id: 'landmark-no-duplicate-banner', enabled: false }, { id: 'landmark-unique', enabled: false }] } },
   },

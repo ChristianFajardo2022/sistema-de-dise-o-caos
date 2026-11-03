@@ -8,7 +8,48 @@ import { DocDecor } from './DocDecor';
 import { DocDeviceFrame } from './DocDeviceFrame';
 import { DocSectionHeadContext, docBody as body, docInline as inline } from './docShared';
 import { DocNotchCard, DocNotchTitle } from './DocNotchCard';
-import type { DocAnatomyPart, DocCardContent, DocGalleryItem, DocInline, DocPractice } from './types';
+import type { DocInline, DocPractice } from './types';
+
+/*
+ * Las piezas v1 (DocContentCard, DocAnatomy, DocGallery, DocTable, DocCallout) ya no son bloques del esquema: las páginas
+ * usan la plantilla v2. Se conservan como piezas sueltas para el bloque `custom` y para la referencia de código.
+ */
+
+/** Tarjeta (Panel de Figma): título, etiqueta opcional, vista de ejemplo, texto y viñetas. */
+export interface DocCardContent {
+  /** Título de la tarjeta (16 px semibold). */
+  title: string;
+  /** Etiqueta corta en versalitas bajo el título (p. ej. "Átomo principal", "Composición"). */
+  eyebrow?: string;
+  /** Ejemplo con el componente real; se dibuja dentro de un marco gris (`DocPreview`). */
+  preview?: ReactNode;
+  /** Alto mínimo del marco del ejemplo (`sm` 96, `md` 160, `lg` 208). Por defecto se ajusta al contenido. */
+  previewSize?: 'sm' | 'md' | 'lg';
+  /** Texto bajo el ejemplo. Varios párrafos: pasar un arreglo (cada elemento es un párrafo). */
+  description?: DocInline | DocInline[];
+  /** Viñetas (en vez de, o además de, `description`). */
+  bullets?: DocInline[];
+  /** Se conserva por compatibilidad: las viñetas usan siempre el punto blanco. */
+  bulletTone?: 'accent' | 'error';
+}
+
+/** Celda de la grilla de ejemplos (`DocGallery`): etiqueta, vista y detalle. */
+export interface DocGalleryItem {
+  /** Etiqueta arriba (12 px semibold). */
+  label: string;
+  /** Ejemplo con el componente real. */
+  preview?: ReactNode;
+  /** Detalle bajo el ejemplo (una o dos líneas). */
+  description?: DocInline;
+}
+
+/** Parte de la anatomía v1 (`DocAnatomy`). Se numera sola (1, 2, 3…) en el orden del arreglo. */
+export interface DocAnatomyPart {
+  /** Nombre de la parte (p. ej. "Contenedor"). */
+  name: string;
+  /** Qué es o para qué sirve, en una línea. */
+  description: DocInline;
+}
 
 /*
  * Piezas de la plantilla "Documentación" de Figma (página 22159:22295; ejemplo Tooltip 22159:22799 y 22159:22689).

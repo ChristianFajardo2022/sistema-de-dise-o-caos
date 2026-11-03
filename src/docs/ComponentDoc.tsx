@@ -3,41 +3,16 @@ import { Tab, TabList, TabPanel, Tabs } from '../components/Tabs';
 import { CodeReference } from './CodeReference';
 import type { DocLive } from './DocDevelopment';
 import { DocAnatomyV2, DocBreakpointsV2, DocFigmaV2, DocStatesV2, DocTokensV2 } from './DocV2';
-import {
-  DocAnatomy,
-  DocCallout,
-  DocContentCard,
-  DocGallery,
-  DocGrid,
-  DocHeader,
-  DocPractices,
-  DocSection,
-  DocTable,
-  DocText,
-  DocUsage,
-} from './DocParts';
+import { DocHeader, DocPractices, DocSection, DocText, DocUsage } from './DocParts';
 import type { ComponentDocContent, DocBlock, DocCodeReference, DocSectionContent } from './types';
 
 /** Dibuja un bloque del esquema con su pieza. */
 export function DocBlockView({ block }: { block: DocBlock }): ReactNode {
   switch (block.type) {
-    case 'cards':
-      return (
-        <DocGrid columns={block.columns ?? 2}>
-          {block.items.map((item) => (
-            <DocContentCard key={item.title} {...item} />
-          ))}
-        </DocGrid>
-      );
-    case 'table':
-      return <DocTable caption={block.caption} columns={block.columns} rows={block.rows} />;
     case 'usage':
       return <DocUsage use={block.use} avoid={block.avoid} />;
     case 'anatomy':
-      if ('groups' in block) return <DocAnatomyV2 groups={block.groups} />;
-      return <DocAnatomy title={block.title} preview={block.preview} parts={block.parts} />;
-    case 'gallery':
-      return <DocGallery title={block.title} columns={block.columns} align={block.align} items={block.items} />;
+      return <DocAnatomyV2 groups={block.groups} />;
     case 'states':
       return <DocStatesV2 items={block.items} />;
     case 'tokens':
@@ -46,8 +21,6 @@ export function DocBlockView({ block }: { block: DocBlock }): ReactNode {
       return <DocBreakpointsV2 desktop={block.desktop} mobile={block.mobile} tablet={block.tablet} />;
     case 'figma':
       return <DocFigmaV2 bullets={block.bullets} />;
-    case 'note':
-      return <DocCallout tone={block.tone}>{block.content}</DocCallout>;
     case 'practices':
       return <DocPractices items={block.items} />;
     case 'text':

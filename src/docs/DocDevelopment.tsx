@@ -1,5 +1,6 @@
-import { useId, useMemo, useState } from 'react';
+import { Component, isValidElement, useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { Alert } from '../components/Alert';
 import { Button } from '../components/Button';
 import { Icon } from '../components/Icon';
 import { Input } from '../components/Input';
@@ -12,7 +13,7 @@ import { Toast, Toaster } from '../components/Toast';
 import { cn } from '../utils/cn';
 import { DocCodeBlock } from './DocCodeBlock';
 import { DocBigCard, DocDotsCanvas } from './DocV2';
-import { buildCode, controlFor, defaultValueOf } from './liveCode';
+import { buildCode, changedArgs, controlFor, defaultValueOf } from './liveCode';
 import type { LiveArgType, PropControl } from './liveCode';
 import { docInline } from './docShared';
 import { inlineMarkdown } from './inlineMarkdown';
@@ -37,6 +38,15 @@ export interface DocLive {
    * Button con `iconOnly` cambia el texto por un ícono). El código generado sale de estos, para que coincida con el lienzo.
    */
   renderedArgs?: Record<string, unknown>;
+  /**
+   * Código propio (`parameters.docsLive.code`) en lugar del JSX generado: recibe los args que cambian el código (sin
+   * los valores por defecto ni las funciones). Para componentes imperativos (Toast: `add({ … })`).
+   */
+  code?: (args: Record<string, unknown>) => string;
+  /** Args iniciales de la historia (los de "Restablecer"). */
+  initialArgs?: Record<string, unknown>;
+  /** Props sin control en Personalizar (`parameters.docsLive.exclude`); siguen en la tabla Props. */
+  exclude?: string[];
   /** ArgTypes de la historia (controles declarados). */
   argTypes: Record<string, LiveArgType>;
   /** Cambia args (llega a la historia por el canal de Storybook). */
@@ -117,10 +127,54 @@ function CanvasToolbar({
   );
 }
 
+/** Huella de los args `default*` (los que el componente solo lee al montarse). */
+function mountArgsKey(args: Record<string, unknown>): string {
+  try {
+    return JSON.stringify(
+      Object.entries(args).filter(([name]) => /^default[A-Z]/.test(name)),
+      (_, v: unknown) => (typeof v === 'function' || isValidElement(v) ? String(typeof v) : v),
+    );
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Si un valor de Personalizar rompe el componente (p. ej. texto libre en `locale`), el error se queda en el lienzo y no
+ * desmonta la página. La `key` del lienzo cambia con los args: al cambiar el control o restablecer, se vuelve a intentar.
+ */
+class CanvasErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <Alert type="error" title="No se puede mostrar el componente">
+        Con estos valores el componente no se dibuja. Cambia el control o usa Restablecer.
+      </Alert>
+    );
+  }
+}
+
 // Figma: "Estado del indicador" con "Dots" (panel interno de la plantilla)
 /** Lienzo de la historia principal: panel con puntos, barra propia y el zoom aplicado solo al contenido. */
 function DocCanvas({ live }: { live: DocLive }) {
   const [zoom, setZoom] = useState(1);
+  // La historia se vuelve a montar al restablecer (el estado interno que dejaron los controles se pierde) y cuando
+  // cambia una prop `default*`, que el componente solo lee al montarse (`defaultOpen`, `defaultValue`…)
+  const [resets, setResets] = useState(0);
+  // Al restablecer se espera a que lleguen los args iniciales (por el canal) antes de volver a montar: montar con los
+  // args viejos repetiría un valor que pudo romper el componente
+  const [argsAtReset, setArgsAtReset] = useState<Record<string, unknown> | null>(null);
+  if (argsAtReset !== null && live.args !== argsAtReset) {
+    setArgsAtReset(null);
+    setResets((n) => n + 1);
+  }
+  const mountKey = `${resets}|${mountArgsKey(live.args)}`;
   return (
     <DocDotsCanvas className="flex min-h-80 flex-col tablet:min-h-130.5">
       <CanvasToolbar
@@ -128,11 +182,12 @@ function DocCanvas({ live }: { live: DocLive }) {
         setZoom={setZoom}
         onReset={() => {
           setZoom(1);
+          setArgsAtReset(live.args);
           live.resetArgs();
         }}
         storyId={live.storyId}
       />
-      <div className="flex flex-1 items-center justify-center overflow-auto px-ds-space-general-5xl pt-ds-space-general-lg pb-ds-primitives-space-6xl">
+      <div className="flex flex-1 items-center-safe justify-center-safe overflow-auto px-ds-space-general-lg pt-ds-space-general-lg tablet:px-ds-space-general-5xl pb-ds-primitives-space-6xl">
         {/*
           `zoom` escala el contenido y su espacio en el flujo; el marco del lienzo no cambia. El decorador global de tema
           (.storybook/ThemeWrapper, marcado con `data-story-wrapper`) pinta fondo y relleno propios alrededor de la
@@ -143,9 +198,9 @@ function DocCanvas({ live }: { live: DocLive }) {
         <div
           data-doc-zoom=""
           style={{ zoom }}
-          className="w-full max-w-full [&_[data-story-wrapper]]:flex [&_[data-story-wrapper]]:justify-center [&_[data-story-wrapper]]:min-h-0! [&_[data-story-wrapper]]:bg-transparent! [&_[data-story-wrapper]]:p-0!"
+          className="w-full max-w-full [&_[data-story-wrapper]]:flex [&_[data-story-wrapper]]:justify-center-safe [&_[data-story-wrapper]]:min-h-0! [&_[data-story-wrapper]]:bg-transparent! [&_[data-story-wrapper]]:p-0!"
         >
-          {live.story}
+          <CanvasErrorBoundary key={mountKey}>{live.story}</CanvasErrorBoundary>
         </div>
       </div>
     </DocDotsCanvas>
@@ -353,14 +408,24 @@ function ControlCard({ name, control, value, onChange }: { name: string; control
  * "Personalizar": título arriba y la tarjeta con una tarjeta de control por prop con control (3 columnas; 2 en tablet;
  * 1 en móvil), como la "Tarjeta" de la pantalla Desarrollo de Figma.
  */
-function DocCustomize({ controls, live }: { controls: { name: string; control: Exclude<PropControl, { kind: 'none' }> }[]; live: DocLive }) {
+/**
+ * Control de Personalizar: la prop, su control y el valor que muestra mientras el arg no está definido (`fallback`: el
+ * valor por defecto de los booleanos, para que una prop que vale `true` por defecto no aparezca apagada).
+ */
+interface CustomizeControl {
+  name: string;
+  control: Exclude<PropControl, { kind: 'none' }>;
+  fallback?: unknown;
+}
+
+function DocCustomize({ controls, live }: { controls: CustomizeControl[]; live: DocLive }) {
   if (controls.length === 0) return null;
   return (
     <DevBlock title="Personalizar">
       <DocBigCard className="p-ds-primitives-space-2xl tablet:p-ds-primitives-space-5xl">
         <div className="grid grid-cols-1 gap-ds-primitives-space-4xl @2xl:grid-cols-2 @5xl:grid-cols-3">
-          {controls.map(({ name, control }) => (
-            <ControlCard key={name} name={name} control={control} value={live.args[name]} onChange={(v) => live.updateArgs({ [name]: v })} />
+          {controls.map(({ name, control, fallback }) => (
+            <ControlCard key={name} name={name} control={control} value={live.args[name] ?? fallback} onChange={(v) => live.updateArgs({ [name]: v })} />
           ))}
         </div>
       </DocBigCard>
@@ -399,14 +464,33 @@ function PropDescription({ text }: { text: string | undefined }) {
   return text ? <span className={docInline}>{inlineMarkdown(text)}</span> : <>—</>;
 }
 
-/** Valor por defecto como chip (`Tag` neutro). */
-function PropDefault({ value }: { value: string | undefined }) {
+/**
+ * Valor por defecto como chip (`Tag` neutro). `wrap` (vista móvil): el texto del chip se parte en varias líneas si no
+ * cabe en la columna del valor, en vez de salirse (el marco de texto del Tag tiene alto fijo de una línea).
+ */
+function PropDefault({ value, wrap = false }: { value: string | undefined; wrap?: boolean }) {
   if (!value) return <>—</>;
   return (
-    <Tag size="sm" type="neutral" iconLeft={false} className="max-w-full font-mono">
+    <Tag
+      size="sm"
+      type="neutral"
+      iconLeft={false}
+      className={cn(
+        'max-w-full font-mono',
+        wrap && '[&>span]:h-auto [&>span]:min-h-ds-dimention-button-container-xs [&>span]:min-w-0 [&>span]:[overflow-wrap:anywhere]',
+      )}
+    >
       {value}
     </Tag>
   );
+}
+
+/**
+ * Valor de un campo de la vista móvil de Props: la columna del valor es angosta (92 px a 390), así que una palabra
+ * larga (un nombre de prop, `'default'` en una descripción) se parte en vez de salirse del campo.
+ */
+function MobileValue({ children }: { children: ReactNode }) {
+  return <span className="min-w-0 max-w-full [overflow-wrap:anywhere]">{children}</span>;
 }
 
 // Figma: Table 13544:69675 (filas sueltas sobre el lienzo, sin tarjeta de fondo)
@@ -424,16 +508,24 @@ function DocPropsCard({ importName, props }: { importName: string; props: DocPro
       {props.map((row) => (
         <TableMobileRow key={row.name}>
           <TableMobileField className="h-auto min-h-14" label="Prop">
-            <PropName row={row} />
+            <MobileValue>
+              <PropName row={row} />
+            </MobileValue>
           </TableMobileField>
           <TableMobileField className="h-auto min-h-14" label="Tipo">
-            <PropType type={row.type} />
+            <MobileValue>
+              <PropType type={row.type} />
+            </MobileValue>
           </TableMobileField>
           <TableMobileField className="h-auto min-h-14" label="Por defecto">
-            <PropDefault value={row.defaultValue} />
+            <MobileValue>
+              <PropDefault value={row.defaultValue} wrap />
+            </MobileValue>
           </TableMobileField>
           <TableMobileField className="h-auto min-h-14" label="Descripción">
-            <PropDescription text={row.description} />
+            <MobileValue>
+              <PropDescription text={row.description} />
+            </MobileValue>
           </TableMobileField>
         </TableMobileRow>
       ))}
@@ -501,11 +593,19 @@ export function DocDevelopment({
   className?: string;
 }) {
   const controls = useMemo(
-    () =>
+    (): CustomizeControl[] =>
       live
         ? props.flatMap((row) => {
-            const control = controlFor(live.argTypes[row.name], row.type);
-            return control.kind === 'none' ? [] : [{ name: row.name, control }];
+            // Clases y estilos no se editan en Personalizar (solo aparecen en Props), ni lo que la historia excluye
+            if (/^(className|style)$|ClassName$/.test(row.name) || live.exclude?.includes(row.name)) return [];
+            let control = controlFor(live.argTypes[row.name], row.type);
+            // Contenido ReactNode que la historia da como texto (`children`, `title`…): se edita como texto, salvo que la
+            // historia diga `control: false`
+            if (control.kind === 'none' && live.argTypes[row.name]?.control !== false && /ReactNode/.test(row.type ?? '') && typeof live.initialArgs?.[row.name] === 'string') {
+              control = { kind: 'text' };
+            }
+            if (control.kind === 'none') return [];
+            return [{ name: row.name, control, fallback: control.kind === 'boolean' ? defaultValueOf(row, control) : undefined }];
           })
         : [],
     [props, live],
@@ -514,7 +614,12 @@ export function DocDevelopment({
     if (!live) return '';
     const defaults: Record<string, string | number | boolean | undefined> = {};
     for (const row of props) defaults[row.name] = defaultValueOf(row, controlFor(live.argTypes[row.name], row.type));
-    return buildCode(importName, live.renderedArgs ?? live.args, defaults);
+    // Solo props del componente: los args que la historia usa para armar el ejemplo (p. ej. `withTertiary`) no van en
+    // el código. Sí van los atributos `aria-*`/`data-*` y lo que agregue `docsLive.args` (claves que no son args).
+    const known = new Set(props.map((row) => row.name));
+    const source = live.renderedArgs ?? live.args;
+    const shown = Object.fromEntries(Object.entries(source).filter(([name]) => known.has(name) || /^(aria|data)-/.test(name) || !(name in live.args)));
+    return live.code ? live.code(changedArgs(shown, defaults)) : buildCode(importName, shown, defaults);
   }, [importName, props, live]);
 
   return (

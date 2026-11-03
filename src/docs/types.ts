@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { IconName } from '../components/Icon/Icon.types';
 
 /**
- * Esquema de contenido de la página de documentación de un componente (plantilla "Documentación" de Figma).
+ * Esquema de contenido de la página de documentación de un componente (plantilla v2, `.qa/docs/plantilla-v2.md`).
  * Cada componente exporta un objeto `doc` de este tipo desde `<Nombre>.doc.tsx`; `ComponentDoc` lo dibuja.
  * La guía para redactarlo está en `.qa/docs/guia-contenido.md`.
  */
@@ -12,42 +12,6 @@ export type DocClassification = 'atomo' | 'molecula' | 'composicion';
 
 /** Texto que admite marcado en línea: `<strong>`, `<code>`, `<em>`. Nada de bloques (párrafos, listas). */
 export type DocInline = ReactNode;
-
-/** Tarjeta (Panel de Figma): título, etiqueta opcional, vista de ejemplo, texto y viñetas. */
-export interface DocCardContent {
-  /** Título de la tarjeta (16 px semibold). */
-  title: string;
-  /** Etiqueta corta en versalitas bajo el título (p. ej. "Átomo principal", "Composición"). */
-  eyebrow?: string;
-  /** Ejemplo con el componente real; se dibuja dentro de un marco gris (`DocPreview`). */
-  preview?: ReactNode;
-  /** Alto mínimo del marco del ejemplo, en px de la escala de Tailwind (`sm` 96, `md` 160, `lg` 208). Por defecto se ajusta al contenido. */
-  previewSize?: 'sm' | 'md' | 'lg';
-  /** Texto bajo el ejemplo. Varios párrafos: pasar un arreglo (cada elemento es un párrafo). */
-  description?: DocInline | DocInline[];
-  /** Viñetas (en vez de, o además de, `description`). */
-  bullets?: DocInline[];
-  /** Color de las viñetas: `accent` (violeta, por defecto) o `error` (rojo, para "Cuándo evitarlo"). */
-  bulletTone?: 'accent' | 'error';
-}
-
-/** Celda de la grilla de ejemplos (`gallery`): etiqueta, vista y detalle. */
-export interface DocGalleryItem {
-  /** Etiqueta arriba (12 px semibold). */
-  label: string;
-  /** Ejemplo con el componente real. */
-  preview?: ReactNode;
-  /** Detalle bajo el ejemplo (una o dos líneas). */
-  description?: DocInline;
-}
-
-/** Parte de la anatomía. Se numera sola (1, 2, 3…) en el orden del arreglo. */
-export interface DocAnatomyPart {
-  /** Nombre de la parte (p. ej. "Contenedor"). */
-  name: string;
-  /** Qué es o para qué sirve, en una línea. */
-  description: DocInline;
-}
 
 /** Buena o mala práctica. */
 export interface DocPractice {
@@ -84,6 +48,19 @@ export interface DocStateItem {
 
 /**
  * Parte señalada en un lienzo de anatomía. El marcador se coloca midiendo el elemento en el DOM.
+ *
+ * Contrato con el verificador (`scripts/docs/verificar-docs.mjs`); no cambia el aspecto:
+ * - Cada lienzo lleva `data-doc-anatomy-canvas` y sus dos copias del componente, `data-doc-anatomy-view="marks"` (la de
+ *   los marcadores) y `data-doc-anatomy-view="dims"` (la de las cotas), con `data-doc-anatomy-scale` (1 sin escalar).
+ * - Cada marcador del lienzo lleva `data-doc-mark="<n>"`, `data-doc-mark-selector`, `data-doc-mark-index` y
+ *   `data-doc-mark-side`: la parte se recupera con `querySelectorAll(selector)[index]` (índice negativo: desde el final)
+ *   dentro de la vista `marks` del mismo lienzo. Su línea guía lleva `data-doc-mark-line="<n>"` y termina en el borde
+ *   `side` de la parte.
+ * - Cada cota lleva `data-doc-dim="padding|gap|height"` y `data-doc-dim-value="<px reales>"` (sin escala), además de
+ *   `data-doc-dim-selector` / `-index` / `-side` (padding y height) o `data-doc-dim-from` / `-to` / `-axis` (gap),
+ *   resueltos en la vista `dims`.
+ * - Si dos marcadores del mismo lado se pisan, el segundo se corre a lo largo de ese lado sin salirse de su parte: la
+ *   línea guía sigue siendo recta y cae sobre la parte.
  */
 export interface DocAnatomyMark {
   /** Número del marcador; debe coincidir con la pauta (1 = primera de la lista). */
@@ -100,17 +77,39 @@ export interface DocAnatomyMark {
 export type DocAnatomyDimension =
   /** Padding de `selector` en el lado indicado (computado). */
   | { kind: 'padding'; selector: string; index?: number; side: 'top' | 'bottom' | 'left' | 'right' }
-  /** Separación horizontal entre dos elementos (el borde derecho del primero y el izquierdo del segundo). */
-  | { kind: 'gap'; from: string; fromIndex?: number; to: string; toIndex?: number }
+  /**
+   * Separación entre dos elementos. `axis: 'x'` (por defecto): horizontal, del borde derecho del primero al izquierdo
+   * del segundo (violeta). `axis: 'y'`: vertical, del borde inferior del primero al superior del segundo (verde), para
+   * piezas apiladas (filas, una burbuja sobre su disparador).
+   */
+  | { kind: 'gap'; from: string; fromIndex?: number; to: string; toIndex?: number; axis?: 'x' | 'y' }
   /** Alto de `selector`, con un corchete a la derecha. */
   | { kind: 'height'; selector: string; index?: number };
 
-/** Lienzo con puntos de la anatomía: etiqueta, componente real, marcadores y cotas. */
+/**
+ * Lienzo con puntos de la anatomía: etiqueta, componente real, marcadores y cotas. Sirve para cualquier forma:
+ * - **Overlays abiertos** (Tooltip, Popover, Modal, menús): dibuja la forma estática abierta (`TooltipBubble`,
+ *   `PopoverPanel`, `ModalPanel`, `DropdownMenuPanel`) en el flujo, junto a su disparador si hace falta. Lo que se abre en
+ *   la capa superior (`popover`, `showModal()`) o con un portal queda fuera del lienzo y no se puede medir ni recortar.
+ * - **Vistas más anchas que el lienzo**: se escalan para caber; marcadores y cotas se calculan sobre la vista escalada
+ *   y las cifras dicen los px reales.
+ * - **Varias instancias o compuestos** (Table, Tabs): `index` elige la instancia; los marcadores del mismo lado se
+ *   separan solos si se pisan.
+ * - **Ancho completo** (Header, Footer): `width` fija el ancho de la vista (`'fill'` o un número de px).
+ * Las dos copias del componente son ilustraciones: van con `inert` (sin foco ni lector de pantalla; las pautas son la
+ * fuente accesible).
+ */
 export interface DocAnatomyCanvas {
   /** Etiqueta sobre el lienzo (p. ej. "Botón con texto"). */
   label: string;
-  /** Componente real. */
+  /** Componente real. Varios hijos se colocan en fila (en columna con `width`). */
   preview: ReactNode;
+  /**
+   * Ancho de la vista. Sin él, el del contenido (se escala si no cabe). Un número: la vista se dibuja a ese ancho en px
+   * (p. ej. 1440 para un Header de escritorio) y se escala para caber. `'fill'`: ocupa el ancho del lienzo. Con
+   * `width`, los hijos se apilan y se estiran a lo ancho.
+   */
+  width?: number | 'fill';
   /** Partes con marcador. */
   marks: DocAnatomyMark[];
   /** Cotas de espaciado. */
@@ -132,6 +131,12 @@ export interface DocTokenEntry {
   color?: string;
   /** Token de tipografía (solo el nombre; no es un color). */
   text?: string;
+  /**
+   * Modo fijo: el componente fuerza ese modo (superficie unicolor, p. ej. `data-theme="dark"` en la burbuja de
+   * Tooltip), así que el hex se lee siempre en él y no cambia con el interruptor. El chip lo dice y lleva
+   * `data-doc-token-mode`.
+   */
+  mode?: 'dark' | 'light';
 }
 
 /** Grupo de tokens: vista del componente a la izquierda, entradas a la derecha. */
@@ -160,17 +165,20 @@ export interface DocBreakpointColumn extends DocBreakpointCard {
  * columna en móvil.
  */
 export type DocBlock =
-  /** Grilla de tarjetas (2 columnas por defecto; 1 en móvil). */
-  | { type: 'cards'; columns?: 1 | 2 | 3; items: DocCardContent[] }
-  /** Tabla: encabezados y filas. La primera celda de cada fila es su encabezado. */
-  | { type: 'table'; caption: string; columns: string[]; rows: DocInline[][] }
-  /** "Cuándo usarlo" / "Cuándo evitarlo": dos tarjetas con viñetas (violeta y roja). */
+  /** "Cuándo usarlo" / "Cuándo evitarlo": dos Cards con muesca y distintivo de éxito / error. */
   | { type: 'usage'; use: DocInline[]; avoid: DocInline[] }
-  /** Anatomía: vista del componente y lista numerada de partes. */
-  | { type: 'anatomy'; title?: string; preview: ReactNode; parts: DocAnatomyPart[] }
-  /** Anatomía v2: tarjeta con lienzos de puntos (marcadores y cotas medidos del DOM) y pautas numeradas. */
+  /** Anatomía: tarjeta con lienzos de puntos (marcadores y cotas medidos del DOM) y pautas numeradas. */
   | { type: 'anatomy'; groups: DocAnatomyGroup[] }
-  /** Estados: tarjeta con una columna por estado (etiqueta con tono, descripción y muestras). */
+  /**
+   * Estados: tarjeta con una columna por estado (etiqueta con tono, descripción y muestras).
+   *
+   * Regla para componentes **no interactivos** (Badge, Logo, Divider, Spinner…): no tienen Hover, Focus ni Press, así
+   * que la sección Estados muestra sus **variantes de aspecto**: una columna por tamaño, tono, tipo o contraste (las
+   * props de apariencia de Figma), con tono `neutral` salvo que la variante sea semántica (éxito, error). La bajada lo
+   * dice ("Badge no es interactivo: sus estados son variantes de aspecto"). Si el componente tiene además estados de
+   * datos (vacío, cargando), van como columnas propias. Un componente interactivo documenta sus estados de interacción
+   * (forzados con `state` cuando exista) y deja las variantes de aspecto para Anatomía o Tokens y modos.
+   */
   | { type: 'states'; items: DocStateItem[] }
   /**
    * Tokens y modos: tarjeta con el título y la bajada de la sección adentro (`titleInside`), interruptor de modo y un
@@ -181,11 +189,7 @@ export type DocBlock =
   | { type: 'breakpoints'; desktop: { columns: DocBreakpointColumn[] }; mobile: DocBreakpointCard; tablet: DocBreakpointCard }
   /** "Uso en Figma": tarjeta con muesca a la izquierda, logo, título y viñetas. Va en una sección `titleInside`. */
   | { type: 'figma'; bullets: DocInline[] }
-  /** Tarjeta con una grilla de ejemplos (posiciones, matriz de estados, respuesta a la interacción). */
-  | { type: 'gallery'; title: string; columns?: 2 | 3 | 4; align?: 'center' | 'start'; items: DocGalleryItem[] }
-  /** Nota destacada: `info` (violeta) o `warning` (amarillo). */
-  | { type: 'note'; tone?: 'info' | 'warning'; content: DocInline }
-  /** Buenas y malas prácticas en pares (✓ / ✕), dos columnas. */
+  /** Buenas y malas prácticas en pares (Hacer / Evitar), dos columnas. */
   | { type: 'practices'; items: DocPractice[] }
   /** Párrafo suelto (con marcado en línea). */
   | { type: 'text'; content: DocInline }

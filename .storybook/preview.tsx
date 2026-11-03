@@ -1,7 +1,15 @@
 import type { Preview, Decorator } from '@storybook/react-vite';
 import { ThemeWrapper } from './ThemeWrapper';
 import { AutoDocsContainer, AutoDocsPage } from '../src/docs/StorybookDocsPage';
+import { probeDocsParameters } from '../src/docs/storybook';
 import '../src/index.css';
+
+/**
+ * Modo sondeo de la documentación: con `STORYBOOK_DOCS_PROBE=1` (p. ej.
+ * `STORYBOOK_DOCS_PROBE=1 npx storybook build -o <carpeta>`), las páginas Docs de los componentes con `docs.json` usan
+ * la plantilla v2 con la pestaña Desarrollo (ver `probeDocsParameters`). Sin la variable, todo queda igual.
+ */
+const DOCS_PROBE = import.meta.env.STORYBOOK_DOCS_PROBE === '1';
 
 const withThemeDecorator: Decorator = (Story, context) => (
   <ThemeWrapper theme={context.globals?.['theme'] ?? 'dark'} flush={context.parameters?.layout === 'fullscreen'}>
@@ -41,10 +49,9 @@ const preview: Preview = {
       },
     },
     // Páginas Docs con el encabezado de CAOS (Header document); Tooltip trae su propia plantilla y la reemplaza
-    docs: {
-      container: AutoDocsContainer,
-      page: AutoDocsPage,
-    },
+    docs: DOCS_PROBE
+      ? probeDocsParameters(import.meta.glob('../src/components/**/*.docs.json'))
+      : { container: AutoDocsContainer, page: AutoDocsPage },
     backgrounds: {
       disable: true, // Usamos nuestro propio selector de tema
     },

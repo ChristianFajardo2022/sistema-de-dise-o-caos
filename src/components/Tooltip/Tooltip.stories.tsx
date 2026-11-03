@@ -52,8 +52,9 @@ type Story = StoryObj<typeof meta>;
 
 /** Pasa el puntero o enfoca el botón (Tab). Escape lo cierra sin mover el foco. */
 export const Interactive: Story = {
+  // Sin padding extra: la burbuja va en la capa superior y no necesita espacio en el lienzo
   render: (args) => (
-    <div className="p-24">
+    <div className="p-ds-space-general-2xl">
       <Tooltip {...args}>
         <Button variant="secondary" size="sm">
           Guardar
@@ -368,8 +369,8 @@ export const ToggletipTest: Story = {
 };
 
 /**
- * La página de documentación (la misma de la pestaña Docs) como historia: así las pruebas y axe la revisan. Sin
- * pestañas del encabezado (Definición, Aplicación y Desarrollo), cada una con su panel.
+ * La página de documentación (la misma de la pestaña Docs) como historia: así las pruebas y axe la revisan. Pestañas
+ * del encabezado (Definición, Aplicación y Desarrollo), cada una con su panel.
  */
 export const DocPageTest: Story = {
   tags: ['!autodocs'],
@@ -377,31 +378,33 @@ export const DocPageTest: Story = {
   render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    expect(canvas.getByRole('heading', { level: 1, name: 'Tooltip' })).toBeInTheDocument();
-    // Pestañas del encabezado: cada una muestra su panel
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Tooltip' })).toBeInTheDocument();
     const tabs = canvas.getAllByRole('tab');
-    expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
-    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
-    // Definición (5 secciones), sin número
-    expect(h2()).toEqual([
-      'Definición del componente',
-      'Propósito y anatomía',
-      'Propiedades y variantes',
-      'Estados y especificaciones de layout',
-      'Estados compuestos y ejemplos base',
-    ]);
-    for (const n of ['01', '05', '06', '07']) expect(canvas.queryByText(n)).not.toBeInTheDocument();
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Tooltip en Figma:']);
+    // Anatomía: un marcador por pauta en cada lienzo, y las vistas son ilustraciones (inert)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(2);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(8));
+    // Tokens: la burbuja sólida tiene modo fijo y su hex no cambia con el interruptor
+    await expect(canvas.getByRole('group', { name: 'Modo de color' })).toBeInTheDocument();
+    const fixed = canvasElement.querySelector('[data-doc-token-mode="dark"]');
+    const before = fixed?.textContent;
+    await userEvent.click(canvas.getByRole('button', { name: 'Modo claro' }));
+    await waitFor(() => expect(canvasElement.querySelector('[data-doc-token-mode="dark"]')?.textContent).toBe(before));
+    await userEvent.click(canvas.getByRole('button', { name: 'Modo oscuro' }));
     await userEvent.click(tabs[1]);
-    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
-    expect(h2()).toEqual(['Comportamiento y reglas de uso', 'Buenas y malas prácticas (Dos and Don’ts)']);
-    expect(canvas.getAllByRole('img', { name: 'Buena práctica' })).toHaveLength(4);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
     // Con las flechas (activación automática) se llega a Desarrollo
     tabs[1].focus();
     await userEvent.keyboard('{ArrowRight}');
-    expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
     // Referencia de código: tabla de props (de solo lectura sin Storybook)
     const props = canvas.getByRole('table', { name: 'Props de Tooltip' });
-    expect(within(props).getByRole('rowheader', { name: /content/ })).toBeInTheDocument();
+    await expect(within(props).getByRole('rowheader', { name: /content/ })).toBeInTheDocument();
   },
 };

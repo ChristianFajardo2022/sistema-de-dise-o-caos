@@ -1,460 +1,394 @@
-import type { ComponentDocContent } from '../../docs/types';
-import { DocTag } from '../../docs/DocParts';
-import { Avatar, AvatarGroup } from '../Avatar';
-import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
+import type { ReactNode } from 'react';
+import type { ComponentDocContent, DocStateItem } from '../../docs/types';
 import { Button } from '../Button';
+import type { ButtonState } from '../Button/Button.types';
 import { Icon } from '../Icon';
-import type { IconName } from '../Icon/Icon.types';
-import { PopoverPanel } from '../Popover/PopoverPanel';
-import { Tooltip } from './Tooltip';
+import { Input } from '../Input';
 import { TooltipBubble } from './TooltipBubble';
 import type { TooltipBubbleProps } from './Tooltip.types';
 
 /*
- * Contenido de la página de documentación de Tooltip (Figma: "Documentación Tooltip — Definición" 22159:22799 y
- * "— Aplicación" 22159:22689). Los textos son los de Figma salvo donde contradicen al código (manda el código):
- * nombres y valores de props, retardos (300 / 150 ms), separación con el disparador (4 px), ancho máximo (288 px),
- * y el sentido de las posiciones (`arrow` es el borde de la flecha; la burbuja va del lado opuesto).
+ * Contenido de la página de documentación de Tooltip (plantilla v2, `.qa/docs/plantilla-v2.md`). Manda el código
+ * (`Tooltip.tsx`, `Tooltip.types.ts`, `Tooltip.variants.ts`), luego `Tooltip.docs.json`. Medidas: Content con padding 8
+ * y radio 8, flecha de 16 × 8, texto Semibold 12/16, ancho máximo 288, 4 px entre la punta y el disparador, retrasos de
+ * 300 ms (abrir) y 150 ms (cerrar).
+ *
+ * Las vistas usan la burbuja estática (`TooltipBubble`) en el flujo: el `Tooltip` real se abre en la capa superior y no
+ * se puede medir ni recortar dentro de un lienzo.
  */
 
-/**
- * Disparador vivo: botón de ícono con su tooltip real (pasa el puntero o enfócalo). El tooltip es el nombre del botón
- * (`describes="label"`): `aria-labelledby` apunta a la burbuja, sin `aria-label`. `id` debe ser único en la página.
- */
-const liveTrigger = (id: string, icon: IconName, label: string, focused = false) => (
-  <Tooltip id={id} content={label} describes="label">
-    <Button iconOnly variant="secondary" size="sm" state={focused ? 'focus' : undefined} aria-labelledby={id}>
-      <Icon name={icon} size={20} variant="line" />
-    </Button>
-  </Tooltip>
+// Figma: 11097:4782 (component set Tooltip (Atom)); Rich tooltip = set Tooltip (Type Simple/Complex) → Popover
+
+const bubble = (text: ReactNode, props: TooltipBubbleProps = {}) => <TooltipBubble {...props}>{text}</TooltipBubble>;
+
+/** Disparador de ejemplo: botón solo con ícono (en uso real, el tooltip es su nombre con `describes="label"`). */
+const trigger = (label = 'Descargar reporte', state?: ButtonState) => (
+  <Button iconOnly variant="secondary" size="sm" state={state} aria-label={label}>
+    <Icon name="download" size={20} variant="line" />
+  </Button>
 );
 
-const PEOPLE = [
-  { name: 'Ana Pérez', photo: PHOTO_SRC.Woman_1 },
-  { name: 'Hugo García', photo: PHOTO_SRC.Men_1 },
-  { name: 'Lucía Torres', photo: PHOTO_SRC.Woman_2 },
-  { name: 'Mateo Ruiz', photo: PHOTO_SRC.Men_2 },
-  { name: 'Sara Molina', photo: PHOTO_SRC.Woman_3 },
-  { name: 'Diego Vega', photo: PHOTO_SRC.Men_3 },
+/** Tooltip abierto: burbuja con la flecha abajo y el disparador debajo, a 4 px (`OFFSET` de `Tooltip.tsx`). */
+const opened = (text = 'Descargar reporte', state?: ButtonState, content: ReactNode = trigger(text, state)) => (
+  <div className="flex flex-col items-center gap-ds-space-general-md">
+    {bubble(text)}
+    {content}
+  </div>
+);
+
+const states: DocStateItem[] = [
+  {
+    label: 'Oculto',
+    tone: 'neutral',
+    description: 'Reposo. La burbuja no se ve, pero ya está en el DOM y el disparador la referencia.',
+    samples: [trigger()],
+  },
+  {
+    label: 'Hover',
+    tone: 'accent',
+    description: (
+      <>
+        Al pasar el puntero, tras 300 ms (<code>delay</code>). El puntero puede pasar a la burbuja sin que se cierre.
+      </>
+    ),
+    samples: [opened(undefined, 'hover')],
+  },
+  {
+    label: 'Focus',
+    tone: 'accent',
+    description: 'Al enfocar el disparador con el teclado, con el mismo retraso. El foco que sigue a un toque no lo abre.',
+    samples: [opened(undefined, 'focus')],
+  },
+  {
+    label: 'Salida',
+    tone: 'neutral',
+    description: (
+      <>
+        Se oculta al salir el puntero (150 ms, <code>closeDelay</code>), al perder el foco o con Escape, que no mueve el foco.
+      </>
+    ),
+    samples: [trigger(undefined, 'focus')],
+  },
+  {
+    label: 'Disabled',
+    tone: 'neutral',
+    description: (
+      <>
+        Con <code>disabled</code> no se muestra ni se enlaza con el disparador, que queda igual.
+      </>
+    ),
+    samples: [trigger()],
+  },
 ];
-
-const actions = (
-  <>
-    <Button variant="tertiary" size="xs" unicolor>
-      Omitir
-    </Button>
-    <Button variant="secondary" contrast="low" size="xs" unicolor>
-      Siguiente
-    </Button>
-  </>
-);
-
-const bubble = (text: string, props: TooltipBubbleProps = {}) => (
-  <TooltipBubble {...props}>
-    {text}
-  </TooltipBubble>
-);
 
 export const doc: ComponentDocContent = {
   name: 'Tooltip',
   icon: 'info-circle',
   classification: 'atomo',
   summary:
-    'Mensaje contextual breve que proporciona aclaraciones sobre un elemento o función sin interrumpir el flujo del usuario. Se clasifica como un Átomo (Tooltip simple) y evoluciona a una Molécula / Composición (Rich Tooltip) para guías asistidas.',
-
+    'El Tooltip es el átomo que muestra un texto breve sobre un elemento al pasar el puntero o al enfocarlo. Aclara íconos y datos abreviados sin interrumpir la tarea; para contenido interactivo se usa Popover.',
   definition: [
     {
-      title: 'Definición del componente',
-      description:
-        'El Tooltip muestra información complementaria no vital al pasar el puntero (hover) o al enfocar (focus) un elemento. Aclara el significado de iconos, controles o datos abreviados sin sustituir etiquetas esenciales ni requerir una acción obligatoria.',
+      title: 'Anatomía',
+      description: 'Una burbuja con flecha que apunta a su disparador. La posición dice en qué borde va la flecha.',
       blocks: [
-        {
-          type: 'cards',
-          items: [
-            {
-              title: 'Tooltip simple',
-              eyebrow: 'Átomo principal',
-              previewSize: 'lg',
-              preview: bubble('Editar perfil'),
-              description: [
-                'Uso exclusivo para mensajes breves, informativos y no interactivos asociados a un único elemento disparador.',
-                <>
-                  <strong>Anatomía:</strong> contenedor, indicador/flecha y texto descriptivo. <strong>Posiciones soportadas:</strong>{' '}
-                  top, bottom, left, right (prop <code>arrow</code>).
-                  <br />
-                  <strong>Comportamiento:</strong> se activa por hover o focus. Se oculta al retirar el puntero o desenfocar (blur).
-                </>,
-              ],
-            },
-            {
-              title: 'Rich tooltip',
-              eyebrow: 'Composición',
-              preview: (
-                <PopoverPanel arrow="center-top" headingLevel="none" title="Personaliza tu espacio" page="1 de 2" actions={actions}>
-                  Conoce cómo personalizar tu espacio de trabajo.
-                </PopoverPanel>
-              ),
-              description: [
-                <>
-                  Contenedor usado para orientación progresiva, onboarding o explicaciones compuestas. Puede incluir elementos interactivos. En
-                  código es el componente <code>Popover</code>.
-                </>,
-                <>
-                  <strong>Anatomía:</strong> contenedor, título, cuerpo/párrafo, contenido visual/imagen opcional, paginación y acciones (botones).
-                  <br />
-                  <strong>Posiciones soportadas:</strong> 8 posiciones de flecha (<code>top-left</code>, <code>center-top</code>,{' '}
-                  <code>top-right</code>, <code>bottom-left</code>, etc.).
-                  <br />
-                  <strong>Comportamiento:</strong> se activa por click o interacción guiada. Requiere un mecanismo explícito de cierre (botón o clic
-                  fuera).
-                </>,
-              ],
-            },
-          ],
-        },
-        {
-          type: 'table',
-          caption: 'Niveles del componente',
-          columns: ['Nivel', 'Propiedades reales', 'Uso'],
-          rows: [
-            [
-              'Tooltip',
-              <>
-                <code>arrow</code>: top · bottom · right · left | <code>solid</code>: true · false
-              </>,
-              'Ayuda contextual breve y no interactiva.',
-            ],
-            [
-              'Rich tooltip (Popover)',
-              <>
-                <code>type</code>: simple · complex | <code>arrow</code>: 8 posiciones | <code>media</code>: con o sin |{' '}
-                <code>title</code> · <code>link</code> · <code>actions</code>
-              </>,
-              'Explicación compuesta, onboarding o guía contextual.',
-            ],
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Propósito y anatomía',
-      description:
-        'Revelar información contextual secundaria en el momento preciso de la interacción. Se vincula visual y semánticamente a un elemento disparador (trigger) mediante un indicador visual (flecha).',
-      blocks: [
-        {
-          type: 'usage',
-          use: [
-            'Aclarar iconografía: explicar iconos interactivos o descriptivos cuyo significado no sea universal.',
-            'Expandir datos reducidos: ampliar información abreviada, textos truncados o términos técnicos/especializados.',
-            'Contexto secundario: aportar información breve sin interrumpir la tarea actual ni cambiar el flujo de navegación.',
-          ],
-          avoid: [
-            'Información crítica: no ocultar instrucciones necesarias para completar una tarea o formulario (usar texto de ayuda permanente / helper text).',
-            'Contenido interactivo: no incluir formularios, enlaces ni acciones dentro de un Tooltip simple (usar Rich Tooltip).',
-            'Notificaciones de estado: no usar para mensajes de error, confirmaciones ni textos extensos (usar Alert o Toast).',
-          ],
-        },
         {
           type: 'anatomy',
-          preview: (
+          groups: [
+            {
+              canvases: [
+                {
+                  label: 'Tooltip abierto',
+                  preview: opened(),
+                  marks: [
+                    { n: 1, selector: '[data-figma-part="Content"]', side: 'left' },
+                    { n: 2, selector: '[data-figma-part="Supporting text"]', side: 'top' },
+                    { n: 3, selector: '[data-figma-part="Arrow"]', side: 'left' },
+                    { n: 4, selector: 'button', side: 'bottom' },
+                  ],
+                  dimensions: [
+                    { kind: 'padding', selector: '[data-figma-part="Content"]', side: 'left' },
+                    { kind: 'padding', selector: '[data-figma-part="Content"]', side: 'top' },
+                    { kind: 'gap', from: '[data-figma-part="div"]', to: 'button', axis: 'y' },
+                  ],
+                },
+              ],
+              guidelines: [
+                <>
+                  <strong>Contenedor:</strong> padding de 8 (<code>space/general/lg</code>) y radio de 8 (<code>radius/general/md</code>). Mide 34 de alto con una línea y crece con el texto hasta 288 de ancho. Relleno sólido o translúcido, con desenfoque de fondo de 12.
+                </>,
+                <>
+                  <strong>Texto:</strong> Helvetica Neue Semibold de 12 px con interlineado de 16, centrado y en blanco unicolor. Si pasa de 288 de ancho, se divide en varias líneas.
+                </>,
+                <>
+                  <strong>Flecha:</strong> triángulo de 16 × 8 (8 × 16 a los lados) del mismo relleno, centrado. Si la burbuja se corre para no salirse de la pantalla, la flecha sigue apuntando al disparador.
+                </>,
+                <>
+                  <strong>Disparador:</strong> un único elemento enfocable (botón, enlace o campo). La punta de la flecha queda a 4 px de él.
+                </>,
+              ],
+            },
+            {
+              canvases: [
+                {
+                  label: 'Posiciones',
+                  preview: (
+                    <>
+                      {bubble('Izquierda', { arrow: 'left' })}
+                      {bubble('Arriba', { arrow: 'top' })}
+                      {bubble('Abajo', { arrow: 'bottom' })}
+                      {bubble('Derecha', { arrow: 'right' })}
+                    </>
+                  ),
+                  marks: [
+                    { n: 1, selector: '[data-figma-part="div"]', index: 0, side: 'left' },
+                    { n: 2, selector: '[data-figma-part="div"]', index: 1, side: 'top' },
+                    { n: 3, selector: '[data-figma-part="div"]', index: 2, side: 'bottom' },
+                    { n: 4, selector: '[data-figma-part="div"]', index: 3, side: 'right' },
+                  ],
+                  dimensions: [
+                    { kind: 'height', selector: ':scope > div', index: 0 },
+                    { kind: 'height', selector: ':scope > div', index: 1 },
+                  ],
+                },
+              ],
+              guidelines: [
+                <>
+                  <strong>Left:</strong> flecha a la izquierda; la burbuja aparece a la derecha del disparador. Con la flecha a un lado mide 34 de alto.
+                </>,
+                <>
+                  <strong>Top:</strong> flecha arriba; la burbuja aparece debajo del disparador. Con la flecha arriba o abajo mide 42 de alto.
+                </>,
+                <>
+                  <strong>Bottom:</strong> la posición por defecto. Flecha abajo; la burbuja aparece encima del disparador, así el puntero no la tapa.
+                </>,
+                <>
+                  <strong>Right:</strong> flecha a la derecha; la burbuja aparece a la izquierda. Toda posición es una preferencia: si no cabe, pasa al lado opuesto.
+                </>,
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Estados',
+      description: 'El Tooltip cuenta con 5 estados. Aquí la burbuja se dibuja abierta y sin comportamiento; en uso sale del puntero y del foco.',
+      blocks: [{ type: 'states', items: states }],
+    },
+    {
+      title: 'Tokens y modos',
+      description: 'Tokens de la burbuja sólida y de la translúcida. La sólida queda siempre en modo oscuro; la translúcida cambia con el modo.',
+      titleInside: true,
+      blocks: [
+        {
+          type: 'tokens',
+          groups: [
+            {
+              title: 'Sólido',
+              preview: bubble('Guarda los cambios'),
+              entries: [
+                { part: 'Fondo y flecha', color: 'background-general-gray-sixth', mode: 'dark' },
+                { part: 'Texto', color: 'text-neutral-white-unicolor', text: 'primitives-typography-size-sm', mode: 'dark' },
+              ],
+            },
+            {
+              title: 'Translúcido',
+              preview: bubble('Guarda los cambios', { solid: false }),
+              entries: [
+                { part: 'Fondo y flecha', color: 'background-field-active-opacity' },
+                { part: 'Texto', color: 'text-neutral-white-unicolor', text: 'primitives-typography-size-sm' },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Uso del componente Tooltip en Figma:',
+      description: '',
+      titleInside: true,
+      blocks: [
+        {
+          type: 'figma',
+          bullets: [
             <>
-              {bubble('Descargar reporte', { arrow: 'bottom' })}
-              {liveTrigger('tooltip-doc-anatomia', 'download', 'Descargar reporte')}
-            </>
-          ),
-          parts: [
-            { name: 'Contenedor', description: 'superficie que agrupa y da contraste al mensaje.' },
-            { name: 'Flecha', description: 'indicador direccional que une visualmente el tooltip con su disparador.' },
-            { name: 'Icono opcional', description: 'refuerza el carácter informativo sin reemplazar el texto.' },
-            { name: 'Mensaje', description: 'texto breve, conciso y específico asociado directamente al elemento.' },
-            { name: 'Disparador', description: 'control o elemento interactivo (ej. Botón, Icono) que recibe el hover o focus.' },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Propiedades y variantes',
-      description:
-        'Las propiedades controlan la orientación espacial, el tratamiento visual de la superficie, la presencia de elementos gráficos y el contenido del Tooltip.',
-      blocks: [
-        {
-          type: 'table',
-          caption: 'Propiedades del Tooltip',
-          columns: ['Propiedad', 'Valores', 'Descripción'],
-          rows: [
-            [
-              <code key="p">arrow</code>,
-              'top · bottom · right · left',
-              'Borde de la burbuja donde va la flecha (Position en Figma). La burbuja aparece del lado opuesto del disparador y la flecha lo apunta. Por defecto bottom.',
-            ],
-            [<code key="p">solid</code>, 'true · false', '“true” usa superficie opaca. “false” usa una superficie translúcida para contextos con menor contraste.'],
-            [<code key="p">content</code>, 'ReactNode', 'Contenido breve; recomendado entre 2 y 8 palabras y una sola idea.'],
-          ],
-        },
-        {
-          type: 'gallery',
-          title: 'Posiciones básicas',
-          items: [
-            {
-              label: 'Top',
-              preview: bubble('Información adicional', { arrow: 'top' }),
-              description: 'Flecha arriba: la burbuja aparece debajo del disparador. Para elementos junto al borde superior de la pantalla o cuando no cabe encima.',
-            },
-            {
-              label: 'Bottom',
-              preview: bubble('Información adicional', { arrow: 'bottom' }),
-              description: 'Posición por defecto. Flecha abajo: la burbuja se ubica encima del disparador, centrada, si hay espacio libre suficiente.',
-            },
-            {
-              label: 'Right',
-              preview: bubble('Información adicional', { arrow: 'right' }),
-              description: 'Flecha a la derecha: la burbuja aparece a la izquierda del disparador. Útil en paneles laterales derechos o controles de margen final.',
-            },
-            {
-              label: 'Left',
-              preview: bubble('Información adicional', { arrow: 'left' }),
-              description: 'Flecha a la izquierda: la burbuja aparece a la derecha del disparador. Útil en barras de navegación laterales (sidebars) o listas compactas.',
-            },
-          ],
-        },
-        {
-          type: 'cards',
-          items: [
-            {
-              title: 'Solid · true',
-              preview: bubble('Ver detalle'),
-              description:
-                'Uso recomendado: variante predeterminada y preferida. Mantiene un contraste elevado y consistente sobre cualquier tipo de fondo o contenido dinámico.',
-            },
-            {
-              title: 'Solid · false',
-              preview: bubble('Ver detalle', { solid: false }),
-              description:
-                'Uso recomendado: úsalo únicamente cuando el fondo de la interfaz sea homogéneo, garantice la accesibilidad de contraste suficiente y no compita visualmente con el texto del tooltip.',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Estados y especificaciones de layout',
-      description:
-        'El Tooltip permanece oculto en reposo y se despliega tras recibir un evento de hover o focus. Su geometría e intervalos se mantienen idénticos independientemente del método de entrada (puntero o teclado). La posición puede variar para evitar recortes con los bordes de la pantalla (viewport).',
-      blocks: [
-        {
-          type: 'gallery',
-          title: 'Matriz de estados',
-          align: 'start',
-          items: [
-            { label: 'Reposo', preview: liveTrigger('tooltip-doc-reposo', 'message-question', 'Ayuda'), description: 'Oculto hasta que el disparador recibe hover o foco.' },
-            { label: 'Hover / Focus', preview: bubble('Hover / Focus'), description: 'Espera breve y conserva visible el disparador.' },
-            { label: 'Visible', preview: bubble('Visible'), description: 'Mensaje legible y flecha alineada al centro del objetivo.' },
-            { label: 'Salida', preview: liveTrigger('tooltip-doc-salida', 'message-question', 'Más ayuda'), description: 'Se oculta al perder hover/foco o pulsar Escape.' },
-          ],
-        },
-        {
-          type: 'table',
-          caption: 'Especificaciones de layout',
-          columns: ['Elemento', 'Medida', 'Separación', 'Alineación'],
-          rows: [
-            ['Contenedor simple', 'Alto 34 px (42 con la flecha arriba o abajo) · ancho según texto', 'Padding 8 px', 'Texto centrado verticalmente'],
-            ['Flecha', '16 × 8 px', 'Unida al borde del contenedor', 'Apunta al centro del disparador'],
-            ['Distancia al disparador', '4 px', 'Nunca superponer el objetivo; 8 px mínimos con el borde de la pantalla', 'Centrada; admite desplazamiento seguro'],
-            ['Ancho máximo', '288 px', 'Una idea por mensaje', 'Texto alineado al inicio si envuelve'],
-          ],
-        },
-        {
-          type: 'note',
-          tone: 'info',
-          content:
-            'La posición declarada por el diseñador o desarrollador actúa como preferencia. Si el tooltip colisiona con los bordes del viewport o con un contenedor con propiedad overflow: hidden, debe invertir su orientación (ej. de Top a Bottom) o desplazarse lateralmente sin perder la conexión visual con su disparador.',
-        },
-      ],
-    },
-    {
-      title: 'Estados compuestos y ejemplos base',
-      description:
-        'El Rich Tooltip extiende el patrón básico para proporcionar orientación contextual de mayor jerarquía (onboarding, explicaciones compuestas o funciones nuevas). Al contener elementos interactivos, sus acciones deben ser explícitas, limitadas y completamente accesibles mediante navegación por teclado.',
-      blocks: [
-        {
-          type: 'cards',
-          items: [
-            {
-              title: 'Orientación breve',
-              preview: (
-                <>
-                  <PopoverPanel arrow="center-top" headingLevel="none" title="Filtra tus resultados" page="1 de 2" actions={actions}>
-                    Usa los filtros para encontrar pedidos por estado.
-                  </PopoverPanel>
-                  <DocTag>Sin recurso visual</DocTag>
-                </>
-              ),
-              description: [
-                'Estructura ligera diseñada para onboarding progresivo o introducción de características dentro del flujo de trabajo.',
-                <>
-                  <strong>Anatomía:</strong> título, párrafo descriptivo, enlace opcional, paginación y hasta 2 botones de acción.
-                  <br />
-                  <strong>Uso recomendado:</strong> mostrar pasos secuenciales en herramientas complejas o guiar en la configuración inicial de una
-                  función.
-                </>,
-              ],
-            },
-            {
-              title: 'Orientación con contenido visual',
-              preview: (
-                <>
-                  <Avatar name="Hugo García" size="lg" />
-                  <PopoverPanel
-                    arrow="center-top"
-                    headingLevel="none"
-                    title="Gestiona tu equipo"
-                    page="2 de 2"
-                    actions={actions}
-                    onClose={() => {}}
-                    media={
-                      <>
-                        <AvatarGroup aria-label="Participantes" max={4} size="sm">
-                          {PEOPLE.map((p) => (
-                            <Avatar key={p.name} variant="photo" src={p.photo} alt={p.name} />
-                          ))}
-                        </AvatarGroup>
-                        <Button size="xs">Unirme</Button>
-                      </>
-                    }
-                  >
-                    Revisa participantes y permisos antes de compartir.
-                  </PopoverPanel>
-                </>
-              ),
-              description: [
-                'Estructura de alto impacto que incorpora elementos gráficos (imágenes, avatares o agrupaciones de usuarios).',
-                <>
-                  <strong>Anatomía:</strong> botón de cierre (CloseButton), área visual / media slot, título, párrafo descriptivo, paginación y
-                  acciones (máximo 2).
-                  <br />
-                  <strong>Uso recomendado:</strong> explicar funciones conceptuales donde una imagen o avatar añada contexto inmediato.
-                </>,
-              ],
-            },
-          ],
-        },
-        {
-          type: 'table',
-          caption: 'Composiciones base',
-          columns: ['Composición', 'Incluye', 'Recomendación'],
-          rows: [
-            ['Tooltip', 'Icono opcional + mensaje', 'Ayuda inmediata de una sola idea.'],
-            ['Rich tooltip informativo', 'Título + párrafo + cerrar', 'Explicación contextual extensa que el usuario puede descartar voluntariamente.'],
-            ['Rich tooltip guiado', 'Contenido + paginación + hasta 2 acciones', 'Secuencia corta, con progreso y salida disponible.'],
+              <strong>Búsqueda y configuración:</strong> encuentra el componente como Tooltip (Atom) en la librería de Assets y arrástralo al lienzo. Sus propiedades son Solid, Position y Text.
+            </>,
+            <>
+              <strong>Position:</strong> el borde de la burbuja con la flecha (Top, Bottom, Left o Right); en código es <code>arrow</code>. La burbuja aparece del lado opuesto al disparador.
+            </>,
+            <>
+              <strong>Solid:</strong> Yes para el relleno sólido y No para el translúcido con desenfoque. Figma no tiene Solid No con Position Bottom; el código sí lo admite.
+            </>,
+            <>
+              <strong>Rich tooltip:</strong> el set Tooltip de Figma (Type Simple o Complex, con título, paginación y acciones) es el componente Popover en código.
+            </>,
           ],
         },
       ],
     },
   ],
-
   application: [
     {
-      title: 'Comportamiento y reglas de uso',
-      description:
-        'El Tooltip actúa como una respuesta secundaria a eventos de hover o focus. Permanece visible mientras el usuario interactúa con el elemento disparador o con el propio contenedor, y se oculta automáticamente sin alterar el estado actual de la interfaz.',
+      title: 'Comportamiento',
+      description: 'Cuándo el Tooltip es la pieza correcta y cuándo conviene otra.',
       blocks: [
         {
-          type: 'cards',
-          items: [
-            {
-              title: 'Apertura y permanencia',
-              bullets: [
-                <>
-                  <strong>Disparadores (Triggers):</strong> se activa mediante paso del puntero (hover) o al recibir foco mediante teclado (focus). No
-                  aparece con toque.
-                </>,
-                <>
-                  <strong>Retardo de apertura (intent delay):</strong> se aplica una demora intencional de 300 ms (prop <code>delay</code>) antes de
-                  desplegar la superficie para evitar apariciones accidentales durante el movimiento rápido del cursor.
-                </>,
-                <>
-                  <strong>Área de recorrido seguro (hoverable):</strong> el tooltip debe permanecer visible si el puntero se desplaza desde el
-                  disparador hacia el interior del propio tooltip. La separación (4 px) no rompe el evento de hover: el retardo de salida da tiempo a
-                  cruzarla.
-                </>,
-                <>
-                  <strong>Persistencia de posición:</strong> mantiene la relación visual con el disparador aunque la posición se invierta por colisión
-                  con los bordes de la pantalla (auto-placement).
-                </>,
-              ],
-            },
-            {
-              title: 'Cierre y disponibilidad',
-              bullets: [
-                <>
-                  Retardo de salida (exit delay): al retirar el puntero se aplica un retraso breve de 150 ms (prop <code>closeDelay</code>) para
-                  permitir movimientos accidentales sin cerrar el mensaje de forma abrupta. Al perder el foco se oculta de inmediato.
-                </>,
-                'Descarte por teclado: presionar la tecla Escape cierra el tooltip de inmediato sin perder ni desplazar el foco del elemento disparador.',
-                'Bloqueo e interacción: un Tooltip simple nunca debe bloquear el resto de la interfaz ni capturar el foco del teclado.',
-              ],
-            },
+          type: 'usage',
+          use: [
+            <>
+              <strong>Botones solo con ícono:</strong> el tooltip es su nombre con <code>describes=&quot;label&quot;</code>; el botón no lleva <code>aria-label</code>.
+            </>,
+            <>
+              <strong>Aclarar un ícono o un dato abreviado:</strong> un texto breve que amplía lo que ya se ve, con <code>aria-describedby</code>.
+            </>,
+            <>
+              <strong>Información que solo vive en el globo:</strong> <code>mode=&quot;toggletip&quot;</code> abre con clic, toque, Enter o Espacio y anuncia el contenido.
+            </>,
+            <>
+              <strong>Contexto secundario:</strong> una sola idea que no interrumpe la tarea ni cambia la navegación.
+            </>,
           ],
-        },
-        {
-          type: 'gallery',
-          title: 'Respuesta a la interacción',
-          columns: 3,
-          items: [
-            { label: 'Reposo', preview: liveTrigger('tooltip-doc-respuesta', 'download', 'Descargar reporte'), description: 'Tooltip oculto' },
-            { label: 'Hover / Focus', preview: bubble('Descargar reporte'), description: 'Aparece tras una demora breve' },
-            { label: 'Escape / Salida', preview: liveTrigger('tooltip-doc-escape', 'download', 'Descargar informe', true), description: 'Se oculta; el foco permanece' },
+          avoid: [
+            <>
+              <strong>Información esencial o errores:</strong> no aparece con toque y se pierde al mover el puntero. (Alternativa: el texto de ayuda del campo o un Alert).
+            </>,
+            <>
+              <strong>Botones, enlaces o formularios:</strong> la burbuja nunca recibe el foco. (Alternativa: Popover).
+            </>,
+            <>
+              <strong>Repetir la etiqueta visible:</strong> el lector la anuncia dos veces y no aporta nada.
+            </>,
+            <>
+              <strong>Textos largos:</strong> el ancho máximo es 288 px y desaparece al salir. (Alternativa: Popover o texto en la interfaz).
+            </>,
+            <>
+              <strong>Translúcido sobre fondos variados:</strong> el texto pierde contraste. (Alternativa: <code>solid</code>, el valor por defecto).
+            </>,
           ],
-        },
-        {
-          type: 'note',
-          tone: 'warning',
-          content:
-            'No utilices Tooltips para información crítica, errores de validación o instrucciones indispensables para completar una tarea. Todo contenido esencial que el usuario deba recordar o consultar continuamente debe permanecer visible en la interfaz o presentarse a través de un patrón persistente (Helper Text, Inline Alert o Banner).',
         },
       ],
     },
     {
-      title: 'Buenas y malas prácticas (Dos and Don’ts)',
-      description:
-        'Conoce las reglas de aplicación del Tooltip para garantizar mensajes oportunos, concisos, legibles, accesibles y correctamente anclados al elemento que describen.',
+      title: 'Aplicaciones de breakpoints',
+      description: 'La burbuja mide lo mismo en todos los breakpoints. Cambia cómo se abre: con puntero y teclado, sí; con toque, no.',
+      blocks: [
+        {
+          type: 'breakpoints',
+          desktop: {
+            columns: [
+              {
+                title: 'Con puntero',
+                bullets: [
+                  <>
+                    <strong>Aparece tras 300 ms</strong> y se oculta 150 ms después de salir, tiempo para pasar el puntero a la burbuja.
+                  </>,
+                  <>
+                    <strong>Bottom por defecto:</strong> encima del disparador, así el puntero no la tapa.
+                  </>,
+                ],
+                preview: opened('Descargar reporte', 'hover'),
+              },
+              {
+                title: 'Con teclado',
+                bullets: [
+                  <>
+                    <strong>Aparece al enfocar</strong> el disparador y se oculta al perder el foco.
+                  </>,
+                  <>
+                    <strong>Escape</strong> la cierra sin mover el foco y no la vuelve a abrir hasta salir y volver.
+                  </>,
+                ],
+                preview: opened('Descargar reporte', 'focus'),
+              },
+            ],
+          },
+          mobile: {
+            bullets: [
+              <>
+                <strong>Sin toque:</strong> el tooltip no aparece con toque, así que su texto también debe estar en el nombre accesible o en la interfaz.
+              </>,
+              <>
+                <strong>Toggletip:</strong> para información que solo vive en el globo, como el ícono de información de un campo; abre con toque.
+              </>,
+              <>
+                <strong>Medidas:</strong> 288 de ancho máximo y 8 px de margen con el borde de la pantalla.
+              </>,
+            ],
+            preview: <Input label="Teléfono" type="tel" optional tooltip="Solo lo usamos para avisarte del envío" fullWidth />,
+          },
+          tablet: {
+            bullets: [
+              <>
+                <strong>Medidas:</strong> las mismas de Desktop.
+              </>,
+              <>
+                <strong>Entrada mixta:</strong> con puntero o teclado se abre igual que en Desktop; con toque no aparece.
+              </>,
+              <>
+                <strong>Bordes de la pantalla:</strong> si no cabe, pasa al lado opuesto y la flecha sigue apuntando al disparador.
+              </>,
+            ],
+            preview: opened('Descargar reporte', 'focus'),
+          },
+        },
+      ],
+    },
+    {
+      title: 'Do and Dont’s',
+      description: 'Reglas de contenido, longitud y qué información puede vivir en un tooltip.',
       blocks: [
         {
           type: 'practices',
           items: [
-            { kind: 'do', title: 'Describe el resultado', description: 'Describe con precisión la función o el resultado de la acción.' },
-            {
-              kind: 'dont',
-              title: 'No repitas la misma palabra o etiqueta que ya es visible en el elemento',
-              description: 'Si el botón muestra el texto "Descargar", no agregues un tooltip que vuelva a decir "Descargar".',
-            },
             {
               kind: 'do',
-              title: 'Mantén la brevedad del mensaje',
-              description: 'Transmite una sola idea directa con una longitud que se pueda leer de un vistazo (2 a 8 palabras).',
+              framed: true,
+              title: 'Nombra el botón de ícono',
+              description: 'Usa el tooltip para nombrar un botón solo con ícono o para decir qué resultado tiene.',
+              preview: opened('Descargar reporte'),
             },
             {
               kind: 'dont',
-              title: 'No incluyas elementos interactivos',
-              description: 'No incluyas enlaces, botones, formularios ni controles interactivos dentro de un Tooltip simple.',
+              framed: true,
+              title: 'Repetir la etiqueta',
+              description: 'No repitas lo que el botón ya dice: no aporta nada y el lector lo anuncia dos veces.',
+              preview: opened(
+                'Descargar',
+                undefined,
+                <Button variant="secondary" size="sm">
+                  Descargar
+                </Button>,
+              ),
             },
             {
               kind: 'do',
-              title: 'Garantiza la accesibilidad por foco',
-              description: 'Haz que el tooltip esté disponible tanto al pasar el puntero (hover) como al navegar con teclado (focus-visible).',
-            },
-            { kind: 'dont', title: 'No dependas exclusivamente del hover', description: 'No diseñes interacciones que funcionen únicamente con el mouse.' },
-            {
-              kind: 'do',
-              title: 'Reubica automáticamente',
-              description:
-                'Invierte o desplaza la orientación (Top/Bottom, Left/Right) cuando falte espacio en el viewport, conservando la flecha orientada al disparador.',
+              framed: true,
+              title: 'Una idea breve',
+              description: 'Escribe una sola idea de 2 a 8 palabras que se lea de un vistazo.',
+              preview: bubble('Guarda los cambios'),
             },
             {
               kind: 'dont',
-              title: 'No ocultes el disparador',
-              description:
-                'No permitas que el contenedor del tooltip se superponga o tape el elemento disparador ni la información adyacente indispensable.',
+              framed: true,
+              title: 'Texto largo',
+              description: 'No escribas párrafos: la burbuja tiene 288 px de ancho máximo y desaparece al mover el puntero.',
+              preview: bubble('Guarda los cambios que hiciste en el formulario para que no se pierdan cuando cierres la ventana o cambies de página'),
+            },
+            {
+              kind: 'do',
+              framed: true,
+              title: 'Requisito a la vista',
+              description: 'Deja visible lo que se necesita para completar la tarea, como el texto de ayuda del campo.',
+              preview: <Input variant="password" label="Contraseña" helperText="Mínimo 8 caracteres" fullWidth />,
+            },
+            {
+              kind: 'dont',
+              framed: true,
+              title: 'Requisito escondido',
+              description: 'No escondas requisitos ni errores en un tooltip: con toque no aparece y se pierde al mover el puntero.',
+              preview: <Input variant="password" label="Contraseña" tooltip="Mínimo 8 caracteres" fullWidth />,
             },
           ],
         },

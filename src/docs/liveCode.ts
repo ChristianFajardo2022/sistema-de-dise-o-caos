@@ -98,34 +98,66 @@ export function defaultValueOf(row: Pick<DocPropRow, 'defaultValue'>, control: P
 
 // ───────────────────────── código JSX ─────────────────────────
 
+const FRAGMENT = Symbol.for('react.fragment');
+
 function nameOfType(type: ReactElement['type']): string {
   if (typeof type === 'string') return type;
-  const t = type as { displayName?: string; name?: string; render?: { name?: string } };
-  return t.displayName || t.name || t.render?.name || 'Componente';
+  if ((type as unknown) === FRAGMENT) return '';
+  // memo(): el componente está en `type`; forwardRef(): en `render`
+  const t = type as { displayName?: string; name?: string; render?: { displayName?: string; name?: string }; type?: ReactElement['type'] };
+  return t.displayName || t.name || t.render?.displayName || t.render?.name || (t.type ? nameOfType(t.type) : '') || 'Componente';
 }
 
 const quote = (s: string) => (s.includes('"') ? `{${JSON.stringify(s)}}` : `"${s}"`);
 
-function formatValue(value: unknown): string | undefined {
+const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
+/** Hasta dónde se baja en objetos anidados (evita ciclos y bloques enormes). */
+const MAX_DEPTH = 5;
+
+/**
+ * Valor de JavaScript escrito como en el código (`{ label: 'Mover' }`, `[1, 2]`, `<Icon />`, `() => {}`): lo usan las
+ * props que son objetos, arreglos o funciones dentro de ellos. En una línea si cabe en 60 caracteres; si no, una
+ * entrada por línea con la sangría de `level`. `undefined` si no se puede escribir.
+ */
+function literal(value: unknown, level: number, depth = 0): string | undefined {
+  if (value === undefined || typeof value === 'symbol') return undefined;
+  if (value === null || typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (typeof value === 'string') return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+  if (typeof value === 'function') return '() => {}';
+  if (isValidElement(value)) return elementToJsx(value, level);
+  if (typeof value !== 'object' || depth >= MAX_DEPTH) return undefined;
+  if (value instanceof Date) return `new Date('${value.toISOString()}')`;
+  const isArray = Array.isArray(value);
+  if (!isArray && Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) return undefined;
+  const entries = isArray
+    ? (value as unknown[]).map((v) => literal(v, level + 1, depth + 1) ?? 'undefined')
+    : Object.entries(value as Record<string, unknown>).flatMap(([k, v]) => {
+        const text = literal(v, level + 1, depth + 1);
+        return text === undefined ? [] : [`${IDENTIFIER.test(k) ? k : `'${k}'`}: ${text}`];
+      });
+  const [open, close] = isArray ? ['[', ']'] : ['{ ', ' }'];
+  if (entries.length === 0) return isArray ? '[]' : '{}';
+  const oneLine = `${open}${entries.join(', ')}${close}`;
+  if (oneLine.length <= 60 && !oneLine.includes('\n')) return oneLine;
+  return `${open.trim()}\n${entries.map((e) => `${indent(level + 1)}${e},`).join('\n')}\n${indent(level)}${close.trim()}`;
+}
+
+function formatValue(value: unknown, level: number): string | undefined {
   if (typeof value === 'string') return quote(value);
   if (typeof value === 'number') return `{${value}}`;
   if (typeof value === 'boolean') return value ? '' : '{false}';
   if (value === null) return '{null}';
-  if (isValidElement(value)) return `{${elementToJsx(value, 0)}}`;
-  if (typeof value === 'object') {
-    try {
-      return `{${JSON.stringify(value)}}`;
-    } catch {
-      return undefined;
-    }
-  }
-  return undefined;
+  const text = literal(value, level);
+  return text === undefined ? undefined : `{${text}}`;
 }
 
-/** `name="x"`, `name`, `name={3}`… o `undefined` si el valor no se puede escribir (funciones, símbolos). */
-function formatProp(name: string, value: unknown): string | undefined {
+/**
+ * `name="x"`, `name`, `name={3}`, `name={{ a: 1 }}`… o `undefined` si el valor no se puede escribir (funciones,
+ * símbolos). `level` es la sangría de la línea de la prop (para objetos de varias líneas).
+ */
+function formatProp(name: string, value: unknown, level = 1): string | undefined {
   if (value === undefined || typeof value === 'function' || typeof value === 'symbol') return undefined;
-  const v = formatValue(value);
+  const v = formatValue(value, level);
   if (v === undefined) return undefined;
   return v === '' ? name : `${name}=${v}`;
 }
@@ -135,6 +167,10 @@ const indent = (level: number) => '  '.repeat(level);
 function childrenLines(children: ReactNode, level: number): string[] {
   if (children === undefined || children === null || children === false || children === true || children === '') return [];
   if (Array.isArray(children)) return children.flatMap((c) => childrenLines(c as ReactNode, level));
+  // Un fragmento como hijo se escribe con sus hijos directamente (`<>` no aporta nada dentro de otro elemento)
+  if (isValidElement(children) && (children.type as unknown) === FRAGMENT) {
+    return childrenLines((children.props as { children?: ReactNode }).children, level);
+  }
   if (isValidElement(children)) return [indent(level) + elementToJsx(children as ReactElement, level)];
   if (typeof children === 'number') return [indent(level) + String(children)];
   if (typeof children === 'string') return [indent(level) + children.replace(/[{}<>]/g, (c) => `{'${c}'}`)];
@@ -146,16 +182,25 @@ function elementToJsx(el: ReactElement, level: number): string {
   const { children, ...rest } = el.props as Record<string, unknown>;
   const tag = nameOfType(el.type);
   const props = Object.entries(rest)
-    .map(([k, v]) => formatProp(k, v))
+    .map(([k, v]) => formatProp(k, v, level + 1))
     .filter((p): p is string => p !== undefined);
   return jsx(tag, props, childrenLines(children as ReactNode, level + 1), level);
 }
 
 function jsx(tag: string, props: string[], inner: string[], level: number): string {
+  // Fragmento (`<>…</>`): sin props
+  if (tag === '') return inner.length === 0 ? '<></>' : `<>\n${inner.join('\n')}\n${indent(level)}</>`;
   const oneLine = `<${tag}${props.map((p) => ` ${p}`).join('')}`;
-  const multiline = props.length > 2 || oneLine.length > 60;
+  const multiline = props.length > 2 || oneLine.length > 60 || props.some((p) => p.includes('\n'));
   const open = multiline ? `<${tag}\n${props.map((p) => `${indent(level + 1)}${p}`).join('\n')}\n${indent(level)}` : oneLine;
   if (inner.length === 0) return `${open}${multiline ? '/>' : ' />'}`;
+  // Elemento anidado con un texto corto (`<DropdownMenuItem>Mi perfil</DropdownMenuItem>`): en una línea. El elemento
+  // principal (nivel 0) conserva su forma de bloque.
+  const text = inner.length === 1 ? inner[0].trim() : '';
+  if (level > 0 && !multiline && text && !text.startsWith('<') && !text.startsWith('{')) {
+    const line = `${open}>${text}</${tag}>`;
+    if (line.length <= 80) return line;
+  }
   return `${open}>\n${inner.join('\n')}\n${indent(level)}</${tag}>`;
 }
 
@@ -204,6 +249,32 @@ export function formatExample(code: string): string {
 }
 
 /**
+ * Args que cambian el código: sin los que valen lo mismo que su valor por defecto, los sin definir y las funciones
+ * (acciones de la historia). Un booleano en `false` sin valor por defecto conocido equivale a omitirlo.
+ */
+export function changedArgs(
+  args: Record<string, unknown>,
+  defaults: Record<string, string | number | boolean | undefined>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [name, value] of Object.entries(args)) {
+    if (value === undefined || typeof value === 'function') continue;
+    if (name !== 'children' && name in defaults && defaults[name] !== undefined && String(defaults[name]) === String(value)) continue;
+    if (value === false && defaults[name] === undefined) continue;
+    out[name] = value;
+  }
+  return out;
+}
+
+/**
+ * Un valor escrito como en el código (`{ type: 'success', title: 'Guardado' }`). Para `docsLive.code`, cuando el
+ * ejemplo no es un elemento JSX (p. ej. la llamada `add({ … })` de un componente imperativo).
+ */
+export function formatLiteral(value: unknown, level = 0): string {
+  return literal(value, level) ?? 'undefined';
+}
+
+/**
  * Código JSX del componente con los args actuales. Omite lo que vale lo mismo que su valor por defecto, lo que está
  * sin definir y las funciones (acciones de la historia).
  */
@@ -213,11 +284,8 @@ export function buildCode(
   defaults: Record<string, string | number | boolean | undefined>,
 ): string {
   const props: string[] = [];
-  for (const [name, value] of Object.entries(args)) {
-    if (name === 'children' || value === undefined || typeof value === 'function') continue;
-    if (name in defaults && defaults[name] !== undefined && String(defaults[name]) === String(value)) continue;
-    // Sin default conocido, un booleano en false equivale a omitirlo
-    if (value === false && defaults[name] === undefined) continue;
+  for (const [name, value] of Object.entries(changedArgs(args, defaults))) {
+    if (name === 'children') continue;
     const p = formatProp(name, value);
     if (p !== undefined) props.push(p);
   }

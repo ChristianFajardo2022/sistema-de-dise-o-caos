@@ -36,11 +36,14 @@ export interface ArgTypeLike {
 /**
  * Props reales a partir del ArgTypes de Storybook (sale del docgen de los tipos del componente). El tipo y la
  * obligatoriedad vienen del código; la descripción y el valor por defecto que falten se completan con `docs.json`.
- * Se omiten los argTypes ocultos (`table.disable`).
+ * Se omiten los argTypes ocultos (`table.disable`) y, si hay `docs.json`, los args que solo usa la historia.
  */
 export function propsFromArgTypes(argTypes: Record<string, ArgTypeLike>, json?: DocsJson): DocPropRow[] {
   return Object.entries(argTypes)
     .filter(([, a]) => !a.table?.disable)
+    // Args que solo usa la historia (p. ej. `withTertiary` para armar el ejemplo): no vienen del docgen (sin `table`)
+    // ni están en docs.json, así que no son props del componente
+    .filter(([key, a]) => !json || a.table !== undefined || json.props?.[key] !== undefined)
     .map(([key, a]) => {
       const fromJson = json?.props?.[key];
       // El docgen resume las uniones con alias como "union" (o "unknown"): ahí sirve más el tipo escrito en docs.json

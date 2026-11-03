@@ -7,13 +7,31 @@ import { Toaster } from './Toaster';
 import { useToastQueue } from './useToastQueue';
 import type { ToastType } from './Toast.types';
 import { Button } from '../Button';
+import { formatLiteral } from '../../docs/liveCode';
 
 const TYPE_OPTIONS: ToastType[] = ['success', 'alert', 'error', 'info'];
+
+/**
+ * Código de la sección Desarrollo: el aviso se usa de forma imperativa (`add` de `useToastQueue` dentro de un
+ * `Toaster`), así que el ejemplo es esa llamada con los args que cambian; el lienzo muestra el aviso suelto.
+ * `open` y `onExited` los maneja la cola.
+ */
+function docsCode({ open: _open, onExited: _onExited, ...args }: Record<string, unknown>): string {
+  return [
+    'const { items, add } = useToastQueue();',
+    '',
+    `add(${formatLiteral(args)});`,
+    '',
+    '<Toaster>',
+    '  {items.map((item) => <Toast key={item.id} {...item.props} />)}',
+    '</Toaster>',
+  ].join('\n');
+}
 
 const meta = {
   title: 'Feedback/Toast',
   component: Toast,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docsLive: { code: docsCode } },
   tags: ['autodocs'],
   argTypes: {
     type: { name: 'type', control: 'radio', options: TYPE_OPTIONS, type: { name: 'enum', value: TYPE_OPTIONS }, description: 'Type de Figma' },

@@ -1,5 +1,5 @@
-import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import { useContext, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Avatar } from '../components/Avatar';
 import { Icon } from '../components/Icon';
 import type { IconName } from '../components/Icon/Icon.types';
@@ -13,10 +13,12 @@ import figmaLogo from './assets/figma-logo.png';
 import type {
   DocAnatomyCanvas,
   DocAnatomyGroup,
+  DocAnatomyMark,
   DocBreakpointCard,
   DocBreakpointColumn,
   DocInline,
   DocStateItem,
+  DocTokenEntry,
   DocTokenGroup,
   DocTone,
 } from './types';
@@ -87,9 +89,23 @@ export function DocDotsCanvas({ children, className, ...rest }: { children: Reac
  * - `list` (en las pautas numeradas): relleno `background/general/white` y número en `text/neutral/black`.
  */
 // Figma: marcador del lienzo 22430:82308; marcador de las pautas 22458:90585
-function Marker({ n, variant, className, style }: { n: number; variant: 'canvas' | 'list'; className?: string; style?: CSSProperties }) {
+function Marker({
+  n,
+  variant,
+  className,
+  style,
+  attrs,
+}: {
+  n: number;
+  variant: 'canvas' | 'list';
+  className?: string;
+  style?: CSSProperties;
+  /** Atributos `data-doc-mark*` del contrato con el verificador (solo en el lienzo). */
+  attrs?: { [key: `data-${string}`]: string | number | undefined };
+}) {
   return (
     <span
+      {...attrs}
       aria-hidden="true"
       style={style}
       className={cn(
@@ -125,12 +141,23 @@ function Guidelines({ items }: { items: DocInline[] }) {
 const GUIDE = 40;
 /** Radio del marcador: la línea guía nace en el borde del círculo, no en el número (el marcador no tiene relleno). */
 const MARKER_RADIUS = 12;
+/** Separación mínima entre centros de marcadores del mismo lado (24 del círculo + 4 de aire). */
+const MARKER_SPACING = 28;
 /** Cuánto sobresalen de la parte las líneas de borde de una cota, y a qué distancia queda su etiqueta. */
 const OVERSHOOT = 8;
 const LABEL_GAP = 16;
+/** Espacio desde el borde del lienzo hasta una vista con marcadores a ese lado: el marcador entero y 4 de aire. */
+const MARK_ROOM = GUIDE + MARKER_RADIUS + 4;
+/** Espacio a la derecha para las cifras de las cotas (alto y padding vertical) aunque no haya marcadores. */
+const LABEL_ROOM = 36;
+
+type Side = DocAnatomyMark['side'];
+
+/** Atributos `data-*` del contrato con el verificador. */
+type DataAttrs = { [key: `data-${string}`]: string | number | undefined };
 
 interface MarkerOverlay {
-  n: number;
+  mark: DocAnatomyMark;
   x: number;
   y: number;
   line: [number, number, number, number];
@@ -144,10 +171,12 @@ interface Band {
   h: number;
   /** Eje del espacio medido: `x` horizontal (banda vertical, violeta) o `y` vertical (banda horizontal, verde). */
   axis: 'x' | 'y';
+  /** Cifra real en px (sin la escala de la vista). */
   value: number;
   /** Líneas de borde de 1 px (extremos) y posición de la etiqueta, fuera del componente. */
   edges: [number, number, number, number][];
   label: { x: number; y: number };
+  attrs: DataAttrs;
 }
 
 interface Bracket {
@@ -155,11 +184,26 @@ interface Bracket {
   y1: number;
   y2: number;
   value: number;
+  /** Posición de la cifra: a la derecha del corchete o, en una vista escalada (piezas juntas), debajo de la parte. */
+  label: { x: number; y: number };
+  attrs: DataAttrs;
 }
 
 interface DimOverlay {
   bands: Band[];
   brackets: Bracket[];
+}
+
+/**
+ * Ajuste de una vista que no cabe o que llena el lienzo: `width` y `height` son su tamaño de diseño (sin escalar) y
+ * `gl` / `gr`, el aire que se reserva a la izquierda y a la derecha para marcadores y cifras.
+ */
+interface ViewFit {
+  scale: number;
+  width: number;
+  height: number;
+  gl: number;
+  gr: number;
 }
 
 function pick(view: HTMLElement, selector: string, index = 0): HTMLElement | null {
@@ -172,19 +216,28 @@ const round1 = (v: number) => Math.round(v * 10) / 10;
 
 type Box = { l: number; t: number; r: number; b: number; w: number; h: number };
 
-/** Caja de un elemento relativa al lienzo (`root`). */
+/** Caja de un elemento relativa al lienzo (`root`), ya con la escala de la vista. */
 const boxOf = (root: HTMLElement) => (el: HTMLElement): Box => {
   const base = root.getBoundingClientRect();
   const r = el.getBoundingClientRect();
   return { l: r.left - base.left, t: r.top - base.top, r: r.right - base.left, b: r.bottom - base.top, w: r.width, h: r.height };
 };
 
-/** Marcadores de la copia superior: a GUIDE de la parte más saliente de su lado, con su línea guía. */
+const isHorizontalSide = (side: Side) => side === 'top' || side === 'bottom';
+
+/**
+ * Marcadores de la copia superior: a GUIDE de la parte más saliente de su lado, con su línea guía. Los del mismo lado
+ * que se pisan (partes alineadas en un compuesto) se separan a lo largo de ese lado sin salirse de su parte, así la
+ * línea sigue recta y cae sobre ella.
+ */
 function measureMarkers(root: HTMLElement, view: HTMLElement, canvas: DocAnatomyCanvas): MarkerOverlay[] {
   const rect = boxOf(root);
   const found = canvas.marks.flatMap((m) => {
     const el = pick(view, m.selector, m.index);
-    return el ? [{ m, r: rect(el) }] : [];
+    if (!el) return [];
+    const r = rect(el);
+    const horizontal = isHorizontalSide(m.side);
+    return [{ m, r, along: horizontal ? r.l + r.w / 2 : r.t + r.h / 2, min: horizontal ? r.l + 1 : r.t + 1, max: horizontal ? r.r - 1 : r.b - 1 }];
   });
   const edge = {
     top: Math.min(...found.filter((f) => f.m.side === 'top').map((f) => f.r.t)),
@@ -192,21 +245,32 @@ function measureMarkers(root: HTMLElement, view: HTMLElement, canvas: DocAnatomy
     left: Math.min(...found.filter((f) => f.m.side === 'left').map((f) => f.r.l)),
     right: Math.max(...found.filter((f) => f.m.side === 'right').map((f) => f.r.r)),
   };
-  return found.map(({ m, r }) => {
-    const cx = r.l + r.w / 2;
-    const cy = r.t + r.h / 2;
-    if (m.side === 'top') return { n: m.n, x: cx, y: edge.top - GUIDE, line: [cx, edge.top - GUIDE + MARKER_RADIUS, cx, r.t] };
-    if (m.side === 'bottom') return { n: m.n, x: cx, y: edge.bottom + GUIDE, line: [cx, edge.bottom + GUIDE - MARKER_RADIUS, cx, r.b] };
-    if (m.side === 'left') return { n: m.n, x: edge.left - GUIDE, y: cy, line: [edge.left - GUIDE + MARKER_RADIUS, cy, r.l, cy] };
-    return { n: m.n, x: edge.right + GUIDE, y: cy, line: [edge.right + GUIDE - MARKER_RADIUS, cy, r.r, cy] };
+  for (const side of ['top', 'bottom', 'left', 'right'] as const) {
+    const row = found.filter((f) => f.m.side === side).sort((a, b) => a.along - b.along);
+    // Hacia adelante y, si una parte no deja correr más su marcador, hacia atrás
+    for (let i = 1; i < row.length; i++) {
+      const prev = row[i - 1].along;
+      if (row[i].along - prev < MARKER_SPACING) row[i].along = Math.min(prev + MARKER_SPACING, row[i].max);
+    }
+    for (let i = row.length - 2; i >= 0; i--) {
+      const next = row[i + 1].along;
+      if (next - row[i].along < MARKER_SPACING) row[i].along = Math.max(next - MARKER_SPACING, row[i].min);
+    }
+  }
+  return found.map(({ m, r, along }) => {
+    if (m.side === 'top') return { mark: m, x: along, y: edge.top - GUIDE, line: [along, edge.top - GUIDE + MARKER_RADIUS, along, r.t] };
+    if (m.side === 'bottom') return { mark: m, x: along, y: edge.bottom + GUIDE, line: [along, edge.bottom + GUIDE - MARKER_RADIUS, along, r.b] };
+    if (m.side === 'left') return { mark: m, x: edge.left - GUIDE, y: along, line: [edge.left - GUIDE + MARKER_RADIUS, along, r.l, along] };
+    return { mark: m, x: edge.right + GUIDE, y: along, line: [edge.right + GUIDE - MARKER_RADIUS, along, r.r, along] };
   });
 }
 
 /**
  * Cotas de la copia inferior (como "Item spacing" de Figma): banda translúcida sobre la zona medida, dos líneas de
- * 1 px en sus bordes que sobresalen del componente y la cifra en una etiqueta fuera de él.
+ * 1 px en sus bordes que sobresalen del componente y la cifra en una etiqueta fuera de él. La geometría es la de la
+ * vista escalada (`scale`); la cifra, la real.
  */
-function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnatomyCanvas): DimOverlay {
+function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnatomyCanvas, scale: number): DimOverlay {
   const rect = boxOf(root);
   const out: DimOverlay = { bands: [], brackets: [] };
   for (const d of canvas.dimensions ?? []) {
@@ -219,11 +283,12 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
       const border = { top: parseFloat(cs.borderTopWidth), bottom: parseFloat(cs.borderBottomWidth), left: parseFloat(cs.borderLeftWidth), right: parseFloat(cs.borderRightWidth) };
       const value = pad[d.side];
       if (!(value > 0)) continue;
-      const x0 = r.l + border.left;
-      const y0 = r.t + border.top;
-      const w = r.w - border.left - border.right;
-      const h = r.h - border.top - border.bottom;
-      const band = d.side === 'left' ? { x: x0, y: y0, w: value, h } : d.side === 'right' ? { x: x0 + w - value, y: y0, w: value, h } : d.side === 'top' ? { x: x0, y: y0, w, h: value } : { x: x0, y: y0 + h - value, w, h: value };
+      const v = value * scale;
+      const x0 = r.l + border.left * scale;
+      const y0 = r.t + border.top * scale;
+      const w = r.w - (border.left + border.right) * scale;
+      const h = r.h - (border.top + border.bottom) * scale;
+      const band = d.side === 'left' ? { x: x0, y: y0, w: v, h } : d.side === 'right' ? { x: x0 + w - v, y: y0, w: v, h } : d.side === 'top' ? { x: x0, y: y0, w, h: v } : { x: x0, y: y0 + h - v, w, h: v };
       const vertical = d.side === 'left' || d.side === 'right';
       out.bands.push({
         ...band,
@@ -234,6 +299,7 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
           : [[r.l - OVERSHOOT, band.y, r.r + OVERSHOOT, band.y], [r.l - OVERSHOOT, band.y + band.h, r.r + OVERSHOOT, band.y + band.h]],
         // Padding horizontal: etiqueta arriba; vertical: a la derecha
         label: vertical ? { x: band.x + band.w / 2, y: r.t - OVERSHOOT - LABEL_GAP } : { x: r.r + OVERSHOOT + LABEL_GAP, y: band.y + band.h / 2 },
+        attrs: { 'data-doc-dim': 'padding', 'data-doc-dim-value': round1(value), 'data-doc-dim-selector': d.selector, 'data-doc-dim-index': d.index ?? 0, 'data-doc-dim-side': d.side },
       });
     } else if (d.kind === 'gap') {
       const a = pick(view, d.from, d.fromIndex);
@@ -241,11 +307,30 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
       if (!a || !b) continue;
       const ra = rect(a);
       const rb = rect(b);
+      const attrs: DataAttrs = { 'data-doc-dim': 'gap', 'data-doc-dim-from': d.from, 'data-doc-dim-to': d.to, 'data-doc-dim-axis': d.axis ?? 'x' };
+      if (d.axis === 'y') {
+        // Separación vertical entre piezas apiladas: banda horizontal (verde) a lo ancho de las dos
+        const left = Math.min(ra.l, rb.l);
+        const right = Math.max(ra.r, rb.r);
+        const h = rb.t - ra.b;
+        out.bands.push({
+          x: left,
+          y: ra.b,
+          w: right - left,
+          h,
+          axis: 'y',
+          value: round1(h / scale),
+          edges: [[left - OVERSHOOT, ra.b, right + OVERSHOOT, ra.b], [left - OVERSHOOT, rb.t, right + OVERSHOOT, rb.t]],
+          label: { x: right + OVERSHOOT + LABEL_GAP, y: ra.b + h / 2 },
+          attrs: { ...attrs, 'data-doc-dim-value': round1(h / scale) },
+        });
+        continue;
+      }
       const top = Math.min(ra.t, rb.t);
       const bottom = Math.max(ra.b, rb.b);
       const w = rb.l - ra.r;
       const host = a.closest('button, a') as HTMLElement | null;
-      const hr = host ? rect(host) : { t: top, b: bottom };
+      const hr = host && view.contains(host) ? rect(host) : { t: top, b: bottom };
       out.bands.push({
         x: ra.r,
         y: top,
@@ -253,19 +338,52 @@ function measureDimensions(root: HTMLElement, view: HTMLElement, canvas: DocAnat
         h: bottom - top,
         // La separación se mide entre elementos en fila: espacio horizontal
         axis: 'x',
-        value: round1(w),
+        value: round1(w / scale),
         edges: [[ra.r, hr.t - OVERSHOOT, ra.r, hr.b + OVERSHOOT], [rb.l, hr.t - OVERSHOOT, rb.l, hr.b + OVERSHOOT]],
         label: { x: ra.r + w / 2, y: hr.b + OVERSHOOT + LABEL_GAP },
+        attrs: { ...attrs, 'data-doc-dim-value': round1(w / scale) },
       });
     } else {
       const el = pick(view, d.selector, d.index);
       if (!el) continue;
       const r = rect(el);
-      out.brackets.push({ x: r.r + 10, y1: r.t, y2: r.b, value: round1(r.h) });
+      const x = r.r + (scale < 1 ? 4 : 10);
+      out.brackets.push({
+        x,
+        y1: r.t,
+        y2: r.b,
+        value: round1(r.h / scale),
+        label: scale < 1 ? { x: r.l + r.w / 2, y: r.b + OVERSHOOT + LABEL_GAP / 2 } : { x: x + 14, y: (r.t + r.b) / 2 },
+        attrs: { 'data-doc-dim': 'height', 'data-doc-dim-value': round1(r.h / scale), 'data-doc-dim-selector': d.selector, 'data-doc-dim-index': d.index ?? 0 },
+      });
     }
   }
   return out;
 }
+
+/**
+ * Escala de la vista: si su ancho de diseño (el del contenido o `width`) no cabe en el lienzo, menos el aire de los
+ * marcadores, se reduce para caber. `null` = sin escalar. El ancho de diseño no depende de la escala (`offsetWidth`).
+ */
+function measureFit(root: HTMLElement, view: HTMLElement, canvas: DocAnatomyCanvas): ViewFit | null {
+  if (root.clientWidth === 0) return null;
+  const cs = getComputedStyle(root);
+  const padL = parseFloat(cs.paddingLeft);
+  const padR = parseFloat(cs.paddingRight);
+  const sides = new Set(canvas.marks.map((m) => m.side));
+  // Solo se reserva aire en los lados que lo necesitan, para no achicar de más la vista
+  const gl = sides.has('left') ? Math.max(0, MARK_ROOM - padL) : 0;
+  const gr = Math.max(0, (sides.has('right') ? MARK_ROOM : LABEL_ROOM) - padR);
+  const available = root.clientWidth - padL - padR - gl - gr;
+  if (canvas.width === 'fill') return { scale: 1, width: available, height: 0, gl, gr };
+  const width = view.offsetWidth;
+  if (available <= 0 || width <= available + 0.5) return null;
+  return { scale: available / width, width, height: view.offsetHeight, gl, gr };
+}
+
+const sameFit = (a: ViewFit | null, b: ViewFit | null) =>
+  a === b ||
+  (a !== null && b !== null && Math.abs(a.scale - b.scale) < 0.001 && a.width === b.width && a.height === b.height && a.gl === b.gl && a.gr === b.gr);
 
 /**
  * Cifra de una cota ("Spacer" de Figma): etiqueta de radio 4 con padding 3/1 y texto blanco, fuera del componente.
@@ -290,19 +408,74 @@ function ValueChip({ x, y, value, tone }: { x: number; y: number; value: number;
 }
 
 /**
+ * Una copia del componente dentro del lienzo. Es una ilustración (`inert`: sin foco ni lector de pantalla). Sin
+ * `width` mide lo que su contenido (`w-max`); con un número, ese ancho; con `'fill'`, el del lienzo menos el aire de
+ * los marcadores. Si no cabe, se escala desde la esquina superior izquierda y el marco reserva el tamaño escalado.
+ */
+function AnatomyView({ kind, canvas, fit, viewRef }: { kind: 'marks' | 'dims'; canvas: DocAnatomyCanvas; fit: ViewFit | null; viewRef: Ref<HTMLDivElement> }) {
+  const fill = canvas.width === 'fill';
+  // Con `fill` la vista no se escala: solo deja el aire de los marcadores
+  const scaled = fit !== null && !fill;
+  const frame: CSSProperties | undefined = fit
+    ? { marginLeft: fit.gl, marginRight: fit.gr, ...(scaled && { width: fit.width * fit.scale, height: fit.height * fit.scale }) }
+    : undefined;
+  return (
+    <div className={cn('relative', fill && 'self-stretch')} style={frame}>
+      <div
+        ref={viewRef}
+        inert
+        data-doc-anatomy-view={kind}
+        data-doc-anatomy-scale={scaled ? Math.round(fit.scale * 1000) / 1000 : 1}
+        className={cn(
+          'flex gap-ds-primitives-space-8xl',
+          canvas.width !== undefined ? 'flex-col items-stretch' : 'w-max items-end',
+          scaled && 'absolute top-0 left-0 origin-top-left',
+        )}
+        style={{
+          width: typeof canvas.width === 'number' ? canvas.width : undefined,
+          transform: scaled ? `scale(${fit.scale})` : undefined,
+        }}
+      >
+        {canvas.preview}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Lienzo de anatomía (como "Átomo vertical" de Figma): etiqueta (Heading 14 blanco) y un lienzo con puntos con dos copias
  * del componente real, una debajo de la otra. Arriba, la copia con los marcadores numerados y su línea guía de 1 px;
  * abajo, la copia con las cotas (bandas translúcidas con la cifra fuera del componente). Todo se mide del DOM con
- * `getBoundingClientRect` y se actualiza con `ResizeObserver`.
+ * `getBoundingClientRect` y se actualiza con `ResizeObserver`; si la vista no cabe, se escala (`measureFit`) y las
+ * medidas se recalculan sobre la vista escalada.
  */
 function AnatomyCanvas({ canvas }: { canvas: DocAnatomyCanvas }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const markViewRef = useRef<HTMLDivElement>(null);
   const dimViewRef = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState<ViewFit | null>(null);
   const [markers, setMarkers] = useState<MarkerOverlay[]>([]);
   const [dims, setDims] = useState<DimOverlay>({ bands: [], brackets: [] });
   const hasDims = (canvas.dimensions?.length ?? 0) > 0;
 
+  // Escala: depende del ancho del lienzo y del de diseño de la vista
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    const markView = markViewRef.current;
+    if (!root || !markView) return;
+    const update = () => {
+      const next = measureFit(root, markView, canvas);
+      setFit((prev) => (sameFit(prev, next) ? prev : next));
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(root);
+    observer.observe(markView);
+    void document.fonts?.ready.then(update);
+    return () => observer.disconnect();
+  }, [canvas]);
+
+  // Marcadores y cotas, ya con la escala aplicada
   useLayoutEffect(() => {
     const root = rootRef.current;
     const markView = markViewRef.current;
@@ -310,7 +483,7 @@ function AnatomyCanvas({ canvas }: { canvas: DocAnatomyCanvas }) {
     if (!root || !markView) return;
     const measure = () => {
       setMarkers(measureMarkers(root, markView, canvas));
-      if (dimView) setDims(measureDimensions(root, dimView, canvas));
+      if (dimView) setDims(measureDimensions(root, dimView, canvas, fit && canvas.width !== 'fill' ? fit.scale : 1));
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -319,7 +492,7 @@ function AnatomyCanvas({ canvas }: { canvas: DocAnatomyCanvas }) {
     // Las fuentes cambian el ancho del texto
     void document.fonts?.ready.then(measure);
     return () => observer.disconnect();
-  }, [canvas]);
+  }, [canvas, fit]);
 
   return (
     <div className="flex min-w-0 flex-col gap-ds-space-general-2xl">
@@ -327,19 +500,18 @@ function AnatomyCanvas({ canvas }: { canvas: DocAnatomyCanvas }) {
         {canvas.label}
       </h3>
       <DocDotsCanvas>
-        <div ref={rootRef} className="relative flex flex-col items-center gap-ds-primitives-space-9xl px-ds-primitives-space-6xl py-ds-primitives-space-8xl">
-          <div ref={markViewRef} className="flex items-end gap-ds-primitives-space-8xl">
-            {canvas.preview}
-          </div>
-          {hasDims && (
-            <div ref={dimViewRef} className="flex items-end gap-ds-primitives-space-8xl">
-              {canvas.preview}
-            </div>
-          )}
+        <div
+          ref={rootRef}
+          data-doc-anatomy-canvas=""
+          // Padding X de 40 (16 en secciones angostas, para que la vista escalada no quede diminuta)
+          className="relative flex flex-col items-center gap-ds-primitives-space-9xl px-ds-primitives-space-2xl py-ds-primitives-space-8xl @md:px-ds-primitives-space-6xl"
+        >
+          <AnatomyView kind="marks" canvas={canvas} fit={fit} viewRef={markViewRef} />
+          {hasDims && <AnatomyView kind="dims" canvas={canvas} fit={fit} viewRef={dimViewRef} />}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-ds-text-neutral-heading">
             <svg className="absolute inset-0 size-full overflow-visible">
               {dims.bands.map((b, i) => (
-                <g key={`b${i}`} className={b.axis === 'x' ? 'text-ds-background-graphic-acent-secondary' : 'text-ds-background-graphic-success-secondary'}>
+                <g key={`b${i}`} {...b.attrs} className={b.axis === 'x' ? 'text-ds-background-graphic-acent-secondary' : 'text-ds-background-graphic-success-secondary'}>
                   <rect x={b.x} y={b.y} width={b.w} height={b.h} className={b.axis === 'x' ? 'fill-ds-background-graphic-acent-secondary-opacity' : 'fill-ds-background-graphic-success-secondary-opacity'} />
                   {b.edges.map((e, k) => (
                     <line key={k} x1={e[0]} y1={e[1]} x2={e[2]} y2={e[3]} stroke="currentColor" strokeWidth={1} />
@@ -348,20 +520,42 @@ function AnatomyCanvas({ canvas }: { canvas: DocAnatomyCanvas }) {
               ))}
               {/* Línea guía del color del marcador */}
               {markers.map((m) => (
-                <line key={`l${m.n}`} x1={m.line[0]} y1={m.line[1]} x2={m.line[2]} y2={m.line[3]} stroke="currentColor" strokeWidth={1} className="text-ds-background-acent-tertiary" />
+                <line
+                  key={`l${m.mark.n}`}
+                  data-doc-mark-line={m.mark.n}
+                  x1={m.line[0]}
+                  y1={m.line[1]}
+                  x2={m.line[2]}
+                  y2={m.line[3]}
+                  stroke="currentColor"
+                  strokeWidth={1}
+                  className="text-ds-background-acent-tertiary"
+                />
               ))}
               {dims.brackets.map((b, i) => (
-                <path key={`k${i}`} d={`M${b.x - 4} ${b.y1}H${b.x}V${b.y2}H${b.x - 4}`} fill="none" stroke="currentColor" strokeWidth={1} />
+                <path key={`k${i}`} {...b.attrs} d={`M${b.x - 4} ${b.y1}H${b.x}V${b.y2}H${b.x - 4}`} fill="none" stroke="currentColor" strokeWidth={1} />
               ))}
             </svg>
             {dims.bands.map((b, i) => (
               <ValueChip key={`v${i}`} x={b.label.x} y={b.label.y} value={b.value} tone={b.axis} />
             ))}
             {dims.brackets.map((b, i) => (
-              <ValueChip key={`s${i}`} x={b.x + 14} y={(b.y1 + b.y2) / 2} value={b.value} tone="size" />
+              <ValueChip key={`s${i}`} x={b.label.x} y={b.label.y} value={b.value} tone="size" />
             ))}
             {markers.map((m) => (
-              <Marker key={`m${m.n}`} n={m.n} variant="canvas" className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: m.x, top: m.y }} />
+              <Marker
+                key={`m${m.mark.n}`}
+                n={m.mark.n}
+                variant="canvas"
+                className="absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: m.x, top: m.y }}
+                attrs={{
+                  'data-doc-mark': m.mark.n,
+                  'data-doc-mark-selector': m.mark.selector,
+                  'data-doc-mark-index': m.mark.index ?? 0,
+                  'data-doc-mark-side': m.mark.side,
+                }}
+              />
             ))}
           </div>
         </div>
@@ -430,20 +624,35 @@ export function DocStatesV2({ items }: { items: DocStateItem[] }) {
 type Mode = 'dark' | 'light';
 
 
+/** Clave del hex de una entrada: el token y, si lo tiene, su modo fijo. */
+const tokenKey = (entry: DocTokenEntry) => (entry.mode ? `${entry.mode}:${entry.color}` : (entry.color ?? ''));
+
+/** Avisa cuando cambia el tema de la página (`data-theme` o la clase de <html>). */
+function subscribeDocTheme(onChange: () => void) {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+  return () => observer.disconnect();
+}
+
 function currentDocTheme(): Mode {
   return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
 }
 
 /** Chip de token ("Attribute"): pastilla gray-seventh con el nombre y, si es de color, un chip gray-sixth con muestra, hex y copiar. */
-function TokenChip({ name, hex, onCopy }: { name: string; hex?: string; onCopy?: (hex: string) => void }) {
+function TokenChip({ name, hex, mode, onCopy }: { name: string; hex?: string; mode?: Mode; onCopy?: (hex: string) => void }) {
   return (
-    <span className={cn('inline-flex max-w-full items-center gap-ds-space-general-md rounded-ds-radius-general-full bg-ds-background-general-gray-seventh py-ds-space-general-md pr-ds-primitives-space-lg pl-ds-space-general-lg text-ds-text-neutral-body', xs)}>
+    <span
+      data-doc-token-mode={mode}
+      className={cn('inline-flex max-w-full items-center gap-ds-space-general-md rounded-ds-radius-general-full bg-ds-background-general-gray-seventh py-ds-space-general-md pr-ds-primitives-space-lg pl-ds-space-general-lg text-ds-text-neutral-body', xs)}
+    >
       <span className="min-w-0 break-all">{name}</span>
       {hex !== undefined && (
         <span className="inline-flex shrink-0 items-center gap-ds-space-general-md rounded-ds-radius-general-lg bg-ds-background-general-gray-sixth px-ds-space-general-md py-ds-space-general-sm text-ds-text-neutral-heading">
+          {/* Con modo fijo, la muestra lee el token en ese modo (como el componente) */}
           <span
             aria-hidden="true"
-            className="size-3 rounded-ds-radius-general-sm shadow-[inset_0_0_0_1px_var(--color-ds-border-general-default-on-canva)]"
+            data-theme={mode}
+            className={cn('size-3 rounded-ds-radius-general-sm shadow-[inset_0_0_0_1px_var(--color-ds-border-general-default-on-canva)]', mode)}
             style={{ backgroundColor: colorVar(name) }}
           />
           <span className="tabular-nums">{hex || '…'}</span>
@@ -470,29 +679,32 @@ function TokenChip({ name, hex, onCopy }: { name: string; hex?: string; onCopy?:
  */
 export function DocTokensV2({ groups }: { groups: DocTokenGroup[] }) {
   const head = useContext(DocSectionHeadContext);
-  const [mode, setMode] = useState<Mode>(currentDocTheme);
+  // Modo de la página (la barra de Storybook lo pone en <html>, a veces después del primer render) y, encima, el que
+  // se eligió en el interruptor mientras la página siga en el mismo modo
+  const pageMode = useSyncExternalStore(subscribeDocTheme, currentDocTheme, () => 'dark' as Mode);
+  const [choice, setChoice] = useState<{ page: Mode; mode: Mode } | null>(null);
+  const mode = choice && choice.page === pageMode ? choice.mode : pageMode;
+  const setMode = (next: Mode) => setChoice({ page: pageMode, mode: next });
   const [hexes, setHexes] = useState<Record<string, string>>({});
   const [message, setMessage] = useState('');
   const probeRef = useRef<HTMLSpanElement>(null);
-
-  // La tarjeta sigue al tema de la página mientras este cambie (la barra de Storybook)
-  useEffect(() => {
-    const observer = new MutationObserver(() => setMode(currentDocTheme()));
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
-    return () => observer.disconnect();
-  }, []);
+  const darkProbeRef = useRef<HTMLSpanElement>(null);
+  const lightProbeRef = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
-    const probe = probeRef.current;
-    if (!probe) return;
+    const probes = { card: probeRef.current, dark: darkProbeRef.current, light: lightProbeRef.current };
     const next: Record<string, string> = {};
     for (const group of groups) {
       for (const entry of group.entries) {
-        if (!entry.color || entry.color in next) continue;
+        const key = tokenKey(entry);
+        const probe = probes[entry.mode ?? 'card'];
+        if (!entry.color || !probe || key in next) continue;
         probe.style.color = colorVar(entry.color);
-        next[entry.color] = toHex(getComputedStyle(probe).color);
+        next[key] = toHex(getComputedStyle(probe).color);
       }
     }
+    // El hex sale del estilo computado de las sondas (DOM ya pintado): no se puede derivar durante el render
+    // oxlint-disable-next-line react/set-state-in-effect
     setHexes(next);
   }, [mode, groups]);
 
@@ -513,6 +725,9 @@ export function DocTokensV2({ groups }: { groups: DocTokenGroup[] }) {
   return (
     <DocBigCard data-theme={mode} className={cn(mode, 'text-ds-text-neutral-body')}>
       <span ref={probeRef} aria-hidden="true" className="pointer-events-none invisible absolute size-0 overflow-hidden" />
+      {/* Sondas de los tokens con modo fijo (`entry.mode`): leen el valor en ese modo, no en el de la tarjeta */}
+      <span ref={darkProbeRef} aria-hidden="true" data-theme="dark" className="dark pointer-events-none invisible absolute size-0 overflow-hidden" />
+      <span ref={lightProbeRef} aria-hidden="true" data-theme="light" className="light pointer-events-none invisible absolute size-0 overflow-hidden" />
       <div className="flex items-start justify-between gap-ds-space-general-4xl">
         <div className="flex min-w-0 flex-col gap-ds-space-general-xl">
           {head && (
@@ -561,7 +776,8 @@ export function DocTokensV2({ groups }: { groups: DocTokenGroup[] }) {
                     {entry.color && (
                       <div className="flex flex-wrap items-center gap-ds-space-general-lg">
                         <span className={xs}>Token Color:</span>
-                        <TokenChip name={entry.color} hex={hexes[entry.color] ?? ''} onCopy={copy} />
+                        <TokenChip name={entry.color} hex={hexes[tokenKey(entry)] ?? ''} mode={entry.mode} onCopy={copy} />
+                        {entry.mode && <span className={xs}>{entry.mode === 'dark' ? 'Fijo en modo oscuro' : 'Fijo en modo claro'}</span>}
                       </div>
                     )}
                     {entry.text && (

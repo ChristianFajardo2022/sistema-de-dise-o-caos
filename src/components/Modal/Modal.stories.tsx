@@ -21,11 +21,53 @@ const SECTION_TITLE = [
 
 type DemoArgs = ModalProps & { withTertiary?: boolean };
 
+/** Args de los controles → props del Modal que arma `Demo` (acciones del pie), para el código de Desarrollo. */
+function docsArgs({ withTertiary, ...args }: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...args,
+    primaryAction: { label: 'Mover' },
+    secondaryAction: { label: 'Cancelar' },
+    tertiaryAction: withTertiary ? { label: 'Nueva carpeta' } : undefined,
+  };
+}
+
+/**
+ * Lienzo de Desarrollo: el `<dialog>` se abre en el top layer, por encima de la página y fuera del lienzo, así que ahí
+ * se dibuja la superficie (`ModalPanel`) con los mismos args. La historia sola (botón "Abrir modal") sigue en
+ * "Abrir en una pestaña nueva".
+ */
+function DocsCanvas(args: Record<string, unknown>) {
+  const { lateral, withTertiary, title, description, icon, closable, closeLabel, headingLevel, bodyLabel } = args as DemoArgs;
+  const panel = (
+    <ModalPanel
+      lateral={lateral}
+      title={title}
+      description={description}
+      icon={icon}
+      closable={closable}
+      closeLabel={closeLabel}
+      headingLevel={headingLevel}
+      bodyLabel={bodyLabel}
+      primaryAction={{ label: 'Mover' }}
+      secondaryAction={{ label: 'Cancelar' }}
+      tertiaryAction={withTertiary ? { label: 'Nueva carpeta' } : undefined}
+    >
+      <FolderPicker titles={lateral ? ['Proyectos', 'Archivo', 'Compartido'] : undefined} />
+    </ModalPanel>
+  );
+  // El lateral ocupa todo el alto de su contenedor
+  return lateral ? <div className="h-150">{panel}</div> : panel;
+}
+
 const meta = {
   title: 'Overlays/Modal',
   component: Modal,
   subcomponents: { ModalPanel },
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    // Apertura y cierre son del diálogo, que el lienzo no abre: esas props quedan solo en la tabla Props
+    docsLive: { render: DocsCanvas, args: docsArgs, exclude: ['open', 'defaultOpen', 'closeOnBackdrop'] },
+  },
   tags: ['autodocs'],
   argTypes: {
     lateral: { control: 'boolean', type: { name: 'boolean' }, description: 'Lateral de Figma: panel lateral derecho' },

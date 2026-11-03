@@ -33,10 +33,33 @@ import { Switch } from '../Switch';
 import { Tag } from '../Tag';
 import { cn } from '../../utils/cn';
 
+/**
+ * Hijos que muestra el código de la sección Desarrollo (`docsLive.args`): la estructura mínima de la tabla (encabezado
+ * y una fila). El lienzo dibuja la tabla completa de la historia; el código, cómo se arma.
+ */
+const DOCS_CODE_CHILDREN = [
+  <TableHeader key="head">
+    <TableRow>
+      <TableHead>Nombre</TableHead>
+      <TableHead>Rol</TableHead>
+    </TableRow>
+  </TableHeader>,
+  <TableBody key="body">
+    <TableRow>
+      <TableCell>Ana Pérez</TableCell>
+      <TableCell>Diseño</TableCell>
+    </TableRow>
+  </TableBody>,
+];
+
 const meta = {
   title: 'Data Display/Table',
   component: Table,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    // Componente compuesto: el render arma las filas, así que el código de Desarrollo lleva los hijos de ejemplo
+    docsLive: { args: (args: Record<string, unknown>) => ({ ...args, children: DOCS_CODE_CHILDREN }) },
+  },
   tags: ['autodocs'],
   argTypes: {
     layout: {
