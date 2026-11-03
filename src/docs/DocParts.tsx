@@ -140,7 +140,8 @@ export function DocNumber({ value }: { value: number }) {
 
 // Figma: 22262:3649 (Sección 01 — …)
 /**
- * Sección ("Sección de documentación" v2): padding X `space/general/8xl`, Y 40 y 32 entre título y contenido; título
+ * Sección ("Sección de documentación" v2): padding X `space/general/8xl`, Y 80 (`space/9xl`, arriba y abajo de la línea
+ * divisoria) y 32 entre título y contenido; título
  * (h2) Prospero 32/36 con la bajada body 14/20 a 12 de separación; línea de 1 px al pie que separa de la siguiente.
  * Es un contenedor de consultas (`@container`): los bloques bajan a una columna según el ancho de la sección.
  */
@@ -150,7 +151,7 @@ export function DocSection({ number, title, description, children, id, titleInsi
     <section
       id={id}
       aria-labelledby={headingId}
-      className="@container flex scroll-mt-ds-space-general-4xl flex-col gap-ds-primitives-space-5xl border-b border-ds-border-general-default-on-canva px-ds-space-general-8xl py-ds-primitives-space-6xl"
+      className="@container flex scroll-mt-ds-space-general-4xl flex-col gap-ds-primitives-space-5xl border-b border-ds-border-general-default-on-canva px-ds-space-general-8xl py-ds-primitives-space-9xl"
     >
       {titleInside ? (
         <DocSectionHeadContext.Provider value={{ headingId, title, description }}>{children}</DocSectionHeadContext.Provider>

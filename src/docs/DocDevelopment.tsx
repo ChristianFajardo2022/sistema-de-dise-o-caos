@@ -295,14 +295,14 @@ const blockTitle =
 /**
  * Bloque de Desarrollo ("Personalizar", "Props") con su título arriba, fuera de la caja, como las secciones de la
  * plantilla: título (y a la derecha un dato opcional, p. ej. el contador), bajada y, debajo, el contenido a 32. Arriba
- * lleva la línea divisoria de las secciones (`DocSection`), de borde a borde y a 40 de cada lado.
+ * lleva la línea divisoria de las secciones (`DocSection`), de borde a borde y a 80 de cada lado.
  */
 function DevBlock({ title, aside, description, children }: { title: string; aside?: ReactNode; description?: ReactNode; children: ReactNode }) {
   const headingId = useId();
   return (
     <section
       aria-labelledby={headingId}
-      className="-mx-ds-space-general-8xl flex min-w-0 flex-col gap-ds-primitives-space-4xl border-t border-ds-border-general-default-on-canva px-ds-space-general-8xl pt-ds-primitives-space-6xl"
+      className="-mx-ds-space-general-8xl flex min-w-0 flex-col gap-ds-primitives-space-4xl border-t border-ds-border-general-default-on-canva px-ds-space-general-8xl pt-ds-primitives-space-9xl"
     >
       <div className="flex flex-col gap-ds-space-general-xl">
         <div className="flex flex-wrap items-baseline justify-between gap-ds-space-general-lg">
@@ -623,7 +623,7 @@ export function DocDevelopment({
   }, [importName, props, live]);
 
   return (
-    <div className={cn('flex min-w-0 flex-col gap-ds-primitives-space-6xl', className)}>
+    <div className={cn('flex min-w-0 flex-col gap-ds-primitives-space-9xl', className)}>
       {live && (
         <>
           <div className="flex min-w-0 flex-col gap-ds-space-general-2xl">
