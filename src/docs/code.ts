@@ -92,8 +92,9 @@ export function argTypesFromDocsJson<T extends Record<string, object>>(json: Doc
     out[key] = {
       ...inferred,
       ...own,
-      // Storybook lo interpreta como Markdown: `<texto>` o `<a>` se tomarían por etiquetas HTML
-      description: (p?.description ?? own.description)?.replace(/<([^>\n]*)>/g, '`<$1>`'),
+      // Storybook lo interpreta como Markdown: `<texto>` o `<a>` se tomarían por etiquetas HTML (las que ya van entre
+      // comillas invertidas se dejan como están)
+      description: (p?.description ?? own.description)?.replace(/`?<([^>\n]*)>`?/g, '`<$1>`'),
       table: {
         ...own.table,
         type: own.table?.type ?? (p?.type ? { summary: p.type } : undefined),

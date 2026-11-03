@@ -160,6 +160,50 @@ function jsx(tag: string, props: string[], inner: string[], level: number): stri
 }
 
 /**
+ * Ejemplo de `docs.json` escrito en una sola línea → el mismo formato que el código generado (una prop por línea cuando
+ * no cabe), para que no haya que desplazarse dentro del bloque. Solo reescribe un elemento suelto (`<X …>contenido</X>`
+ * o `<X … />`) de más de 60 caracteres; lo demás (varias líneas, fragmentos, varios elementos) se devuelve tal cual.
+ */
+export function formatExample(code: string): string {
+  const src = code.trim();
+  const head = /^<([A-Z][\w.]*)/.exec(src);
+  if (!head || src.includes('\n') || src.length <= 60) return code;
+  const tag = head[1];
+  const props: string[] = [];
+  let current = '';
+  let depth = 0;
+  let quoteChar: string | null = null;
+  let i = head[0].length;
+  for (; i < src.length; i++) {
+    const c = src[i];
+    if (quoteChar) {
+      current += c;
+      if (c === quoteChar) quoteChar = null;
+    } else if (depth > 0) {
+      current += c;
+      if (c === '{') depth++;
+      else if (c === '}') depth--;
+    } else if (c === '>' || (c === '/' && src[i + 1] === '>')) {
+      break;
+    } else if (/\s/.test(c)) {
+      if (current) props.push(current);
+      current = '';
+    } else {
+      if (c === '"' || c === "'") quoteChar = c;
+      else if (c === '{') depth++;
+      current += c;
+    }
+  }
+  if (current) props.push(current);
+  if (i >= src.length) return code;
+  if (src[i] === '/') return src.slice(i) === '/>' ? jsx(tag, props, [], 0) : code;
+  const close = `</${tag}>`;
+  const inner = src.slice(i + 1, src.length - close.length).trim();
+  if (!src.endsWith(close) || inner.includes(`<${tag}`)) return code;
+  return jsx(tag, props, inner ? [indent(1) + inner] : [], 0);
+}
+
+/**
  * Código JSX del componente con los args actuales. Omite lo que vale lo mismo que su valor por defecto, lo que está
  * sin definir y las funciones (acciones de la historia).
  */

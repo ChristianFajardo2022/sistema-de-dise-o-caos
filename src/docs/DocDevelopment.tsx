@@ -15,6 +15,7 @@ import { DocBigCard, DocDotsCanvas } from './DocV2';
 import { buildCode, controlFor, defaultValueOf } from './liveCode';
 import type { LiveArgType, PropControl } from './liveCode';
 import { docInline } from './docShared';
+import { inlineMarkdown } from './inlineMarkdown';
 import type { DocPropRow } from './types';
 
 /*
@@ -134,14 +135,15 @@ function DocCanvas({ live }: { live: DocLive }) {
       <div className="flex flex-1 items-center justify-center overflow-auto px-ds-space-general-5xl pt-ds-space-general-lg pb-ds-primitives-space-6xl">
         {/*
           `zoom` escala el contenido y su espacio en el flujo; el marco del lienzo no cambia. El decorador global de tema
-          (.storybook/ThemeWrapper) pinta fondo y relleno propios alrededor de la historia: aquí se anulan para que el
+          (.storybook/ThemeWrapper, marcado con `data-story-wrapper`) pinta fondo y relleno propios alrededor de la
+          historia: aquí se anulan para que el
           componente quede sobre el lienzo (la historia que se abre sola en otra pestaña sí los conserva). El contenedor ocupa
           todo el ancho y centra la historia: así una prop de ancho completo (`fullWidth`) llega al ancho del lienzo.
         */}
         <div
           data-doc-zoom=""
           style={{ zoom }}
-          className="w-full max-w-full [&>.sb-story>div>div]:flex [&>.sb-story>div>div]:justify-center [&>.sb-story>div>div]:min-h-0! [&>.sb-story>div>div]:bg-transparent! [&>.sb-story>div>div]:p-0!"
+          className="w-full max-w-full [&_[data-story-wrapper]]:flex [&_[data-story-wrapper]]:justify-center [&_[data-story-wrapper]]:min-h-0! [&_[data-story-wrapper]]:bg-transparent! [&_[data-story-wrapper]]:p-0!"
         >
           {live.story}
         </div>
@@ -237,12 +239,16 @@ const blockTitle =
 
 /**
  * Bloque de Desarrollo ("Personalizar", "Props") con su título arriba, fuera de la caja, como las secciones de la
- * plantilla: título (y a la derecha un dato opcional, p. ej. el contador), bajada y, debajo, el contenido a 32.
+ * plantilla: título (y a la derecha un dato opcional, p. ej. el contador), bajada y, debajo, el contenido a 32. Arriba
+ * lleva la línea divisoria de las secciones (`DocSection`), de borde a borde y a 40 de cada lado.
  */
 function DevBlock({ title, aside, description, children }: { title: string; aside?: ReactNode; description?: ReactNode; children: ReactNode }) {
   const headingId = useId();
   return (
-    <section aria-labelledby={headingId} className="flex min-w-0 flex-col gap-ds-primitives-space-4xl">
+    <section
+      aria-labelledby={headingId}
+      className="-mx-ds-space-general-8xl flex min-w-0 flex-col gap-ds-primitives-space-4xl border-t border-ds-border-general-default-on-canva px-ds-space-general-8xl pt-ds-primitives-space-6xl"
+    >
       <div className="flex flex-col gap-ds-space-general-xl">
         <div className="flex flex-wrap items-baseline justify-between gap-ds-space-general-lg">
           <h2 id={headingId} className={blockTitle}>
@@ -379,9 +385,18 @@ function PropName({ row }: { row: DocPropRow }) {
   );
 }
 
-/** Tipo de la prop: mono en `text/neutral/body`, partido donde haga falta para que no desborde. */
+/** Tipo de la prop: mono a la medida del nombre en `text/neutral/body`, partido donde haga falta para que no desborde. */
 function PropType({ type }: { type: string | undefined }) {
-  return type ? <code className="font-mono [overflow-wrap:anywhere] text-ds-text-neutral-body">{type}</code> : <>—</>;
+  return type ? (
+    <code className="font-mono text-ds-primitives-typography-size-md [overflow-wrap:anywhere] text-ds-text-neutral-body">{type}</code>
+  ) : (
+    <>—</>
+  );
+}
+
+/** Descripción de la prop con su marcado en línea (`código`, **negrita**…) interpretado. */
+function PropDescription({ text }: { text: string | undefined }) {
+  return text ? <span className={docInline}>{inlineMarkdown(text)}</span> : <>—</>;
 }
 
 /** Valor por defecto como chip (`Tag` neutro). */
@@ -418,7 +433,7 @@ function DocPropsCard({ importName, props }: { importName: string; props: DocPro
             <PropDefault value={row.defaultValue} />
           </TableMobileField>
           <TableMobileField className="h-auto min-h-14" label="Descripción">
-            {row.description ?? '—'}
+            <PropDescription text={row.description} />
           </TableMobileField>
         </TableMobileRow>
       ))}
@@ -457,7 +472,9 @@ function DocPropsCard({ importName, props }: { importName: string; props: DocPro
               <TableCell>
                 <PropDefault value={row.defaultValue} />
               </TableCell>
-              <TableCell>{row.description ?? '—'}</TableCell>
+              <TableCell>
+                <PropDescription text={row.description} />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -501,7 +518,7 @@ export function DocDevelopment({
   }, [importName, props, live]);
 
   return (
-    <div className={cn('flex min-w-0 flex-col gap-ds-primitives-space-5xl', className)}>
+    <div className={cn('flex min-w-0 flex-col gap-ds-primitives-space-6xl', className)}>
       {live && (
         <>
           <div className="flex min-w-0 flex-col gap-ds-space-general-2xl">

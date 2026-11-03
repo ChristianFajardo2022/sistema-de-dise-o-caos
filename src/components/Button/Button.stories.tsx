@@ -51,6 +51,8 @@ const meta: Meta<ButtonArgs> = {
   parameters: { docs: componentDocsParameters(doc, docsJson), docsLive: { args: iconOnlyArgs } },
   // Tipos explícitos: con la unión discriminada de ButtonProps el docgen no los infiere y Storybook descarta los args de la URL
   argTypes: argTypesFromDocsJson(docsJson, {
+    // ReactNode en el tipo, pero en los controles se edita como texto (con iconOnly, docsLive lo cambia por el ícono)
+    children: { control: 'text' },
     variant: {
       type: { name: 'enum', value: ['primary', 'secondary', 'tertiary'] },
       control: 'select',

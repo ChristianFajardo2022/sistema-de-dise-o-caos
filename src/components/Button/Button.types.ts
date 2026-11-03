@@ -69,6 +69,7 @@ export interface ButtonBaseProps extends ButtonHTMLAttributes<HTMLButtonElement>
   hrefLang?: string;
   /** Clases adicionales */
   className?: string;
+  /** Texto del botón. Con `iconOnly`, el ícono (y el nombre accesible va en `aria-label`). */
   children?: ReactNode;
 }
 

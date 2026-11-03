@@ -25,6 +25,7 @@ export function ThemeWrapper({ theme: selectedTheme, flush = false, children }: 
 
   return (
     <div
+      data-story-wrapper=""
       style={{
         padding: flush ? 0 : '32px',
         minHeight: '100px',

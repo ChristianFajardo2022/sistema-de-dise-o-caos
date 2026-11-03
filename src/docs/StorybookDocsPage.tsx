@@ -8,6 +8,7 @@ import { ComponentDoc } from './ComponentDoc';
 import type { DocLive } from './DocDevelopment';
 import type { LiveArgType } from './liveCode';
 import { DocHeader } from './DocParts';
+import { inlineMarkdown } from './inlineMarkdown';
 import { codeFromDocsJson, propsFromArgTypes } from './code';
 import type { ArgTypeLike, DocsJson } from './code';
 import type { ComponentDocContent, DocCodeReference } from './types';
@@ -159,27 +160,6 @@ function useAutoDocsHeader() {
     summary,
     rest: (summary ? others : [first, ...others]).join('\n\n'),
   };
-}
-
-/**
- * Marcado en línea de la bajada (`código`, **negrita**, *cursiva*, [enlace](url)). El `Markdown` de Storybook no sirve
- * aquí: sus piezas necesitan el tema de Storybook, que solo existe dentro de su contenedor.
- */
-function inlineMarkdown(text: string): ReactNode[] {
-  const pattern = /`([^`]+)`|\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]]+)\]\(([^)\s]+)\)/g;
-  const out: ReactNode[] = [];
-  let last = 0;
-  for (const m of text.matchAll(pattern)) {
-    if (m.index > last) out.push(text.slice(last, m.index));
-    const key = m.index;
-    if (m[1] !== undefined) out.push(<code key={key}>{m[1]}</code>);
-    else if (m[2] !== undefined) out.push(<strong key={key}>{m[2]}</strong>);
-    else if (m[3] !== undefined) out.push(<em key={key}>{m[3]}</em>);
-    else out.push(<a key={key} href={m[5]} className="text-ds-text-link-default underline">{m[4]}</a>);
-    last = m.index + m[0].length;
-  }
-  if (last < text.length) out.push(text.slice(last));
-  return out;
 }
 
 function AutoDocsHeader() {

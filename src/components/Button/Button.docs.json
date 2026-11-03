@@ -4,6 +4,10 @@
   "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Type Primary, Secondary (Contrats low/high, sin fondo, solo borde) y Tertiary; Unicolor para Secondary y Tertiary; tamaños md 56, sm 48 y xs 32; estados Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary sin Load); modo Icon-single cuadrado sin alto fijo: padding Y space/button/lg, padding X space/button/3xl · 2xl · lg y caja de contenido de 16 por dimention/button/container/lg · md · xs (md 56 · sm 48 · xs 32 en escritorio, md 48 · sm 40 · xs 32 en móvil); Tertiary Icon-single con radio completo y fondo en hover, focus y press. Trazo de Primary de 0.5px (stroke/dm) y de 1px en Focus (stroke/lg). Tipografía Helvetica Neue Semibold (600), 14px fijo en todos los breakpoints (typography/button/size/md-uniform), interlineado 100 %. Íconos a la medida de Figma por tamaño (con texto 20 en md y sm, 14 en xs; Icon-single 20 en md y sm y 16 en xs, o 24 y 20 en tertiary), reemplazable con iconSize, y color por token. Con href se dibuja como <a> con todos los efectos (incluido el barrido de Primary). Sin anillo de foco ni escala al presionar: cada estado usa sus tokens.",
   "category": "General Controls",
   "props": {
+    "children": {
+      "type": "ReactNode",
+      "description": "Texto del botón. Con `iconOnly`, el ícono (y el nombre accesible va en `aria-label`)."
+    },
     "variant": {
       "type": "'primary' | 'secondary' | 'tertiary'",
       "default": "'primary'",

@@ -2,6 +2,7 @@ import { DocCodeBlock } from './DocCodeBlock';
 import { DocDevelopment } from './DocDevelopment';
 import type { DocLive } from './DocDevelopment';
 import { DocCard, DocSection } from './DocParts';
+import { formatExample } from './liveCode';
 import type { DocCodeExample, DocCodeReference } from './types';
 
 export { DocCodeBlock };
@@ -29,7 +30,7 @@ export function CodeReference({ importName, related = [], props, examples = [], 
           <div className="grid grid-cols-1 gap-ds-space-general-2xl desktop:grid-cols-2">
             {examples.map((example: DocCodeExample) => (
               <DocCard key={example.title} title={example.title}>
-                <DocCodeBlock label={`Ejemplo: ${example.title}`}>{example.code}</DocCodeBlock>
+                <DocCodeBlock label={`Ejemplo: ${example.title}`}>{formatExample(example.code)}</DocCodeBlock>
               </DocCard>
             ))}
           </div>
