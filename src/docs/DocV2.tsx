@@ -594,17 +594,20 @@ const toneClass: Record<DocTone, string> = {
 
 // Figma: 22627:8694 (Estados)
 /**
- * Estados: tarjeta grande con dos columnas (una en secciones angostas, `@2xl`): etiqueta con tono, descripción y un
- * panel `default-on-card` (radio 24) con las muestras directamente sobre él, sin fondo propio (padding 8 cada una).
+ * Estados: tarjeta grande con dos columnas (una en secciones angostas, `@2xl`) separadas 40 (`space/general/5xl`):
+ * etiqueta con tono y descripción a 12 (`space/general/xl`), y a 24 (`space/general/3xl`) un panel `default-on-card`
+ * (radio 24) con las muestras directamente sobre él, sin fondo propio (padding 8 cada una).
  */
 export function DocStatesV2({ items }: { items: DocStateItem[] }) {
   return (
     <DocBigCard>
-      <div className="grid grid-cols-1 gap-ds-primitives-space-4xl @2xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-ds-space-general-5xl @2xl:grid-cols-2">
         {items.map((item) => (
-          <div key={item.label} className="flex min-w-0 flex-col gap-ds-space-general-2xl">
-            <h3 className={cn(label600, toneClass[item.tone ?? 'neutral'])}>{item.label}</h3>
-            <p className={cn(docBody, 'min-h-20')}>{item.description}</p>
+          <div key={item.label} className="flex min-w-0 flex-col gap-ds-space-general-3xl">
+            <div className="flex flex-col gap-ds-space-general-xl">
+              <h3 className={cn(label600, toneClass[item.tone ?? 'neutral'])}>{item.label}</h3>
+              <p className={docBody}>{item.description}</p>
+            </div>
             <div className="flex min-w-0 flex-1 flex-col justify-center gap-ds-space-general-lg rounded-ds-radius-container-on-card bg-ds-background-container-default-on-card p-ds-space-general-2xl">
               {item.samples.map((sample, i) => (
                 <div key={i} className="flex min-w-0 items-center justify-center overflow-hidden p-ds-space-general-lg">
