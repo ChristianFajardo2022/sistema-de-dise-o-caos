@@ -86,7 +86,7 @@ export const doc: ComponentDocContent = {
   icon: 'info-circle',
   classification: 'atomo',
   summary:
-    'El Tooltip es el átomo que muestra un texto breve sobre un elemento al pasar el puntero o al enfocarlo. Aclara íconos y datos abreviados sin interrumpir la tarea; para contenido interactivo se usa Popover.',
+    'El Tooltip es el átomo que muestra un texto breve junto a un elemento al pasar el puntero o al enfocarlo. Aclara íconos y datos abreviados sin interrumpir la tarea; para contenido interactivo se usa Popover.',
   definition: [
     {
       title: 'Anatomía',
@@ -173,7 +173,7 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Estados',
-      description: 'El Tooltip cuenta con 5 estados. Aquí la burbuja se dibuja abierta y sin comportamiento; en uso sale del puntero y del foco.',
+      description: 'Tooltip tiene 5 estados. Aquí la burbuja se dibuja abierta y sin comportamiento; en uso se abre con el puntero o el foco.',
       blocks: [{ type: 'states', items: states }],
     },
     {
@@ -186,7 +186,7 @@ export const doc: ComponentDocContent = {
           groups: [
             {
               title: 'Sólido',
-              preview: bubble('Guarda los cambios'),
+              preview: bubble('Guardar cambios'),
               entries: [
                 { part: 'Fondo y flecha', color: 'background-general-gray-sixth', mode: 'dark' },
                 { part: 'Texto', color: 'text-neutral-white-unicolor', text: 'primitives-typography-size-sm', mode: 'dark' },
@@ -194,7 +194,7 @@ export const doc: ComponentDocContent = {
             },
             {
               title: 'Translúcido',
-              preview: bubble('Guarda los cambios', { solid: false }),
+              preview: bubble('Guardar cambios', { solid: false }),
               entries: [
                 { part: 'Fondo y flecha', color: 'background-field-active-opacity' },
                 { part: 'Texto', color: 'text-neutral-white-unicolor', text: 'primitives-typography-size-sm' },
@@ -216,7 +216,7 @@ export const doc: ComponentDocContent = {
               <strong>Búsqueda y configuración:</strong> encuentra el componente como Tooltip (Atom) en la librería de Assets y arrástralo al lienzo. Sus propiedades son Solid, Position y Text.
             </>,
             <>
-              <strong>Position:</strong> el borde de la burbuja con la flecha (Top, Bottom, Left o Right); en código es <code>arrow</code>. La burbuja aparece del lado opuesto al disparador.
+              <strong>Position:</strong> el borde de la burbuja con la flecha (Top, Bottom, Left o Right); en código es <code>arrow</code>. La burbuja aparece en el lado opuesto a la flecha.
             </>,
             <>
               <strong>Solid:</strong> Yes para el relleno sólido y No para el translúcido con desenfoque. Figma no tiene Solid No con Position Bottom; el código sí lo admite.
@@ -244,7 +244,7 @@ export const doc: ComponentDocContent = {
               <strong>Aclarar un ícono o un dato abreviado:</strong> un texto breve que amplía lo que ya se ve, con <code>aria-describedby</code>.
             </>,
             <>
-              <strong>Información que solo vive en el globo:</strong> <code>mode=&quot;toggletip&quot;</code> abre con clic, toque, Enter o Espacio y anuncia el contenido.
+              <strong>Información que solo aparece en la burbuja:</strong> <code>mode=&quot;toggletip&quot;</code> abre con clic, toque, Enter o Espacio y anuncia el contenido.
             </>,
             <>
               <strong>Contexto secundario:</strong> una sola idea que no interrumpe la tarea ni cambia la navegación.
@@ -261,7 +261,7 @@ export const doc: ComponentDocContent = {
               <strong>Repetir la etiqueta visible:</strong> el lector la anuncia dos veces y no aporta nada.
             </>,
             <>
-              <strong>Textos largos:</strong> el ancho máximo es 288 px y desaparece al salir. (Alternativa: Popover o texto en la interfaz).
+              <strong>Textos largos:</strong> el ancho máximo es 288 px y la burbuja desaparece al salir el puntero. (Alternativa: Popover o texto en la interfaz).
             </>,
             <>
               <strong>Translúcido sobre fondos variados:</strong> el texto pierde contraste. (Alternativa: <code>solid</code>, el valor por defecto).
@@ -272,7 +272,7 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Aplicaciones de breakpoints',
-      description: 'La burbuja mide lo mismo en todos los breakpoints. Cambia cómo se abre: con puntero y teclado, sí; con toque, no.',
+      description: 'La burbuja mide lo mismo en todos los breakpoints. Se abre con puntero y teclado, pero no con toque.',
       blocks: [
         {
           type: 'breakpoints',
@@ -310,13 +310,13 @@ export const doc: ComponentDocContent = {
                 <strong>Sin toque:</strong> el tooltip no aparece con toque, así que su texto también debe estar en el nombre accesible o en la interfaz.
               </>,
               <>
-                <strong>Toggletip:</strong> para información que solo vive en el globo, como el ícono de información de un campo; abre con toque.
+                <strong>Toggletip:</strong> para información que solo aparece en la burbuja, como el ícono de información de un campo. Abre con toque.
               </>,
               <>
                 <strong>Medidas:</strong> 288 de ancho máximo y 8 px de margen con el borde de la pantalla.
               </>,
             ],
-            preview: <Input label="Teléfono" type="tel" optional tooltip="Solo lo usamos para avisarte del envío" fullWidth />,
+            preview: <Input label="Celular" type="tel" optional tooltip="Solo lo usamos para contactarte" fullWidth />,
           },
           tablet: {
             bullets: [
@@ -367,14 +367,14 @@ export const doc: ComponentDocContent = {
               framed: true,
               title: 'Una idea breve',
               description: 'Escribe una sola idea de 2 a 8 palabras que se lea de un vistazo.',
-              preview: bubble('Guarda los cambios'),
+              preview: bubble('Guardar cambios'),
             },
             {
               kind: 'dont',
               framed: true,
               title: 'Texto largo',
-              description: 'No escribas párrafos: la burbuja tiene 288 px de ancho máximo y desaparece al mover el puntero.',
-              preview: bubble('Guarda los cambios que hiciste en el formulario para que no se pierdan cuando cierres la ventana o cambies de página'),
+              description: 'No escribas párrafos: la burbuja mide 288 px como máximo y desaparece al mover el puntero.',
+              preview: bubble('Guardar los cambios que hiciste en el formulario para que no se pierdan cuando cierres la ventana o cambies de página'),
             },
             {
               kind: 'do',

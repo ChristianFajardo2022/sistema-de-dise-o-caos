@@ -6,7 +6,7 @@ import type { TooltipArrow } from './Tooltip.types';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { ComponentDoc } from '../../docs/ComponentDoc';
-import { codeFromDocsJson } from '../../docs/code';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
 import { componentDocsParameters } from '../../docs/storybook';
 import { doc } from './Tooltip.doc';
 import docsJson from './Tooltip.docs.json';
@@ -15,31 +15,39 @@ const ARROW_OPTIONS: TooltipArrow[] = ['top', 'bottom', 'left', 'right'];
 const SURFACE = 'bg-ds-background-general-black';
 const LABEL = 'font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm text-ds-text-neutral-gray';
 
+/** Disparador de Interactive y del código de Desarrollo. */
+const TRIGGER = (
+  <Button variant="secondary" size="sm">
+    Guardar
+  </Button>
+);
+
 const meta = {
   title: 'Overlays/Tooltip',
   component: Tooltip,
   subcomponents: { TooltipBubble },
   // La página Docs usa la plantilla de documentación (Tooltip.doc.tsx) con la referencia de código al final
-  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
-  tags: ['autodocs'],
-  argTypes: {
-    arrow: {
-      control: 'radio',
-      options: ARROW_OPTIONS,
-      type: { name: 'enum', value: ARROW_OPTIONS },
-      description: 'Position de Figma: borde de la burbuja con la flecha (la burbuja aparece del lado opuesto)',
-    },
-    solid: { control: 'boolean', type: { name: 'boolean' }, description: 'Solid de Figma: relleno sólido o translúcido' },
-    content: { control: 'text', description: 'Text de Figma: texto breve, sin contenido interactivo' },
-    delay: { control: { type: 'number', min: 0, step: 50 }, type: { name: 'number' }, description: 'Retraso al abrir (ms)' },
-    closeDelay: { control: { type: 'number', min: 0, step: 50 }, type: { name: 'number' }, description: 'Retraso al cerrar (ms)' },
-    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'No se muestra' },
-    children: { control: false },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    // El código de Desarrollo muestra el mismo disparador que dibuja Interactive (el arg `children` es un marcador)
+    docsLive: { args: (args: Record<string, unknown>) => ({ ...args, children: TRIGGER }) },
   },
+  tags: ['autodocs'],
+  // Las descripciones salen de Tooltip.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    arrow: { control: 'radio', options: ARROW_OPTIONS, type: { name: 'enum', value: ARROW_OPTIONS } },
+    solid: { control: 'boolean', type: { name: 'boolean' } },
+    content: { control: 'text' },
+    delay: { control: { type: 'number', min: 0, step: 50 }, type: { name: 'number' } },
+    closeDelay: { control: { type: 'number', min: 0, step: 50 }, type: { name: 'number' } },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
+    children: { control: false },
+  }),
   args: {
     arrow: 'bottom',
     solid: true,
-    content: 'Guarda los cambios',
+    content: 'Guardar cambios',
     delay: 300,
     closeDelay: 150,
     disabled: false,
@@ -55,11 +63,7 @@ export const Interactive: Story = {
   // Sin padding extra: la burbuja va en la capa superior y no necesita espacio en el lienzo
   render: (args) => (
     <div className="p-ds-space-general-2xl">
-      <Tooltip {...args}>
-        <Button variant="secondary" size="sm">
-          Guardar
-        </Button>
-      </Tooltip>
+      <Tooltip {...args}>{TRIGGER}</Tooltip>
     </div>
   ),
 };
@@ -138,7 +142,7 @@ export const IconButton: Story = {
  * por una región `role="status"`.
  */
 export const Toggletip: Story = {
-  args: { content: 'Lo usamos solo para avisarte del envío' },
+  args: { content: 'Solo lo usamos para contactarte' },
   render: (args) => (
     <div className="p-24">
       <Tooltip {...args} mode="toggletip">
@@ -180,7 +184,7 @@ export const HoverTest: Story = {
     const button = canvas.getByRole('button', { name: 'Guardar' });
     const tooltip = canvas.getByRole('tooltip', { hidden: true });
     expect(button).toHaveAttribute('aria-describedby', tooltip.id);
-    expect(button).toHaveAccessibleDescription('Guarda los cambios');
+    expect(button).toHaveAccessibleDescription('Guardar cambios');
     expect(tooltip.matches(':popover-open')).toBe(false);
 
     await userEvent.hover(button);
@@ -347,7 +351,7 @@ export const ToggletipTest: Story = {
     // Clic abre y llena la región viva; otro clic cierra
     await userEvent.click(button);
     await waitFor(() => expect(tooltip.matches(':popover-open')).toBe(true));
-    expect(status).toHaveTextContent('Lo usamos solo para avisarte del envío');
+    expect(status).toHaveTextContent('Solo lo usamos para contactarte');
     await userEvent.click(button);
     await waitFor(() => expect(tooltip.matches(':popover-open')).toBe(false));
     expect(status).toBeEmptyDOMElement();

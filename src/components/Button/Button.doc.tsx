@@ -133,7 +133,7 @@ export const doc: ComponentDocContent = {
                   <strong>Ícono izquierdo:</strong> opcional (<code>leftIcon</code>). Mide 20 px en md y sm y 14 px en xs, y toma el color del ícono del estado.
                 </>,
                 <>
-                  <strong>Texto:</strong> Helvetica Neue Semibold de 14 px fijo en todos los breakpoints, interlineado 100 %. No se divide en varias líneas.
+                  <strong>Texto:</strong> Helvetica Neue Semibold de 14 px fijo en todos los breakpoints, interlineado 100%. No se divide en varias líneas.
                 </>,
                 <>
                   <strong>Ícono derecho:</strong> opcional (<code>rightIcon</code>), con las mismas medidas. Entre ícono y texto hay 8 px (<code>space/button/lg</code>).
@@ -170,9 +170,9 @@ export const doc: ComponentDocContent = {
                   label: 'Tamaños con texto',
                   preview: (
                     <>
-                      {btn({ size: 'md' }, 'md')}
-                      {btn({ size: 'sm' }, 'sm')}
-                      {btn({ size: 'xs' }, 'xs')}
+                      {btn({ size: 'md' })}
+                      {btn({ size: 'sm' })}
+                      {btn({ size: 'xs' })}
                     </>
                   ),
                   marks: [
@@ -205,7 +205,7 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Estados',
-      description: 'El átomo Button cuenta con 7 estados y 3 tipos. Hover, Focus y Press se fuerzan con state solo para documentar; en uso salen de la interacción.',
+      description: <>Button tiene 7 estados y 3 tipos. Hover, Focus y Press se fuerzan con <code>state</code> solo para documentar; en uso salen de la interacción.</>,
       blocks: [{ type: 'states', items: states }],
     },
     {
@@ -308,7 +308,7 @@ export const doc: ComponentDocContent = {
           ],
           avoid: [
             <>
-              <strong>Enlaces de texto:</strong> dentro de un párrafo o una lista usa <code>ButtonLink</code>. (Alternativa: Button con <code>href</code> si necesita aspecto de botón).
+              <strong>Enlaces de texto:</strong> dentro de un párrafo o una lista usa <code>ButtonLink</code>. (Alternativa: Button con <code>href</code>, si necesitas aspecto de botón).
             </>,
             <>
               <strong>Textos largos:</strong> la etiqueta no se divide en varias líneas. (Alternativa: una acción corta y el detalle en el texto cercano).
@@ -346,9 +346,9 @@ export const doc: ComponentDocContent = {
                 ],
                 preview: (
                   <>
-                    {btn({ size: 'md' }, 'Botón md')}
-                    {btn({ size: 'sm' }, 'Botón sm')}
-                    {btn({ size: 'xs' }, 'Botón xs')}
+                    {btn({ size: 'md' })}
+                    {btn({ size: 'sm' })}
+                    {btn({ size: 'xs' })}
                   </>
                 ),
               },
@@ -375,7 +375,7 @@ export const doc: ComponentDocContent = {
           mobile: {
             bullets: [
               <>
-                <strong>Con texto:</strong> md 48, sm 40 y xs 32, porque el alto sale de los tokens responsive de Mobile.
+                <strong>Con texto:</strong> md 48, sm 40 y xs 32, con los tokens responsive de Mobile.
               </>,
               <>
                 <strong>Icon-single:</strong> md 48, sm 40 y xs 32.
@@ -386,9 +386,9 @@ export const doc: ComponentDocContent = {
             ],
             preview: (
               <>
-                {btn({ size: 'md', fullWidth: true }, 'Botón md')}
-                {btn({ size: 'sm', fullWidth: true }, 'Botón sm')}
-                {btn({ size: 'xs', fullWidth: true }, 'Botón xs')}
+                {btn({ size: 'md', fullWidth: true })}
+                {btn({ size: 'sm', fullWidth: true })}
+                {btn({ size: 'xs', fullWidth: true })}
                 <div className="flex items-center gap-4">
                   {single({ size: 'md' })}
                   {single({ size: 'sm' })}
@@ -411,9 +411,9 @@ export const doc: ComponentDocContent = {
             ],
             preview: (
               <>
-                {btn({ size: 'md', fullWidth: true }, 'Botón md')}
-                {btn({ size: 'sm', fullWidth: true }, 'Botón sm')}
-                {btn({ size: 'xs', fullWidth: true }, 'Botón xs')}
+                {btn({ size: 'md', fullWidth: true })}
+                {btn({ size: 'sm', fullWidth: true })}
+                {btn({ size: 'xs', fullWidth: true })}
                 <div className="flex items-center gap-4">
                   {single({ size: 'md' })}
                   {single({ size: 'sm' })}
@@ -436,7 +436,7 @@ export const doc: ComponentDocContent = {
               kind: 'do',
               framed: true,
               title: 'Una acción principal',
-              description: 'Deja un solo Primary por vista y las alternativas en Secondary o Tertiary.',
+              description: 'Deja un solo Primary por vista; las alternativas van en Secondary o Tertiary.',
               preview: (
                 <div className="flex flex-wrap gap-2">
                   {btn({ variant: 'primary' }, 'Guardar')}
@@ -448,7 +448,7 @@ export const doc: ComponentDocContent = {
               kind: 'dont',
               framed: true,
               title: 'Dos acciones principales',
-              description: 'No pongas varios Primary juntos: la jerarquía se pierde y no se sabe cuál es la acción principal.',
+              description: 'No pongas varios Primary juntos: se pierde la jerarquía.',
               preview: (
                 <div className="flex flex-wrap gap-2">
                   {btn({ variant: 'primary' }, 'Guardar')}
@@ -460,7 +460,7 @@ export const doc: ComponentDocContent = {
               kind: 'do',
               framed: true,
               title: 'Delete para lo destructivo',
-              description: 'Usa state="delete" en la acción que borra o no se puede deshacer, y una alternativa segura al lado.',
+              description: <>Usa <code>state=&quot;delete&quot;</code> en la acción que borra o no se puede deshacer, con una alternativa segura al lado.</>,
               preview: (
                 <div className="flex flex-wrap gap-2">
                   {btn({ variant: 'secondary' }, 'Cancelar')}
@@ -472,7 +472,7 @@ export const doc: ComponentDocContent = {
               kind: 'dont',
               framed: true,
               title: 'Destructiva sin Delete',
-              description: 'No presentes una acción destructiva con el aspecto normal de Primary: se confunde con una acción segura.',
+              description: 'No dibujes una acción destructiva con el aspecto normal de Primary: parece segura.',
               preview: (
                 <div className="flex flex-wrap gap-2">
                   {btn({ variant: 'secondary' }, 'Cancelar')}
@@ -484,14 +484,14 @@ export const doc: ComponentDocContent = {
               kind: 'do',
               framed: true,
               title: 'Texto corto y de acción',
-              description: 'Escribe un verbo o una frase breve que diga qué pasa al presionar.',
+              description: 'Usa un verbo en infinitivo, de una a tres palabras, que diga qué pasa al presionar.',
               preview: btn({ variant: 'primary' }, 'Guardar cambios'),
             },
             {
               kind: 'dont',
               framed: true,
               title: 'Etiqueta vaga',
-              description: 'No uses etiquetas vagas como "Haz clic aquí": no dicen qué pasa al presionar. Nombra la acción.',
+              description: 'No uses etiquetas vagas como "Haz clic aquí" u "OK": no dicen qué pasa. Nombra la acción.',
               preview: btn({ variant: 'primary' }, 'Haz clic aquí'),
             },
           ],

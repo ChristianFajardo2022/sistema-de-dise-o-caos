@@ -1,67 +1,67 @@
 {
   "name": "Button",
   "component": "Button",
-  "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Type Primary, Secondary (Contrats low/high, sin fondo, solo borde) y Tertiary; Unicolor para Secondary y Tertiary; tamaños md 56, sm 48 y xs 32; estados Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary sin Load); modo Icon-single cuadrado sin alto fijo: padding Y space/button/lg, padding X space/button/3xl · 2xl · lg y caja de contenido de 16 por dimention/button/container/lg · md · xs (md 56 · sm 48 · xs 32 en escritorio, md 48 · sm 40 · xs 32 en móvil); Tertiary Icon-single con radio completo y fondo en hover, focus y press. Trazo de Primary de 0.5px (stroke/dm) y de 1px en Focus (stroke/lg). Tipografía Helvetica Neue Semibold (600), 14px fijo en todos los breakpoints (typography/button/size/md-uniform), interlineado 100 %. Íconos a la medida de Figma por tamaño (con texto 20 en md y sm, 14 en xs; Icon-single 20 en md y sm y 16 en xs, o 24 y 20 en tertiary), reemplazable con iconSize, y color por token. Con href se dibuja como <a> con todos los efectos (incluido el barrido de Primary). Sin anillo de foco ni escala al presionar: cada estado usa sus tokens.",
+  "description": "Botón del sistema de diseño CAOS, fiel al component set Button de Figma (nodo 155:1315). Tiene tres jerarquías: Primary, Secondary (Contrats low o high, sin fondo y solo con borde) y Tertiary. Unicolor aplica a Secondary y Tertiary. Los tamaños son md 56, sm 48 y xs 32. Los estados son Default, Hover, Focus, Press, Inactive, Delete y Load (Tertiary no tiene Load). El modo Icon-single es cuadrado y sin alto fijo: padding Y space/button/lg, padding X space/button/3xl · 2xl · lg y una caja de contenido de 16 por dimention/button/container/lg · md · xs (md 56 · sm 48 · xs 32 en escritorio; md 48 · sm 40 · xs 32 en móvil). Tertiary Icon-single tiene radio completo y fondo en hover, focus y press. El trazo de Primary mide 0.5 px (stroke/dm) y 1 px en Focus (stroke/lg). La tipografía es Helvetica Neue Semibold (600) de 14 px fijo en todos los breakpoints (typography/button/size/md-uniform), con interlineado 100%. Los íconos siguen la medida de Figma por tamaño: con texto, 20 px en md y sm y 14 px en xs; en Icon-single, 20 px en md y sm y 16 px en xs (24 y 20 px en Tertiary). Se reemplazan con iconSize y toman el color del token. Con href se dibuja como <a> y conserva todos los efectos, incluido el barrido de Primary. No tiene anillo de foco ni escala al presionar: cada estado usa sus tokens.",
   "category": "General Controls",
   "props": {
     "children": {
       "type": "ReactNode",
-      "description": "Texto del botón. Con `iconOnly`, el ícono (y el nombre accesible va en `aria-label`)."
+      "description": "Texto del botón. Con `iconOnly`, el ícono; el nombre accesible va en `aria-label`."
     },
     "variant": {
       "type": "'primary' | 'secondary' | 'tertiary'",
       "default": "'primary'",
-      "description": "Type de Figma. Para enlaces de texto usar ButtonLink; para un enlace con aspecto de botón, href."
+      "description": "Jerarquía visual (Type en Figma). Para enlaces de texto usa ButtonLink; para un enlace con aspecto de botón, usa href."
     },
     "contrast": {
       "type": "'low' | 'high'",
       "default": "'low'",
-      "description": "Contrats de Figma. Solo aplica a secondary; cada nivel tiene sus propios tokens de borde, texto e ícono."
+      "description": "Nivel de contraste (Contrats en Figma). Solo aplica a secondary; cada nivel tiene sus propios tokens de borde, texto e ícono."
     },
     "unicolor": {
       "type": "boolean",
       "default": false,
-      "description": "Texto e ícono de un solo color. Solo en secondary y tertiary sin iconOnly; cambia solo los colores (tokens *-unicolor). Secondary lo aplica en default, hover, focus y press; Tertiary solo en default. Inactive y Delete conservan sus colores."
+      "description": "Texto e ícono de un solo color (tokens *-unicolor). Solo aplica a secondary y tertiary sin iconOnly, y cambia solo los colores. Secondary lo usa en default, hover, focus y press; tertiary, solo en default. Inactive y delete conservan sus colores."
     },
     "size": {
       "type": "'md' | 'sm' | 'xs'",
       "default": "'md'",
-      "description": "Con texto, alto mínimo: md 56, padding 24/8, min-width 92; sm 48, padding 24/8, min-width 92; xs 32, padding 16/8 (un ícono de 20 lo lleva a 36, como el HUG de Figma). Tertiary: padding X 0. Icon-single: md 56 · sm 48 · xs 32 en escritorio y md 48 · sm 40 · xs 32 en móvil (tokens responsive)."
+      "description": "Tamaño (Size en Figma). Con texto, el alto mínimo es md 56 (padding 24/8, min-width 92), sm 48 (padding 24/8, min-width 92) y xs 32 (padding 16/8). Un ícono de 20 px lleva xs a 36, como el HUG de Figma. Tertiary tiene padding X 0. Icon-single mide md 56 · sm 48 · xs 32 en escritorio y md 48 · sm 40 · xs 32 en móvil (tokens responsive)."
     },
     "state": {
       "type": "'default' | 'hover' | 'focus' | 'press' | 'inactive' | 'delete' | 'load'",
       "default": "'default'",
-      "description": "State de Figma. hover, focus y press fuerzan el aspecto para documentación; delete es el estado de acción destructiva de cada tipo; tertiary no tiene load (se muestra como inactive)."
+      "description": "Estado (State en Figma). hover, focus y press fuerzan el aspecto solo para documentar. delete es la acción destructiva de cada tipo. tertiary no tiene load y se muestra como inactive."
     },
     "loading": {
       "type": "boolean",
       "default": false,
-      "description": "Estado load: deshabilita el botón, muestra el Spinner dots md (3 puntos de 8px) con el color del ícono del estado y establece aria-busy. Usa aria-disabled en vez de disabled (conserva el foco), cancela onClick y el submit mientras carga, y el nombre accesible queda \"<texto> Cargando\"."
+      "description": "Estado load. Deshabilita el botón, muestra tres puntos (Spinner dots md, de 8 px) con el color del ícono del estado y establece aria-busy. Usa aria-disabled en vez de disabled para conservar el foco, cancela onClick y el submit mientras carga, y deja el nombre accesible como \"<texto> Cargando\"."
     },
     "disabled": {
       "type": "boolean",
       "default": false,
-      "description": "Estado inactive."
+      "description": "Estado inactive: el botón no responde a la interacción."
     },
     "leftIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Ícono antes del texto (iconLeft). Se dibuja a la medida de iconSize (20 en md y sm, 14 en xs) con el token icon/button del estado."
+      "description": "Ícono antes del texto (iconLeft en Figma). Mide lo que indica iconSize (20 px en md y sm, 14 px en xs) y toma el token icon/button del estado."
     },
     "rightIcon": {
       "type": "ReactNode",
       "required": false,
-      "description": "Ícono después del texto (iconRigth). Se dibuja a la medida de iconSize (20 en md y sm, 14 en xs) con el token icon/button del estado."
+      "description": "Ícono después del texto (iconRigth en Figma). Mide lo que indica iconSize (20 px en md y sm, 14 px en xs) y toma el token icon/button del estado."
     },
     "iconSize": {
       "type": "14 | 16 | 20 | 24",
       "required": false,
-      "description": "Medida del ícono en px. Sin valor sigue a Figma por tamaño y tipo; úsalo solo cuando la pantalla de Figma dibuja otra medida. Con texto, un ícono más alto que la línea estira el botón (xs con 20 → 36)."
+      "description": "Medida del ícono en px. Sin valor, sigue a Figma por tamaño y tipo; úsalo solo si la pantalla de Figma dibuja otra medida. Con texto, un ícono más alto que la línea estira el botón (xs con 20 px pasa a 36)."
     },
     "iconOnly": {
       "type": "boolean",
       "default": false,
-      "description": "Icon-single: botón cuadrado (56, 48 o 32 en escritorio; 48, 40 o 32 en móvil). Pasar el ícono como children. Con iconOnly es obligatorio aria-label o aria-labelledby (el tipo lo exige)."
+      "description": "Icon-single: botón cuadrado (56, 48 o 32 px en escritorio; 48, 40 o 32 px en móvil). Pasa el ícono como children. Con iconOnly es obligatorio aria-label o aria-labelledby; el tipo lo exige."
     },
     "fullWidth": {
       "type": "boolean",
@@ -71,17 +71,17 @@
     "touchTarget": {
       "type": "boolean",
       "default": false,
-      "description": "Solo con iconOnly: Icon-single de 44×44 con ícono de 20 centrado, como los botones de Top App Bar iOS (tittle-header/top-app-bar). Sustituye la medida de size."
+      "description": "Solo con iconOnly: Icon-single de 44 × 44 px con ícono de 20 px centrado, como los botones de Top App Bar iOS (tittle-header/top-app-bar). Reemplaza la medida de size."
     },
     "type": {
       "type": "'button' | 'submit' | 'reset'",
       "default": "'button'",
-      "description": "Tipo nativo del botón. No aplica con href."
+      "description": "Tipo nativo del botón (type de HTML). No aplica con href."
     },
     "href": {
       "type": "string",
       "required": false,
-      "description": "Con href el botón se dibuja como <a> (navegación real, admite Cmd/Ctrl/clic medio) y conserva todos los efectos del tipo, incluido el barrido de Primary. Inactive quita el href (role=\"link\" + aria-disabled, fuera del orden de tabulación); Load lo conserva con aria-disabled y cancela la navegación. Acepta target, rel (con target=\"_blank\" usa noopener noreferrer y avisa \"se abre en una pestaña nueva\" en sr-only), download y hrefLang. El ref apunta al <a> aunque esté tipado como HTMLButtonElement."
+      "description": "Con href el botón se dibuja como <a>: navega de verdad (admite Cmd/Ctrl y clic medio) y conserva todos los efectos del tipo, incluido el barrido de Primary. Inactive quita el href (role=\"link\" y aria-disabled, fuera del orden de tabulación). Load lo conserva con aria-disabled y cancela la navegación. Acepta target, rel, download y hrefLang. Con target=\"_blank\" usa noopener noreferrer y avisa \"se abre en una pestaña nueva\" en sr-only. El ref apunta al <a> aunque esté tipado como HTMLButtonElement."
     }
   },
   "examples": [
@@ -95,7 +95,7 @@
     },
     {
       "title": "Load",
-      "code": "<Button variant=\"primary\" loading>Procesando</Button>"
+      "code": "<Button variant=\"primary\" loading>Guardar cambios</Button>"
     },
     {
       "title": "Delete",

@@ -410,7 +410,8 @@ function ControlCard({ name, control, value, onChange }: { name: string; control
  */
 /**
  * Control de Personalizar: la prop, su control y el valor que muestra mientras el arg no está definido (`fallback`: el
- * valor por defecto de los booleanos, para que una prop que vale `true` por defecto no aparezca apagada).
+ * valor por defecto de interruptores y listas, para que una prop que vale `true` no aparezca apagada ni una lista con
+ * valor por defecto aparezca vacía).
  */
 interface CustomizeControl {
   name: string;
@@ -605,7 +606,9 @@ export function DocDevelopment({
               control = { kind: 'text' };
             }
             if (control.kind === 'none') return [];
-            return [{ name: row.name, control, fallback: control.kind === 'boolean' ? defaultValueOf(row, control) : undefined }];
+            // Sin arg, interruptores y listas muestran el valor por defecto de la prop (solo a la vista: el código lo omite)
+            const showsDefault = control.kind === 'boolean' || control.kind === 'select';
+            return [{ name: row.name, control, fallback: showsDefault ? defaultValueOf(row, control) : undefined }];
           })
         : [],
     [props, live],
