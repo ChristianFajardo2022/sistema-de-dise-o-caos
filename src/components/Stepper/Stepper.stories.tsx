@@ -1,43 +1,66 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
 import { Stepper } from './Stepper';
 import { StepperStep } from './StepperStep';
 import type { StepperItem, StepperOrientation, StepperStatus } from './Stepper.types';
+import { doc } from './Stepper.doc';
+import docsJson from './Stepper.docs.json';
+
+// Pasos de ejemplo de la historia que alimenta Personalizar (también se escriben en el código generado)
+const STEPS: StepperItem[] = [
+  { title: 'Cuenta', description: 'Correo y contraseña' },
+  { title: 'Perfil', description: 'Nombre y foto' },
+  { title: 'Preferencias', description: 'Idioma y avisos' },
+  { title: 'Revisión', description: 'Confirmar los datos' },
+];
+
+const ORIENTATION_VALUES = ['vertical', 'horizontal'];
 
 const meta = {
   title: 'Feedback/Stepper',
   component: Stepper,
-  parameters: { layout: 'centered' },
   tags: ['autodocs'],
-  argTypes: {
+  parameters: {
+    layout: 'centered',
+    // La página Docs usa la plantilla de documentación (Stepper.doc.tsx) con la referencia de código al final
+    docs: componentDocsParameters(doc, docsJson),
+    // `steps` y `aria-label` no son controles: se agregan a los args para que el código generado muestre los pasos
+    docsLive: {
+      // Los pasos navegables (botones con foco) son lo que muestra Estados: el lienzo usa la historia `Clickable`
+      story: 'Clickable',
+      args: (a: Record<string, unknown>) => ({ steps: STEPS, 'aria-label': 'Progreso del registro', ...a }),
+      // El código generado omite las funciones: el manejador se escribe a mano, con un nombre genérico
+      code: (args: Record<string, unknown>) =>
+        buildCode('Stepper', args, { orientation: 'vertical' }).replace('<Stepper', '<Stepper onStepClick={(index) => goTo(index)}'),
+    },
+  },
+  // Las descripciones salen de Stepper.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
     orientation: {
       control: 'radio',
-      options: ['vertical', 'horizontal'],
-      type: { name: 'enum', value: ['vertical', 'horizontal'] },
-      description: 'Orientation de Figma',
+      options: ORIENTATION_VALUES,
+      type: { name: 'enum', value: ORIENTATION_VALUES },
     },
-    current: { control: { type: 'number', min: 0, max: 5 }, type: { name: 'number' }, description: 'Índice del paso en curso' },
-  },
+    current: { control: { type: 'number', min: 0, max: 5 }, type: { name: 'number' } },
+    children: { control: false },
+  }),
   args: { orientation: 'vertical', current: 1 },
 } satisfies Meta<typeof Stepper>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const STEPS: StepperItem[] = [
-  { title: 'Datos personales', description: 'Nombre y contacto' },
-  { title: 'Dirección', description: 'Lugar de residencia' },
-  { title: 'Documentos', description: 'Adjuntar archivos' },
-  { title: 'Revisión', description: 'Confirmar la información' },
-];
-
 const sizeFor = (o: StepperOrientation | undefined) => (o === 'horizontal' ? 'w-[617px] max-w-full' : 'w-[335px] max-w-full');
 
 export const Interactive: Story = {
   render: (args) => (
     <div className={sizeFor(args.orientation)}>
-      <Stepper {...args} aria-label="Progreso del registro" steps={STEPS} />
+      <Stepper aria-label="Progreso del registro" steps={STEPS} {...args} />
     </div>
   ),
 };
@@ -69,13 +92,18 @@ export const Composition: Story = {
   ),
 };
 
-function ClickableDemo(args: { orientation?: StepperOrientation; onStepClick?: (i: number) => void }) {
-  const [current, setCurrent] = useState(0);
+function ClickableDemo(args: {
+  orientation?: StepperOrientation;
+  current?: number;
+  label?: string;
+  onStepClick?: (i: number) => void;
+}) {
+  const [current, setCurrent] = useState(args.current ?? 0);
   return (
     <div className={sizeFor(args.orientation)}>
       <Stepper
         orientation={args.orientation}
-        aria-label="Pasos navegables"
+        aria-label={args.label ?? 'Pasos navegables'}
         current={current}
         steps={STEPS}
         onStepClick={(i) => {
@@ -90,7 +118,16 @@ function ClickableDemo(args: { orientation?: StepperOrientation; onStepClick?: (
 /** Pasos navegables: cada uno es un botón con foco visible. */
 export const Clickable: Story = {
   args: { onStepClick: fn() },
-  render: (args) => <ClickableDemo orientation={args.orientation} onStepClick={args.onStepClick} />,
+  // `key`: al cambiar el control `current` el lienzo parte de ese paso
+  render: (args) => (
+    <ClickableDemo
+      key={args.current}
+      orientation={args.orientation}
+      current={args.current}
+      label={args['aria-label']}
+      onStepClick={args.onStepClick}
+    />
+  ),
 };
 
 const STATUSES: { figma: string; status: StepperStatus }[] = [
@@ -193,5 +230,29 @@ export const KeyboardTest: Story = {
     await userEvent.keyboard(' ');
     await expect(args.onStepClick).toHaveBeenLastCalledWith(2);
     await expect(c.getAllByRole('listitem')[2]).toHaveAttribute('aria-current', 'step');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Stepper' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Stepper en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Stepper' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

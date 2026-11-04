@@ -343,9 +343,10 @@ function PropControlInput({
       return <Switch aria-labelledby={labelId} checked={value === true} onCheckedChange={onChange} />;
     case 'select':
       return (
-        // Label visible "Opción" (como "Texto" y "Número" de Input); el nombre accesible es la etiqueta de la tarjeta
+        // Label visible "Opción" (como "Texto" y "Número" de Input); el nombre accesible es la etiqueta de la tarjeta.
+        // Sin valor ni default conocido (p. ej. el ícono que depende del tipo) el label que descansa dentro dice "Por defecto".
         <Select
-          label="Opción"
+          label={value === undefined || value === null ? 'Por defecto' : 'Opción'}
           aria-labelledby={labelId}
           className="w-40"
           value={value === undefined || value === null ? null : String(value)}

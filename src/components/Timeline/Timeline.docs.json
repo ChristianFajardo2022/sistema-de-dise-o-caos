@@ -1,37 +1,165 @@
 {
   "name": "Timeline",
   "component": "Timeline",
-  "description": "Línea de tiempo del sistema de diseño CAOS, fiel a los component sets Timeline (13687:11466) e Indicator (13576:32508) de Figma, más el componente suelto Status tracker (13770:10884) que se documenta como StatusTracker. Timeline es una lista ordenada (ol) de pasos; cada TimelineItem dibuja el nodo y un segmento de barra con avance 0, 50 o 100 % y el texto (título, descripción, fecha y hora). Orientation vertical u horizontal; en horizontal el texto de Figma se oculta en móvil y queda solo para lector de pantalla. Los extremos de la barra salen de la posición del ítem en la lista (o de position = Type de Figma). Accesibilidad: lista con role list, estado legible por lector (texto oculto 'Completado: ', 'En curso: ', etc., configurable con statusLabels o statusLabel), aria-current='step' en el paso en curso, fecha y hora en <time dateTime> cuando se pasa dateTime, nodo y barra aria-hidden. El estado no se comunica solo con color (WCAG 1.4.1) gracias a ese texto. StatusTracker: resumen 'Estado actual' (visible en móvil), figura decorativa opcional (marker) sobre el paso actual, línea horizontal y botón de historial (onShowHistory o slot historyAction); el marker se desplaza entre pasos y respeta prefers-reduced-motion.",
+  "description": "Línea de tiempo del sistema de diseño CAOS, fiel a los component sets Timeline e Indicator de Figma, más el componente suelto Status tracker, que se documenta como StatusTracker. Timeline es una lista ordenada (ol) de pasos; cada TimelineItem dibuja el nodo y un segmento de barra con avance 0, 50 o 100% y el texto (título, descripción, fecha y hora). Orientation vertical u horizontal; en horizontal el texto de Figma se oculta en móvil y queda solo para lector de pantalla. Los extremos de la barra salen de la posición del ítem en la lista (o de position = Type de Figma). Accesibilidad: lista con role list, estado legible por lector (texto oculto \"Completado: \", \"En curso: \", etc., configurable con statusLabels o statusLabel), aria-current=\"step\" en el paso en curso, fecha y hora en <time dateTime> cuando se pasa dateTime, nodo y barra aria-hidden. El estado no se comunica solo con color (WCAG 1.4.1) gracias a ese texto. StatusTracker: resumen \"Estado actual\" (visible en móvil), figura decorativa opcional (marker) sobre el paso actual, línea horizontal y botón de historial (onShowHistory o slot historyAction); el marker se desplaza entre pasos y respeta prefers-reduced-motion.",
   "category": "Feedback",
   "props": {
-    "items": { "type": "TimelineItemData[]", "required": false, "description": "Pasos como datos: { title, description?, date?, time?, dateTime?, status, progress?, statusLabel? }. Alternativa a children." },
-    "children": { "type": "ReactNode", "required": false, "description": "Composición con TimelineItem (slot Espacio de Figma)." },
-    "orientation": { "type": "'vertical' | 'horizontal'", "default": "'vertical'", "description": "Orientation de Figma." },
-    "statusLabels": { "type": "Partial<Record<TimelineStatus, string>>", "required": false, "description": "Textos de estado para lector de pantalla. Por defecto: Pendiente, En curso, Con advertencia, Con error, Completado." },
-    "aria-label": { "type": "string", "required": false, "description": "Nombre de la lista cuando no hay un encabezado alrededor (usar aria-labelledby si lo hay)." },
-    "TimelineItem.title": { "type": "ReactNode", "required": true, "description": "Title text." },
-    "TimelineItem.description": { "type": "ReactNode", "required": false, "description": "Description text; sin ella no se dibuja (prop Description)." },
-    "TimelineItem.date": { "type": "ReactNode", "required": false, "description": "Date text." },
-    "TimelineItem.time": { "type": "ReactNode", "required": false, "description": "Hour text." },
-    "TimelineItem.dateTime": { "type": "string", "required": false, "description": "Fecha y hora ISO para <time dateTime>." },
-    "TimelineItem.status": { "type": "'incomplete' | 'current' | 'warning' | 'error' | 'complete'", "default": "'incomplete'", "description": "State de Figma (Incomplete, Currently, Warning, Error, Check). Solo current lleva aria-current='step'." },
-    "TimelineItem.icon": { "type": "ReactNode", "required": false, "description": "Slot de ícono en el nodo: centrado sobre el punto (8 px) o el anillo (12 px) sin cambiar su huella. Usa <Icon size={12} /> con color propio; es decorativo (aria-hidden), el estado lo anuncia el texto." },
-    "TimelineItem.progress": { "type": "0 | 50 | 100", "required": false, "description": "Percentage de Figma. Por defecto sale del estado: incomplete 0, complete 100, el resto 50." },
-    "TimelineItem.position": { "type": "'initial' | 'middle' | 'finally'", "required": false, "description": "Type de Figma. Por defecto sale de la posición del ítem en la lista." },
-    "TimelineItem.orientation": { "type": "'vertical' | 'horizontal'", "required": false, "description": "Por defecto la de Timeline." },
-    "StatusTracker.items": { "type": "TimelineItemData[]", "required": true, "description": "Pasos del seguimiento; se ignora su descripción (como en Figma)." },
-    "StatusTracker.title": { "type": "ReactNode", "default": "'Estado actual'", "description": "Título del resumen; da nombre al grupo (visible en móvil)." },
-    "StatusTracker.reference": { "type": "ReactNode", "required": false, "description": "Referencia del elemento seguido, junto al título (móvil)." },
-    "StatusTracker.marker": { "type": "ReactNode", "required": false, "description": "Figura decorativa sobre el paso actual (aria-hidden)." },
-    "StatusTracker.onShowHistory": { "type": "() => void", "required": false, "description": "Muestra el botón de historial (Button history de Figma) y lo llama al pulsarlo." },
-    "StatusTracker.historyLabel": { "type": "string", "default": "'Ver historial'", "description": "Texto del botón." },
-    "StatusTracker.live": { "type": "'polite' | 'assertive'", "required": false, "description": "Activa una región aria-live (oculta a la vista) que anuncia \"título: estado: paso actual\" cuando cambia el paso. Sin valor no hay región. polite para avances, assertive solo para errores; el primer render no se anuncia." },
-    "StatusTracker.historyAction": { "type": "ReactNode", "required": false, "description": "Slot que reemplaza al botón de historial." }
+    "items": {
+      "type": "TimelineItemData[]",
+      "required": false,
+      "description": "Pasos como datos: { title, description?, date?, time?, dateTime?, status, progress?, statusLabel? }. Alternativa a children."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Composición con TimelineItem (slot Espacio en Figma)."
+    },
+    "orientation": {
+      "type": "'vertical' | 'horizontal'",
+      "default": "'vertical'",
+      "description": "Orientation de Figma: disposición de los pasos."
+    },
+    "statusLabels": {
+      "type": "Partial<Record<TimelineStatus, string>>",
+      "required": false,
+      "description": "Textos de estado para lector de pantalla. Por defecto: Pendiente, En curso, Con advertencia, Con error, Completado."
+    },
+    "aria-label": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre de la lista cuando no hay un encabezado alrededor (usar aria-labelledby si lo hay)."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases que se suman a las de la lista (ol)."
+    },
+    "TimelineItem.title": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Título del paso (Title text en Figma)."
+    },
+    "TimelineItem.description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Descripción del paso (Description text en Figma). Sin ella no se dibuja (prop Description)."
+    },
+    "TimelineItem.date": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Fecha del paso (Date text en Figma)."
+    },
+    "TimelineItem.time": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Hora del paso (Hour text en Figma)."
+    },
+    "TimelineItem.dateTime": {
+      "type": "string",
+      "required": false,
+      "description": "Fecha y hora ISO para <time dateTime>."
+    },
+    "TimelineItem.status": {
+      "type": "'incomplete' | 'current' | 'warning' | 'error' | 'complete'",
+      "default": "'incomplete'",
+      "description": "State de Figma (Incomplete, Currently, Warning, Error, Check). Solo current lleva aria-current='step'."
+    },
+    "TimelineItem.icon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Slot de ícono en el nodo: centrado sobre el punto (8 px) o el anillo (12 px) sin cambiar su huella. Usa <Icon size={12} /> con color propio; es decorativo (aria-hidden), el estado lo anuncia el texto."
+    },
+    "TimelineItem.progress": {
+      "type": "0 | 50 | 100",
+      "required": false,
+      "description": "Percentage de Figma. Por defecto sale del estado: incomplete 0, complete 100, el resto 50."
+    },
+    "TimelineItem.position": {
+      "type": "'initial' | 'middle' | 'finally'",
+      "required": false,
+      "description": "Type de Figma. Por defecto sale del lugar del paso en la lista."
+    },
+    "TimelineItem.orientation": {
+      "type": "'vertical' | 'horizontal'",
+      "required": false,
+      "description": "Orientation del paso. Por defecto la de Timeline."
+    },
+    "StatusTracker.items": {
+      "type": "TimelineItemData[]",
+      "required": true,
+      "description": "Pasos del seguimiento; se ignora su descripción (como en Figma)."
+    },
+    "StatusTracker.title": {
+      "type": "ReactNode",
+      "default": "'Estado actual'",
+      "description": "Título del resumen; da nombre al grupo (visible en móvil)."
+    },
+    "StatusTracker.reference": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Referencia del elemento seguido, junto al título (móvil)."
+    },
+    "StatusTracker.marker": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Figura decorativa sobre el paso actual (aria-hidden)."
+    },
+    "StatusTracker.onShowHistory": {
+      "type": "() => void",
+      "required": false,
+      "description": "Muestra el botón de historial (Button history de Figma) y lo llama al pulsarlo."
+    },
+    "StatusTracker.historyLabel": {
+      "type": "string",
+      "default": "'Ver historial'",
+      "description": "Texto del botón de historial. Solo con onShowHistory."
+    },
+    "StatusTracker.live": {
+      "type": "'polite' | 'assertive'",
+      "required": false,
+      "description": "Activa una región aria-live (oculta a la vista) que anuncia \"título: estado: paso actual\" cuando cambia el paso. Sin valor no hay región. polite para avances, assertive solo para errores; el primer render no se anuncia."
+    },
+    "StatusTracker.historyAction": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Slot que reemplaza al botón de historial."
+    },
+    "TimelineItem.statusLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Texto de estado para lector de pantalla; reemplaza al de statusLabels."
+    },
+    "StatusTracker.statusLabels": {
+      "type": "Partial<Record<TimelineStatus, string>>",
+      "required": false,
+      "description": "Textos de estado para lector de pantalla, por estado. Por defecto: Pendiente, En curso, Con advertencia, Con error, Completado."
+    },
+    "StatusTracker.className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases que se suman a las del contenedor."
+    }
+  },
+  "subcomponents": {
+    "TimelineItem": "Paso de la línea de tiempo (Indicator de Figma): nodo, segmento de barra y texto. Va dentro de Timeline. Props: title, description, date, time, dateTime, status, progress, statusLabel, icon, orientation y position.",
+    "StatusTracker": "Seguimiento de estado (Status tracker de Figma): resumen del estado actual, línea horizontal y botón de historial. Props: items, title, reference, marker, onShowHistory, historyLabel, historyAction, statusLabels y live."
   },
   "examples": [
-    { "title": "Con datos", "code": "<Timeline aria-label=\"Historial\" items={[{ title: 'Recibido', status: 'complete', date: 'Hoy', time: '8:00pm', dateTime: '2026-10-28T20:00' }, { title: 'En proceso', status: 'current' }, { title: 'Listo', status: 'incomplete' }]} />" },
-    { "title": "Composición", "code": "<Timeline aria-label=\"Historial\"><TimelineItem title=\"Recibido\" status=\"complete\" /><TimelineItem title=\"Con error\" status=\"error\" description=\"Falta un dato.\" /></Timeline>" },
-    { "title": "Horizontal", "code": "<Timeline orientation=\"horizontal\" aria-label=\"Etapas\" items={etapas} />" },
-    { "title": "Status tracker", "code": "<StatusTracker items={etapas} reference=\"Ref. 1234567890\" marker={<img src={figura} alt=\"\" />} onShowHistory={abrirHistorial} />" }
+    {
+      "title": "Con datos",
+      "code": "<Timeline aria-label=\"Historial\" items={[{ title: 'Recibido', status: 'complete', date: 'Hoy', time: '8:00pm', dateTime: '2026-10-28T20:00' }, { title: 'En proceso', status: 'current' }, { title: 'Listo', status: 'incomplete' }]} />"
+    },
+    {
+      "title": "Composición",
+      "code": "<Timeline aria-label=\"Historial\"><TimelineItem title=\"Recibido\" status=\"complete\" /><TimelineItem title=\"Con error\" status=\"error\" description=\"Falta un dato.\" /></Timeline>"
+    },
+    {
+      "title": "Horizontal",
+      "code": "<Timeline orientation=\"horizontal\" aria-label=\"Etapas\" items={etapas} />"
+    },
+    {
+      "title": "Status tracker",
+      "code": "<StatusTracker items={etapas} reference=\"Solicitud 2026-0142\" marker={<img src={figura} alt=\"\" />} onShowHistory={abrirHistorial} />"
+    }
   ]
 }

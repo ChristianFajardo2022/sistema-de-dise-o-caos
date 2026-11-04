@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { Decorator, Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { ProgressBar } from './ProgressBar';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ProgressBar.doc';
+import docsJson from './ProgressBar.docs.json';
 import type { ProgressBarProps, ProgressBarStatus, ProgressBarType } from './ProgressBar.types';
 
 const TYPE_OPTIONS: ProgressBarType[] = ['linear-text', 'text-above', 'external-text'];
@@ -26,9 +31,17 @@ const narrow: Decorator = (Story) => (
 const meta = {
   title: 'Feedback/Progress bar',
   component: ProgressBar,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      exclude: ['aria-labelledby'],
+      args: (a: Record<string, unknown>) => ({ ...a, label: a.label || 'Progreso' }),
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     value: { control: { type: 'range', min: 0, max: 100, step: 1 }, type: { name: 'number' }, description: 'Progreso continuo entre 0 y max' },
     max: { control: 'number', type: { name: 'number' }, description: 'Valor que equivale al 100 %' },
     type: {
@@ -48,7 +61,7 @@ const meta = {
     showValue: { control: 'boolean', type: { name: 'boolean' }, description: 'Muestra el texto del porcentaje' },
     label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible' },
     statusLabel: { control: 'text', type: { name: 'string' }, description: 'Texto del estado para lectores de pantalla' },
-  },
+  }),
   args: { value: 60, max: 100, type: 'linear-text', status: 'default', showValue: true, label: 'Carga del archivo' },
 } satisfies Meta<typeof ProgressBar>;
 
@@ -63,7 +76,7 @@ export const CustomFormat: Story = {
   args: { value: 3, max: 8, status: 'success', formatValue: (v, p) => `${v}/8 (${Math.round(p)}%)` },
 };
 
-/** El valor cambia solo para ver la transición (se detiene con prefers-reduced-motion). */
+/** El valor cambia solo para ver la transición (con prefers-reduced-motion la transición dura 0,01 ms y el cambio es casi inmediato). */
 export const Animated: Story = {
   decorators: [narrow],
   render: (args) => <AnimatedBar {...args} />,
@@ -137,5 +150,27 @@ export const AccessibleNameTest: Story = {
     await expect(canvas.getByTestId('clamped')).toHaveAttribute('aria-valuenow', '100');
     await expect(canvas.getByTestId('scaled')).toHaveAttribute('aria-valuetext', '38%');
     await expect(canvas.getByTestId('scaled')).toHaveAttribute('aria-valuemax', '8');
+  },
+};
+
+/** Test: la página de documentación (plantilla v2) con sus pestañas y secciones */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'ProgressBar' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente ProgressBar en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de ProgressBar' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

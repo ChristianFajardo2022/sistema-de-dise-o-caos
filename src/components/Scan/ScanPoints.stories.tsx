@@ -8,7 +8,8 @@ const meta = {
   title: 'Feedback/Scan/ScanPoints',
   component: ScanPoints,
   parameters: { layout: 'centered' },
-  tags: ['autodocs'],
+  // Se documenta dentro de la página de Scan (feedback-scan--docs): sin página propia
+  tags: ['!autodocs'],
   argTypes: {
     step: { control: { type: 'range', min: 0, max: 8, step: 1 }, type: { name: 'number' }, description: 'Fotograma fijo 0-8 (Propiedad 1 de Figma)' },
     animated: { control: 'boolean', type: { name: 'boolean' }, description: 'Recorre los fotogramas en bucle; se apaga con prefers-reduced-motion' },

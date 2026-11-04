@@ -7,20 +7,27 @@ import { Toaster } from './Toaster';
 import { useToastQueue } from './useToastQueue';
 import type { ToastType } from './Toast.types';
 import { Button } from '../Button';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
 import { formatLiteral } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Toast.doc';
+import docsJson from './Toast.docs.json';
 
 const TYPE_OPTIONS: ToastType[] = ['success', 'alert', 'error', 'info'];
 
 /**
  * Código de la sección Desarrollo: el aviso se usa de forma imperativa (`add` de `useToastQueue` dentro de un
- * `Toaster`), así que el ejemplo es esa llamada con los args que cambian; el lienzo muestra el aviso suelto.
+ * `Toaster`), así que el ejemplo es esa llamada (dentro de un manejador) con los args que cambian; el lienzo muestra el aviso suelto.
  * `open` y `onExited` los maneja la cola.
  */
 function docsCode({ open: _open, onExited: _onExited, ...args }: Record<string, unknown>): string {
   return [
     'const { items, add } = useToastQueue();',
     '',
-    `add(${formatLiteral(args)});`,
+    'function onSave() {',
+    '  add(' + formatLiteral(args) + ');',
+    '}',
     '',
     '<Toaster>',
     '  {items.map((item) => <Toast key={item.id} {...item.props} />)}',
@@ -31,17 +38,17 @@ function docsCode({ open: _open, onExited: _onExited, ...args }: Record<string, 
 const meta = {
   title: 'Feedback/Toast',
   component: Toast,
-  parameters: { layout: 'padded', docsLive: { code: docsCode } },
+  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson), docsLive: { code: docsCode, exclude: ['open', 'onExited'] } },
   tags: ['autodocs'],
-  argTypes: {
-    type: { name: 'type', control: 'radio', options: TYPE_OPTIONS, type: { name: 'enum', value: TYPE_OPTIONS }, description: 'Type de Figma' },
-    title: { control: 'text', type: { name: 'string' }, description: 'Text subheading de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Text description de Figma (si se omite no se dibuja)' },
-    role: { control: 'radio', options: ['status', 'alert'], type: { name: 'enum', value: ['status', 'alert'] }, description: 'Por defecto status en success e info, alert en error y alert' },
-    duration: { control: 'number', type: { name: 'number' }, description: 'Cierre automático en ms (pausa con puntero o foco)' },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    type: { control: 'radio', options: TYPE_OPTIONS, type: { name: 'enum', value: TYPE_OPTIONS } },
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    role: { control: 'radio', options: ['status', 'alert'], type: { name: 'enum', value: ['status', 'alert'] } },
+    duration: { control: 'number', type: { name: 'number' } },
     closeLabel: { control: 'text', type: { name: 'string' } },
-    label: { control: 'text', type: { name: 'string' }, description: 'Texto sr-only del tipo' },
-  },
+    label: { control: 'text', type: { name: 'string' } },
+  }),
   args: { type: 'success', title: 'Cambios guardados', description: 'Tu perfil se actualizó correctamente.', onClose: fn() },
 } satisfies Meta<typeof Toast>;
 
@@ -195,5 +202,37 @@ export const ExitTest: Story = {
     onExitedSpy.mockClear();
     await expect(within(canvasElement).getByTestId('t-exit')).toHaveAttribute('data-state', 'closed');
     await waitFor(() => expect(onExitedSpy).toHaveBeenCalledTimes(1), { timeout: 2000 });
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Toast' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Toast en Figma:']);
+    // Anatomía: un marcador por pauta en cada lienzo (5 + 4), con las vistas como ilustraciones (inert)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(2);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(9));
+    // Tokens: el aviso fuerza el modo oscuro, así que todas sus entradas tienen modo fijo
+    await expect(canvas.getByRole('switch', { name: 'Modo oscuro' })).toBeInTheDocument();
+    await expect(canvasElement.querySelector('[data-doc-token-mode="dark"]')).not.toBeNull();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Toast' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

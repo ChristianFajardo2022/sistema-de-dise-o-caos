@@ -32,7 +32,7 @@ export interface DocPractice {
 }
 
 /** Tono de la etiqueta de una columna de estados. */
-export type DocTone = 'neutral' | 'accent' | 'success' | 'error';
+export type DocTone = 'neutral' | 'accent' | 'success' | 'alert' | 'error';
 
 /** Columna del bloque `states`: un estado con su descripción y sus muestras. */
 export interface DocStateItem {

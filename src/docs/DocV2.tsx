@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 import { NotchedSurface } from '../components/_internal/NotchedSurface';
 import { cn } from '../utils/cn';
 import { DocDeviceFrame } from './DocDeviceFrame';
-import { DocBullets } from './DocParts';
+import { DocBullets, ShrinkToFit } from './DocParts';
 import { colorVar, toHex } from './colorUtils';
 import { DocSectionHeadContext, docBody } from './docShared';
 import figmaLogo from './assets/figma-logo.png';
@@ -596,6 +596,7 @@ const toneClass: Record<DocTone, string> = {
   neutral: 'text-ds-text-neutral-gray-2',
   accent: 'text-ds-text-acent-firts',
   success: 'text-ds-text-semantic-success-secondary',
+  alert: 'text-ds-text-semantic-alert-secondary',
   error: 'text-ds-text-semantic-error-secondary',
 };
 
@@ -618,7 +619,7 @@ export function DocStatesV2({ items }: { items: DocStateItem[] }) {
             <div className="flex min-w-0 flex-1 flex-col justify-center gap-ds-space-general-lg rounded-ds-radius-container-on-card bg-ds-background-container-default-on-card p-ds-space-general-2xl">
               {item.samples.map((sample, i) => (
                 <div key={i} className="flex min-w-0 items-center justify-center overflow-hidden p-ds-space-general-lg">
-                  {sample}
+                  <ShrinkToFit>{sample}</ShrinkToFit>
                 </div>
               ))}
             </div>
@@ -756,7 +757,9 @@ export function DocTokensV2({ groups }: { groups: DocTokenGroup[] }) {
         {groups.map((group) => (
           <div key={group.title} className="grid grid-cols-1 gap-ds-primitives-space-5xl @2xl:grid-cols-2">
             <DocDotsCanvas className="flex min-h-56 items-center justify-center p-ds-primitives-space-5xl">
-              <div className="flex flex-wrap items-center justify-center gap-ds-space-general-4xl">{group.preview}</div>
+              <ShrinkToFit>
+                <div className="flex flex-wrap items-center justify-center gap-ds-space-general-4xl">{group.preview}</div>
+              </ShrinkToFit>
             </DocDotsCanvas>
             <div className="flex min-w-0 flex-col gap-ds-space-general-2xl">
               <h3 className={cn(label600, 'text-ds-text-neutral-heading')}>{group.title}</h3>
@@ -817,13 +820,16 @@ function BreakpointHead({ title, kind }: { title: string; kind: 'desktop' | 'mob
   );
 }
 
+/** Disposición de la muestra dentro del marco de breakpoint: la misma del panel del marco (columna, arriba a la izquierda). */
+const BREAKPOINT_PREVIEW = 'flex-col items-start gap-ds-space-general-2xl';
+
 function DesktopColumn({ column }: { column: DocBreakpointColumn }) {
   return (
     <div className="flex min-w-0 flex-col gap-ds-space-general-3xl">
       <h4 className={cn(label600, 'text-ds-text-neutral-white')}>{column.title}</h4>
       <DocBullets items={column.bullets} />
       <DocDeviceFrame breakpoint="desktop" className="flex-1">
-        {column.preview}
+        <ShrinkToFit innerClassName={BREAKPOINT_PREVIEW}>{column.preview}</ShrinkToFit>
       </DocDeviceFrame>
     </div>
   );
@@ -833,7 +839,7 @@ function DeviceCard({ title, breakpoint, card }: { title: string; breakpoint: 'm
   return (
     <DocBigCard>
       <DocDeviceFrame breakpoint={breakpoint} className="mx-auto min-h-80 max-w-sm">
-        {card.preview}
+        <ShrinkToFit innerClassName={BREAKPOINT_PREVIEW}>{card.preview}</ShrinkToFit>
       </DocDeviceFrame>
       <BreakpointHead title={title} kind="mobile" />
       <DocBullets items={card.bullets} />

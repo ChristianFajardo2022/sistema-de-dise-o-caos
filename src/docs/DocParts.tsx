@@ -524,6 +524,63 @@ function FitToWidth({ width, minHeight, children }: { width: number; minHeight?:
 }
 
 /**
+ * Muestra que no cabe en su panel (un aviso de 344 en una columna de 142): la reduce con `zoom` hasta que quepa entera,
+ * en vez de recortarla. Lo que puede encogerse (texto que salta de línea, filas que bajan) se encoge como siempre: solo
+ * se reduce cuando el ancho mínimo del contenido (`min-content`) supera el del panel, y entonces se dibuja a ese ancho.
+ */
+export function ShrinkToFit({
+  children,
+  className,
+  innerClassName = 'justify-center',
+}: {
+  children: ReactNode;
+  className?: string;
+  /** Disposición del contenido (por defecto, centrado en fila). */
+  innerClassName?: string;
+}) {
+  const outer = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const out = outer.current;
+    const content = inner.current;
+    if (!out || !content) return;
+    const measure = () => {
+      // Se mide sin escala ni tope: con `max-w-full` el ancho mínimo saldría recortado al del panel
+      content.style.zoom = '1';
+      content.style.maxWidth = 'none';
+      content.style.width = 'min-content';
+      const minWidth = content.getBoundingClientRect().width;
+      const available = out.clientWidth;
+      if (available > 0 && minWidth > available + 0.5) {
+        // Sin el tope de `max-w-full`: el contenido se dibuja a su ancho mínimo y el zoom lo hace caber
+        content.style.maxWidth = 'none';
+        content.style.width = `${minWidth}px`;
+        content.style.zoom = String(available / minWidth);
+      } else {
+        content.style.maxWidth = '';
+        content.style.width = '';
+      }
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(out);
+    // Fuentes y contenido que llega después (imágenes, textos medidos) cambian el ancho mínimo
+    void document.fonts?.ready.then(measure);
+    const late = window.setTimeout(measure, 500);
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(late);
+    };
+  }, []);
+  return (
+    <div ref={outer} className={cn('flex w-full min-w-0 justify-center', className)}>
+      <div ref={inner} className={cn('flex w-full min-w-0 max-w-full shrink-0', innerClassName)}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Una práctica. Estilo v2 (`framed`): Card con muesca, título "Hacer" / "Evitar" en éxito o error, la regla en una
  * línea y, debajo, un panel tintado (`background/semantic/success|error/firts`, radio 16, alto ~284) con el marco de
  * dispositivo pegado abajo. Estilo v1: círculo con ✓ / ✕, título (h3) y explicación.

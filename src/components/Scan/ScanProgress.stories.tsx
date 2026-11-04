@@ -8,7 +8,8 @@ const meta = {
   title: 'Feedback/Scan/ScanProgress',
   component: ScanProgress,
   parameters: { layout: 'centered' },
-  tags: ['autodocs'],
+  // Se documenta dentro de la página de Scan (feedback-scan--docs): sin página propia
+  tags: ['!autodocs'],
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100, step: 1 }, type: { name: 'number' }, description: 'Avance 0-100' },
     complete: { control: 'boolean', type: { name: 'boolean' }, description: 'Estado terminado (Variante12 de Figma)' },

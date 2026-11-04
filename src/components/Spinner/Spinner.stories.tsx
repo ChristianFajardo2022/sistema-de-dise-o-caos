@@ -1,8 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Spinner } from './Spinner';
 import type { SpinnerSize, SpinnerTone, SpinnerType, SpinnerVariant } from './Spinner.types';
 import { Button } from '../Button';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Spinner.doc';
+import docsJson from './Spinner.docs.json';
 
 const VARIANTS: SpinnerVariant[] = ['ring', 'dots'];
 const TYPES: SpinnerType[] = ['1', '2', '3'];
@@ -12,41 +17,17 @@ const TONES: SpinnerTone[] = ['default', 'current'];
 const meta = {
   title: 'Feedback/Spinner',
   component: Spinner,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
-  argTypes: {
-    variant: {
-      name: 'variant',
-      control: 'radio',
-      options: VARIANTS,
-      type: { name: 'enum', value: VARIANTS },
-      description: 'ring = Spinner de Figma; dots = Spinner button',
-    },
-    type: {
-      name: 'type',
-      control: 'radio',
-      options: TYPES,
-      type: { name: 'enum', value: TYPES },
-      description: 'Type de Figma: fotograma inicial (ring: 1 y 2; dots: 1, 2 y 3)',
-    },
-    size: {
-      name: 'size',
-      control: 'radio',
-      options: SIZES,
-      type: { name: 'enum', value: SIZES },
-      description: 'Size de Figma, solo en dots',
-    },
-    tone: {
-      name: 'tone',
-      control: 'radio',
-      options: TONES,
-      type: { name: 'enum', value: TONES },
-      description: 'default = tokens de Figma; current = hereda el color del texto',
-    },
-    label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible' },
-    decorative: { control: 'boolean', type: { name: 'boolean' }, description: 'Oculta el spinner a lectores de pantalla' },
-    animated: { control: 'boolean', type: { name: 'boolean' }, description: 'Anima el indicador (pulso con reduced-motion)' },
-  },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    variant: { type: { name: 'enum', value: VARIANTS }, control: 'radio', options: VARIANTS },
+    type: { type: { name: 'enum', value: TYPES }, control: 'radio', options: TYPES },
+    size: { type: { name: 'enum', value: SIZES }, control: 'radio', options: SIZES },
+    tone: { type: { name: 'enum', value: TONES }, control: 'radio', options: TONES },
+    label: { type: { name: 'string' }, control: 'text' },
+    decorative: { type: { name: 'boolean' }, control: 'boolean' },
+    animated: { type: { name: 'boolean' }, control: 'boolean' },
+  }),
   args: { variant: 'ring', type: '1', size: 'md', tone: 'default', label: 'Cargando', decorative: false, animated: true },
 } satisfies Meta<typeof Spinner>;
 
@@ -178,5 +159,28 @@ export const AccessibleNameTest: Story = {
     const deco = within(canvas.getByTestId('deco')).queryByRole('status');
     await expect(deco).toBeNull();
     await expect(canvas.getByTestId('deco').firstElementChild).toHaveAttribute('aria-hidden', 'true');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Spinner' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Spinner en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (3 + 4 + 2)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(9);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Spinner' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

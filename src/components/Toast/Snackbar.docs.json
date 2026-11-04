@@ -1,58 +1,59 @@
 {
   "name": "Snackbar",
   "component": "Snackbar",
-  "description": "Aviso con acciones del sistema de diseño CAOS, fiel al component set Snackbar de Figma (11844:10443, 4 variantes: Type). Igual que el Toast pero sin muesca ni botón de cierre (radius 24 plano) y con hasta dos acciones (Button y Button 2: Button tertiary xs unicolor) bajo el texto. Sin botón de cierre, la salida es una acción (closeOnAction llama a onClose), Escape o duration. Accesibilidad: es una región viva (role=status en success e info, role=alert en error y alert) con aria-atomic; se anuncia sin mover el foco y no lo atrapa. El tipo se antepone como texto sr-only porque color e ícono solos no bastan (WCAG 1.4.1); el ícono es decorativo. Escape con el foco dentro lo cierra. La entrada (opacidad y 8 px) solo ocurre con motion-safe; con movimiento reducido aparece de golpe. Es siempre Dark (todo es unicolor). Pendiente de diseño: el ruido (NOISE) y el desenfoque de fondo del Canva no tienen recurso; el relleno es opaco, así que el desenfoque no se vería.",
+  "description": "Aviso breve y no modal con acciones del sistema de diseño CAOS (set Snackbar de Figma, 4 variantes: Type). Igual que el Toast, pero plano (radio 24, sin muesca ni trazo), sin botón de cierre y con hasta dos acciones (Button y Button 2 en Figma: Button tertiary xs unicolor) bajo el texto. Sin botón de cierre, el aviso sale al activar una acción (`closeOnAction` llama a `onClose`), con Escape o al cumplirse `duration`. Se lanza de forma imperativa con `useToastQueue` (`kind: 'snackbar'`) dentro de un `Toaster`. Accesibilidad: es una región viva (role=\"status\" en success e info, role=\"alert\" en error y alert) con aria-atomic; se anuncia sin mover el foco y no lo atrapa. El tipo se antepone como texto solo para lectores de pantalla, porque el color y el ícono no bastan (WCAG 1.4.1); el ícono es decorativo. Escape con el foco dentro lo cierra. La entrada (opacidad y 8 px) ocurre solo con motion-safe: con movimiento reducido aparece de golpe. Es siempre oscuro (todo es unicolor). Pendiente de diseño: el ruido (NOISE) y el desenfoque de fondo del Canva no tienen recurso, y el relleno es opaco.",
   "category": "Feedback",
   "props": {
     "type": {
       "type": "'success' | 'alert' | 'error' | 'info'",
       "default": "'success'",
-      "description": "Type de Figma: color semántico e ícono."
+      "description": "Color semántico e ícono (Type en Figma)."
     },
     "title": {
       "type": "ReactNode",
       "required": false,
-      "description": "Text subheading de Figma."
+      "description": "Título del aviso (Text subheading en Figma)."
     },
     "description": {
       "type": "ReactNode",
       "required": false,
-      "description": "Text description de Figma. El booleano Description se resuelve por presencia: sin esta prop no se dibuja."
+      "description": "Texto de apoyo (Text description en Figma). El booleano Description de Figma se resuelve por presencia: sin esta prop no se dibuja."
     },
     "icon": {
       "type": "IconName",
       "required": false,
-      "description": "Sobrescribe el ícono del type."
+      "description": "Cambia el ícono del tipo."
     },
     "label": {
       "type": "string",
       "required": false,
-      "description": "Texto sr-only con el tipo (Éxito, Advertencia, Error, Información). Cadena vacía lo desactiva."
+      "description": "Texto solo para lectores de pantalla con el tipo (Éxito, Advertencia, Error, Información). Una cadena vacía lo desactiva."
     },
     "role": {
       "type": "'status' | 'alert'",
       "required": false,
-      "description": "Región viva. Por defecto status en success e info y alert en error y alert."
+      "description": "Región viva. Por defecto `status` en success e info y `alert` en error y alert.",
+      "default": "según `type`"
     },
     "duration": {
       "type": "number",
       "required": false,
-      "description": "Cierre automático en ms; se pausa con puntero o foco. Sin valor no se cierra solo."
+      "description": "Cierre automático en ms. Sin valor no se cierra solo. Se pausa con el puntero encima o el foco dentro y se reinicia al salir; al cumplirse llama a `onClose`. No lo uses en avisos con acción ni de error o alerta (WCAG 2.2.1)."
     },
     "onClose": {
       "type": "() => void",
       "required": false,
-      "description": "Cierre: botón (Toast), Escape con el foco dentro, fin de duration."
+      "description": "Se llama al activar una acción `{ label }` (si `closeOnAction` es `true`), con Escape si el foco está dentro y al cumplirse `duration`. Sin botón de cierre, quien lo use debe tener una de estas salidas."
     },
     "open": {
       "type": "boolean",
       "default": "true",
-      "description": "false inicia la animación de salida (data-state=\"closed\", utilidad animate-caos-toast-out de index.css: 200 ms con desplazamiento de 8 px; solo fundido de 150 ms con prefers-reduced-motion). El aviso sigue montado hasta que termina."
+      "description": "`false` inicia la salida (`data-state=\"closed\"`, utilidad `animate-caos-toast-out`: 200 ms con desplazamiento de 8 px; solo fundido de 150 ms con `prefers-reduced-motion`). El aviso sigue montado hasta que termina."
     },
     "onExited": {
       "type": "() => void",
       "required": false,
-      "description": "Termina la salida (animationend o plazo de respaldo de 400 ms): desmonta el aviso aquí. useToastQueue ya lo hace."
+      "description": "Termina la salida (`animationend` o plazo de respaldo de 400 ms): desmonta el aviso aquí. `useToastQueue` ya lo hace."
     },
     "className": {
       "type": "string",
@@ -62,23 +63,31 @@
     "action": {
       "type": "{ label, onClick?, href? } | ReactNode",
       "required": false,
-      "description": "Button de Figma."
+      "description": "Primera acción (Button en Figma): un objeto `{ label, onClick?, href? }` o un nodo propio. Con `href` es un enlace. Se dibuja como Button tertiary xs unicolor."
     },
     "secondaryAction": {
       "type": "{ label, onClick?, href? } | ReactNode",
       "required": false,
-      "description": "Button 2 de Figma."
+      "description": "Segunda acción (Button 2 en Figma), con las mismas opciones que `action`. Sin ella solo se dibuja la primera."
     },
     "closeOnAction": {
       "type": "boolean",
       "default": "true",
-      "description": "Llama a onClose tras activar una acción { label, onClick }."
+      "description": "Llama a `onClose` tras activar una acción `{ label }`, porque el Snackbar no tiene botón de cierre. No aplica a un nodo propio."
     }
   },
   "examples": [
     {
       "title": "Con deshacer",
-      "code": "<Snackbar type=\"info\" title=\"Elemento archivado\" action={{ label: 'Deshacer', onClick: undo }} onClose={close} />"
+      "code": "const { items, add } = useToastQueue();\n\nfunction onArchive() {\n  add({\n    kind: 'snackbar',\n    type: 'info',\n    title: 'Archivo movido',\n    action: { label: 'Deshacer', onClick: () => undo() },\n  });\n}\n\n<Toaster>\n  {items.map((item) => <Snackbar key={item.id} {...item.props} />)}\n</Toaster>"
+    },
+    {
+      "title": "Con dos acciones",
+      "code": "function onArchive() {\n  add({\n    kind: 'snackbar',\n    type: 'success',\n    title: 'Archivo movido',\n    description: 'Ahora está en Documentos.',\n    action: { label: 'Deshacer', onClick: () => undo() },\n    secondaryAction: { label: 'Ver carpeta', href: '/documentos' },\n  });\n}"
     }
-  ]
+  ],
+  "subcomponents": {
+    "Toaster": "Región que apila los avisos.",
+    "useToastQueue": "Cola de avisos: `add`, `remove`, `clear` y `limit`."
+  }
 }

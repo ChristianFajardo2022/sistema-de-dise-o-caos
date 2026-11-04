@@ -23,10 +23,22 @@ interface DocDeviceFrameProps {
  * Marco de dispositivo: `background/container/surface` con radio `radius/general/2xl` (24) y, dentro, un panel
  * `default-on-canva` de radio 8 y padding 16 donde va el componente real. Sin barra de estado.
  */
+/**
+ * Un descendiente con tema propio (`data-theme`, `.dark`, como los avisos unicolor) vuelve a declarar las variables
+ * responsive por media query y se salta las del marco. Esta regla le devuelve las del breakpoint del marco.
+ */
+function nestedThemeCss(breakpoint: DocBreakpointName): string {
+  const vars = Object.entries(BREAKPOINT_VARS[breakpoint])
+    .filter(([name, value]) => value !== `var(${name})`)
+    .map(([name, value]) => `${name}: ${value};`)
+    .join(' ');
+  return `[data-doc-breakpoint="${breakpoint}"] :is(.light, .dark, [data-theme]) { ${vars} }`;
+}
+
 export function DocDeviceFrame({ breakpoint, rounding = 'all', statusBar = false, children, className }: DocDeviceFrameProps) {
   return (
     <div
-      data-breakpoint={breakpoint}
+      data-doc-breakpoint={breakpoint}
       style={BREAKPOINT_VARS[breakpoint] as CSSProperties}
       className={cn(
         'flex w-full min-w-0 flex-col bg-ds-background-container-surface p-ds-space-general-lg',
@@ -35,6 +47,9 @@ export function DocDeviceFrame({ breakpoint, rounding = 'all', statusBar = false
         className,
       )}
     >
+      <style href={`doc-breakpoint-${breakpoint}`} precedence="default">
+        {nestedThemeCss(breakpoint)}
+      </style>
       {statusBar && (
         // Figma: fila de la barra de estado (hora a la izquierda, isla dinámica al centro); decorativa
         <div aria-hidden="true" className="relative flex h-ds-primitives-dimention-4xl shrink-0 items-center px-ds-space-general-4xl">

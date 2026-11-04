@@ -10,8 +10,14 @@
 @custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 @custom-variant light (&:where(.light, .light *, [data-theme="light"], [data-theme="light"] *));
 
+/* Dentro de un marco de breakpoint de la documentación (`data-doc-breakpoint`) manda el marco, no la ventana. */
 @custom-variant mobile {
   @media (width < 48rem) {
+    &:where(:not([data-doc-breakpoint="tablet"] *, [data-doc-breakpoint="desktop"] *)) {
+      @slot;
+    }
+  }
+  &:where([data-doc-breakpoint="mobile"] *) {
     @slot;
   }
 }

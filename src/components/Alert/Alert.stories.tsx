@@ -1,36 +1,39 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Alert } from './Alert';
 import type { AlertType } from './Alert.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Alert.doc';
+import docsJson from './Alert.docs.json';
 
 const TYPE_OPTIONS: AlertType[] = ['success', 'alert', 'error', 'info'];
 
 const meta = {
   title: 'Feedback/Alert',
   component: Alert,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
   // El Alert ocupa el ancho de su contenedor; aquí se muestra al ancho de Figma (344)
   decorators: [(Story, { parameters }) => (parameters.sinMarco ? <Story /> : <div className="w-86 max-w-full"><Story /></div>)],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     type: {
       name: 'type',
       control: 'radio',
       options: TYPE_OPTIONS,
       type: { name: 'enum', value: TYPE_OPTIONS },
-      description: 'Type de Figma: success, alert, error o info',
     },
-    background: { control: 'boolean', type: { name: 'boolean' }, description: 'Background de Figma: contorno y padding' },
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
-    children: { control: 'text', type: { name: 'string' }, description: 'Prop Description de Figma' },
+    background: { control: 'boolean', type: { name: 'boolean' } },
+    title: { control: 'text', type: { name: 'string' } },
+    children: { control: 'text', type: { name: 'string' } },
     role: {
       control: 'radio',
       options: ['status', 'alert'],
       type: { name: 'enum', value: ['status', 'alert'] },
-      description: 'status (por defecto) o alert para errores dinámicos urgentes',
     },
-    label: { control: 'text', type: { name: 'string' }, description: 'Texto sr-only del tipo' },
-  },
+    label: { control: 'text', type: { name: 'string' } },
+  }),
   args: {
     type: 'success',
     background: true,
@@ -111,5 +114,28 @@ export const RoleTest: Story = {
     await expect(canvas.getByTestId('a-status')).toHaveTextContent('Éxito: ListoGuardado');
     await expect(canvas.getByTestId('a-alert')).toHaveAttribute('role', 'alert');
     await expect(canvas.getByRole('alert')).toHaveTextContent('Error: FalloSin conexión');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', sinMarco: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Alert' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Alert en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (4 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(7);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Alert' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

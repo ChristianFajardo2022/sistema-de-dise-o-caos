@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Icon } from '../Icon';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
 import { StatusTracker } from './StatusTracker';
 import { Timeline } from './Timeline';
 import { TimelineItem } from './TimelineItem';
@@ -12,20 +15,30 @@ import type {
   TimelineProgress,
   TimelineStatus,
 } from './Timeline.types';
+import { doc } from './Timeline.doc';
+import docsJson from './Timeline.docs.json';
+
+// Las props de TimelineItem y StatusTracker (nombres con punto en docs.json) solo se listan en Props: no tienen control
+const OTHER_PIECES = Object.keys(docsJson.props).filter((name) => name.includes('.'));
 
 const meta = {
   title: 'Feedback/Timeline',
   component: Timeline,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: OTHER_PIECES },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  // Las descripciones salen de Timeline.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
     orientation: {
       control: 'radio',
       options: ['vertical', 'horizontal'],
       type: { name: 'enum', value: ['vertical', 'horizontal'] },
-      description: 'Orientation de Figma',
     },
-  },
+    ...Object.fromEntries(OTHER_PIECES.map((name) => [name, { control: false }])),
+  }),
   args: { orientation: 'vertical', 'aria-label': 'Historial de la solicitud' },
 } satisfies Meta<typeof Timeline>;
 
@@ -36,7 +49,7 @@ const ITEMS: TimelineItemData[] = [
   { title: 'Recibido', description: 'La solicitud quedó registrada.', date: 'Ayer', time: '9:15am', dateTime: '2026-10-27T09:15', status: 'complete' },
   { title: 'En revisión', description: 'Un equipo valida los datos enviados.', date: 'Ayer', time: '4:40pm', dateTime: '2026-10-27T16:40', status: 'complete' },
   { title: 'En proceso', description: 'Se está preparando el resultado.', date: 'Hoy', time: '8:00pm', dateTime: '2026-10-28T20:00', status: 'current' },
-  { title: 'Listo', description: 'Podrás recogerlo cuando esté disponible.', status: 'incomplete' },
+  { title: 'Listo', description: 'Podrás descargarlo cuando esté disponible.', status: 'incomplete' },
 ];
 
 export const Interactive: Story = {
@@ -96,7 +109,7 @@ export const FigmaMatrix: Story = {
                 <Timeline key={figma} orientation={o.v} aria-label={figma}>
                   <TimelineItem
                     title="En revisión"
-                    description={o.v === 'vertical' ? 'El elemento llegó a la oficina de origen y está en proceso.' : 'El elemento llegó a la oficina y está en proceso.'}
+                    description={o.v === 'vertical' ? 'El documento está en la etapa de revisión.' : 'El documento está en revisión.'}
                     date="Hoy"
                     time="8:00pm"
                     orientation={o.v}
@@ -121,17 +134,17 @@ export const FigmaTimeline: Story = {
   render: () => (
     <div className="w-[335px] bg-ds-background-general-black">
       <Timeline aria-label="Historial de ejemplo" data-figma="Propiedad 1=Vertical">
-        {['Recibido', 'En revisión', 'En proceso', 'Preparado'].map((title, i) => (
+        {['Recibido', 'En revisión', 'En proceso', 'Aprobado'].map((title, i) => (
           <TimelineItem
             key={title}
             title={title}
-            description="El elemento llegó a la etapa de origen y está en proceso."
+            description="El documento está en la etapa de revisión."
             date="Hoy"
             time="8:00pm"
             status={i === 3 ? 'current' : 'incomplete'}
           />
         ))}
-        <TimelineItem title="Listo" description="El elemento llegó a la etapa de origen y está en proceso." date="Hoy" time="8:00pm" status="complete" />
+        <TimelineItem title="Listo" description="El documento está en la etapa de revisión." date="Hoy" time="8:00pm" status="complete" />
       </Timeline>
     </div>
   ),
@@ -144,7 +157,7 @@ const TRACKER_ITEMS: TimelineItemData[] = [
   { title: 'En revisión', date: 'Hoy', time: '8:00pm', status: 'incomplete' },
   { title: 'En proceso', date: 'Hoy', time: '8:00pm', status: 'incomplete' },
   { title: 'Verificado', date: 'Hoy', time: '8:00pm', status: 'incomplete' },
-  { title: 'Preparado', date: 'Hoy', time: '8:00pm', status: 'incomplete' },
+  { title: 'Aprobado', date: 'Hoy', time: '8:00pm', status: 'incomplete' },
   { title: 'Listo', date: 'Hoy', time: '8:00pm', status: 'incomplete' },
 ];
 
@@ -157,7 +170,7 @@ export const FigmaStatusTracker: Story = {
   render: () => (
     <div className="bg-ds-background-general-black p-6">
       <div className="w-full max-w-[1094px]">
-        <StatusTracker items={TRACKER_ITEMS} marker={MARKER} reference="Ref. 1234567890" data-figma="Status tracker" />
+        <StatusTracker items={TRACKER_ITEMS} marker={MARKER} reference="Solicitud 2026-0142" data-figma="Status tracker" />
       </div>
     </div>
   ),
@@ -172,7 +185,7 @@ function TrackerDemo() {
   }));
   return (
     <div className="flex w-[900px] max-w-full flex-col gap-6">
-      <StatusTracker items={items} marker={MARKER} reference="Ref. 1234567890" onShowHistory={() => setHistory((v) => !v)} />
+      <StatusTracker items={items} marker={MARKER} reference="Solicitud 2026-0142" onShowHistory={() => setHistory((v) => !v)} />
       <div className="flex gap-2">
         <button type="button" onClick={() => setStep((s) => Math.min(s + 1, items.length - 1))} className="text-ds-text-neutral-white underline">
           Avanzar
@@ -229,7 +242,7 @@ export const TestSemantics: Story = {
 export const TestStatusTracker: Story = {
   tags: ['!autodocs'],
   render: () => (
-    <StatusTracker items={TRACKER_ITEMS} reference="Ref. 1" onShowHistory={() => {}} historyLabel="Ver historial" />
+    <StatusTracker items={TRACKER_ITEMS} reference="Solicitud 1" onShowHistory={() => {}} historyLabel="Ver historial" />
   ),
   play: async ({ canvasElement }) => {
     const c = within(canvasElement);
@@ -284,5 +297,32 @@ export const StatusTrackerLive: Story = {
     await expect(region).toHaveTextContent(`Estado actual: En curso: ${TRACKER_ITEMS[0].title}`);
     await userEvent.click(c.getByRole('button', { name: 'Avanzar' }));
     await expect(region).toHaveTextContent(`Estado actual: En curso: ${TRACKER_ITEMS[1].title}`);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Timeline' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Timeline en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 4 + 5)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(15);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    const props = canvas.getByRole('table', { name: 'Props de Timeline' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).getByRole('rowheader', { name: /StatusTracker\.live/ })).toBeInTheDocument();
   },
 };

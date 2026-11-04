@@ -1,5 +1,11 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './EmptyState.doc';
+import docsJson from './EmptyState.docs.json';
 import { EmptyState } from './EmptyState';
 import type { EmptyStateProps, EmptyStateType } from './EmptyState.types';
 
@@ -23,9 +29,23 @@ const frame: Decorator = (Story) => (
 const meta = {
   title: 'Feedback/EmptyState',
   component: EmptyState,
-  parameters: { layout: 'padded' },
+  // El lienzo de Desarrollo usa la historia Interactive, que dibuja las dos acciones: el código las escribe porque el
+  // generado omite las funciones. `icon` no tiene lista corta de valores válidos; sigue en Props.
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      exclude: ['icon'],
+      code: (args: Record<string, unknown>) => {
+        const base = buildCode('EmptyState', args, { type: 'first-use', headingLevel: 3 });
+        const actions =
+          "  primaryAction={{ label: 'Crear proyecto', onClick: () => create() }}\n  secondaryAction={{ label: 'Ver ayuda', onClick: () => help() }}";
+        return base.includes('\n') ? base.replace(/\n\/>$/, `\n${actions}\n/>`) : base.replace(' />', `\n${actions}\n/>`);
+      },
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     type: {
       control: 'select',
       options: TYPES,
@@ -40,7 +60,7 @@ const meta = {
       type: { name: 'enum', value: [2, 3, 4, 5, 6] },
       description: 'Nivel del encabezado del título',
     },
-  },
+  }),
   args: {
     type: 'first-use',
     title: 'Aún no hay proyectos',
@@ -170,5 +190,28 @@ export const TestOptionalParts: Story = {
     const c = within(canvasElement);
     await expect(c.queryByRole('heading')).toBeNull();
     await expect(c.queryByRole('button')).toBeNull();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'EmptyState' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente EmptyState en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 4)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(10);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de EmptyState' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };
