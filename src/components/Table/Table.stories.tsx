@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Fragment, useState } from 'react';
 import type { ReactNode } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
   Table,
   TableBody,
@@ -32,6 +32,11 @@ import { NumberRating, StarRating } from '../Rating';
 import { Switch } from '../Switch';
 import { Tag } from '../Tag';
 import { cn } from '../../utils/cn';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Table.doc';
+import docsJson from './Table.docs.json';
 
 /**
  * Hijos que muestra el código de la sección Desarrollo (`docsLive.args`): la estructura mínima de la tabla (encabezado
@@ -52,24 +57,41 @@ const DOCS_CODE_CHILDREN = [
   </TableBody>,
 ];
 
+/** Versión móvil que muestra el código de Desarrollo (`mobile`): la lista con una fila, como la que dibuja el lienzo. */
+const DOCS_CODE_MOBILE = (
+  <TableMobileList aria-label="Personas">
+    <TableMobileRow selectionLabel="Seleccionar a Ana Pérez" visibleFields={3}>
+      <TableMobileField label="Nombre">
+        <TableText>Ana Pérez</TableText>
+      </TableMobileField>
+      <TableMobileField label="Rol">
+        <TableText>Diseño</TableText>
+      </TableMobileField>
+    </TableMobileRow>
+  </TableMobileList>
+);
+
 const meta = {
   title: 'Data Display/Table',
   component: Table,
   parameters: {
     layout: 'padded',
-    // Componente compuesto: el render arma las filas, así que el código de Desarrollo lleva los hijos de ejemplo
-    docsLive: { args: (args: Record<string, unknown>) => ({ ...args, children: DOCS_CODE_CHILDREN }) },
+    // La página Docs usa la plantilla de documentación (Table.doc.tsx) con la referencia de código al final
+    docs: componentDocsParameters(doc, docsJson),
+    // Componente compuesto: el render arma las filas y la versión móvil (`mobile`), así que el código de Desarrollo
+    // lleva los hijos y la lista móvil de ejemplo (con `layout="mobile"` el lienzo dibuja esa lista)
+    docsLive: { args: (args: Record<string, unknown>) => ({ ...args, mobile: DOCS_CODE_MOBILE, children: DOCS_CODE_CHILDREN }) },
   },
   tags: ['autodocs'],
-  argTypes: {
+  // Las descripciones salen de Table.docs.json (solo las props de Table; las de las piezas van en `subcomponents`)
+  argTypes: argTypesFromDocsJson(docsJson, {
     layout: {
       control: 'radio',
       options: ['auto', 'table', 'mobile'],
       type: { name: 'enum', value: ['auto', 'table', 'mobile'] },
-      description: 'auto: tabla y, en móvil, la versión `mobile`; table o mobile la fuerzan',
     },
-    label: { control: 'text', type: { name: 'string', required: true }, description: 'Nombre accesible de la tabla' },
-  },
+    label: { control: 'text', type: { name: 'string', required: true } },
+  }),
   args: { label: 'Personas', layout: 'auto' },
 } satisfies Meta<typeof Table>;
 
@@ -143,7 +165,8 @@ function PeopleTable({ label, layout, rows = PEOPLE }: { label: string; layout?:
   };
 
   const mobile = (
-    <TableMobileList aria-label={label}>
+    // `min-w-0`: en un contenedor flex angosto (el lienzo de Desarrollo a 390) la lista no crece más que su padre
+    <TableMobileList aria-label={label} className="min-w-0">
       {sorted.map((p) => (
         <TableMobileRow
           key={p.id}
@@ -866,4 +889,38 @@ export const FigmaMatrixRowCard: Story = {
       </TableRowCard>
     </div>
   ),
+};
+
+// ───────────────────────── documentación ─────────────────────────
+
+/** Página de documentación (plantilla v2): encabezado, 3 pestañas y secciones en orden. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Table' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Table en Figma:']);
+    // Anatomía: 5 lienzos inertes y un marcador por pauta (6 + 5 + 6 + 5)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(5);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(22));
+    // La tabla de escritorio (960 px) se escala para caber en el lienzo
+    await waitFor(() => expect(Number((views[0] as HTMLElement).dataset.docAnatomyScale)).toBeLessThanOrEqual(1));
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Table' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+  },
 };

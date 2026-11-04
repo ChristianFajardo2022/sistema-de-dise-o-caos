@@ -10,7 +10,8 @@ const meta = {
   title: 'Data Display/Rating/IconStar',
   component: IconStar,
   parameters: { layout: 'padded' },
-  tags: ['autodocs'],
+  // Se documenta dentro de la página de StarRating: sin página propia
+  tags: ['!autodocs'],
   argTypes: {
     state: { name: 'state', control: 'radio', options: STATES, type: { name: 'enum', value: STATES }, description: 'state de Figma' },
     size: { name: 'size', control: 'radio', options: SIZES, type: { name: 'enum', value: SIZES }, description: 'size de Figma: 16, 20 o 32' },

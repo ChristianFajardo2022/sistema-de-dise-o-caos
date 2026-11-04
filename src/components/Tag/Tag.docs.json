@@ -1,7 +1,7 @@
 {
   "name": "Tag",
   "component": "Tag",
-  "description": "Etiqueta del sistema de diseño CAOS, fiel al component set Tag de Figma (id 9541:10661, 60 variantes: Type × State × Size). Type: default, success, alert, error, info y neutral con tokens background/*, text/* e icon/*. Size: md (alto 32) y sm (alto 24); cápsula radius/button/full, padding X 12, gap 4, ícono de 14 y texto 12 regular. Diferencia con Badge: Badge es un indicador no interactivo (punto o contador); Tag lleva texto y puede ser interactivo. Sin onClick es un <span> estático sin hover, foco ni press. Con onClick es un <button type=\"button\"> con hover, foco visible (outline de 2px), press y disabled nativo (Inactive). La spec de Figma no trae ícono de cerrar, así que no hay onRemove. Icon-left de Figma es iconLeft (ícono tag por defecto, intercambiable con icon). La prop state solo fuerza el aspecto en documentación.",
+  "description": "Etiqueta del sistema de diseño CAOS, fiel al component set Tag de Figma (60 variantes: Type × State × Size). Type: default, success, alert, error, info y neutral con tokens background/*, text/* e icon/*. Size: md (alto 32) y sm (alto 24); cápsula radius/button/full, padding X 12, gap 4, ícono de 14 y texto 12 regular. Diferencia con Badge: Badge es un indicador no interactivo (punto o contador); Tag lleva texto y puede ser interactivo. Padding en X de 12 en Desktop y Tablet, y de 8 en Mobile. Sin onClick es un <span> estático sin hover, foco ni press. Con onClick es un <button type=\"button\"> con hover, foco visible (outline de 2px), press y disabled nativo (Inactive). La spec de Figma no trae ícono de cerrar, así que no hay onRemove. Icon-left de Figma es iconLeft (ícono tag por defecto, intercambiable con icon). La prop state solo fuerza el aspecto en documentación.",
   "category": "Data Display",
   "props": {
     "type": { "type": "'default' | 'success' | 'alert' | 'error' | 'info' | 'neutral'", "default": "'default'", "description": "Type de Figma: color semántico." },
@@ -10,7 +10,7 @@
     "iconLeft": { "type": "boolean", "default": "true", "description": "Icon-left de Figma: muestra el ícono a la izquierda." },
     "icon": { "type": "IconName", "default": "'tag'", "description": "Ícono de la biblioteca CAOS (INSTANCE_SWAP de Figma), 14px relleno." },
     "state": { "type": "'default' | 'hover' | 'focus' | 'press' | 'inactive'", "default": "'default'", "description": "Solo para documentación: fuerza el aspecto de un estado." },
-    "disabled": { "type": "boolean", "default": "false", "description": "Inactive. En botón usa disabled nativo; en span aplica aria-disabled." },
+    "disabled": { "type": "boolean", "default": "false", "description": "Inactive. En un botón usa el disabled nativo; en un span solo cambia el aspecto." },
     "onClick": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Si se pasa, la etiqueta es un button interactivo." },
     "className": { "type": "string", "required": false, "description": "Clases adicionales para el elemento raíz. El resto de props nativas y el ref van al elemento." }
   },

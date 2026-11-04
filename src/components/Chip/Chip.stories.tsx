@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Chip.doc';
+import docsJson from './Chip.docs.json';
 import { Chip } from './Chip';
 import { ChipGroup } from './ChipGroup';
 import { ChipPlus } from './ChipPlus';
@@ -34,49 +39,65 @@ const meta = {
   title: 'Data Display/Chip',
   component: Chip,
   tags: ['autodocs'],
-  argTypes: {
+  parameters: {
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      // value, selected y defaultSelected solo tienen sentido dentro de un ChipGroup o con estado propio
+      exclude: ['value', 'selected', 'defaultSelected'],
+      // El avatar es un elemento: con primary-avatar se le da uno de ejemplo
+      args: (a: Record<string, unknown>) => ({
+        ...a,
+        avatar: a.type === 'primary-avatar' ? <Avatar variant="initials" name="Ana Pérez" /> : undefined,
+      }),
+    },
+  },
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
     type: {
       type: { name: 'enum', value: ['primary', 'primary-avatar', 'primary-color', 'primary-box'] },
       control: 'select',
       options: ['primary', 'primary-avatar', 'primary-color', 'primary-box'],
-      description: 'Type de Figma',
     },
     state: {
       type: { name: 'enum', value: ['default', 'hover', 'focus', 'select', 'inactive'] },
       control: 'select',
       options: [undefined, 'default', 'hover', 'focus', 'select', 'inactive'],
-      description: 'State forzado, solo para documentación. En uso real lo dan :hover, :focus-visible, selected y disabled.',
     },
     color: {
       type: { name: 'enum', value: ['purple', 'green', 'yellow', 'red', 'blue', 'violet', 'cyan'] },
       control: 'select',
       options: ['purple', 'green', 'yellow', 'red', 'blue', 'violet', 'cyan'],
-      description: 'Color del punto de primary-color',
     },
     tone: {
       type: { name: 'enum', value: ['soft', 'strong'] },
       control: 'radio',
       options: ['soft', 'strong'],
-      description: 'Intensidad del punto: soft (set Chips) o strong (filtro Chips colors)',
     },
-    icon: { type: { name: 'boolean' }, control: 'boolean', description: 'Icon (primary y primary-box)' },
-    close: { type: { name: 'boolean' }, control: 'boolean', description: 'Close' },
-    disabled: { type: { name: 'boolean' }, control: 'boolean', description: 'Inactive' },
-    selected: { type: { name: 'boolean' }, control: 'boolean', description: 'Seleccionado (controlado)' },
-    children: { control: 'text', description: 'Text' },
-  },
-  args: { type: 'primary', children: 'Entrega hoy', icon: true, onRemove: fn() },
+    badge: { type: { name: 'string' }, control: 'text' },
+    icon: { type: { name: 'boolean' }, control: 'boolean' },
+    close: { type: { name: 'boolean' }, control: 'boolean' },
+    disabled: { type: { name: 'boolean' }, control: 'boolean' },
+    selected: { type: { name: 'boolean' }, control: 'boolean' },
+    children: { control: 'text' },
+  }),
+  args: { type: 'primary', children: 'Hoy', icon: true, close: true, onRemove: fn() },
 } satisfies Meta<typeof Chip>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** Chip informativo (sin acción): un span con su botón de quitar. */
-export const Interactive: Story = {};
+export const Interactive: Story = {
+  // Con `primary-avatar` el control de `type` necesita un avatar: se le da uno de ejemplo
+  render: (args) => (
+    <Chip {...args} avatar={args.avatar ?? (args.type === 'primary-avatar' ? <Avatar variant="initials" name="Ana Pérez" /> : undefined)} />
+  ),
+};
 
 /** Con `selected`/`defaultSelected` es un botón de alternancia (`aria-pressed`). */
 export const Toggle: Story = {
-  args: { defaultSelected: false, onSelectedChange: fn(), children: 'Con garantía' },
+  args: { defaultSelected: false, onSelectedChange: fn(), children: 'Favoritos' },
 };
 
 /** `primary-avatar`: el avatar se pasa a `xs` y se deshabilita con el chip. */
@@ -100,14 +121,14 @@ export const WithBadge: Story = {
 
 /** `primary-box`: rectangular, el texto se parte en varias líneas cuando falta ancho. */
 export const Box: Story = {
-  args: { type: 'primary-box', children: 'Entrega en horario extendido con firma del destinatario' },
+  args: { type: 'primary-box', children: 'Reunión en horario extendido con asistencia confirmada de todo el equipo' },
   decorators: [(Story) => <div className="w-48"><Story /></div>],
 };
 
 /** Selección única: grupo de radios, las flechas mueven y seleccionan. */
 export const GroupSingle: Story = {
   render: () => (
-    <ChipGroup aria-label="Tamaño del envío" selectionMode="single" defaultValue={['m']}>
+    <ChipGroup aria-label="Tamaño del documento" selectionMode="single" defaultValue={['m']}>
       <Chip value="s" icon={false}>Pequeño</Chip>
       <Chip value="m" icon={false}>Mediano</Chip>
       <Chip value="l" icon={false}>Grande</Chip>
@@ -119,10 +140,10 @@ export const GroupSingle: Story = {
 /** Selección múltiple: botones de alternancia con una sola parada de tabulación. */
 export const GroupMultiple: Story = {
   render: () => (
-    <ChipGroup aria-label="Servicios adicionales" selectionMode="multiple" defaultValue={['seguro']}>
-      <Chip value="seguro">Seguro</Chip>
-      <Chip value="firma">Firma</Chip>
-      <Chip value="frio">Cadena de frío</Chip>
+    <ChipGroup aria-label="Notificaciones" selectionMode="multiple" defaultValue={['correo']}>
+      <Chip value="correo">Correo</Chip>
+      <Chip value="mensaje">Mensaje</Chip>
+      <Chip value="alerta">Alerta</Chip>
     </ChipGroup>
   ),
 };
@@ -143,9 +164,9 @@ export const GroupOverflow: Story = {
 /** Chips quitables: Supr/Retroceso o el botón "Quitar" y el foco pasa al vecino. */
 export const GroupRemovable: Story = {
   render: function Render() {
-    const [tags, setTags] = useState(['Frágil', 'Urgente', 'Interno']);
+    const [tags, setTags] = useState(['Importante', 'Urgente', 'Interno']);
     return (
-      <ChipGroup aria-label="Etiquetas del envío">
+      <ChipGroup aria-label="Etiquetas del documento">
         {tags.map((t) => (
           <Chip key={t} icon={false} onRemove={() => setTags((c) => c.filter((x) => x !== t))}>
             {t}
@@ -239,14 +260,14 @@ export const ToggleTest: Story = {
     return (
       <div>
         <Chip data-testid="info">Informativo</Chip>
-        <Chip defaultSelected={false} onRemove={onRemove}>Frágil</Chip>
+        <Chip defaultSelected={false} onRemove={onRemove}>Importante</Chip>
         <Chip disabled onClick={() => {}} onRemove={onRemove}>Apagado</Chip>
       </div>
     );
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const toggle = canvas.getByRole('button', { name: 'Frágil' });
+    const toggle = canvas.getByRole('button', { name: 'Importante' });
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await userEvent.tab();
     await expect(toggle).toHaveFocus();
@@ -254,7 +275,7 @@ export const ToggleTest: Story = {
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
     await userEvent.keyboard('{Enter}');
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    await expect(canvas.getByRole('button', { name: 'Quitar Frágil' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Quitar Importante' })).toBeInTheDocument();
     await expect(canvas.getByRole('button', { name: 'Quitar Apagado' })).toBeDisabled();
     await expect(canvas.getByRole('button', { name: 'Apagado' })).toBeDisabled();
   },
@@ -329,14 +350,14 @@ export const HitAreaTest: Story = {
   render: () => (
     <div className="p-6">
       <Chip defaultSelected={false} onRemove={() => {}}>
-        Frágil
+        Importante
       </Chip>
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const body = canvas.getByRole('button', { name: 'Frágil' });
-    const close = canvas.getByRole('button', { name: 'Quitar Frágil' });
+    const body = canvas.getByRole('button', { name: 'Importante' });
+    const close = canvas.getByRole('button', { name: 'Quitar Importante' });
     const root = body.closest('[data-chip-root]')!.getBoundingClientRect();
     // Padding de la cápsula (izquierda, arriba y abajo): cae en el cuerpo
     for (const [x, y] of [
@@ -363,8 +384,8 @@ export const EmptyGroupFocusTest: Story = {
   render: GroupRemovable.render,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const group = canvas.getByRole('group', { name: 'Etiquetas del envío' });
-    for (const t of ['Frágil', 'Urgente', 'Interno']) {
+    const group = canvas.getByRole('group', { name: 'Etiquetas del documento' });
+    for (const t of ['Importante', 'Urgente', 'Interno']) {
       await userEvent.click(canvas.getByRole('button', { name: `Quitar ${t}` }));
     }
     await waitFor(() => expect(group).toHaveFocus());
@@ -402,5 +423,33 @@ export const ToolbarAndOverflowActionsTest: Story = {
     const item = await within(document.body).findByRole('menuitem', { name: 'Dos' });
     await userEvent.click(item);
     await expect(canvas.getByTestId('last')).toHaveTextContent('dos');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Chip' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Chip en Figma:']);
+    await expect(canvas.getByRole('switch', { name: 'Modo oscuro' })).toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática)
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    // Sin Storybook no hay lienzo, código ni Personalizar: solo el bloque Props, de solo lectura
+    const props = canvas.getByRole('table', { name: 'Props de Chip' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(canvas.queryByRole('group', { name: 'Personalizar' })).not.toBeInTheDocument();
   },
 };

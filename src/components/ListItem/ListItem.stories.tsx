@@ -5,6 +5,11 @@ import { ListItem } from './ListItem';
 import type { ListItemProps, ListItemVariant } from './ListItem.types';
 import { Avatar, AvatarGroup } from '../Avatar';
 import { DropdownMenuItem } from '../DropdownMenu';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ListItem.doc';
+import docsJson from './ListItem.docs.json';
 
 const VARIANT_OPTIONS: ListItemVariant[] = ['simple', 'complex'];
 
@@ -14,7 +19,7 @@ const withList: Decorator = (Story, { parameters }) =>
     <Story />
   ) : (
   <div className="bg-ds-background-general-black">
-    <ul role="list" className="m-0 w-full max-w-5xl p-0">
+    <ul role="list" className="m-0 w-[min(30rem,calc(100vw-12rem))] p-0">
       <Story />
     </ul>
   </div>
@@ -23,21 +28,25 @@ const withList: Decorator = (Story, { parameters }) =>
 const meta = {
   title: 'Data Display/List item',
   component: ListItem,
-  parameters: { layout: 'padded' },
-  tags: ['autodocs'],
-  argTypes: {
-    variant: { control: 'radio', options: VARIANT_OPTIONS, type: { name: 'enum', value: VARIANT_OPTIONS }, description: 'Type de Figma' },
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Descripción (opcional)' },
-    category: { control: 'text', type: { name: 'string' }, description: 'Categoría (solo complex)' },
-    selectable: { control: 'boolean', type: { name: 'boolean' }, description: 'Dibuja el checkbox' },
-    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'State Disabled de Figma' },
+  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson),
+    // `defaultSelected` choca con `selected`; `href` con texto libre vuelve la fila un enlace que navega el iframe
+    docsLive: { exclude: ['defaultSelected', 'href'] },
   },
+  tags: ['autodocs'],
+  // Las descripciones salen de ListItem.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    variant: { control: 'radio', options: VARIANT_OPTIONS, type: { name: 'enum', value: VARIANT_OPTIONS } },
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    category: { control: 'text', type: { name: 'string' } },
+    selectable: { control: 'boolean', type: { name: 'boolean' } },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
+  }),
   args: {
     variant: 'complex',
-    title: 'Nombre del item',
-    description: 'Descripción',
-    category: 'Categoría',
+    title: 'Informe trimestral',
+    description: 'Actualizado hoy',
+    category: 'Documento',
     selectable: true,
     disabled: false,
   },
@@ -48,15 +57,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const menuItems = [
-  <DropdownMenuItem key="dup" type="icon" icon="add-circle">Duplicar</DropdownMenuItem>,
-  <DropdownMenuItem key="mov" type="icon" icon="add-circle">Mover</DropdownMenuItem>,
+  <DropdownMenuItem key="dup" type="icon" icon="document-copy">Duplicar</DropdownMenuItem>,
+  <DropdownMenuItem key="mov" type="icon" icon="forward">Mover</DropdownMenuItem>,
 ];
 
 const folder = <Avatar variant="icon" size="sm" label="Carpeta" />;
 
 /** Preview con controles. Los controles de la derecha aparecen porque se pasan `onEdit`, `onDelete` y `menu`. */
 export const Interactive: Story = {
-  args: { leading: folder, onEdit: fn(), onDelete: fn(), menu: menuItems },
+  args: { leading: folder, onView: fn(), onEdit: fn(), onDelete: fn(), menu: menuItems },
 };
 
 export const Simple: Story = {
@@ -157,9 +166,9 @@ export const FigmaMatrix: Story = {
               key={name}
               data-figma={name}
               variant={variant}
-              title="Nombre del item"
-              description="Descripción"
-              category="Categoría"
+              title="Informe trimestral"
+              description="Actualizado hoy"
+              category="Documento"
               leading={folder}
               selectable
               disabled={disabled}
@@ -181,10 +190,10 @@ export const AccessibleNamesTest: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('listitem')).toBeInTheDocument();
-    await expect(canvas.getByRole('checkbox', { name: 'Nombre del item' })).toBeInTheDocument();
-    await expect(canvas.getByRole('button', { name: 'Editar Nombre del item' })).toBeInTheDocument();
-    await expect(canvas.getByRole('button', { name: 'Eliminar Nombre del item' })).toBeInTheDocument();
-    await expect(canvas.getByRole('button', { name: 'Más opciones de Nombre del item' })).toBeInTheDocument();
+    await expect(canvas.getByRole('checkbox', { name: 'Informe trimestral' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Editar Informe trimestral' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Eliminar Informe trimestral' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Más opciones de Informe trimestral' })).toBeInTheDocument();
   },
 };
 
@@ -195,7 +204,7 @@ export const KeyboardTest: Story = {
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.tab();
-    const checkbox = canvas.getByRole('checkbox', { name: 'Nombre del item' });
+    const checkbox = canvas.getByRole('checkbox', { name: 'Informe trimestral' });
     await expect(checkbox).toHaveFocus();
     await userEvent.keyboard(' ');
     await expect(args.onSelectedChange).toHaveBeenLastCalledWith(true);
@@ -204,17 +213,17 @@ export const KeyboardTest: Story = {
     await expect(args.onSelectedChange).toHaveBeenLastCalledWith(false);
 
     await userEvent.tab();
-    await expect(canvas.getByRole('button', { name: 'Editar Nombre del item' })).toHaveFocus();
+    await expect(canvas.getByRole('button', { name: 'Editar Informe trimestral' })).toHaveFocus();
     await userEvent.keyboard('{Enter}');
     await expect(args.onEdit).toHaveBeenCalledTimes(1);
 
     await userEvent.tab();
-    await expect(canvas.getByRole('button', { name: 'Eliminar Nombre del item' })).toHaveFocus();
+    await expect(canvas.getByRole('button', { name: 'Eliminar Informe trimestral' })).toHaveFocus();
     await userEvent.keyboard('{Enter}');
     await expect(args.onDelete).toHaveBeenCalledTimes(1);
 
     await userEvent.tab();
-    const more = canvas.getByRole('button', { name: 'Más opciones de Nombre del item' });
+    const more = canvas.getByRole('button', { name: 'Más opciones de Informe trimestral' });
     await expect(more).toHaveFocus();
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
@@ -229,11 +238,11 @@ export const ClickTest: Story = {
   args: { onEdit: fn(), onDelete: fn(), onSelectedChange: fn() },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('checkbox', { name: 'Nombre del item' }));
+    await userEvent.click(canvas.getByRole('checkbox', { name: 'Informe trimestral' }));
     await expect(args.onSelectedChange).toHaveBeenCalledWith(true);
-    await userEvent.click(canvas.getByRole('button', { name: 'Editar Nombre del item' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Editar Informe trimestral' }));
     await expect(args.onEdit).toHaveBeenCalledTimes(1);
-    await userEvent.click(canvas.getByRole('button', { name: 'Eliminar Nombre del item' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Eliminar Informe trimestral' }));
     await expect(args.onDelete).toHaveBeenCalledTimes(1);
   },
 };
@@ -245,10 +254,10 @@ export const DisabledTest: Story = {
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('listitem')).not.toHaveAttribute('aria-disabled');
-    const checkbox = canvas.getByRole('checkbox', { name: 'Nombre del item' });
-    const edit = canvas.getByRole('button', { name: 'Editar Nombre del item' });
-    const del = canvas.getByRole('button', { name: 'Eliminar Nombre del item' });
-    const more = canvas.getByRole('button', { name: 'Más opciones de Nombre del item' });
+    const checkbox = canvas.getByRole('checkbox', { name: 'Informe trimestral' });
+    const edit = canvas.getByRole('button', { name: 'Editar Informe trimestral' });
+    const del = canvas.getByRole('button', { name: 'Eliminar Informe trimestral' });
+    const more = canvas.getByRole('button', { name: 'Más opciones de Informe trimestral' });
     for (const el of [checkbox, edit, del, more]) await expect(el).toBeDisabled();
     await userEvent.click(edit);
     await userEvent.click(del);
@@ -294,5 +303,28 @@ export const NavigationTest: Story = {
     await expect(chevron).not.toBeNull();
     await userEvent.tab();
     await expect(canvas.getByRole('link', { name: 'Fotografías' })).toHaveFocus();
+  },
+};
+
+/** Página de documentación (plantilla v2): encabezado, 3 pestañas y secciones en orden. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', ownList: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'List item' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente List item en Figma:']);
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThan(0));
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de ListItem' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

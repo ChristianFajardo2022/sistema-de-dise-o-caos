@@ -7,7 +7,7 @@ import { cva } from 'class-variance-authority';
  * El marco `Desktop` y el `Mobile` (oculto en Figma) se resuelven con una sola estructura y container queries.
  *
  * - Raíz: padding space/general/lg (8) lateral y arriba y abajo space/general/2xl (16) en complex o space/general/xl (12) en simple; borde superior de
- *   border/general/lg (1) en border/general/default-on-canva. El trazo de Figma es INSIDE y no suma alto: se dibuja
+ *   border/general/lg (1.5) en border/general/default-on-canva. El trazo de Figma es INSIDE y no suma alto: se dibuja
  *   con un box-shadow inset (no ocupa espacio, así que el padding y el alto coinciden con Figma). Es el contenedor de consulta (`@container`): el layout vive en el hijo.
  * - Desktop (contenedor >= 18rem de contenido, lo que mide la fila con avatar, texto y dos botones; no el corte de viewport de 48rem, que no aplica a un container query): una fila, gap 16 (complex) u 8 (simple).
  * - Mobile (< 18rem): la fila lleva casilla, avatar, título (con la categoría encima) y acciones;

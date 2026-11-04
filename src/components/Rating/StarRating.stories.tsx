@@ -3,6 +3,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within, fn } from 'storybook/test';
 import { StarRating } from './StarRating';
 import type { StarRatingSize } from './Rating.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './StarRating.doc';
+import docsJson from './StarRating.docs.json';
 
 const SIZES: { size: StarRatingSize; figma: string }[] = [
   { size: 'sm', figma: '20px' },
@@ -23,23 +28,37 @@ function Controlled(args: React.ComponentProps<typeof StarRating>) {
 const meta = {
   title: 'Data Display/Rating/StarRating',
   component: StarRating,
-  parameters: { layout: 'padded' },
+  // El lienzo de Desarrollo usa Interactive: `value` pasa a `defaultValue` para que `readOnly` y `disabled` se noten
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      args: ({ value, ...rest }: Record<string, unknown>) => ({ ...rest, defaultValue: value ?? 0 }),
+      exclude: ['defaultValue', 'onChange'],
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
-    size: { name: 'size', control: 'radio', options: SIZE_OPTIONS, type: { name: 'enum', value: SIZE_OPTIONS }, description: 'Size de Figma: sm = 20px, md = 32px' },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    size: { name: 'size', control: 'radio', options: SIZE_OPTIONS, type: { name: 'enum', value: SIZE_OPTIONS }, description: 'Size de Figma: sm = 20 px, md = 32 px' },
     value: { control: { type: 'range', min: 0, max: 5, step: 1 }, type: { name: 'number' }, description: 'Puntaje de 0 a 5 (State de Figma)' },
     readOnly: { control: 'boolean', type: { name: 'boolean' }, description: 'Fuerza el modo de solo lectura' },
-    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Deshabilita (modo interactivo)' },
+    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Deshabilita las estrellas. Solo aplica en modo interactivo: con readOnly no cambia nada' },
     label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible' },
-  },
+  }),
   args: { size: 'sm', value: 4 },
 } satisfies Meta<typeof StarRating>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Solo lectura: `role="img"` con "4 de 5 estrellas". */
-export const Interactive: Story = {};
+/**
+ * Alimenta el lienzo de Desarrollo: `value` es el puntaje inicial de un grupo interactivo (cambia al hacer clic y al
+ * mover el control). Con `readOnly` queda en solo lectura (`role="img"`).
+ */
+export const Interactive: Story = {
+  render: ({ value, ...args }) => <StarRating key={value} {...args} defaultValue={value ?? 0} />,
+};
 
 /** Modo interactivo controlado: grupo de radios con previsualización al pasar el puntero. */
 export const Selectable: Story = {
@@ -118,5 +137,30 @@ export const DisabledTest: Story = {
     const radios = within(canvasElement).getAllByRole('radio');
     for (const r of radios) await expect(r).toBeDisabled();
     await expect(radios[1]).toBeChecked();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'StarRating' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente StarRating en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (3 + 2 + 4)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(9);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de StarRating' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

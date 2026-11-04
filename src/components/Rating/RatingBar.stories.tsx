@@ -1,7 +1,12 @@
 import type { Decorator, Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { RatingBar } from './RatingBar';
 import type { RatingBarDisplay, RatingBarItem } from './Rating.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './RatingBar.doc';
+import docsJson from './RatingBar.docs.json';
 
 const DISPLAY_OPTIONS: RatingBarDisplay[] = ['percentage', 'count'];
 
@@ -24,12 +29,13 @@ const narrow: Decorator = (Story) => (
 const meta = {
   title: 'Data Display/Rating/RatingBar',
   component: RatingBar,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson), docsLive: { story: 'Interactive' } },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     display: { name: 'display', control: 'radio', options: DISPLAY_OPTIONS, type: { name: 'enum', value: DISPLAY_OPTIONS }, description: 'Texto de cada fila' },
+    total: { control: { type: 'number', min: 1 }, description: 'Total que equivale al 100%. Al menos la suma de las filas' },
     label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible de la lista' },
-  },
+  }),
   args: { distribution: DISTRIBUTION, display: 'percentage', label: 'Reseñas por calificación' },
 } satisfies Meta<typeof RatingBar>;
 
@@ -86,5 +92,27 @@ export const AccessibleNameTest: Story = {
     const five = canvas.getByRole('progressbar', { name: '5 estrellas' });
     await expect(five).toHaveAttribute('aria-valuetext', '40%');
     await expect(canvas.getByRole('progressbar', { name: '1 estrella' })).toHaveAttribute('aria-valuetext', '0%');
+  },
+};
+
+/** Test: la página de documentación (plantilla v2) con sus pestañas y secciones */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'RatingBar' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente RatingBar en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de RatingBar' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

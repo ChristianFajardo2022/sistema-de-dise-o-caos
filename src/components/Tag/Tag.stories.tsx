@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { Tag } from './Tag';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Tag.doc';
+import docsJson from './Tag.docs.json';
 import type { TagSize, TagState, TagType } from './Tag.types';
 
 const TYPES: { type: TagType; figma: string }[] = [
@@ -24,7 +29,8 @@ const meta = {
   title: 'Data Display/Tag',
   component: Tag,
   tags: ['autodocs'],
-  argTypes: {
+  parameters: { docs: componentDocsParameters(doc, docsJson) },
+  argTypes: argTypesFromDocsJson(docsJson, {
     type: {
       type: { name: 'enum', value: ['default', 'success', 'alert', 'error', 'info', 'neutral'] },
       control: 'select',
@@ -46,8 +52,8 @@ const meta = {
     iconLeft: { type: { name: 'boolean' }, control: 'boolean', description: 'Icon-left' },
     disabled: { type: { name: 'boolean' }, control: 'boolean', description: 'Inactive' },
     children: { control: 'text', description: 'Text' },
-  },
-  args: { type: 'default', size: 'md', iconLeft: true, children: 'Etiqueta' },
+  }),
+  args: { type: 'default', size: 'md', iconLeft: true, children: 'Activo' },
 } satisfies Meta<typeof Tag>;
 
 export default meta;
@@ -122,5 +128,28 @@ export const RoleTest: Story = {
     await userEvent.keyboard(' ');
     await userEvent.click(btn);
     await expect(canvas.getByRole('button', { name: 'Apagada' })).toBeDisabled();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Tag' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Tag en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (3 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(6);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Tag' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -6,8 +6,8 @@ import { cva } from 'class-variance-authority';
  * Fuente: component sets de Figma de la carpeta Avatar.
  * - Avatar (Type Text/Photo/Brand/Icon, 56): envoltorio de los átomos; en código es `variant`.
  * - Avatar colors (Type Names/User × Size xs/sm/md/lg × Color): círculo con dimention/avatar/*
- *   (24, 32, 48, 56), radio radius/button/full, texto Helvetica (md y lg: typography/button/size/md en regular,
- *   sm y xs: typography/button/size/sm en medium 500). Color: fondo background/*-secondary, texto text/* e ícono icon/*.
+ *   (24, 32, 48, 56), radio radius/button/full, texto Helvetica (typography/weight/Semibold 600 en todos los tamaños;
+ *   md y lg: typography/button/size/md, sm y xs: typography/button/size/sm). Color: fondo background/*-secondary, texto text/* e ícono icon/*.
  *   Disabled: background/container/disabled-on-card, text/neutral/disabled-negative, icon/general/disabled-negative.
  * - Avatar photo (Size xs-lg): círculo con la imagen; Disabled = imagen en grises.
  * - Avatar brand / Avatar icon (Contrast × State × Size): píldora con fondo background/icon/* y radio

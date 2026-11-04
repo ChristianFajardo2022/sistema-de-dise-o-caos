@@ -539,8 +539,8 @@ function DocPropsCard({ importName, props }: { importName: string; props: DocPro
       aside={<p className={cardBody}>{count}</p>}
       description={
         <p className={cn(cardBody, docInline)}>
-          Props de <code>{importName}</code> tal como están en el código. Las de HTML nativas que no aparecen aquí (como <code>className</code> o{' '}
-          <code>aria-*</code>) pasan al elemento raíz.
+          Props de <code>{importName}</code> tal como están en el código. Los atributos de HTML que no aparecen aquí (como <code>aria-*</code>{' '}
+          o <code>data-*</code>) pasan al elemento raíz.
         </p>
       }
     >

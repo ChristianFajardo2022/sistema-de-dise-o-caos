@@ -79,9 +79,9 @@ const all = () => (
 export const doc: ComponentDocContent = {
   name: 'NotificationText',
   icon: 'info-circle',
-  classification: 'molecula',
+  classification: 'atomo',
   summary:
-    'El NotificationText es la molécula para dar un mensaje breve bajo un campo de formulario: una ayuda, un error, una confirmación o un aviso. Une un ícono de 14 px con una línea de texto y cambia de color según su tipo. Los campos de CAOS lo usan para pintar sus mensajes.',
+    'El NotificationText es el átomo para dar un mensaje breve bajo un campo de formulario: una ayuda, un error, una confirmación o un aviso. Une un ícono de 14 px con una línea de texto y cambia de color según su tipo. Los campos de CAOS lo usan para pintar sus mensajes.',
   definition: [
     {
       title: 'Anatomía',

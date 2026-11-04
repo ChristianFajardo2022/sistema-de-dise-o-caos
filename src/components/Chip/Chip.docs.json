@@ -1,38 +1,149 @@
 {
   "name": "Chip",
   "component": "Chip",
-  "description": "Chip del sistema de diseño CAOS, fiel a los component sets Chips (id 9347:46000: Type Primary / Primary avatar / Primary color / Primary box × State Default / Hover / Focus / Select / Inactive) y Chips plus (id 15236:72238, el \"+N\"; el set tiene errores en Figma: cuatro variantes comparten el nombre State=Default, Size=lg). Cápsula con ícono de reloj, texto 12 y botón de quitar; Type cambia el adorno de la izquierda (ícono, avatar de 24 o punto de color de 24) y Primary box es la versión rectangular (radio 16) cuyo texto se parte en varias líneas. Default es un chip sin relleno con trazo de 0.5: el texto es blanco, por eso en la captura de Figma sobre fondo claro parece vacío (no es un placeholder). Select es el chip marcado, Inactive equivale a disabled. Semántica: sin acción es un span; con onClick es un botón; con selected/defaultSelected/onSelectedChange es un botón de alternancia (aria-pressed). Toda la cápsula (con su padding) es el área de clic del cuerpo; Quitar es un botón aparte \"Quitar <texto>\" (no anidado, de 24 × 24 por encima del cuerpo), y Supr/Retroceso sobre el cuerpo hacen lo mismo: en single y multiple es la única forma de quitar con teclado (el botón Quitar no es parada de tabulación). Al quitar, el foco pasa al chip vecino; si era el último, al \"+N\" o al propio grupo; en un chip suelto, el consumidor mueve el foco (onRemove recibe el evento). ChipGroup agrupa: single = radiogroup (role=radio, una parada de tabulación, flechas mueven y seleccionan), multiple = toolbar de botones de alternancia (patrón APG Toolbar: una parada de tabulación, flechas mueven el foco), none = group de chips independientes; con max el resto se resume en ChipPlus (\"+N\"), que abre un DropdownMenu con casillas (multiple), radios (single) o, en none, una lista solo informativa (o ítems de menú con la acción de los chips que tengan onClick; los que tienen onRemove no se ocultan). La prop state solo fuerza el aspecto en documentación.",
+  "description": "Chip del sistema de diseño CAOS (sets Chips y Chips plus en Figma). Cápsula compacta con texto de 12 px, un adorno a la izquierda y un botón para quitar. Type (jerarquía visual en Figma) cambia el adorno: ícono, avatar de 24 px o punto de color de 24 px; Primary box es la versión rectangular, con radio de 16 px, cuyo texto se parte en varias líneas. El estado Default no tiene relleno y dibuja un trazo de 1 px: su texto es blanco, así que sobre un fondo claro parece vacío. Select es el chip marcado e Inactive equivale a disabled. Sin acción es un span; con onClick es un botón; con selected, defaultSelected u onSelectedChange es un botón de alternancia (aria-pressed). Toda la cápsula es el área de clic del cuerpo. Quitar es un botón aparte, \"Quitar <texto>\", de 24 × 24 px sobre el cuerpo; Supr y Retroceso sobre el cuerpo hacen lo mismo y son la única forma de quitar con teclado en un grupo con selección, porque el botón no es parada de tabulación. Al quitar, el foco pasa al chip vecino; en un chip suelto, mueve el foco tú (onRemove recibe el evento). ChipGroup agrupa los chips: single es un radiogroup (flechas mueven y seleccionan), multiple es un toolbar de botones de alternancia y none es un group de chips independientes. Con max, el resto se resume en ChipPlus (\"+N\"), que abre una lista con casillas (multiple), radios (single) o solo texto (none). La prop state solo fuerza el aspecto para documentar.",
   "category": "Data Display",
   "props": {
-    "type": { "type": "'primary' | 'primary-avatar' | 'primary-color' | 'primary-box'", "default": "'primary'", "description": "Type de Figma." },
-    "children": { "type": "ReactNode", "required": false, "description": "Prop Text de Figma: texto del chip." },
-    "label": { "type": "string", "required": false, "description": "Texto plano para el nombre del botón de quitar cuando children no es un string." },
-    "icon": { "type": "boolean", "default": "true", "description": "Prop Icon de Figma (primary y primary-box)." },
-    "badge": { "type": "ReactNode", "required": false, "description": "Slot de Badge numérico a la izquierda (primary y primary-box), en el lugar del ícono; si se pasa, el ícono no se dibuja." },
-    "badgeState": { "type": "BadgeState", "default": "'default'", "description": "Color semántico del Badge numérico." },
-    "badgeLabel": { "type": "string", "required": false, "description": "Texto sr-only tras el número del Badge (p. ej. \"pendientes\")." },
-    "iconName": { "type": "IconName", "default": "'clock'", "description": "Ícono de la biblioteca CAOS, 14px relleno." },
-    "avatar": { "type": "ReactElement", "required": false, "description": "Avatar de primary-avatar; el chip lo pasa a xs, a disabled si está inactivo y lo marca decorativo." },
-    "color": { "type": "'purple' | 'green' | 'yellow' | 'red' | 'blue' | 'violet' | 'cyan'", "default": "'purple'", "description": "Color del punto de primary-color. violet = background/graphic/acent-secondary; cyan = background/graphic/information-*." },
-    "tone": { "type": "'soft' | 'strong'", "default": "'soft'", "description": "Intensidad del punto: soft = background/graphic/*-firts (set Chips); strong = background/graphic/*-secondary (filtro Chips colors). purple y violet no cambian." },
-    "colorLabel": { "type": "string", "required": false, "description": "Texto sr-only con el significado del color; sin él el punto es decorativo." },
-    "close": { "type": "boolean", "default": "onRemove !== undefined", "description": "Prop Close de Figma: muestra el botón de quitar." },
-    "onRemove": { "type": "(event) => void", "required": false, "description": "Se activa al quitar (botón o Supr/Retroceso). Recibe el evento (clic o tecla). Dentro de un ChipGroup el foco pasa al vecino; en un chip suelto, muévelo tú." },
-    "removeLabel": { "type": "string", "required": false, "description": "Nombre accesible del botón de quitar. Por defecto \"Quitar <texto>\"." },
-    "value": { "type": "string", "required": false, "description": "Identificador dentro de un ChipGroup." },
-    "selected": { "type": "boolean", "required": false, "description": "Seleccionado (controlado); vuelve el chip un botón de alternancia." },
-    "defaultSelected": { "type": "boolean", "required": false, "description": "Seleccionado al inicio (no controlado)." },
-    "onSelectedChange": { "type": "(selected: boolean) => void", "required": false, "description": "Cambia la selección." },
-    "state": { "type": "'default' | 'hover' | 'focus' | 'select' | 'inactive'", "required": false, "description": "Solo para documentación: fuerza el aspecto de un estado." },
-    "disabled": { "type": "boolean", "default": "false", "description": "Inactive: deshabilita cuerpo y botón de quitar." },
-    "rootProps": { "type": "HTMLAttributes<HTMLSpanElement>", "required": false, "description": "Atributos de la cápsula (raíz), p. ej. data-*." },
-    "className": { "type": "string", "required": false, "description": "Clases de la cápsula. ref y el resto de props nativas van al cuerpo del chip." }
+    "type": {
+      "type": "'primary' | 'primary-avatar' | 'primary-color' | 'primary-box'",
+      "default": "'primary'",
+      "description": "Tipo de chip (Type en Figma)."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto del chip (Text en Figma)."
+    },
+    "label": {
+      "type": "string",
+      "required": false,
+      "description": "Texto plano para el nombre del botón de quitar cuando children no es un string."
+    },
+    "icon": {
+      "type": "boolean",
+      "default": "true",
+      "description": "Muestra el ícono a la izquierda (Icon en Figma). Aplica a primary y primary-box."
+    },
+    "badge": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Badge numérico a la izquierda, en el lugar del ícono (primary y primary-box). Con él, el ícono no se dibuja."
+    },
+    "badgeState": {
+      "type": "BadgeState",
+      "default": "'default'",
+      "description": "Color semántico del Badge numérico (State del Badge en Figma)."
+    },
+    "badgeLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Texto para lectores de pantalla tras el número del Badge, p. ej. \"pendientes\"."
+    },
+    "iconName": {
+      "type": "IconName",
+      "default": "'clock'",
+      "description": "Ícono de la biblioteca CAOS, 14px relleno."
+    },
+    "avatar": {
+      "type": "ReactElement",
+      "required": false,
+      "description": "Avatar de primary-avatar. El chip lo pasa a xs, lo deshabilita si está inactivo y lo marca decorativo."
+    },
+    "color": {
+      "type": "'purple' | 'green' | 'yellow' | 'red' | 'blue' | 'violet' | 'cyan'",
+      "default": "'purple'",
+      "description": "Color del punto de primary-color. violet usa background/graphic/acent-secondary y cyan usa background/graphic/information-*."
+    },
+    "tone": {
+      "type": "'soft' | 'strong'",
+      "default": "'soft'",
+      "description": "Intensidad del punto: soft usa los pasteles del set Chips y strong usa los del filtro Chips colors. purple y violet no cambian."
+    },
+    "colorLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Texto para lectores de pantalla con el significado del color. Sin él, el punto es decorativo."
+    },
+    "close": {
+      "type": "boolean",
+      "default": "onRemove !== undefined",
+      "description": "Muestra el botón de quitar (Close en Figma)."
+    },
+    "onRemove": {
+      "type": "(event) => void",
+      "required": false,
+      "description": "Se activa al quitar, con el botón o con Supr y Retroceso. Recibe el evento. Dentro de un ChipGroup el foco pasa al vecino; en un chip suelto, muévelo tú."
+    },
+    "removeLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre accesible del botón de quitar. Por defecto \"Quitar <texto>\"."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Identificador dentro de un ChipGroup."
+    },
+    "selected": {
+      "type": "boolean",
+      "required": false,
+      "description": "Seleccionado (controlado). Vuelve el chip un botón de alternancia."
+    },
+    "defaultSelected": {
+      "type": "boolean",
+      "required": false,
+      "description": "Seleccionado al inicio (no controlado)."
+    },
+    "onSelectedChange": {
+      "type": "(selected: boolean) => void",
+      "required": false,
+      "description": "Cambia la selección."
+    },
+    "state": {
+      "type": "'default' | 'hover' | 'focus' | 'select' | 'inactive'",
+      "required": false,
+      "description": "Solo para documentación: fuerza el aspecto de un estado (State en Figma)."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Chip no disponible (Inactive en Figma). Deshabilita el cuerpo y el botón de quitar."
+    },
+    "rootProps": {
+      "type": "HTMLAttributes<HTMLSpanElement>",
+      "required": false,
+      "description": "Atributos de la cápsula (raíz), p. ej. data-*."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases de la cápsula. ref y el resto de props nativas van al cuerpo del chip."
+    }
   },
   "examples": [
-    { "title": "Chip informativo quitable", "code": "<Chip onRemove={() => quitar(id)}>Frágil</Chip>" },
-    { "title": "Alternancia", "code": "<Chip defaultSelected onSelectedChange={setActivo}>Con garantía</Chip>" },
-    { "title": "Con avatar", "code": "<Chip type=\"primary-avatar\" avatar={<Avatar variant=\"initials\" name=\"Ana Pérez\" />}>Ana Pérez</Chip>" },
-    { "title": "Selección única", "code": "<ChipGroup aria-label=\"Tamaño\" selectionMode=\"single\" defaultValue={['m']}><Chip value=\"s\" icon={false}>Pequeño</Chip><Chip value=\"m\" icon={false}>Mediano</Chip></ChipGroup>" },
-    { "title": "Con desbordamiento (+N)", "code": "<ChipGroup aria-label=\"Ciudades\" selectionMode=\"multiple\" max={3}>…</ChipGroup>" }
-  ]
+    {
+      "title": "Chip informativo quitable",
+      "code": "<Chip onRemove={() => quitar(id)}>Importante</Chip>"
+    },
+    {
+      "title": "Alternancia",
+      "code": "<Chip defaultSelected onSelectedChange={setActivo}>Favoritos</Chip>"
+    },
+    {
+      "title": "Con avatar",
+      "code": "<Chip type=\"primary-avatar\" avatar={<Avatar variant=\"initials\" name=\"Ana Pérez\" />}>Ana Pérez</Chip>"
+    },
+    {
+      "title": "Selección única",
+      "code": "<ChipGroup aria-label=\"Tamaño\" selectionMode=\"single\" defaultValue={['m']}><Chip value=\"s\" icon={false}>Pequeño</Chip><Chip value=\"m\" icon={false}>Mediano</Chip></ChipGroup>"
+    },
+    {
+      "title": "Con desbordamiento (+N)",
+      "code": "<ChipGroup aria-label=\"Ciudades\" selectionMode=\"multiple\" max={3}>…</ChipGroup>"
+    }
+  ],
+  "subcomponents": {
+    "ChipGroup": "Agrupa chips (hijos directos con value único). selectionMode ('none' | 'single' | 'multiple', por defecto 'none'): none es un group de chips independientes, single un radiogroup (flechas mueven y seleccionan) y multiple un toolbar de botones de alternancia (flechas, Inicio y Fin mueven el foco). value, defaultValue y onValueChange manejan la selección (arreglo de value). max resume el resto en un \"+N\" que abre una lista. overflowLabel (recibe la cantidad y debe contener \"+N\") y overflowMenuLabel nombran el \"+N\" y su lista. aria-label es obligatorio en single.",
+    "ChipPlus": "Botón \"+N\" de Chips plus. count es la cantidad de chips ocultos. state ('default' | 'hover' | 'focus' | 'select' | 'inactive') fuerza el aspecto, solo para documentar; con aria-expanded toma el aspecto Select. disabled lo deja inactivo. label es el nombre accesible y debe contener \"+N\" (por defecto \"Ver +N más\")."
+  }
 }

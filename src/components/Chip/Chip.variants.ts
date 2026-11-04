@@ -12,7 +12,7 @@ import { cva } from 'class-variance-authority';
  *   Box: radio radius/general/xl (16), mismo padding que Primary, texto de ancho completo que se parte
  *   (alto de línea 14) y contenido alineado arriba.
  * - Estados por variables CSS (--chip-bg, --chip-stroke, --chip-fg, --chip-ic): Default = sin relleno y trazo
- *   0.5 border/general/gray-fourth; Hover = background/general/gray-seventh + mismo trazo; Focus =
+ *   de 1 px (border/general/md; Figma dibuja 0.5 px con border/general/sm) border/general/gray-fourth; Hover = background/general/gray-seventh + mismo trazo; Focus =
  *   gray-sixth + border/general/gray-tertiary; Select = gray-sixth sin trazo; Inactive =
  *   container/disabled-on-canva con trazo border/general/disabled y texto/ícono disabled-negative.
  * - Trazo fino como box-shadow inset (Chrome redondea border-width). Figma no dibuja anillo de foco: se

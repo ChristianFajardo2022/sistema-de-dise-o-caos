@@ -9,19 +9,56 @@ import type { AvatarColor, AvatarContrast, AvatarSize, AvatarState, AvatarVarian
 import { PhotoSample, SampleLogo } from './Avatar.samples';
 import { PHOTO_SRC, SAMPLE_PHOTO_SRC } from './Avatar.sample-data';
 import type { PhotoName } from './Avatar.sample-data';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Avatar.doc';
+import docsJson from './Avatar.docs.json';
 
 const VARIANT_OPTIONS: AvatarVariant[] = ['initials', 'user', 'photo', 'brand', 'icon'];
 const SIZE_OPTIONS: AvatarSize[] = ['xs', 'sm', 'md', 'lg'];
 const COLOR_OPTIONS: AvatarColor[] = ['purple', 'yellow', 'blue', 'green', 'red'];
 const CONTRAST_OPTIONS: AvatarContrast[] = ['on-canva', 'on-card'];
 
+/** Nombre de muestra: el que usa el render si el control `name` queda vacío (sin él, las iniciales dejan un círculo vacío). */
+const DEMO_NAME = 'Hugo García';
+
+/**
+ * Args del código de Desarrollo (`docsLive.args`): lo mismo que dibuja el `render`. En `photo` agrega `src` (ruta de
+ * ejemplo en lugar de la foto de muestra) y `alt`; en `brand`, `logo` y `label`; y quita `name` donde no aplica.
+ */
+function docsArgs(args: Record<string, unknown>): Record<string, unknown> {
+  const out = { ...args };
+  const name = typeof out['name'] === 'string' && out['name'].trim() ? out['name'] : DEMO_NAME;
+  if (out['variant'] === 'photo') {
+    if (out['children'] == null) out['src'] = out['src'] ?? '/images/perfil.jpg';
+    out['alt'] = out['alt'] ?? name;
+    delete out['name'];
+  } else if (out['variant'] === 'brand') {
+    out['logo'] = out['logo'] ?? <SampleLogo />;
+    out['label'] = out['label'] ?? 'Marca';
+    delete out['name'];
+  } else if (out['variant'] === 'icon') {
+    delete out['name'];
+  } else {
+    out['name'] = name;
+  }
+  return out;
+}
+
 const meta = {
   title: 'Data Display/Avatar',
   component: Avatar,
   subcomponents: { AvatarGroup, AvatarPlus },
-  parameters: { layout: 'centered' },
+  // Desarrollo toma la historia Initials, que lee los args; el control `variant` cambia el tipo (el render añade logo y foto).
+  // `src` fuera: una URL escrita a mano rompe la imagen (la foto de muestra la pone el render); el código la muestra igual.
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { story: 'Initials', args: docsArgs, exclude: ['src'] },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     variant: {
       name: 'variant',
       control: 'radio',
@@ -65,7 +102,7 @@ const meta = {
     alt: { control: 'text', type: { name: 'string' }, description: 'Texto alternativo de photo' },
     label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible de user, brand e icon' },
     badgeLabel: { control: 'text', type: { name: 'string' }, description: 'Texto sr-only del indicador' },
-  },
+  }),
   args: {
     variant: 'initials',
     size: 'lg',
@@ -73,16 +110,17 @@ const meta = {
     contrast: 'on-canva',
     disabled: false,
     badge: true,
-    name: 'Hugo García',
+    name: DEMO_NAME,
     badgeLabel: 'En línea',
   },
   // Al cambiar variant desde los controles, brand y photo necesitan contenido: se usa el de muestra
   render: (args) => (
     <Avatar
       {...args}
+      name={args.variant === 'initials' && !args.name?.trim() ? DEMO_NAME : args.name}
       logo={args.logo ?? (args.variant === 'brand' ? <SampleLogo /> : undefined)}
       src={args.src ?? (args.variant === 'photo' && args.children == null ? SAMPLE_PHOTO_SRC : undefined)}
-      alt={args.alt ?? (args.variant === 'photo' ? args.name : undefined)}
+      alt={args.alt ?? (args.variant === 'photo' ? args.name || DEMO_NAME : undefined)}
       label={args.label ?? (args.variant === 'brand' ? 'Marca' : undefined)}
     />
   ),
@@ -631,5 +669,35 @@ export const BadgeRulesTest: Story = {
     // badgeState cambia el color del indicador; sin él queda el de siempre
     const dot = (id: string) => getComputedStyle(canvas.getByTestId(id).querySelector('[data-figma-part="Badge"] [data-figma-part="Badge"]')!).backgroundColor;
     await expect(dot('online')).not.toBe(dot('md'));
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Avatar' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Avatar en Figma:']);
+    await expect(canvas.getByRole('switch', { name: 'Modo oscuro' })).toBeInTheDocument();
+    // Una pauta por marcador: 3 + 3 + 3 + 2 (marca) + 2 (ícono) + 4 + 3
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThan(0);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática)
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    // Sin Storybook no hay lienzo, código ni Personalizar: solo el bloque Props, de solo lectura
+    const props = canvas.getByRole('table', { name: 'Props de Avatar' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(canvas.queryByRole('group', { name: 'Personalizar' })).not.toBeInTheDocument();
   },
 };

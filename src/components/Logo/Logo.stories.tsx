@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Logo } from './Logo';
 import type { LogoSize, LogoType } from './Logo.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Logo.doc';
+import docsJson from './Logo.docs.json';
 
 const TYPE_OPTIONS: LogoType[] = ['logo', 'icon'];
 const SIZE_OPTIONS: LogoSize[] = ['xs', 'sm', 'md', 'lg'];
@@ -9,9 +14,9 @@ const SIZE_OPTIONS: LogoSize[] = ['xs', 'sm', 'md', 'lg'];
 const meta = {
   title: 'Data Display/Logo',
   component: Logo,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson), docsLive: { exclude: ['title'] } },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     type: {
       name: 'type',
       control: 'radio',
@@ -28,7 +33,7 @@ const meta = {
     },
     title: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible' },
     decorative: { control: 'boolean', type: { name: 'boolean' }, description: 'Oculta el logo a lectores de pantalla' },
-  },
+  }),
   args: { type: 'logo', size: 'lg', decorative: false },
 } satisfies Meta<typeof Logo>;
 
@@ -98,5 +103,27 @@ export const SizeTest: Story = {
     await expect(canvas.getByRole('img', { name: 'lg' })).toHaveAttribute('width', '158');
     await expect(canvas.getByRole('img', { name: 'xs' })).toHaveAttribute('height', '24');
     await expect(canvas.getByRole('img', { name: 'icon-md' })).toHaveAttribute('width', '48');
+  },
+};
+
+/** Test: la página de documentación (plantilla v2) con sus pestañas y secciones */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Logo' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Logo en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Logo' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };
