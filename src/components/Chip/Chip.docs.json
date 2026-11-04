@@ -101,6 +101,7 @@
     },
     "state": {
       "type": "'default' | 'hover' | 'focus' | 'select' | 'inactive'",
+      "default": "'default'",
       "required": false,
       "description": "Solo para documentación: fuerza el aspecto de un estado (State en Figma)."
     },

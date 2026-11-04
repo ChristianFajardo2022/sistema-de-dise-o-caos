@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { ComponentDoc } from '../../docs/ComponentDoc';
 import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
 import { componentDocsParameters } from '../../docs/storybook';
 import { doc } from './Chip.doc';
 import docsJson from './Chip.docs.json';
@@ -50,6 +51,11 @@ const meta = {
         ...a,
         avatar: a.type === 'primary-avatar' ? <Avatar variant="initials" name="Ana Pérez" /> : undefined,
       }),
+      // El botón de quitar solo tiene sentido con `onRemove` (el generado omite las funciones); con él `close` sobra
+      code: ({ close, ...a }: Record<string, unknown>) => {
+        const code = buildCode('Chip', a, { icon: true });
+        return close ? code.replace('<Chip', '<Chip onRemove={() => remove()}') : code;
+      },
     },
   },
   // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
@@ -62,7 +68,7 @@ const meta = {
     state: {
       type: { name: 'enum', value: ['default', 'hover', 'focus', 'select', 'inactive'] },
       control: 'select',
-      options: [undefined, 'default', 'hover', 'focus', 'select', 'inactive'],
+      options: ['default', 'hover', 'focus', 'select', 'inactive'],
     },
     color: {
       type: { name: 'enum', value: ['purple', 'green', 'yellow', 'red', 'blue', 'violet', 'cyan'] },
