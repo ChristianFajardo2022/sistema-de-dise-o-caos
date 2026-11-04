@@ -1,23 +1,52 @@
 import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './FileUploadSimple.doc';
+import docsJson from './FileUploadSimple.docs.json';
 import { FileUploadSimple } from './FileUploadSimple';
 import type { FileUploadSimpleProps, FileUploadSimpleState, FileUploadSimpleStatus } from './FileUploadSimple.types';
 
 const meta = {
   title: 'Form Controls/FileUploadSimple',
   component: FileUploadSimple,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      // R6: el estado lo lleva la historia (carga simulada), así que `status`, `progress` y el archivo no se editan aquí
+      story: 'Interactive',
+      exclude: ['status', 'defaultStatus', 'progress', 'file', 'defaultFile', 'alert', 'replaceText', 'removeLabel'],
+      // El código generado omite las funciones: con los manejadores el ejemplo funciona al copiarlo
+      code: (a: Record<string, unknown>) => {
+        const lines = ['status={status}', 'progress={progress}', 'onFileChange={(file) => upload(file)}', 'onRemove={() => cancel()}'];
+        for (const [name, value] of Object.entries(a)) {
+          if (value === undefined || value === '' || typeof value === 'function' || (name === 'disabled' && value === false)) continue;
+          if (name === 'maxSize' && value === 25 * 1024 ** 2) lines.push('maxSize={25 * 1024 ** 2}');
+          else if (value === true) lines.push(name);
+          else if (typeof value === 'string') lines.push(`${name}="${value}"`);
+          else lines.push(`${name}={${JSON.stringify(value)}}`);
+        }
+        return `<FileUploadSimple\n${lines.map((l) => `  ${l}`).join('\n')}\n/>`;
+      },
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     status: { control: 'inline-radio', options: ['idle', 'uploading', 'loaded', 'error'], type: { name: 'enum', value: ['idle', 'uploading', 'loaded', 'error'] } },
     state: { control: 'inline-radio', options: ['default', 'hover', 'focus', 'disabled'], type: { name: 'enum', value: ['default', 'hover', 'focus', 'disabled'] } },
     progress: { control: { type: 'range', min: 0, max: 100 }, type: { name: 'number' } },
     accept: { control: 'text', type: { name: 'string' } },
     maxSize: { control: 'number', type: { name: 'number' }, description: 'Bytes' },
     disabled: { control: 'boolean', type: { name: 'boolean' } },
-  },
-  args: { accept: '.pdf,.jpg', maxSize: 23 * 1024 ** 3 },
+    title: { control: 'text', type: { name: 'string' } },
+    actionText: { control: 'text', type: { name: 'string' } },
+    formatsText: { control: 'text', type: { name: 'string' } },
+    sizeText: { control: 'text', type: { name: 'string' } },
+  }),
+  args: { accept: '.pdf,.jpg', maxSize: 25 * 1024 ** 2 },
   decorators: [
     (Story, { parameters }) =>
       parameters.sinMarco ? (
@@ -204,5 +233,28 @@ export const TestDisabled: Story = {
   args: { disabled: true, onFileChange: fn() },
   play: async ({ canvasElement }) => {
     await expect(within(canvasElement).getByLabelText('Selecciona tu archivo')).toBeDisabled();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', sinMarco: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'FileUploadSimple' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente FileUploadSimple en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 6 + 5)
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(17));
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de FileUploadSimple' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

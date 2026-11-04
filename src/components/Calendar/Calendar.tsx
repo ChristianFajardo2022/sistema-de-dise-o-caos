@@ -621,7 +621,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) =
     >
       {body}
       {showActions && (
-        <div className="flex justify-end gap-2 max-tablet:flex-col-reverse">
+        <div className="flex justify-end gap-2 mobile:flex-col-reverse">
           <Button variant="secondary" contrast="high" size="sm" onClick={() => onCancel?.()}>
             <span data-figma-part="Button">{labels.cancel}</span>
           </Button>

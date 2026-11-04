@@ -1,15 +1,35 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './SignaturePad.doc';
+import docsJson from './SignaturePad.docs.json';
 import { SignaturePad } from './SignaturePad';
 import type { SignaturePadHandle, SignaturePadProps, SignatureValue } from './SignaturePad.types';
 
 const meta = {
   title: 'Form Controls/SignaturePad',
   component: SignaturePad,
-  parameters: { layout: 'padded' },
+  // El render de Interactive maneja el valor; el código generado omite las funciones, así que se escribe el manejador.
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      exclude: ['value', 'defaultValue', 'labels'],
+      code: (args: Record<string, unknown>) => {
+        const base = buildCode('SignaturePad', args, { orientation: 'horizontal', disabled: false, maximizable: false, requireSignature: true, strokeWidth: 2.5 });
+        const handler = '  onValueChange={(value) => setValue(value)}';
+        const extra = args.orientation === 'vertical' ? '\n  onCreate={(strokes) => save(strokes)}\n  onCancel={() => close()}' : '';
+        return base.includes('\n') ? base.replace(/\n\/>$/, `\n${handler}${extra}\n/>`) : base.replace(' />', `\n${handler}${extra}\n/>`);
+      },
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     orientation: {
       control: 'inline-radio',
       options: ['horizontal', 'vertical'],
@@ -22,7 +42,7 @@ const meta = {
     strokeWidth: { control: 'number', description: 'Grosor del trazo en px', type: { name: 'number' } },
     signerName: { control: 'text', description: 'Nombre del firmante (vertical)', type: { name: 'string' } },
     signerId: { control: 'text', description: 'Documento del firmante (vertical)', type: { name: 'string' } },
-  },
+  }),
   args: { orientation: 'horizontal', disabled: false, maximizable: false, requireSignature: true, strokeWidth: 2.5 },
 } satisfies Meta<typeof SignaturePad>;
 
@@ -331,5 +351,28 @@ export const ImperativeHandleTest: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'vacio' }));
     await expect(canvasElement.querySelector('output')).toHaveTextContent('true');
     await expect(canvas.getByRole('img', { name: 'Firma vacía' })).toBeInTheDocument();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'SignaturePad' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente SignaturePad en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (5 + 6)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(11);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de SignaturePad' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

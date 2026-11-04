@@ -395,7 +395,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>((props, 
       onBlur={handleRootBlur}
     >
       <FieldRow always tooltip={tooltip ? { id: ids.tooltip, text: tooltip, disabled: isDisabled } : null}>
-        <div ref={fieldRef} className={inputFieldVariants({ variant: 'text', state: fieldState })}>
+        <div ref={fieldRef} data-slot="field" className={inputFieldVariants({ variant: 'text', state: fieldState })}>
           <div
             className={cn(
               'relative h-10 min-w-0 flex-1',

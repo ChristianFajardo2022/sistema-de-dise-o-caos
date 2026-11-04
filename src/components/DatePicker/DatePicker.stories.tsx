@@ -4,6 +4,11 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { DatePicker } from './DatePicker';
 import type { DatePickerBaseProps, DatePickerProps, DatePickerState } from './DatePicker.types';
 import type { DateRange } from '../Calendar';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './DatePicker.doc';
+import docsJson from './DatePicker.docs.json';
 
 /** Args de Storybook: props base más la selección, sin la unión por `mode`. */
 type DatePickerArgs = DatePickerBaseProps & {
@@ -21,40 +26,43 @@ const MATRIX_MONTH = new Date(2026, 3, 1);
 
 const STATES: DatePickerState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'];
 
+/** Idiomas válidos para Personalizar (texto libre rompe Intl). */
+const LOCALES = ['es', 'es-CO', 'en-US'];
+
 const meta = {
   title: 'Form Controls/DatePicker',
   component: DatePicker as unknown as ComponentType<DatePickerArgs>,
-  parameters: { layout: 'padded' },
-  tags: ['autodocs'],
-  argTypes: {
-    mode: {
-      control: 'radio',
-      options: ['single', 'range'],
-      type: { name: 'enum', value: ['single', 'range'] },
-      description: 'Una fecha o un rango ("dd/mm/aaaa – dd/mm/aaaa")',
-    },
-    state: {
-      control: 'select',
-      options: STATES,
-      type: { name: 'enum', value: STATES },
-      description: 'State forzado (solo documentación); `active` dibuja el calendario abierto en el flujo',
-    },
-    label: { control: 'text', type: { name: 'string', required: true }, description: 'Label flotante' },
-    placeholder: { control: 'text', type: { name: 'string' }, description: 'Por defecto, la pista del idioma (dd/mm/aaaa)' },
-    locale: { control: 'text', type: { name: 'string' }, description: 'Idioma del formato y del calendario' },
-    helperText: { control: 'text', type: { name: 'string' }, description: 'Mensaje de ayuda' },
-    errorText: { control: 'text', type: { name: 'string' }, description: 'Mensaje de error' },
-    successText: { control: 'text', type: { name: 'string' }, description: 'Mensaje de éxito' },
-    optional: { control: 'boolean', type: { name: 'boolean' }, description: 'Agrega " | Opcional"' },
-    showActions: { control: 'boolean', type: { name: 'boolean' }, description: 'Pie con Cancelar y Aplicar' },
-    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Deshabilitado' },
-    readOnly: { control: 'boolean', type: { name: 'boolean' }, description: 'Burnt-In (solo lectura)' },
-    fullWidth: { control: 'boolean', type: { name: 'boolean' }, description: 'Ocupa el 100 % del contenedor' },
-    minDate: { control: 'date', description: 'Fecha mínima' },
-    maxDate: { control: 'date', description: 'Fecha máxima' },
+  parameters: {
+    layout: 'padded',
+    // La página Docs usa la plantilla de documentación (DatePicker.doc.tsx) con la referencia de código al final
+    docs: componentDocsParameters(doc, docsJson),
+    // `open` y `defaultOpen` abren el calendario en la capa superior, fuera del lienzo: sin control en Personalizar (el
+    // calendario abierto se ve con `state="active"`). `name` e `id` remiten al formulario o a otros elementos
+    docsLive: { exclude: ['open', 'defaultOpen', 'name', 'id'] },
   },
+  tags: ['autodocs'],
+  // Las descripciones salen de DatePicker.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    mode: { control: 'radio', options: ['single', 'range'], type: { name: 'enum', value: ['single', 'range'] } },
+    state: { control: 'select', options: STATES, type: { name: 'enum', value: STATES } },
+    label: { control: 'text', type: { name: 'string', required: true } },
+    placeholder: { control: 'text', type: { name: 'string' } },
+    // Con texto libre, una etiqueta de idioma mal escrita rompe Intl (RangeError): solo idiomas válidos (R7)
+    locale: { control: 'select', options: LOCALES, type: { name: 'enum', value: LOCALES } },
+    helperText: { control: 'text', type: { name: 'string' } },
+    errorText: { control: 'text', type: { name: 'string' } },
+    successText: { control: 'text', type: { name: 'string' } },
+    optional: { control: 'boolean', type: { name: 'boolean' } },
+    showActions: { control: 'boolean', type: { name: 'boolean' } },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
+    readOnly: { control: 'boolean', type: { name: 'boolean' } },
+    required: { control: 'boolean', type: { name: 'boolean' } },
+    fullWidth: { control: 'boolean', type: { name: 'boolean' } },
+    minDate: { control: 'date' },
+    maxDate: { control: 'date' },
+  }),
   args: {
-    label: 'Fecha de entrega',
+    label: 'Fecha de inicio',
     mode: 'single',
     state: 'default',
     locale: 'es',
@@ -73,8 +81,9 @@ type Story = StoryObj<typeof meta>;
 const asProps = (args: DatePickerArgs) => args as DatePickerProps;
 
 export const Interactive: Story = {
+  // `max-w-full`: en un lienzo angosto el contenedor no crece al ancho del campo (320)
   render: (args) => (
-    <div className="min-h-[640px]">
+    <div className="min-h-[640px] max-w-full">
       <DatePicker key={args.mode} {...asProps(args)} />
     </div>
   ),
@@ -146,15 +155,15 @@ export const FigmaMatrix: Story = {
 /** Test: escribir la fecha con la máscara la aplica y el botón anuncia la fecha */
 export const TypeDateTest: Story = {
   tags: ['!autodocs'],
-  args: { onChange: fn(), name: 'entrega' },
+  args: { onChange: fn(), name: 'inicio' },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: 'Fecha de entrega' });
+    const input = canvas.getByRole('textbox', { name: 'Fecha de inicio' });
     await userEvent.type(input, '14102026');
     await expect(input).toHaveValue('14/10/2026');
     await expect(args.onChange).toHaveBeenLastCalledWith(new Date(2026, 9, 14));
     await expect(canvas.getByRole('button', { name: 'Elegir fecha, miércoles, 14 de octubre de 2026' })).toBeVisible();
-    await expect(canvasElement.querySelector('input[type="hidden"][name="entrega"]')).toHaveValue('2026-10-14');
+    await expect(canvasElement.querySelector('input[type="hidden"][name="inicio"]')).toHaveValue('2026-10-14');
     // Un separador escrito antes de tiempo completa con cero
     await userEvent.clear(input);
     await userEvent.type(input, '3/1/2027');
@@ -171,7 +180,7 @@ export const InvalidDateTest: Story = {
   args: { maxDate: new Date(2026, 11, 31) },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: 'Fecha de entrega' });
+    const input = canvas.getByRole('textbox', { name: 'Fecha de inicio' });
     await userEvent.type(input, '31022026');
     await userEvent.tab();
     await expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -214,7 +223,7 @@ export const KeyboardSelectTest: Story = {
     await userEvent.click(within(dialog).getByRole('button', { name: 'Aplicar' }));
     await expect(args.onChange).toHaveBeenLastCalledWith(new Date(2026, 9, 31));
     await waitFor(() => expect(dialog).not.toBeVisible());
-    await expect(canvas.getByRole('textbox', { name: 'Fecha de entrega' })).toHaveValue('31/10/2026');
+    await expect(canvas.getByRole('textbox', { name: 'Fecha de inicio' })).toHaveValue('31/10/2026');
     const changed = canvas.getByRole('button', { name: 'Elegir fecha, sábado, 31 de octubre de 2026' });
     await expect(changed).toHaveFocus();
     // Al reabrir, el foco va al día elegido
@@ -237,9 +246,9 @@ export const EscapeTest: Story = {
     await waitFor(() => expect(dialog).not.toBeVisible());
     await expect(button).toHaveFocus();
     await expect(args.onChange).not.toHaveBeenCalled();
-    await expect(canvas.getByRole('textbox', { name: 'Fecha de entrega' })).toHaveValue('14/10/2026');
+    await expect(canvas.getByRole('textbox', { name: 'Fecha de inicio' })).toHaveValue('14/10/2026');
     // Alt + Flecha abajo en el campo también abre
-    await userEvent.click(canvas.getByRole('textbox', { name: 'Fecha de entrega' }));
+    await userEvent.click(canvas.getByRole('textbox', { name: 'Fecha de inicio' }));
     await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}');
     await waitFor(() => expect(dialog).toBeVisible());
     await userEvent.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
@@ -312,7 +321,7 @@ function DatePickerApiDemo() {
         ref={ref}
         inputRef={alias}
         rootProps={{ ref: root, 'data-testid': 'raiz' }}
-        label="Fecha de entrega"
+        label="Fecha de inicio"
         calendarProps={{ today: TODAY }}
         onValueChange={() => setLog((l) => `${l}v`)}
         onChange={() => setLog((l) => `${l}c`)}
@@ -330,7 +339,39 @@ export const ApiTest: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByTestId('refs')).toHaveTextContent('INPUT|true|raiz');
-    await userEvent.type(canvas.getByRole('textbox', { name: 'Fecha de entrega' }), '14102026');
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Fecha de inicio' }), '14102026');
     await expect(canvas.getByTestId('log')).toHaveTextContent('vc');
+  },
+};
+
+/** Página de documentación (plantilla v2): encabezado, pestañas, secciones y tabla de props. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'DatePicker' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente DatePicker en Figma:']);
+    // Anatomía: un marcador por pauta (5 + 5), y las vistas son ilustraciones (inert)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(2);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(10));
+    // El calendario de la anatomía va en el flujo (state="active"), no en la capa superior
+    await expect(views[1].querySelector('[role="dialog"]')).not.toHaveAttribute('popover');
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de DatePicker' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

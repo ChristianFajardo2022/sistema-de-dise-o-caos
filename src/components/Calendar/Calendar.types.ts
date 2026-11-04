@@ -53,7 +53,7 @@ export interface CalendarLabels {
   /** Nombre de las listas de los campos Mes y Año. */
   monthList: string;
   yearList: string;
-  /** Botones del pie (Figma: "Limpiar" y "Filtrar"). */
+  /** Botones del pie: Limpiar y Filtrar por defecto, como Figma. */
   cancel: string;
   apply: string;
 }
@@ -86,11 +86,11 @@ export interface CalendarBaseProps
   showOutsideDays?: boolean;
   /** Fecha de hoy (`aria-current="date"`). Por defecto, la del sistema; pasarla hace los tests y capturas deterministas. */
   today?: Date;
-  /** Dibuja el pie con los botones Cancelar/Aplicar (Figma: "Limpiar" y "Filtrar"). */
+  /** Dibuja el pie con los botones Limpiar y Filtrar (`labels.cancel` y `labels.apply`). */
   showActions?: boolean;
-  /** Se pulsa Aplicar (el de Figma, "Filtrar"). Recibe la selección actual. */
+  /** Se pulsa Filtrar (`labels.apply`). Recibe la selección actual. */
   onApply?: (value: Date | null | DateRange) => void;
-  /** Se pulsa Cancelar (el de Figma, "Limpiar"). */
+  /** Se pulsa Limpiar (`labels.cancel`). No borra la selección. */
   onCancel?: () => void;
   /**
    * Enfoca al montar la celda activa de la cuadrícula (el día elegido, hoy o el primero del mes; en las vistas Mes y Año,

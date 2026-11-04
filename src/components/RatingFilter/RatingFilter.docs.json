@@ -1,17 +1,58 @@
 {
   "name": "RatingFilter",
   "component": "RatingFilter",
-  "description": "Filtro por calificación mínima, fiel al set Rating de la página Filter de Figma (13725:72539, Type=Default/1/2/3/4). Slider existente (5 posiciones, pasos de 25 %) y StarRating de 32 repartido a todo el ancho que refleja el valor. Type=Default = sin filtro (value null): pulgar al inicio y ninguna estrella encendida; Type=1…4 = 2…5 estrellas. La primera posición del slider es \"Sin filtro\" (no existe \"1 estrella o más\", toda calificación es ≥ 1): Inicio limpia el filtro con teclado y la primera estrella también. El slider es el control accesible (APG Slider, aria-valuetext \"3 estrellas o más\"); las estrellas se pueden pulsar como atajo con puntero y están ocultas a tecnologías de apoyo.",
+  "description": "Filtro por calificación mínima. Une un Slider de cinco posiciones (pasos de 25%) con una fila de cinco estrellas de 32 que refleja el valor, repartidas a todo el ancho. Sin filtro (value null, Type Default en Figma): el pulgar queda al inicio y ninguna estrella se enciende. Con calificación (2 a 5 estrellas, Type 1 a 4 en Figma): las estrellas se encienden hasta el valor. La primera posición del slider es \"Sin filtro\": no existe \"1 estrella o más\", porque toda calificación es de 1 o más; Inicio limpia el filtro con teclado y la primera estrella también. El slider es el control accesible (patrón APG Slider, aria-valuetext \"3 estrellas o más\"); las estrellas son un atajo con puntero y están ocultas a las tecnologías de apoyo. Foco con contorno de 2 px y disabled con opacidad de 50%, agregados (no están en Figma). Ocupa el ancho del contenedor (Figma lo fija en 300).",
   "category": "Form Controls",
   "props": {
-    "value": { "type": "number | null", "required": false, "description": "Calificación mínima 2 a 5 (controlado); null = sin filtro (un 1 se trata como null)." },
-    "defaultValue": { "type": "number | null", "default": "null", "description": "Valor inicial (no controlado)." },
-    "onValueChange": { "type": "(value: number | null) => void", "required": false, "description": "Nueva calificación mínima (2 a 5) o null al volver a la primera posición." },
-    "label": { "type": "string", "default": "'Calificación mínima'", "description": "Nombre accesible del slider (o aria-labelledby)." },
-    "disabled": { "type": "boolean", "default": "false", "description": "Deshabilitado." },
-    "name": { "type": "string", "required": false, "description": "Input oculto para formularios." }
+    "value": {
+      "type": "number | null",
+      "required": false,
+      "description": "Calificación mínima 2 a 5 (controlado); null = sin filtro (un 1 se trata como null)."
+    },
+    "defaultValue": {
+      "type": "number | null",
+      "default": "null",
+      "description": "Valor inicial (no controlado)."
+    },
+    "onValueChange": {
+      "type": "(value: number | null) => void",
+      "required": false,
+      "description": "Nueva calificación mínima (2 a 5) o null al volver a la primera posición."
+    },
+    "label": {
+      "type": "string",
+      "default": "'Calificación mínima'",
+      "description": "Nombre accesible del slider. Se ignora si hay aria-labelledby."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Deshabilitado: el slider no responde y las estrellas no se pueden pulsar."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre para formularios: input oculto con el valor del slider."
+    },
+    "aria-labelledby": {
+      "type": "string",
+      "required": false,
+      "description": "Id de una etiqueta visible que nombra el slider, por ejemplo el título del filtro."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para la raíz. Las demás props de HTML (data-*, eventos) también van a la raíz."
+    }
   },
   "examples": [
-    { "title": "En una sección", "code": "<FilterSection id=\"calificacion\" title=\"Calificación\">{({ value, onValueChange, labelId }) => <RatingFilter aria-labelledby={labelId} value={value ?? null} onValueChange={onValueChange} />}</FilterSection>" }
+    {
+      "title": "Con título visible",
+      "code": "<RatingFilter aria-labelledby=\"calificacion\" defaultValue={4} onValueChange={(value) => setValue(value)} />"
+    },
+    {
+      "title": "En una sección",
+      "code": "<FilterSection id=\"calificacion\" title=\"Calificación\">{({ value, onValueChange, labelId }) => <RatingFilter aria-labelledby={labelId} value={value ?? null} onValueChange={onValueChange} />}</FilterSection>"
+    }
   ]
 }

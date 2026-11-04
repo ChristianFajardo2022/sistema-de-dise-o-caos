@@ -24,40 +24,41 @@ const meta = {
   title: 'Form Controls/FilterSection',
   component: FilterSection,
   parameters: { layout: 'centered' },
-  tags: ['autodocs'],
+  // Se documenta dentro de la página de FilterPanel: sin página propia
+  tags: ['!autodocs'],
   argTypes: {
     variant: { control: 'radio', options: ['card', 'plain'], type: { name: 'enum', value: ['card', 'plain'] } },
     icon: { control: 'boolean', type: { name: 'boolean' } },
     clearable: { control: 'boolean', type: { name: 'boolean' } },
   },
-  args: { id: 'color', title: 'Color', variant: 'card', icon: true, clearable: true },
+  args: { id: 'estado', title: 'Estado', variant: 'card', icon: true, clearable: true },
 } satisfies Meta<typeof FilterSection>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const COLORES = [
-  { value: 'rojo', label: 'Rojo' },
-  { value: 'azul', label: 'Azul' },
-  { value: 'verde', label: 'Verde' },
-  { value: 'negro', label: 'Negro' },
+const ESTADOS = [
+  { value: 'pendiente', label: 'Pendiente' },
+  { value: 'revision', label: 'En revisión' },
+  { value: 'aprobado', label: 'Aprobado' },
+  { value: 'archivado', label: 'Archivado' },
 ];
 
-/** Sección suelta con ChipGroup conectado por la función hija. */
+/** Sección suelta con ChipGroup unido a la sección por la función hija. */
 export const Interactive: Story = {
-  args: { defaultValue: ['azul'] },
+  args: { defaultValue: ['aprobado'] },
   render: (args) => (
     <div className="w-96 bg-ds-background-container-default-on-canva p-6">
       <FilterSection {...args}>
         {({ value, onValueChange }) => (
           <ChipGroup
             selectionMode="multiple"
-            aria-label="Colores"
+            aria-label="Estados"
             value={(value as string[] | undefined) ?? []}
             onValueChange={onValueChange}
             className="flex-wrap"
           >
-            {COLORES.map((c) => (
+            {ESTADOS.map((c) => (
               <Chip key={c.value} value={c.value} icon={false}>
                 {c.label}
               </Chip>
@@ -71,7 +72,7 @@ export const Interactive: Story = {
 
 /** "Individual filter": título y chips sin tarjeta, para un filtro suelto en la página. */
 export const Plain: Story = {
-  args: { variant: 'plain', id: 'talla', title: 'Talla', defaultValue: ['m'] },
+  args: { variant: 'plain', id: 'tipo', title: 'Tipo de documento', defaultValue: ['informe'] },
   render: (args) => (
     <div className="w-[554px]">
       <FilterSection {...args}>
@@ -83,9 +84,13 @@ export const Plain: Story = {
             onValueChange={onValueChange}
             className="flex-wrap"
           >
-            {['S', 'M', 'L', 'XL'].map((t) => (
-              <Chip key={t} value={t.toLowerCase()} icon={false}>
-                {t}
+            {[
+              { value: 'informe', label: 'Informe' },
+              { value: 'acta', label: 'Acta' },
+              { value: 'presentacion', label: 'Presentación' },
+            ].map((t) => (
+              <Chip key={t.value} value={t.value} icon={false}>
+                {t.label}
               </Chip>
             ))}
           </ChipGroup>
@@ -315,35 +320,35 @@ export const FigmaMatrixIndividual: Story = {
 /** Test: el conteo del título sigue al valor y "Limpiar" lo quita (sección suelta, no controlada). */
 export const ClearTest: Story = {
   tags: ['!autodocs'],
-  args: { defaultValue: ['azul', 'rojo'] },
+  args: { defaultValue: ['aprobado', 'pendiente'] },
   render: Interactive.render,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('button', { name: 'Color 2 seleccionados' })).toHaveAttribute('aria-expanded', 'true');
-    await userEvent.click(canvas.getByRole('button', { name: 'Verde' }));
-    await expect(canvas.getByRole('button', { name: 'Color 3 seleccionados' })).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole('button', { name: 'Limpiar Color' }));
-    await expect(canvas.getByRole('button', { name: 'Color' })).toBeInTheDocument();
-    await expect(canvas.queryByRole('button', { name: 'Limpiar Color' })).not.toBeInTheDocument();
-    await expect(canvas.getByRole('button', { name: 'Color' })).toHaveFocus();
-    await expect(canvas.getByRole('button', { name: 'Verde' })).toHaveAttribute('aria-pressed', 'false');
+    await expect(canvas.getByRole('button', { name: 'Estado 2 seleccionados' })).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.click(canvas.getByRole('button', { name: 'En revisión' }));
+    await expect(canvas.getByRole('button', { name: 'Estado 3 seleccionados' })).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: 'Limpiar Estado' }));
+    await expect(canvas.getByRole('button', { name: 'Estado' })).toBeInTheDocument();
+    await expect(canvas.queryByRole('button', { name: 'Limpiar Estado' })).not.toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Estado' })).toHaveFocus();
+    await expect(canvas.getByRole('button', { name: 'En revisión' })).toHaveAttribute('aria-pressed', 'false');
   },
 };
 
 function ControlledSection() {
-  const [value, setValue] = useState<FilterValue>(['azul']);
+  const [value, setValue] = useState<FilterValue>(['aprobado']);
   return (
     <div className="w-96 bg-ds-background-container-default-on-canva p-6">
-      <FilterSection id="color" title="Color" value={value} onValueChange={setValue}>
+      <FilterSection id="estado" title="Estado" value={value} onValueChange={setValue}>
         {({ value: current, onValueChange }) => (
           <ChipGroup
             selectionMode="multiple"
-            aria-label="Colores"
+            aria-label="Estados"
             value={(current as string[] | undefined) ?? []}
             onValueChange={onValueChange}
             className="flex-wrap"
           >
-            {COLORES.map((c) => (
+            {ESTADOS.map((c) => (
               <Chip key={c.value} value={c.value} icon={false}>
                 {c.label}
               </Chip>
@@ -362,12 +367,12 @@ export const ClearControlledTest: Story = {
   render: () => <ControlledSection />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('button', { name: 'Color 1 seleccionado' })).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole('button', { name: 'Limpiar Color' }));
+    await expect(canvas.getByRole('button', { name: 'Estado 1 seleccionado' })).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: 'Limpiar Estado' }));
     await expect(canvas.getByTestId('valor')).toHaveTextContent('sin valor');
-    await expect(canvas.getByRole('button', { name: 'Color' })).toBeInTheDocument();
-    await expect(canvas.getByRole('button', { name: 'Azul' })).toHaveAttribute('aria-pressed', 'false');
-    await userEvent.click(canvas.getByRole('button', { name: 'Rojo' }));
-    await expect(canvas.getByTestId('valor')).toHaveTextContent('["rojo"]');
+    await expect(canvas.getByRole('button', { name: 'Estado' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Aprobado' })).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.click(canvas.getByRole('button', { name: 'Pendiente' }));
+    await expect(canvas.getByTestId('valor')).toHaveTextContent('["pendiente"]');
   },
 };

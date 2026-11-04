@@ -1,24 +1,60 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { RatingFilter } from './RatingFilter';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './RatingFilter.doc';
+import docsJson from './RatingFilter.docs.json';
+
+const NO_FILTER = 'Sin filtro';
+const INITIAL_OPTIONS = [NO_FILTER, '2', '3', '4', '5'];
+/** El control ofrece "Sin filtro" y 2 a 5 como texto; el componente recibe `null` o el número. */
+const toValue = (initial: unknown): number | null => (typeof initial === 'string' && initial !== NO_FILTER ? Number(initial) : typeof initial === 'number' ? initial : null);
 
 const meta = {
   title: 'Form Controls/RatingFilter',
   component: RatingFilter,
-  parameters: { layout: 'centered' },
+  // Personalizar usa Interactive: `defaultValue` es la calificación inicial (null = sin filtro) y `value` queda fuera
+  // porque volvería controlado al componente
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      args: ({ defaultValue, ...rest }: Record<string, unknown>) => ({ ...rest, defaultValue: toValue(defaultValue) }),
+      code: ({ defaultValue, ...args }: Record<string, unknown>) =>
+        buildCode('RatingFilter', defaultValue === null ? args : { ...args, defaultValue }, { label: 'Calificación mínima', disabled: false }).replace(
+          '<RatingFilter',
+          '<RatingFilter onValueChange={(value) => setValue(value)}'
+        ),
+      exclude: ['value', 'onValueChange', 'aria-labelledby'],
+    },
+  },
   tags: ['autodocs'],
   decorators: [(Story, { parameters }) => (parameters.sinMarco ? <Story /> : <div className="w-76"><Story /></div>)],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
+    defaultValue: {
+      control: 'select',
+      options: INITIAL_OPTIONS,
+      type: { name: 'enum', value: INITIAL_OPTIONS },
+      description: 'Calificación mínima inicial (no controlado): "Sin filtro" es null; de 2 a 5 estrellas (Type de Figma: Default, 1 a 4)',
+    },
     disabled: { control: 'boolean', type: { name: 'boolean' } },
-    defaultValue: { control: 'number' },
-  },
+    label: { control: 'text', type: { name: 'string' } },
+  }),
   args: { label: 'Calificación mínima', disabled: false },
 } satisfies Meta<typeof RatingFilter>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Interactive: Story = { args: { defaultValue: 3 } };
+/** Alimenta el lienzo de Desarrollo: `defaultValue` es la calificación inicial; arranca sin filtro. */
+export const Interactive: Story = {
+  args: { defaultValue: NO_FILTER as unknown as null },
+  render: ({ defaultValue, ...args }) => <RatingFilter key={String(defaultValue)} {...args} defaultValue={toValue(defaultValue)} />,
+};
 
 export const WithoutFilter: Story = { args: { defaultValue: null } };
 
@@ -68,5 +104,30 @@ export const KeyboardTest: Story = {
     await userEvent.click(stars.children[0] as HTMLElement);
     await expect(args.onValueChange).toHaveBeenLastCalledWith(null);
     await expect(slider).toHaveAttribute('aria-valuetext', 'Sin filtro');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', sinMarco: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'RatingFilter' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente RatingFilter en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (4 + 2)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(6);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de RatingFilter' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

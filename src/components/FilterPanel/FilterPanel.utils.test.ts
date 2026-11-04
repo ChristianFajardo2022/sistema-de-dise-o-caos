@@ -20,11 +20,11 @@ describe('FilterPanel utils', () => {
   });
 
   it('suma todas las secciones y quita una sin mutar', () => {
-    const values = { color: ['rojo', 'azul'], calificacion: 4, envio: false };
+    const values = { estado: ['pendiente', 'aprobado'], calificacion: 4, favoritos: false };
     expect(countFilters(values)).toBe(3);
     expect(countFilters(undefined)).toBe(0);
-    const next = omitFilter(values, 'color');
-    expect(next).toEqual({ calificacion: 4, envio: false });
-    expect(values.color).toEqual(['rojo', 'azul']);
+    const next = omitFilter(values, 'estado');
+    expect(next).toEqual({ calificacion: 4, favoritos: false });
+    expect(values.estado).toEqual(['pendiente', 'aprobado']);
   });
 });

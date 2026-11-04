@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './FileDropzone.doc';
+import docsJson from './FileDropzone.docs.json';
 import { FileDropzone } from './FileDropzone';
 import type { FileDropzoneProps, FileDropzoneState } from './FileDropzone.types';
 
@@ -17,13 +23,27 @@ const FIGMA: Record<Exclude<FileDropzoneState, 'static'>, string> = {
 const meta = {
   title: 'Form Controls/FileDropzone',
   component: FileDropzone,
-  parameters: { layout: 'padded' },
+  // El código generado omite las funciones: se escribe el manejador que usa el lienzo.
+  // `icon` y `children` son nodos sin lista de valores válidos; siguen en Props.
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      exclude: ['icon', 'children'],
+      code: (args: Record<string, unknown>) => {
+        const base = buildCode('FileDropzone', args, { multiple: false, disabled: false });
+        const handler = '  onFilesSelected={(files) => addFiles(files)}';
+        return base.includes('\n') ? base.replace(/\n\/>$/, `\n${handler}\n/>`) : base.replace(' />', `\n${handler}\n/>`);
+      },
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     state: {
       control: 'select',
-      options: [undefined, ...STATES],
-      type: { name: 'enum', value: STATES },
+      options: [...STATES, 'static'],
+      type: { name: 'enum', value: [...STATES, 'static'] },
       description: 'State de Figma forzado (solo documentación)',
     },
     accept: { control: 'text', type: { name: 'string' }, description: 'Tipos admitidos (sintaxis de `accept`)' },
@@ -32,8 +52,8 @@ const meta = {
     disabled: { control: 'boolean', type: { name: 'boolean' } },
     title: { control: 'text', type: { name: 'string' }, description: 'Capa Heading de Figma' },
     actionText: { control: 'text', type: { name: 'string' }, description: 'Segunda capa Heading de Figma' },
-  },
-  args: { accept: '.pdf,.jpg,.jpeg', maxSize: 25 * 1024 ** 2, multiple: false, disabled: false },
+  }),
+  args: { accept: '.pdf,.jpg,.png', maxSize: 25 * 1024 ** 2, multiple: false, disabled: false },
   decorators: [
     (Story) => (
       <div className="w-[400px] bg-ds-background-general-black p-6">
@@ -111,7 +131,7 @@ export const TestAccessibility: Story = {
     // Input de archivo real, con nombre y descripción
     const input = c.getByLabelText('Selecciona tu archivo');
     await expect(input).toHaveAttribute('type', 'file');
-    await expect(input).toHaveAccessibleDescription(/PDF, JPG, JPEG\.\s*Máx\. 25 MB/);
+    await expect(input).toHaveAccessibleDescription(/PDF, JPG, PNG\.\s*Máx\. 25 MB/);
     // El teclado lo alcanza y el foco se ve en la raíz
     await userEvent.tab();
     await expect(input).toHaveFocus();
@@ -207,5 +227,28 @@ export const TestDisabled: Story = {
     data.items.add(pdf());
     label.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: data }));
     await expect(args.onFilesSelected).not.toHaveBeenCalled();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'FileDropzone' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente FileDropzone en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(9);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de FileDropzone' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

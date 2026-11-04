@@ -3,15 +3,24 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { TimePicker } from './TimePicker';
 import type { TimePickerProps, TimePickerState } from './TimePicker.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './TimePicker.doc';
+import docsJson from './TimePicker.docs.json';
 
 const STATE_OPTIONS: TimePickerState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'];
 
 const meta = {
   title: 'Form Controls/TimePicker',
   component: TimePicker,
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: ['value', 'defaultValue'] },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     hourCycle: {
       name: 'hourCycle',
       control: 'radio',
@@ -33,8 +42,8 @@ const meta = {
     helperText: { control: 'text', type: { name: 'string' } },
     errorText: { control: 'text', type: { name: 'string' } },
     successText: { control: 'text', type: { name: 'string' } },
-  },
-  args: { hourCycle: 12, minuteStep: 1, label: 'Hora de la cita' },
+  }),
+  args: { hourCycle: 12, minuteStep: 1, label: 'Hora de inicio' },
 } satisfies Meta<typeof TimePicker>;
 
 export default meta;
@@ -50,7 +59,7 @@ function ControlledDemo(args: TimePickerProps) {
   const [value, setValue] = useState('14:30');
   return (
     <div className="flex flex-col gap-4">
-      <TimePicker {...args} value={value} onChange={setValue} />
+      <TimePicker {...args} value={value} onValueChange={setValue} />
       <output className="text-sm text-ds-text-neutral-body">Valor (24 h): {value || '(vacío)'}</output>
     </div>
   );
@@ -113,7 +122,7 @@ export const TypingTest: Story = {
   args: { onChange: fn() },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    const group = canvas.getByRole('group', { name: 'Hora de la cita' });
+    const group = canvas.getByRole('group', { name: 'Hora de inicio' });
     await expect(group).toBeInTheDocument();
     const hour = canvas.getByRole('spinbutton', { name: 'Hora' });
     const minute = canvas.getByRole('spinbutton', { name: 'Minutos' });
@@ -270,5 +279,28 @@ export const ApiTest: Story = {
     await userEvent.type(minute, '30');
     await userEvent.click(canvas.getByRole('radio', { name: 'PM' }));
     await expect(canvas.getByTestId('valor')).toHaveTextContent('21:30');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'TimePicker' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente TimePicker en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(9);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de TimePicker' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

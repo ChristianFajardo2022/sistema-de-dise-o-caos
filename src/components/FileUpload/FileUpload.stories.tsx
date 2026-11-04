@@ -1,27 +1,57 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './FileUpload.doc';
+import docsJson from './FileUpload.docs.json';
 import { FileUpload } from './FileUpload';
 import type { FileUploadEntry, FileUploadProps } from './FileUpload.types';
+
+/** Archivos con los que arranca el lienzo de Desarrollo. */
+const LIVE_ITEMS: FileUploadEntry[] = [
+  { id: 'a', name: 'informe-trimestral.pdf', status: 'complete' },
+  { id: 'b', name: 'foto-perfil.png', status: 'loading', progress: 40 },
+];
 
 const meta = {
   title: 'Form Controls/FileUpload',
   component: FileUpload,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      // El estado de la lista lo lleva la historia (R6): `items` de Interactive es solo la lista inicial
+      // El código generado omite funciones y `items`: con los manejadores el ejemplo funciona al copiarlo
+      code: ({ items: _items, ...a }: Record<string, unknown>) =>
+        buildCode('FileUpload', a, { listLabel: 'Archivos', multiple: false, disabled: false }).replace(
+          '<FileUpload',
+          '<FileUpload\n  items={files}\n  onFilesSelected={(selected) => upload(selected)}\n  onRemove={(id) => remove(id)}'
+        ),
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     accept: { control: 'text', type: { name: 'string' } },
     maxSize: { control: 'number', type: { name: 'number' }, description: 'Bytes por archivo' },
     multiple: { control: 'boolean', type: { name: 'boolean' } },
     disabled: { control: 'boolean', type: { name: 'boolean' } },
-  },
-  args: { accept: '.pdf,.jpg,.png', maxSize: 25 * 1024 ** 2, multiple: true },
+    listLabel: { control: 'text', type: { name: 'string' } },
+    title: { control: 'text', type: { name: 'string' } },
+    actionText: { control: 'text', type: { name: 'string' } },
+    specifications: { control: 'text', type: { name: 'string' } },
+    maxSizeLabel: { control: 'text', type: { name: 'string' } },
+  }),
+  args: { accept: '.pdf,.jpg,.png', maxSize: 25 * 1024 ** 2, multiple: true, listLabel: 'Archivos' },
   decorators: [
     (Story, { parameters }) =>
       parameters.sinMarco ? (
         <Story />
       ) : (
-        <div className="w-[421px] bg-ds-background-general-black p-6">
+        <div className="w-[421px] max-w-full bg-ds-background-general-black p-6">
           <Story />
         </div>
       ),
@@ -33,7 +63,7 @@ type Story = StoryObj<typeof meta>;
 
 /** Carga simulada: cada archivo elegido avanza solo hasta completarse. Quien use el componente hace la carga real. */
 function SimulatedUpload(args: FileUploadProps) {
-  const [items, setItems] = useState<FileUploadEntry[]>([]);
+  const [items, setItems] = useState<FileUploadEntry[]>(args.items ?? []);
   const counter = useRef(0);
 
   useEffect(() => {
@@ -69,6 +99,7 @@ function SimulatedUpload(args: FileUploadProps) {
 }
 
 export const Interactive: Story = {
+  args: { items: LIVE_ITEMS },
   render: (args: FileUploadProps) => <SimulatedUpload {...args} />,
 };
 
@@ -175,5 +206,27 @@ export const TestSelectFiles: Story = {
     const file = new File(['x'], 'nuevo.pdf', { type: 'application/pdf' });
     await userEvent.upload(c.getByLabelText('Selecciona tu archivo'), file);
     await expect(args.onFilesSelected).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', sinMarco: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'FileUpload' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente FileUpload en Figma:']);
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThan(0));
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de FileUpload' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

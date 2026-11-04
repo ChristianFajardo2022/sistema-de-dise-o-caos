@@ -90,13 +90,29 @@ function leerChips(raizSel) {
 /** Valor esperado (hex) de cada token de color en oscuro y claro, con un elemento sonda con `data-theme`. Autocontenida. */
 function esperados(nombres) {
   const ctx = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  // Los colores translúcidos (`color-mix`) se leen del texto computado: el canvas guarda el alfa premultiplicado y
+  // redondea el color (#FEFEFE1A sale #FFFFFF1A). El canvas queda solo para formatos que no sean rgb() ni color(srgb).
+  const h = (v) => Math.round(v).toString(16).padStart(2, '0').toUpperCase();
   const aHex = (css) => {
+    const rgb = css.match(/^rgba?\(([^)]+)\)$/);
+    const srgb = css.match(/^color\(srgb ([\d.]+) ([\d.]+) ([\d.]+)(?: \/ ([\d.]+%?))?\)$/);
+    if (rgb || srgb) {
+      let r, g, b, a = 1;
+      if (rgb) {
+        const p = rgb[1].split(/[\s,/]+/).filter(Boolean).map(parseFloat);
+        [r, g, b] = p;
+        if (p.length > 3) a = p[3];
+      } else {
+        [r, g, b] = [srgb[1], srgb[2], srgb[3]].map((v) => parseFloat(v) * 255);
+        if (srgb[4]) a = srgb[4].endsWith('%') ? parseFloat(srgb[4]) / 100 : parseFloat(srgb[4]);
+      }
+      return `#${h(r)}${h(g)}${h(b)}${a < 1 ? h(a * 255) : ''}`;
+    }
     ctx.clearRect(0, 0, 1, 1);
     ctx.fillStyle = '#000';
     ctx.fillStyle = css;
     ctx.fillRect(0, 0, 1, 1);
     const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-    const h = (v) => v.toString(16).padStart(2, '0').toUpperCase();
     return `#${h(r)}${h(g)}${h(b)}${a < 255 ? h(a) : ''}`;
   };
   const valor = (nombre, modo) => {

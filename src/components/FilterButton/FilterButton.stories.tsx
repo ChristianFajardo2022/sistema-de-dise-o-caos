@@ -1,23 +1,29 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { FilterButton } from './FilterButton';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './FilterButton.doc';
+import docsJson from './FilterButton.docs.json';
 
 const meta = {
   title: 'Form Controls/FilterButton',
   component: FilterButton,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
-  argTypes: {
-    count: { control: 'number', description: 'Filtros aplicados (Badge Number)' },
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    count: { control: 'number', type: { name: 'number' } },
     badge: { control: 'boolean', type: { name: 'boolean' } },
-    disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Type=Inactive' },
+    disabled: { control: 'boolean', type: { name: 'boolean' } },
     layout: {
       control: 'radio',
       options: ['auto', 'desktop', 'mobile', 'icon'],
       type: { name: 'enum', value: ['auto', 'desktop', 'mobile', 'icon'] },
     },
     children: { control: 'text' },
-  },
+  }),
   args: { children: 'Filtros', count: 3, badge: true, disabled: false, layout: 'auto', onClick: fn() },
 } satisfies Meta<typeof FilterButton>;
 
@@ -109,5 +115,33 @@ export const IconLayoutTest: Story = {
     await expect(button).toHaveAccessibleDescription('3 filtros aplicados');
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalled();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'FilterButton' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente FilterButton en Figma:']);
+    await expect(canvas.getByRole('switch', { name: 'Modo oscuro' })).toBeInTheDocument();
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática)
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    // Sin Storybook no hay lienzo, código ni Personalizar: solo el bloque Props, de solo lectura
+    const props = canvas.getByRole('table', { name: 'Props de FilterButton' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(canvas.queryByRole('group', { name: 'Personalizar' })).not.toBeInTheDocument();
   },
 };

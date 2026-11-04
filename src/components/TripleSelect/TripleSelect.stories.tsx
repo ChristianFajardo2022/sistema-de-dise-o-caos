@@ -4,6 +4,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { TripleSelect } from './TripleSelect';
 import type { TripleSelectFields, TripleSelectState } from './TripleSelect.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './TripleSelect.doc';
+import docsJson from './TripleSelect.docs.json';
 
 const STATES: TripleSelectState[] = ['default', 'filled', 'active', 'burnt-in', 'disabled', 'error', 'success'];
 
@@ -34,9 +39,9 @@ const BIRTH_FIELDS: TripleSelectFields = [
 const meta = {
   title: 'Form Controls/TripleSelect',
   component: TripleSelect,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     state: {
       name: 'state',
       control: 'select',
@@ -50,7 +55,7 @@ const meta = {
     helperText: { control: 'text', type: { name: 'string' } },
     errorText: { control: 'text', type: { name: 'string' } },
     successText: { control: 'text', type: { name: 'string' } },
-  },
+  }),
   args: { label: 'Fecha de nacimiento', fields: BIRTH_FIELDS },
 } satisfies Meta<typeof TripleSelect>;
 
@@ -320,5 +325,28 @@ export const FocusTest: Story = {
     await waitFor(() => expect(firstError).toHaveFocus());
     await expect(section(firstError).outlineStyle).toBe('none');
     await expect(getComputedStyle(error).outlineStyle).toBe('solid');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'TripleSelect' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente TripleSelect en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 2)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(8);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de TripleSelect' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

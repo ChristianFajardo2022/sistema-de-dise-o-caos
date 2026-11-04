@@ -119,6 +119,17 @@ const MAX_DEPTH = 5;
  * props que son objetos, arreglos o funciones dentro de ellos. En una línea si cabe en 60 caracteres; si no, una
  * entrada por línea con la sangría de `level`. `undefined` si no se puede escribir.
  */
+/**
+ * Una fecha como se escribe a mano, en hora local: `new Date(2026, 9, 23)` (mes desde 0) y la hora solo si no es
+ * medianoche. Una ISO en UTC (`'2026-10-23T05:00:00.000Z'`) no se lee y cambia de día según la zona horaria.
+ */
+function dateLiteral(date: Date): string {
+  const parts = [date.getFullYear(), date.getMonth(), date.getDate()];
+  const time = [date.getHours(), date.getMinutes(), date.getSeconds()];
+  while (time.length && time[time.length - 1] === 0) time.pop();
+  return `new Date(${[...parts, ...time].join(', ')})`;
+}
+
 function literal(value: unknown, level: number, depth = 0): string | undefined {
   if (value === undefined || typeof value === 'symbol') return undefined;
   if (value === null || typeof value === 'number' || typeof value === 'boolean') return String(value);
@@ -126,7 +137,7 @@ function literal(value: unknown, level: number, depth = 0): string | undefined {
   if (typeof value === 'function') return '() => {}';
   if (isValidElement(value)) return elementToJsx(value, level);
   if (typeof value !== 'object' || depth >= MAX_DEPTH) return undefined;
-  if (value instanceof Date) return `new Date('${value.toISOString()}')`;
+  if (value instanceof Date) return dateLiteral(value);
   const isArray = Array.isArray(value);
   if (!isArray && Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) return undefined;
   const entries = isArray

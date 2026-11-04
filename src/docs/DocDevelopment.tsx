@@ -12,6 +12,7 @@ import { Tag } from '../components/Tag';
 import { Toast, Toaster } from '../components/Toast';
 import { cn } from '../utils/cn';
 import { DocCodeBlock } from './DocCodeBlock';
+import { ShrinkToFit } from './DocParts';
 import { DocBigCard, DocDotsCanvas } from './DocV2';
 import { buildCode, changedArgs, controlFor, defaultValueOf } from './liveCode';
 import type { LiveArgType, PropControl } from './liveCode';
@@ -200,7 +201,11 @@ function DocCanvas({ live }: { live: DocLive }) {
           style={{ zoom }}
           className="w-full max-w-full [&_[data-story-wrapper]]:flex [&_[data-story-wrapper]]:justify-center-safe [&_[data-story-wrapper]]:min-h-0! [&_[data-story-wrapper]]:bg-transparent! [&_[data-story-wrapper]]:p-0!"
         >
-          <CanvasErrorBoundary key={mountKey}>{live.story}</CanvasErrorBoundary>
+          {/* A escala 1, lo que no cabe en el lienzo (p. ej. a 390 de ventana) se reduce en vez de salirse; con zoom propio,
+              el usuario manda */}
+          <ShrinkToFit enabled={zoom === 1}>
+            <CanvasErrorBoundary key={mountKey}>{live.story}</CanvasErrorBoundary>
+          </ShrinkToFit>
         </div>
       </div>
     </DocDotsCanvas>

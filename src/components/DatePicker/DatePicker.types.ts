@@ -41,7 +41,7 @@ export interface DatePickerBaseProps
   maxDate?: Date;
   /** Deshabilita días puntuales. Pasa al Calendar y valida lo escrito. */
   isDateDisabled?: (date: Date) => boolean;
-  /** Pie con Cancelar y Aplicar (como Figma). Sin él, elegir un día (o el fin del rango) aplica y cierra. Por defecto `true`. */
+  /** Pie con Cancelar y Aplicar (Figma dice Limpiar y Filtrar). Sin él, elegir un día (o el fin del rango) aplica y cierra. Por defecto `true`. */
   showActions?: boolean;
   /** Calendario abierto (controlado). */
   open?: boolean;

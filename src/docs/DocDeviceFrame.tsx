@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '../utils/cn';
+import { MediaWidthContext } from '../utils/useMediaQuery';
 import { BREAKPOINT_VARS } from './breakpoints.generated';
 import type { DocBreakpointName } from './breakpoints.generated';
 
@@ -27,6 +28,9 @@ interface DocDeviceFrameProps {
  * Un descendiente con tema propio (`data-theme`, `.dark`, como los avisos unicolor) vuelve a declarar las variables
  * responsive por media query y se salta las del marco. Esta regla le devuelve las del breakpoint del marco.
  */
+/** Ancho que simula cada marco para los hooks de media query (`useMediaQuery`): uno típico de cada breakpoint. */
+const SIMULATED_WIDTH: Record<DocBreakpointName, number> = { mobile: 376, tablet: 768, desktop: 1440 };
+
 function nestedThemeCss(breakpoint: DocBreakpointName): string {
   const vars = Object.entries(BREAKPOINT_VARS[breakpoint])
     .filter(([name, value]) => value !== `var(${name})`)
@@ -60,7 +64,7 @@ export function DocDeviceFrame({ breakpoint, rounding = 'all', statusBar = false
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col items-start justify-start gap-ds-space-general-2xl overflow-hidden rounded-ds-radius-general-lg bg-ds-background-container-default-on-canva p-ds-space-general-2xl">
-        {children}
+        <MediaWidthContext.Provider value={SIMULATED_WIDTH[breakpoint]}>{children}</MediaWidthContext.Provider>
       </div>
     </div>
   );

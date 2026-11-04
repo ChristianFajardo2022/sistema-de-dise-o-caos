@@ -5,6 +5,12 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Calendar } from './Calendar';
 import type { CalendarBaseProps, CalendarCellState, CalendarProps, CalendarRangeCellState, CalendarSingleProps, DateRange } from './Calendar.types';
 import { CalendarDayCell, CalendarPeriodCell, CalendarRangeCell } from './CalendarCells';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { cn } from '../../utils/cn';
+import { doc } from './Calendar.doc';
+import docsJson from './Calendar.docs.json';
 
 /** Args de Storybook: props base más la selección, sin la unión por `mode` (los args son parciales). */
 type CalendarArgs = CalendarBaseProps & {
@@ -18,36 +24,39 @@ type CalendarArgs = CalendarBaseProps & {
 const TODAY = new Date(2026, 9, 23);
 const OCTOBER = new Date(2026, 9, 1);
 
+/** Idiomas de la lista de Personalizar: con texto libre, un código no válido rompe `Intl` (receta R7). */
+const LOCALES = ['es', 'es-CO', 'en-US'];
+const VIEWS = ['day', 'month', 'year'];
+const WEEK_STARTS = [0, 1, 2, 3, 4, 5, 6];
+
 const meta = {
   title: 'Form Controls/Calendar',
   component: Calendar as unknown as ComponentType<CalendarArgs>,
-  parameters: { layout: 'padded' },
   tags: ['autodocs'],
-  argTypes: {
-    mode: {
-      control: 'radio',
-      options: ['single', 'range'],
-      type: { name: 'enum', value: ['single', 'range'] },
-      description: 'Type de Figma: `single` = Only date, `range` = Date range',
+  parameters: {
+    layout: 'padded',
+    // La página Docs usa la plantilla de documentación (Calendar.doc.tsx) con la referencia de código al final
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      // `view` es controlada: con un valor fijo el chip y los campos Mes y Año dejan de cambiar la vista (R6). La vista
+      // inicial se elige con `defaultView`. Fechas, funciones y `labels` no tienen control y siguen en Props
+      exclude: ['view'],
     },
-    view: {
-      control: 'radio',
-      options: ['day', 'month', 'year'],
-      type: { name: 'enum', value: ['day', 'month', 'year'] },
-      description: 'Date de Figma (Day, Month, Year). En `range` indica el campo activo (Mes o Año).',
-    },
-    locale: { control: 'text', type: { name: 'string' }, description: 'Idioma de los nombres de mes y día (Intl)' },
-    weekStartsOn: {
-      control: 'select',
-      options: [0, 1, 2, 3, 4, 5, 6],
-      type: { name: 'enum', value: [0, 1, 2, 3, 4, 5, 6] },
-      description: 'Primer día de la semana: 0 domingo (Figma), 1 lunes…',
-    },
-    showOutsideDays: { control: 'boolean', type: { name: 'boolean' }, description: 'Días de los meses vecinos (atenuados)' },
-    showActions: { control: 'boolean', type: { name: 'boolean' }, description: 'Pie con Cancelar y Aplicar' },
-    minDate: { control: 'date', description: 'Fecha mínima seleccionable' },
-    maxDate: { control: 'date', description: 'Fecha máxima seleccionable' },
   },
+  // Las descripciones salen de Calendar.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    mode: { control: 'radio', options: ['single', 'range'], type: { name: 'enum', value: ['single', 'range'] } },
+    view: { control: 'radio', options: VIEWS, type: { name: 'enum', value: VIEWS } },
+    defaultView: { control: 'radio', options: VIEWS, type: { name: 'enum', value: VIEWS } },
+    // R7: lista de idiomas válidos en lugar de texto libre
+    locale: { control: 'select', options: LOCALES, type: { name: 'enum', value: LOCALES } },
+    weekStartsOn: { control: 'select', options: WEEK_STARTS, type: { name: 'enum', value: WEEK_STARTS } },
+    showOutsideDays: { control: 'boolean', type: { name: 'boolean' } },
+    showActions: { control: 'boolean', type: { name: 'boolean' } },
+    autoFocus: { control: 'boolean', type: { name: 'boolean' } },
+    minDate: { control: 'date' },
+    maxDate: { control: 'date' },
+  }),
   args: {
     mode: 'single',
     defaultView: 'day',
@@ -66,7 +75,14 @@ type Story = StoryObj<typeof meta>;
 const asProps = (args: CalendarArgs) => args as CalendarProps;
 
 export const Interactive: Story = {
-  render: (args) => <Calendar key={args.mode} {...asProps(args)} className="mx-auto" />,
+  // `defaultView` solo se lee al montar: la clave vuelve a montar el calendario al cambiar el modo o la vista inicial
+  // La caja tiene el ancho máximo del calendario (448 en una fecha; 460 en Mobile y 740 desde Tablet en rango): el lienzo
+  // de Desarrollo escala a partir de un ancho fijo y no del ancho mínimo, que con zoom se redondea y desborda 1 o 2 px
+  render: (args) => (
+    <div className={cn(args.mode === 'range' ? 'w-ds-dimention-field-calendar-calendar-max' : 'w-md', 'max-w-full')}>
+      <Calendar key={`${args.mode}-${args.defaultView}`} {...asProps(args)} />
+    </div>
+  ),
 };
 
 export const OnlyDate: Story = {
@@ -441,5 +457,31 @@ export const FocusTest: Story = {
     await userEvent.click(canvas.getByRole('button', { name: /^Mes ?octubre/i }));
     const menu = await canvas.findByRole('menu', { name: 'Elegir mes' });
     await waitFor(() => expect(within(menu).getByRole('menuitem', { name: /octubre/i })).toHaveFocus());
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Calendar' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Calendar en Figma:']);
+    // 6 + 6 + 5 marcadores en los tres grupos de la anatomía
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(17);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Calendar' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

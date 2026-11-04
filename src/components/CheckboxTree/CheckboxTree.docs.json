@@ -1,20 +1,22 @@
 {
   "name": "CheckboxTree",
   "component": "CheckboxTree",
-  "description": "Árbol de selección del sistema de diseño CAOS: el tipo \"Selection tree\" del set Atoms de la página Filter de Figma (13874:43337, variante 14015:46215). Casillas anidadas (Checkbox existente) con sangría de 24 y gap 16, donde cada madre refleja a sus hijas: marcada, desmarcada o mixta. Patrón WAI-ARIA APG Checkbox (Mixed-State): inputs nativos, la madre usa la propiedad indeterminate (anunciada como mixta) y aria-controls con sus hijas, y cada rama es un role=group nombrado por la madre. Se prefirió a APG Tree View porque Figma muestra todas las ramas abiertas y sin control de expandir. Teclado: Tab recorre, Espacio alterna; alternar la madre marca o desmarca toda la rama (las hojas deshabilitadas no cambian). El valor es la lista de hojas marcadas. El estado mixto no está dibujado en Figma: lo da Checkbox indeterminate (relleno de Select con una raya de 8 × 1.5).",
+  "description": "Árbol de selección del sistema de diseño CAOS (tipo Selection tree del set Atoms de la página Filter de Figma). Casillas anidadas (Checkbox) con sangría de 24 px y separación de 16 px, donde cada madre refleja a sus hijas: marcada, desmarcada o mixta. Sigue el patrón WAI-ARIA Checkbox (Mixed-State): inputs nativos, la madre usa la propiedad indeterminate (el lector la anuncia como mixta) y aria-controls con sus hijas, y cada rama es un role=group nombrado por la madre. Se eligió sobre Tree View porque Figma muestra todas las ramas abiertas y sin control para expandir. Teclado: Tab recorre las casillas y Espacio alterna; alternar la madre marca o desmarca toda su rama, salvo las hojas deshabilitadas. El valor es la lista de hojas marcadas. El estado mixto no está dibujado en Figma: lo da Checkbox con indeterminate.",
   "category": "Form Controls",
   "props": {
-    "items": { "type": "CheckboxTreeNode[]", "required": true, "description": "Árbol: { value, label, children?, disabled? }. Los nodos con children son grupos." },
-    "value": { "type": "string[]", "required": false, "description": "Hojas marcadas (controlado)." },
+    "items": { "type": "CheckboxTreeNode[]", "required": true, "description": "Árbol de opciones: { value, label, children?, disabled? }. Los nodos con children son grupos (List en Figma)." },
+    "value": { "type": "string[]", "required": false, "description": "Hojas marcadas (controlado). Úsalo con onValueChange." },
     "defaultValue": { "type": "string[]", "required": false, "description": "Hojas marcadas al inicio (no controlado)." },
-    "onValueChange": { "type": "(value: string[]) => void", "required": false, "description": "Nueva lista de hojas marcadas, en el orden del árbol." },
-    "contrast": { "type": "'positive' | 'negative'", "default": "'positive'", "description": "Contrast de las casillas." },
+    "onValueChange": { "type": "(value: string[]) => void", "required": false, "description": "Recibe la nueva lista de hojas marcadas, en el orden del árbol." },
+    "contrast": { "type": "'positive' | 'negative'", "default": "'positive'", "description": "Contraste de las casillas (Contrast en Figma): positive sobre la superficie del tema y negative sobre la inversa." },
     "disabled": { "type": "boolean", "default": "false", "description": "Deshabilita todo el árbol." },
-    "name": { "type": "string", "required": false, "description": "name de los inputs de las hojas para formularios." },
-    "aria-label": { "type": "string", "required": false, "description": "Nombre del grupo raíz (o aria-labelledby)." }
+    "name": { "type": "string", "required": false, "description": "name de los inputs de las hojas, para enviarlas en un formulario. Cada hoja marcada envía su value." },
+    "aria-label": { "type": "string", "required": false, "description": "Nombre accesible del grupo raíz. Sin una etiqueta visible, es obligatorio." },
+    "aria-labelledby": { "type": "string", "required": false, "description": "Id de la etiqueta visible que nombra el grupo raíz. Úsalo en lugar de aria-label." },
+    "className": { "type": "string", "required": false, "description": "Clases adicionales para la raíz." }
   },
   "examples": [
-    { "title": "No controlado", "code": "<CheckboxTree aria-label=\"Categorías\" items={categorias} defaultValue={['camisas']} />" },
-    { "title": "Controlado", "code": "<CheckboxTree aria-labelledby={tituloId} items={categorias} value={marcadas} onValueChange={setMarcadas} />" }
+    { "title": "No controlado", "code": "<CheckboxTree aria-label=\"Tipos de archivo\" items={tipos} defaultValue={['informes']} />" },
+    { "title": "Controlado", "code": "<CheckboxTree aria-labelledby={tituloId} items={tipos} value={marcados} onValueChange={setMarcados} />" }
   ]
 }

@@ -1,20 +1,57 @@
 {
   "name": "FilterButton",
   "component": "FilterButton",
-  "description": "Botón que abre los filtros, fiel al set Filter button de Figma (14112:4253, Type=Default/Inactive). Escritorio: Badge Number (Info) + Button Tertiary md con chevron-right, gap 8. Móvil: Badge + Button Tertiary de solo ícono (filter). layout=auto elige el marco con matchMedia (< 48rem = móvil). El número del badge describe al botón (aria-describedby: \"Filtros, 3 filtros aplicados\"); el badge lleva aria-hidden para que el conteo no se lea dos veces (la descripción funciona igual con nodos ocultos); con 0 o sin count no se dibuja. Type=Inactive = disabled (botón deshabilitado y badge gris). Para abrir un FilterPanel modal, pasar aria-haspopup=\"dialog\" y aria-expanded.",
+  "description": "Botón que abre los filtros y muestra cuántos hay aplicados. Escritorio: Badge de número (Info) + Button Tertiary md con chevron-right, a 8 px. Móvil: Badge + Button Tertiary de solo ícono (filter). layout=auto elige el marco con matchMedia (menos de 48 rem = móvil). El número del badge describe al botón (aria-describedby: \"3 filtros aplicados\"; el nombre sigue siendo \"Filtros\"); el badge lleva aria-hidden para que el conteo no se lea dos veces. Con 0 o sin count no se dibuja. Inactive (Type en Figma) = disabled: botón deshabilitado y badge atenuado. Para abrir un FilterPanel modal, pasa aria-haspopup=\"dialog\" y aria-expanded.",
   "category": "Form Controls",
   "props": {
-    "children": { "type": "ReactNode", "default": "'Filtros'", "description": "Prop Text de Figma. En móvil es el nombre accesible." },
-    "count": { "type": "number | string", "required": false, "description": "Filtros aplicados (Badge Number). Suele salir de countFilters(aplicados)." },
-    "badge": { "type": "boolean", "default": "true", "description": "Prop Badge de Figma." },
-    "countLabel": { "type": "string | (count) => string", "default": "'filtro aplicado' / 'filtros aplicados'", "description": "Texto que sigue al número para lectores de pantalla." },
-    "disabled": { "type": "boolean", "default": "false", "description": "Type=Inactive." },
-    "layout": { "type": "'auto' | 'desktop' | 'mobile' | 'icon'", "default": "'auto'", "description": "Marco de Figma a dibujar. `icon` = set Icon button+Filters (21923:89647): Button Secondary low de solo ícono 56×56 con el badge abajo a la derecha; no lo elige `auto`." },
-    "rootProps": { "type": "HTMLAttributes<HTMLSpanElement>", "required": false, "description": "Atributos de la raíz; el ref y el resto de props van al botón." }
+    "children": {
+      "type": "ReactNode",
+      "default": "'Filtros'",
+      "description": "Texto del botón (Text en Figma). En móvil es el nombre accesible."
+    },
+    "count": {
+      "type": "number | string",
+      "required": false,
+      "description": "Filtros aplicados (número del Badge). Suele salir de countFilters(aplicados). Con 0 o sin valor no se dibuja el contador."
+    },
+    "badge": {
+      "type": "boolean",
+      "default": "true",
+      "description": "Muestra el contador (Badge en Figma)."
+    },
+    "countLabel": {
+      "type": "string | (count) => string",
+      "default": "'filtro aplicado' / 'filtros aplicados'",
+      "description": "Texto que sigue al número para lectores de pantalla. Puede ser una función de la cantidad."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Botón deshabilitado y contador atenuado (Type Inactive en Figma)."
+    },
+    "layout": {
+      "type": "'auto' | 'desktop' | 'mobile' | 'icon'",
+      "default": "'auto'",
+      "description": "Marco que se dibuja: desktop (texto y chevron), mobile (solo ícono) o icon (botón de ícono con el contador superpuesto, set Icon button+Filters en Figma). auto elige desktop o mobile según el ancho de la ventana; no elige icon."
+    },
+    "rootProps": {
+      "type": "HTMLAttributes<HTMLSpanElement>",
+      "required": false,
+      "description": "Atributos de la raíz (la fila). El ref y el resto de props van al botón."
+    }
   },
   "examples": [
-    { "title": "Con conteo", "code": "<FilterButton count={countFilters(aplicados)} aria-haspopup=\"dialog\" aria-expanded={abierto} onClick={() => setAbierto(true)} />" },
-    { "title": "Solo ícono", "code": "<FilterButton layout=\"mobile\" count={2} />" },
-    { "title": "Botón de ícono con badge", "code": "<FilterButton layout=\"icon\" count={3} />" }
+    {
+      "title": "Con conteo",
+      "code": "<FilterButton count={countFilters(aplicados)} aria-haspopup=\"dialog\" aria-expanded={abierto} onClick={() => setAbierto(true)} />"
+    },
+    {
+      "title": "Solo ícono",
+      "code": "<FilterButton layout=\"mobile\" count={2} />"
+    },
+    {
+      "title": "Botón de ícono con badge",
+      "code": "<FilterButton layout=\"icon\" count={3} />"
+    }
   ]
 }

@@ -532,9 +532,12 @@ export function ShrinkToFit({
   children,
   className,
   innerClassName = 'justify-center',
+  enabled = true,
 }: {
   children: ReactNode;
   className?: string;
+  /** `false` deja el contenido a escala 1 sin medir (p. ej. cuando el usuario fija su propio zoom). */
+  enabled?: boolean;
   /** Disposición del contenido (por defecto, centrado en fila). */
   innerClassName?: string;
 }) {
@@ -544,6 +547,12 @@ export function ShrinkToFit({
     const out = outer.current;
     const content = inner.current;
     if (!out || !content) return;
+    if (!enabled) {
+      content.style.zoom = '';
+      content.style.maxWidth = '';
+      content.style.width = '';
+      return;
+    }
     const measure = () => {
       // Se mide sin escala ni tope: con `max-w-full` el ancho mínimo saldría recortado al del panel
       content.style.zoom = '1';
@@ -554,8 +563,10 @@ export function ShrinkToFit({
       if (available > 0 && minWidth > available + 0.5) {
         // Sin el tope de `max-w-full`: el contenido se dibuja a su ancho mínimo y el zoom lo hace caber
         content.style.maxWidth = 'none';
-        content.style.width = `${minWidth}px`;
-        content.style.zoom = String(available / minWidth);
+        // Ancho entero hacia arriba y escala hacia abajo: el redondeo del zoom no debe dejar 1 px por fuera
+        const width = Math.ceil(minWidth);
+        content.style.width = `${width}px`;
+        content.style.zoom = String(Math.floor((available / width) * 1000) / 1000);
       } else {
         content.style.maxWidth = '';
         content.style.width = '';
@@ -570,7 +581,7 @@ export function ShrinkToFit({
       observer.disconnect();
       window.clearTimeout(late);
     };
-  }, []);
+  }, [enabled]);
   return (
     <div ref={outer} className={cn('flex w-full min-w-0 justify-center', className)}>
       <div ref={inner} className={cn('flex w-full min-w-0 max-w-full shrink-0', innerClassName)}>

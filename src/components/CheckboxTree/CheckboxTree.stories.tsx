@@ -3,23 +3,28 @@ import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { CheckboxTree } from './CheckboxTree';
 import type { CheckboxTreeNode } from './CheckboxTree.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './CheckboxTree.doc';
+import docsJson from './CheckboxTree.docs.json';
 
 const CATEGORIAS: CheckboxTreeNode[] = [
   {
-    value: 'ropa',
-    label: 'Ropa',
+    value: 'documentos',
+    label: 'Documentos',
     children: [
-      { value: 'camisas', label: 'Camisas' },
-      { value: 'pantalones', label: 'Pantalones' },
-      { value: 'chaquetas', label: 'Chaquetas' },
+      { value: 'informes', label: 'Informes' },
+      { value: 'contratos', label: 'Contratos' },
+      { value: 'actas', label: 'Actas' },
     ],
   },
   {
-    value: 'calzado',
-    label: 'Calzado',
+    value: 'imagenes',
+    label: 'Imágenes',
     children: [
-      { value: 'tenis', label: 'Tenis' },
-      { value: 'botas', label: 'Botas', disabled: true },
+      { value: 'fotos', label: 'Fotos' },
+      { value: 'capturas', label: 'Capturas', disabled: true },
     ],
   },
 ];
@@ -27,12 +32,17 @@ const CATEGORIAS: CheckboxTreeNode[] = [
 const meta = {
   title: 'Form Controls/CheckboxTree',
   component: CheckboxTree,
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo de Desarrollo usa la forma no controlada (la que muestra el código); `value` y las referencias a otros elementos quedan fuera
+    docsLive: { story: 'Interactive', exclude: ['value', 'aria-labelledby'] },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     contrast: { control: 'radio', options: ['positive', 'negative'], type: { name: 'enum', value: ['positive', 'negative'] } },
     disabled: { control: 'boolean', type: { name: 'boolean' } },
-  },
+  }),
   args: { items: CATEGORIAS, 'aria-label': 'Categorías', contrast: 'positive', disabled: false },
 } satisfies Meta<typeof CheckboxTree>;
 
@@ -40,7 +50,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 function Controlled(args: Story['args']) {
-  const [value, setValue] = useState<string[]>(['camisas']);
+  const [value, setValue] = useState<string[]>(['informes']);
   return (
     <div className="flex w-76 flex-col gap-4">
       <CheckboxTree {...args} items={args?.items ?? CATEGORIAS} value={value} onValueChange={setValue} />
@@ -49,20 +59,31 @@ function Controlled(args: Story['args']) {
   );
 }
 
-export const Interactive: Story = { render: (args) => <Controlled {...args} /> };
+/** Forma no controlada: parte de `defaultValue` y el árbol guarda su propio estado. */
+export const Interactive: Story = {
+  args: { defaultValue: ['informes'] },
+  render: (args) => (
+    <div className="w-76">
+      <CheckboxTree {...args} />
+    </div>
+  ),
+};
 
-/** Tres niveles: la madre de arriba refleja a nietas y bisnietas. */
+/** Forma controlada: `value` y `onValueChange` con un estado propio. */
+export const ControlledState: Story = { render: (args) => <Controlled {...args} /> };
+
+/** Tres niveles: la madre de arriba refleja a las hijas y a las nietas. */
 export const Nested: Story = {
   args: {
-    'aria-label': 'Zonas de entrega',
-    defaultValue: ['norte-1'],
+    'aria-label': 'Espacios de trabajo',
+    defaultValue: ['diseno-1'],
     items: [
       {
-        value: 'ciudad',
-        label: 'Toda la ciudad',
+        value: 'todos',
+        label: 'Todos los espacios',
         children: [
-          { value: 'norte', label: 'Norte', children: [{ value: 'norte-1', label: 'Sector 1' }, { value: 'norte-2', label: 'Sector 2' }] },
-          { value: 'sur', label: 'Sur', children: [{ value: 'sur-1', label: 'Sector 3' }] },
+          { value: 'diseno', label: 'Diseño', children: [{ value: 'diseno-1', label: 'Equipo 1' }, { value: 'diseno-2', label: 'Equipo 2' }] },
+          { value: 'producto', label: 'Producto', children: [{ value: 'producto-1', label: 'Equipo 3' }] },
         ],
       },
     ],
@@ -102,39 +123,67 @@ export const MixedStateTest: Story = {
   args: { onValueChange: fn() },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    const ropa = canvas.getByRole('checkbox', { name: 'Ropa' });
-    const camisas = canvas.getByRole('checkbox', { name: 'Camisas' });
-    const pantalones = canvas.getByRole('checkbox', { name: 'Pantalones' });
-    await expect(canvas.getByRole('group', { name: 'Ropa' })).toBeInTheDocument();
-    await expect(ropa).not.toBePartiallyChecked();
+    const documentos = canvas.getByRole('checkbox', { name: 'Documentos' });
+    const informes = canvas.getByRole('checkbox', { name: 'Informes' });
+    const contratos = canvas.getByRole('checkbox', { name: 'Contratos' });
+    await expect(canvas.getByRole('group', { name: 'Documentos' })).toBeInTheDocument();
+    await expect(documentos).not.toBePartiallyChecked();
 
     // Una hija marcada: la madre queda mixta
-    await userEvent.click(camisas);
-    await expect(ropa).toBePartiallyChecked();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(['camisas']);
+    await userEvent.click(informes);
+    await expect(documentos).toBePartiallyChecked();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(['informes']);
 
     // Teclado: Tab llega a la madre y Espacio marca toda la rama
-    ropa.focus();
+    documentos.focus();
     await userEvent.keyboard(' ');
-    await expect(ropa).toBeChecked();
-    await expect(ropa).not.toBePartiallyChecked();
-    await expect(pantalones).toBeChecked();
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(['camisas', 'pantalones', 'chaquetas']);
+    await expect(documentos).toBeChecked();
+    await expect(documentos).not.toBePartiallyChecked();
+    await expect(contratos).toBeChecked();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(['informes', 'contratos', 'actas']);
 
     // Tab pasa a la primera hija; Espacio la desmarca y la madre vuelve a mixto
     await userEvent.tab();
-    await expect(camisas).toHaveFocus();
+    await expect(informes).toHaveFocus();
     await userEvent.keyboard(' ');
-    await expect(ropa).toBePartiallyChecked();
+    await expect(documentos).toBePartiallyChecked();
 
-    // Con la hoja deshabilitada, la madre de Calzado marca solo Tenis
-    const calzado = canvas.getByRole('checkbox', { name: 'Calzado' });
-    await userEvent.click(calzado);
-    await expect(canvas.getByRole('checkbox', { name: 'Tenis' })).toBeChecked();
-    await expect(canvas.getByRole('checkbox', { name: 'Botas' })).not.toBeChecked();
-    await expect(calzado).toBePartiallyChecked();
+    // Con la hoja deshabilitada, la madre de Imágenes marca solo Fotos
+    const imagenes = canvas.getByRole('checkbox', { name: 'Imágenes' });
+    await userEvent.click(imagenes);
+    await expect(canvas.getByRole('checkbox', { name: 'Fotos' })).toBeChecked();
+    await expect(canvas.getByRole('checkbox', { name: 'Capturas' })).not.toBeChecked();
+    await expect(imagenes).toBePartiallyChecked();
     // Desde mixto con todo lo habilitado marcado, vuelve a desmarcar
-    await userEvent.click(calzado);
-    await expect(canvas.getByRole('checkbox', { name: 'Tenis' })).not.toBeChecked();
+    await userEvent.click(imagenes);
+    await expect(canvas.getByRole('checkbox', { name: 'Fotos' })).not.toBeChecked();
+  },
+};
+
+/** Test: la página Docs (plantilla v2) se dibuja con su encabezado, sus secciones y la referencia de código */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'CheckboxTree' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente CheckboxTree en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (5 + 3 + 3)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(11);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
+    const props = canvas.getByRole('table', { name: 'Props de CheckboxTree' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+    await expect(within(props).getByRole('rowheader', { name: /aria-labelledby/ })).toBeInTheDocument();
   },
 };
