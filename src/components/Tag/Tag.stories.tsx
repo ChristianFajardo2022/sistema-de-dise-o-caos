@@ -3,6 +3,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import { Tag } from './Tag';
 import { ComponentDoc } from '../../docs/ComponentDoc';
 import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
 import { componentDocsParameters } from '../../docs/storybook';
 import { doc } from './Tag.doc';
 import docsJson from './Tag.docs.json';
@@ -29,7 +30,16 @@ const meta = {
   title: 'Data Display/Tag',
   component: Tag,
   tags: ['autodocs'],
-  parameters: { docs: componentDocsParameters(doc, docsJson) },
+  // El lienzo de Desarrollo usa la versión con `onClick`: la estática no reacciona a hover, foco ni press. El código
+  // lo escribe porque el generado omite las funciones.
+  parameters: {
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Clickable',
+      code: (args: Record<string, unknown>) =>
+        buildCode('Tag', args, { iconLeft: true }).replace('<Tag', '<Tag onClick={() => toggle()}'),
+    },
+  },
   argTypes: argTypesFromDocsJson(docsJson, {
     type: {
       type: { name: 'enum', value: ['default', 'success', 'alert', 'error', 'info', 'neutral'] },
