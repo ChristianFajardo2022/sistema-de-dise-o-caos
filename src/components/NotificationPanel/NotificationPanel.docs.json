@@ -1,13 +1,13 @@
 {
   "name": "NotificationPanel",
   "component": "NotificationPanel",
-  "description": "Panel de notificaciones, fiel a los component sets Simple notifications (12602:6152) y Complex notifications (15302:8832) de Figma (el marco Profile card de 400). Encabezado con título, filtro \"Todas\" / \"No leídos\" (ChipGroup de selección única) y, en complex, el botón de ajustes; en complex, pestañas (Tabs sm on-card con contador); divisor; y la lista dentro de un ScrollArea. Sin notificaciones muestra el EmptyState (ícono document en simple y notification en complex). Por defecto es una región (section) nombrada por su título. Con popup (se abre desde NotificationBell) es role=\"dialog\" no modal con aria-modal=\"false\": el foco pasa al panel al abrir y vuelve a quien lo tenía al cerrar, y Escape llama a onOpenChange(false); el clic fuera y la posición los resuelve quien lo abre (el Header, un Popover…). open={false} no dibuja nada. La lista es ul role=\"list\" con nombre; sus hijos son <li> (NotificationItem, NotificationCard, NotificationGroup y NotificationPanelHeading). Al eliminar una notificación el foco pasa a la vecina o, si era la última, al panel. El panel no filtra ni agrupa: recibe children ya listos y avisa de los cambios de filtro y de pestaña.",
+  "description": "Panel de notificaciones, fiel a los component sets Simple notifications y Complex notifications de Figma (el marco Profile card de 400). Encabezado con título, filtro \"Todas\" / \"No leídos\" (ChipGroup de selección única) y, en complex, el botón de ajustes; en complex, pestañas (Tabs sm on-card con contador); divisor; y la lista dentro de un ScrollArea. Sin notificaciones muestra el EmptyState (ícono document en simple y notification en complex). Por defecto es una región (section) nombrada por su título. Con popup (se abre desde NotificationBell) es role=\"dialog\" no modal con aria-modal=\"false\": el foco pasa al panel al abrir y vuelve a quien lo tenía al cerrar, y Escape llama a onOpenChange(false); el clic fuera y la posición los resuelve quien lo abre (el Header, un Popover…). open={false} no dibuja nada. La lista es ul role=\"list\" con nombre; sus hijos son <li> (NotificationItem, NotificationCard, NotificationGroup y NotificationPanelHeading). Al eliminar una notificación el foco pasa a la vecina o, si era la última, al panel. El panel no filtra ni agrupa: recibe children ya listos y avisa de los cambios de filtro y de pestaña.",
   "category": "Overlays",
   "props": {
     "variant": {
       "type": "'simple' | 'complex'",
       "default": "'simple'",
-      "description": "Type de Figma."
+      "description": "Tipo de panel (Type en Figma): simple, con filas de texto, o complex, con ajustes, pestañas, tarjetas y grupos."
     },
     "title": {
       "type": "ReactNode",
@@ -52,7 +52,7 @@
     "settingsLabel": {
       "type": "string",
       "default": "'Ajustes de notificaciones'",
-      "description": "Nombre accesible del botón de ajustes."
+      "description": "Solo complex, con onSettingsClick. Nombre accesible del botón de ajustes."
     },
     "tabs": {
       "type": "NotificationPanelTab[]",
@@ -77,12 +77,12 @@
     "tabsLabel": {
       "type": "string",
       "default": "'Categorías de notificaciones'",
-      "description": "Nombre accesible de la lista de pestañas."
+      "description": "Solo con tabs (complex). Nombre accesible de la lista de pestañas."
     },
     "tabScrollButtons": {
       "type": "boolean",
       "default": false,
-      "description": "Left y Right chevron tab de Figma: botones de desplazamiento (aria-hidden, solo puntero)."
+      "description": "Solo con tabs (complex). Botones de desplazamiento de las pestañas (Left y Right chevron tab en Figma); son aria-hidden y solo para puntero."
     },
     "children": {
       "type": "ReactNode | ((tab) => ReactNode)",
@@ -132,7 +132,7 @@
     "rootProps": {
       "type": "NotificationRootProps",
       "required": false,
-      "description": "Atributos del <li> raíz (data-*, id…)."
+      "description": "Atributos extra de la raíz (data-*). ref, id y el resto de props también van a la raíz."
     },
     "className": {
       "type": "string",
@@ -143,11 +143,11 @@
   "examples": [
     {
       "title": "Desde la campana",
-      "code": "<NotificationBell size=\"sm\" count={2} open={open} aria-controls=\"notifications\" aria-haspopup=\"dialog\" onClick={() => setOpen(!open)} />\n<NotificationPanel id=\"notifications\" popup open={open} onOpenChange={setOpen}>\n  <NotificationItem title=\"Factura lista\" description=\"Descárgala hoy.\" unread />\n</NotificationPanel>"
+      "code": "<NotificationBell size=\"sm\" count={2} open={open} aria-controls=\"notifications\" aria-haspopup=\"dialog\" onClick={() => setOpen(!open)} />\n<NotificationPanel id=\"notifications\" popup open={open} onOpenChange={setOpen}>\n  <NotificationItem title=\"Documento compartido\" description=\"Ana Pérez compartió Informe anual contigo.\" unread />\n</NotificationPanel>"
     },
     {
       "title": "Complejo con secciones",
-      "code": "<NotificationPanel variant=\"complex\" tabs={tabs}>\n  <NotificationPanelHeading>Hoy</NotificationPanelHeading>\n  <NotificationCard title=\"Factura 1042\" unread />\n</NotificationPanel>"
+      "code": "<NotificationPanel variant=\"complex\" tabs={tabs}>\n  <NotificationPanelHeading>Hoy</NotificationPanelHeading>\n  <NotificationCard title=\"Reunión reprogramada\" description=\"La reunión de equipo pasó a las 3:00 p.m.\" unread />\n</NotificationPanel>"
     }
   ]
 }

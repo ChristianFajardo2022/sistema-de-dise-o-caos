@@ -11,7 +11,7 @@ import type { AlertModalType } from './Modal.types';
  *   derecha para el Button corner md On canva (40, ícono close 16).
  * - Ícono semántico de 56 (dimention/icono/M, 48 en móvil), en línea, color icon/semantic/<tipo>-firts:
  *   Info info-circle (9512:2282) · Error close-circle (9477:24834) · Alert warning (9546:5846) · Success tick-circle (9544:4073).
- * - Info: gap 8 (gap/general/md). Heading: Secondary semibold heading/lg (20/24), text/neutral/heading, centrado.
+ * - Info: gap 8 (space/general/lg). Heading: Secondary semibold heading/lg (20/24), text/neutral/heading, centrado.
  *   Description group: gap 4 (space/general/md; 8 en móvil). Descripción 1: Primary semibold body/lg (16/22,
  *   line-height-large). Descripción 2: Primary regular body/md (14/20). Las dos en text/neutral/body, centradas.
  * - CTA: fila centrada con gap 16 (space/general/2xl): Tertiary · Secondary · Primary md.

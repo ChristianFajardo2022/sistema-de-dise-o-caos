@@ -1,48 +1,21 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { NotificationPanel } from './NotificationPanel';
 import { NotificationPanelHeading } from './NotificationPanelHeading';
-import type { NotificationFilterValue, NotificationPanelTab } from './NotificationPanel.types';
+import type { NotificationFilterValue, NotificationPanelProps, NotificationPanelTab } from './NotificationPanel.types';
 import { NotificationBell } from '../NotificationBell';
 import { NotificationCard } from '../NotificationCard';
 import { NotificationGroup, NotificationGroupItem } from '../NotificationGroup';
 import { NotificationItem } from '../NotificationItem';
 import { FIGMA_LOREM } from '../NotificationItem/NotificationItem.shared';
-
-const meta = {
-  title: 'Overlays/NotificationPanel',
-  component: NotificationPanel,
-  tags: ['autodocs'],
-  parameters: { layout: 'padded' },
-  decorators: [
-    (Story, { parameters }) =>
-      parameters.fullWidth ? (
-        <Story />
-      ) : (
-        <div className="w-full max-w-[400px]">
-          <Story />
-        </div>
-      ),
-  ],
-  argTypes: {
-    variant: {
-      control: 'radio',
-      options: ['simple', 'complex'],
-      type: { name: 'enum', value: ['simple', 'complex'] },
-      description: 'Type de Figma: simple (filas de texto) o complex (pestañas, tarjetas y grupos)',
-    },
-    title: { control: 'text', type: { name: 'string' }, description: 'Texto del encabezado' },
-    empty: { control: 'boolean', type: { name: 'boolean' }, description: 'Type "No notification" de Figma: estado vacío' },
-    popup: { control: 'boolean', type: { name: 'boolean' }, description: 'role="dialog" no modal (se abre desde la campana)' },
-    tabScrollButtons: { control: 'boolean', type: { name: 'boolean' }, description: 'Left y Right chevron tab de Figma' },
-  },
-  args: { variant: 'simple' },
-} satisfies Meta<typeof NotificationPanel>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { formatLiteral } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NotificationPanel.doc';
+import docsJson from './NotificationPanel.docs.json';
 
 // ───────────────────────── datos de ejemplo ─────────────────────────
 
@@ -54,17 +27,182 @@ interface Note {
 }
 
 const NOTES: Note[] = [
-  { id: 1, title: 'Pago recibido', description: 'Recibimos tu pago de la factura de octubre.', unread: true },
-  { id: 2, title: 'Factura lista', description: 'Ya puedes descargar tu factura de octubre.', unread: true },
-  { id: 3, title: 'Cuenta actualizada', description: 'Cambiaste el correo de tu cuenta.', unread: false },
-  { id: 4, title: 'Nueva factura', description: 'Ya puedes descargar tu factura de noviembre.', unread: false },
+  { id: 1, title: 'Documento compartido', description: 'Ana Pérez compartió Informe anual contigo.', unread: true },
+  { id: 2, title: 'Reunión reprogramada', description: 'La reunión de equipo pasó a las 3:00 p.m.', unread: true },
+  { id: 3, title: 'Nuevo comentario', description: 'Hugo García comentó en Plan de trabajo.', unread: false },
+  { id: 4, title: 'Ajustes guardados', description: 'Cambiaste el idioma de tu perfil.', unread: false },
 ];
 
 const TABS: NotificationPanelTab[] = [
   { value: 'all', label: 'Todas', icon: 'notification', badge: 4, badgeLabel: 'notificaciones' },
-  { value: 'payments', label: 'Pagos', icon: 'document', badge: 2, badgeLabel: 'sin leer' },
-  { value: 'account', 'aria-label': 'Cuenta', icon: 'setting' },
+  { value: 'docs', label: 'Documentos', icon: 'document', badge: 2, badgeLabel: 'sin leer' },
+  { value: 'settings', 'aria-label': 'Ajustes', icon: 'setting' },
 ];
+
+// ───────────────────────── Desarrollo (docsLive) ─────────────────────────
+
+/**
+ * Lienzo de Desarrollo (`docsLive.render`, recetas R1, R2 y R6): la campana y el panel, igual que el código copiable.
+ * Arranca cerrado; la campana lo abre como diálogo no modal (`popup`): recibe el foco, Escape lo cierra y el foco vuelve a
+ * la campana. El filtro cambia la lista. El clic fuera no lo cierra aquí (lo resuelve quien abre el panel; el código
+ * copiable trae un ejemplo), para que tocar los controles de Personalizar no lo cierre.
+ */
+function DocsCanvas(args: Record<string, unknown>) {
+  const { open: _open, popup: _popup, filter: _filter, tab: _tab, children: _children, ...rest } = args as Partial<NotificationPanelProps>;
+  const panelId = useId();
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState<NotificationFilterValue>(rest.defaultFilter ?? 'all');
+  const complex = rest.variant === 'complex';
+  const shown = filter === 'unread' ? NOTES.filter((n) => n.unread) : NOTES;
+  return (
+    <div className="flex w-100 flex-col items-end gap-ds-space-general-lg">
+      <NotificationBell
+        size="sm"
+        count={NOTES.filter((n) => n.unread).length}
+        open={open}
+        aria-controls={panelId}
+        aria-haspopup="dialog"
+        onClick={() => setOpen(!open)}
+      />
+      <NotificationPanel
+        {...rest}
+        id={panelId}
+        popup
+        open={open}
+        onOpenChange={setOpen}
+        filter={filter}
+        onFilterChange={setFilter}
+        tabs={complex ? (rest.tabs ?? TABS) : rest.tabs}
+        onSettingsClick={complex ? () => {} : undefined}
+        empty={rest.empty || shown.length === 0}
+      >
+        {complex
+          ? [
+              <NotificationPanelHeading key="hoy">Hoy</NotificationPanelHeading>,
+              ...shown.map((n) => <NotificationCard key={n.id} time="Hace 20 min" title={n.title} description={n.description} unread={n.unread} />),
+            ]
+          : shown.map((n) => <NotificationItem key={n.id} title={n.title} description={n.description} unread={n.unread} />)}
+      </NotificationPanel>
+    </div>
+  );
+}
+
+/** Valor de una prop escrito como en JSX. */
+const jsxProp = (name: string, value: unknown) =>
+  typeof value === 'string' ? `${name}="${value.replace(/"/g, '&quot;')}"` : value === true ? name : `${name}={${formatLiteral(value, 4)}}`;
+
+/**
+ * Código de Desarrollo (R2), completo y listo para copiar (la plantilla muestra la importación encima): estado de apertura y de filtro, cierre con clic fuera
+ * (el panel no lo trae: lo resuelve quien lo abre) y la lista filtrada.
+ */
+function docsCode(args: Record<string, unknown>) {
+  const { open: _open, popup: _popup, filter: _filter, tab: _tab, children: _children, defaultFilter, empty, ...rest } = args;
+  const complex = rest.variant === 'complex';
+  const props = [
+    'id="notifications"',
+    'popup',
+    'open={open}',
+    'onOpenChange={setOpen}',
+    'filter={filter}',
+    'onFilterChange={setFilter}',
+    empty === true ? 'empty' : 'empty={shown.length === 0}',
+    ...Object.entries(rest).map(([name, value]) => jsxProp(name, value)),
+    ...(complex && rest.tabs === undefined ? [`tabs={${formatLiteral(TABS, 4)}}`] : []),
+    ...(complex ? ['onSettingsClick={() => openSettings()}'] : []),
+  ];
+  const item = complex
+    ? '<NotificationCard key={n.id} time={n.time} title={n.title} description={n.description} unread={n.unread} />'
+    : '<NotificationItem key={n.id} title={n.title} description={n.description} unread={n.unread} />';
+  const notes = NOTES.slice(0, 3).map(
+    (n) => `  { id: ${n.id}, ${complex ? "time: 'Hace 20 min', " : ''}title: '${n.title}', description: '${n.description}', unread: ${n.unread} },`
+  );
+  return [
+    'const notes = [',
+    ...notes,
+    '];',
+    '',
+    'export function Notifications() {',
+    '  const [open, setOpen] = useState(false);',
+    `  const [filter, setFilter] = useState(${formatLiteral(defaultFilter ?? 'all')});`,
+    '  const rootRef = useRef(null);',
+    "  const shown = filter === 'unread' ? notes.filter((n) => n.unread) : notes;",
+    ...(complex ? ['  // Lleva a los ajustes de notificaciones de tu producto', '  const openSettings = () => {};'] : []),
+    '',
+    '  // Clic fuera: el panel no lo trae; lo cierra quien lo abre',
+    '  useEffect(() => {',
+    '    if (!open) return;',
+    '    const onPointerDown = (event) => {',
+    '      if (!rootRef.current?.contains(event.target)) setOpen(false);',
+    '    };',
+    "    document.addEventListener('pointerdown', onPointerDown);",
+    "    return () => document.removeEventListener('pointerdown', onPointerDown);",
+    '  }, [open]);',
+    '',
+    '  return (',
+    '    <div ref={rootRef}>',
+    '      <NotificationBell',
+    '        size="sm"',
+    '        count={notes.filter((n) => n.unread).length}',
+    '        open={open}',
+    '        aria-controls="notifications"',
+    '        aria-haspopup="dialog"',
+    '        onClick={() => setOpen(!open)}',
+    '      />',
+    '      <NotificationPanel',
+    ...props.map((p) => `        ${p}`),
+    '      >',
+    ...(complex ? ['        <NotificationPanelHeading>Hoy</NotificationPanelHeading>'] : []),
+    `        {shown.map((n) => ${item})}`,
+    '      </NotificationPanel>',
+    '    </div>',
+    '  );',
+    '}',
+  ].join('\n');
+}
+
+const VARIANTS = ['simple', 'complex'];
+const HEADING_LEVELS = [2, 3, 4, 5, 6];
+const FILTERS = ['all', 'unread'];
+
+const meta = {
+  title: 'Overlays/NotificationPanel',
+  component: NotificationPanel,
+  tags: ['autodocs'],
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo maneja apertura, filtro y lista (R1, R6); el código muestra campana, manejadores y filas (R2)
+    docsLive: {
+      render: DocsCanvas,
+      code: docsCode,
+      exclude: ['open', 'popup', 'onOpenChange', 'filter', 'onFilterChange', 'tab', 'defaultTab', 'onTabChange', 'onSettingsClick', 'children', 'rootProps'],
+    },
+  },
+  decorators: [
+    (Story, { parameters }) =>
+      parameters.fullWidth ? (
+        <Story />
+      ) : (
+        <div className="w-full max-w-[400px]">
+          <Story />
+        </div>
+      ),
+  ],
+  // Las descripciones salen de NotificationPanel.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    variant: { control: 'radio', options: VARIANTS, type: { name: 'enum', value: VARIANTS } },
+    title: { control: 'text', type: { name: 'string' } },
+    headingLevel: { control: 'select', options: HEADING_LEVELS, type: { name: 'enum', value: HEADING_LEVELS } },
+    defaultFilter: { control: 'radio', options: FILTERS, type: { name: 'enum', value: FILTERS } },
+    empty: { control: 'boolean', type: { name: 'boolean' } },
+    popup: { control: 'boolean', type: { name: 'boolean' } },
+    tabScrollButtons: { control: 'boolean', type: { name: 'boolean' } },
+  }),
+  args: { variant: 'simple' },
+} satisfies Meta<typeof NotificationPanel>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 // ───────────────────────── historias ─────────────────────────
 
@@ -116,19 +254,19 @@ function ComplexDemo({ scroll = false }: { scroll?: boolean }) {
             <NotificationCard
               key={id}
               time="Hace 22 min"
-              title={`Factura ${1040 + id}`}
-              description={tab === 'payments' ? 'Pagos: tu pago fue confirmado.' : 'Todas: tu pago fue confirmado.'}
+              title={`Informe ${id}`}
+              description={tab === 'docs' ? 'Documentos: Ana Pérez compartió un archivo.' : 'Todas: Ana Pérez compartió un archivo.'}
               unread
               onClick={() => {}}
               onDelete={() => setCards((all) => all.filter((x) => x !== id))}
             />
           ))}
-          <NotificationGroup title="Actualizaciones de la cuenta" time="Hace 1 h" unread>
-            <NotificationGroupItem time="Hace 1 h" description="Cambiaste tu contraseña." unread />
-            <NotificationGroupItem time="Hace 3 h" description="Iniciaste sesión en un equipo nuevo." />
+          <NotificationGroup title="Comentarios en Plan de trabajo" time="Hace 1 h" unread>
+            <NotificationGroupItem time="Hace 1 h" description="Hugo García respondió tu comentario." unread />
+            <NotificationGroupItem time="Hace 3 h" description="Ana Pérez agregó un comentario." />
           </NotificationGroup>
           <NotificationPanelHeading>Ayer</NotificationPanelHeading>
-          <NotificationCard time="Ayer" title="Factura lista" description="Ya puedes descargarla." />
+          <NotificationCard time="Ayer" title="Ajustes guardados" description="Cambiaste el idioma de tu perfil." />
         </>
       )}
     </NotificationPanel>
@@ -289,10 +427,10 @@ export const StructureTest: Story = {
     await userEvent.click(within(filter).getByRole('radio', { name: 'Todas' }));
     await waitFor(() => expect(within(list).getAllByRole('listitem')).toHaveLength(4));
     // Abrir una notificación la marca como leída
-    const first = within(list).getByRole('button', { name: 'Pago recibido' });
+    const first = within(list).getByRole('button', { name: 'Documento compartido' });
     await expect(first).toHaveAccessibleDescription(/^No leída/);
     await userEvent.click(first);
-    await waitFor(() => expect(within(list).getByRole('button', { name: 'Pago recibido' })).toHaveAccessibleDescription(/^Recibimos/));
+    await waitFor(() => expect(within(list).getByRole('button', { name: 'Documento compartido' })).toHaveAccessibleDescription(/^Ana Pérez/));
   },
 };
 
@@ -319,13 +457,13 @@ export const ComplexTest: Story = {
     await expect(within(tablist).getAllByRole('tab')).toHaveLength(3);
     await expect(canvas.getByRole('button', { name: 'Ajustes de notificaciones' })).toBeInTheDocument();
     await expect(canvas.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual(['Hoy', 'Ayer']);
-    await userEvent.click(within(tablist).getByRole('tab', { name: /Pagos/ }));
-    await waitFor(() => expect(canvas.getAllByText(/^Pagos: tu pago/)).toHaveLength(2));
+    await userEvent.click(within(tablist).getByRole('tab', { name: /Documentos/ }));
+    await waitFor(() => expect(canvas.getAllByText(/^Documentos: Ana Pérez/)).toHaveLength(2));
     // Eliminar la primera tarjeta con el botón: el foco pasa a la siguiente
-    await userEvent.click(canvas.getAllByRole('button', { name: /^Eliminar notificación: Factura/ })[0]);
-    await waitFor(() => expect(canvas.getByRole('button', { name: 'Factura 1042' })).toHaveFocus());
+    await userEvent.click(canvas.getAllByRole('button', { name: /^Eliminar notificación: Informe/ })[0]);
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Informe 2' })).toHaveFocus());
     // Desplegar el grupo
-    const toggle = canvas.getByRole('button', { name: /^Mostrar notificaciones Actualizaciones/ });
+    const toggle = canvas.getByRole('button', { name: /^Mostrar notificaciones Comentarios/ });
     await userEvent.click(toggle);
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   },
@@ -357,7 +495,7 @@ export const EscapeTest: Story = {
   args: { popup: true, onOpenChange: fn() },
   render: (args) => (
     <NotificationPanel {...args}>
-      <NotificationItem title="Aviso" description="Hola" />
+      <NotificationItem title="Nuevo comentario" description="Hugo García comentó en Plan de trabajo." />
     </NotificationPanel>
   ),
   play: async ({ canvasElement, args }) => {
@@ -366,5 +504,37 @@ export const EscapeTest: Story = {
     await waitFor(() => expect(dialog).toHaveFocus());
     await userEvent.keyboard('{Escape}');
     await expect(args.onOpenChange).toHaveBeenCalledWith(false);
+  },
+};
+
+/** Página de documentación (plantilla v2): la revisan vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', fullWidth: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NotificationPanel' })).toBeInTheDocument();
+    // Sin las pestañas de los paneles Complex de ejemplo
+    const tabs = canvas.getAllByRole('tab').filter((t) => t.closest('[data-notification-panel]') === null);
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    // Sin los títulos de los paneles de ejemplo, que también son h2 (`data-figma-part`)
+    const h2 = () =>
+      canvas
+        .getAllByRole('heading', { level: 2 })
+        .filter((h) => !h.hasAttribute('data-figma-part'))
+        .map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NotificationPanel en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 del panel simple + 5 del complejo)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(11);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de NotificationPanel' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

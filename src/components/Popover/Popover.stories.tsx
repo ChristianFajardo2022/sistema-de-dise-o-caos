@@ -10,6 +10,12 @@ import type { PhotoName } from '../Avatar/Avatar.sample-data';
 import { Button } from '../Button';
 import { ButtonLink } from '../ButtonLink';
 import { Icon } from '../Icon';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { formatLiteral } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Popover.doc';
+import docsJson from './Popover.docs.json';
 
 const ARROW_OPTIONS: PopoverArrow[] = [
   'top-left',
@@ -48,13 +54,51 @@ function SampleMedia({ action = 'Unirme' }: { action?: string }) {
   );
 }
 
+/** Valor de una prop escrito como en JSX. */
+const jsxProp = (name: string, value: unknown) =>
+  typeof value === 'string' ? `${name}="${value.replace(/"/g, '&quot;')}"` : value === true ? name : `${name}={${formatLiteral(value)}}`;
+
+/**
+ * Código de Desarrollo (`docsLive.code`): el mismo Popover del lienzo con su estado `open` y los botones que lo cierran,
+ * listo para copiar. El código generado omite las funciones, así que el estado y los manejadores van escritos aquí.
+ */
+function docsCode(args: Record<string, unknown>) {
+  const { open: _open, defaultOpen: _defaultOpen, children, trigger: _trigger, actions: _actions, ...rest } = args;
+  const text = typeof children === 'string' && children ? children : '';
+  return [
+    'const [open, setOpen] = useState(false);',
+    '',
+    '<Popover',
+    '  open={open}',
+    '  onOpenChange={(next) => setOpen(next)}',
+    ...Object.entries(rest).map(([name, value]) => `  ${jsxProp(name, value)}`),
+    '  trigger={<Button variant="secondary" size="sm">Ver novedades</Button>}',
+    '  actions={',
+    '    <>',
+    '      <Button variant="tertiary" size="xs" unicolor onClick={() => setOpen(false)}>Ahora no</Button>',
+    '      <Button variant="secondary" contrast="low" size="xs" unicolor onClick={() => setOpen(false)}>Entendido</Button>',
+    '    </>',
+    '  }',
+    '>',
+    `  ${text}`,
+    '</Popover>',
+  ].join('\n');
+}
+
 const meta = {
   title: 'Overlays/Popover',
   component: Popover,
   subcomponents: { PopoverPanel },
-  parameters: { layout: 'centered' },
+  // La página Docs usa la plantilla de documentación (Popover.doc.tsx) con la referencia de código al final
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    // `open` lo lleva el lienzo (R6) y las funciones no salen en el código: se escribe a mano (`code`)
+    docsLive: { exclude: ['open', 'defaultOpen', 'icon'], code: docsCode },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  // Las descripciones salen de Popover.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
     arrow: {
       control: 'select',
       options: ARROW_OPTIONS,
@@ -76,11 +120,11 @@ const meta = {
     media: { control: false },
     actions: { control: false },
     link: { control: false },
-  },
+  }),
   args: {
     arrow: 'top-left',
-    title: 'Nuevo panel de pedidos',
-    children: 'Desde aquí ves el estado de cada pedido y lo que falta por despachar.',
+    title: 'Nuevo panel de ajustes',
+    children: 'Desde aquí cambias tus preferencias y ves lo que falta por revisar.',
   },
 } satisfies Meta<typeof Popover>;
 
@@ -237,9 +281,9 @@ export const LinkRowTest: Story = {
 };
 
 const TOUR = [
-  { label: 'Buscar', icon: 'search', title: 'Busca lo que necesites', text: 'Escribe un pedido, un cliente o una guía.' },
-  { label: 'Filtrar', icon: 'filter', title: 'Filtra la lista', text: 'Combina estado, fecha y ciudad para encontrar más rápido.' },
-  { label: 'Notificaciones', icon: 'notification', title: 'Entérate a tiempo', text: 'Aquí llegan los avisos de cada pedido.' },
+  { label: 'Buscar', icon: 'search', title: 'Busca lo que necesites', text: 'Escribe un documento, un perfil o una guía.' },
+  { label: 'Filtrar', icon: 'filter', title: 'Filtra la lista', text: 'Combina estado, fecha y área para encontrar más rápido.' },
+  { label: 'Notificaciones', icon: 'notification', title: 'Entérate a tiempo', text: 'Aquí llegan los avisos de cada reunión.' },
 ] as const;
 
 function TourDemo({ onFinish, arrow = 'center-top' }: { onFinish?: () => void; arrow?: PopoverArrow }) {
@@ -333,30 +377,30 @@ export const KeyboardTest: Story = {
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
     await userEvent.click(trigger);
-    const dialog = await canvas.findByRole('dialog', { name: 'Nuevo panel de pedidos' });
+    const dialog = await canvas.findByRole('dialog', { name: 'Nuevo panel de ajustes' });
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
     expect(trigger).toHaveAttribute('aria-controls', dialog.id);
-    expect(dialog).toHaveAccessibleDescription(/estado de cada pedido/);
+    expect(dialog).toHaveAccessibleDescription(/cambias tus preferencias/);
     expect(dialog).not.toHaveAttribute('aria-modal');
     await waitFor(() => expect(dialog).toHaveFocus());
 
     await userEvent.tab();
-    expect(canvas.getByRole('button', { name: 'Ahora no' })).toHaveFocus();
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Ahora no' })).toHaveFocus());
     await userEvent.tab();
-    expect(canvas.getByRole('button', { name: 'Entendido' })).toHaveFocus();
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Entendido' })).toHaveFocus());
 
     // Escape cierra y devuelve el foco al disparador
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'false'));
-    expect(dialog.matches(':popover-open')).toBe(false);
-    expect(trigger).toHaveFocus();
+    await waitFor(() => expect(dialog.matches(':popover-open')).toBe(false));
+    await waitFor(() => expect(trigger).toHaveFocus());
 
     // Una acción también cierra y devuelve el foco
     await userEvent.click(trigger);
     await waitFor(() => expect(dialog.matches(':popover-open')).toBe(true));
     await userEvent.click(canvas.getByRole('button', { name: 'Entendido' }));
     await waitFor(() => expect(dialog.matches(':popover-open')).toBe(false));
-    expect(trigger).toHaveFocus();
+    await waitFor(() => expect(trigger).toHaveFocus());
   },
 };
 
@@ -392,7 +436,7 @@ export const MediaCloseTest: Story = {
     expect(within(dialog).getByRole('group', { name: 'Participantes' })).toBeInTheDocument();
     await userEvent.click(within(dialog).getByRole('button', { name: 'Cerrar' }));
     await waitFor(() => expect(dialog.matches(':popover-open')).toBe(false));
-    expect(trigger).toHaveFocus();
+    await waitFor(() => expect(trigger).toHaveFocus());
   },
 };
 
@@ -436,11 +480,11 @@ export const TourTest: Story = {
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(within(dialog).getByText('3 de 3')).toBeInTheDocument());
     const finish = within(dialog).getByRole('button', { name: 'Finalizar' });
-    expect(finish).toHaveFocus();
+    await waitFor(() => expect(finish).toHaveFocus());
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(dialog.matches(':popover-open')).toBe(false));
     expect(finishSpy).toHaveBeenCalledTimes(1);
-    expect(start).toHaveFocus();
+    await waitFor(() => expect(start).toHaveFocus());
   },
 };
 
@@ -505,5 +549,42 @@ export const ControlledTest: Story = {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.getByTestId('changes')).toHaveTextContent('1'));
     await waitFor(() => expect(dialog.matches(':popover-open')).toBe(true));
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Popover' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Popover en Figma:']);
+    // Anatomía: un marcador por pauta en cada lienzo, y las vistas son ilustraciones (inert)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(4);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(19));
+    // Tokens: la superficie es unicolor y su hex no cambia con el interruptor de modo
+    const modeSwitch = canvas.getByRole('switch', { name: 'Modo oscuro' });
+    const fixed = canvasElement.querySelector('[data-doc-token-mode="dark"]');
+    const before = fixed?.textContent;
+    await userEvent.click(modeSwitch);
+    await waitFor(() => expect(canvasElement.querySelector('[data-doc-token-mode="dark"]')?.textContent).toBe(before));
+    await userEvent.click(modeSwitch);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    // Con las flechas (activación automática) se llega a Desarrollo
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    // Referencia de código: tabla de props (de solo lectura sin Storybook)
+    const props = canvas.getByRole('table', { name: 'Props de Popover' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

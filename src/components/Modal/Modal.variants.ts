@@ -13,7 +13,7 @@ import { cva } from 'class-variance-authority';
  *   (space/general/lg): fila "Close" (ícono close 24 en línea, alineado a la derecha) + encabezado. Contenido con
  *   Scroll bar a 8 (space/general/lg).
  * - Header: fila con gap 16 (space/general/2xl): Avatar icon On card de 48 (40 en móvil) + "Info" en columna con gap 4
- *   (gap/general/sm): Heading Secondary semibold heading/lg (20/24, text/neutral/heading) y descripción Primary regular
+ *   (space/general/md): Heading Secondary semibold heading/lg (20/24, text/neutral/heading) y descripción Primary regular
  *   body/md (14/20, line-height-large, text/neutral/body).
  * - Container (slot): ocupa el alto libre, columna con gap 32 (space/general/4xl).
  * - CTA: fila alineada a la derecha con gap 8 (space/general/lg): Tertiary · Secondary · Primary md.

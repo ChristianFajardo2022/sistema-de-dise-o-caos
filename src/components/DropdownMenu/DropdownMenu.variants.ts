@@ -13,7 +13,7 @@ import { cva } from 'class-variance-authority';
  * Ítem:
  * - Alto 34 natural (8 + 18 + 8; avatar 40), sin alto mínimo, padding 8, gap 8, radio field/sm (12), texto 14/18 field/size/sm.
  * - Default sin relleno, Hover background/field/hover, Select background/field/active-slow-contrast,
- *   Disabled texto text/neutral/disabled-positive.
+ *   Disabled texto text/neutral/disabled-on-canva e ícono icon/general/disabled-positive.
  * - Control checkbox/radio de 16 (como Selection): anillo de 1.5 con box-shadow inset.
  * - Foco con teclado: no existe en Figma; outline de 2px por dentro con el token de borde activo (WCAG 2.4.7).
  */

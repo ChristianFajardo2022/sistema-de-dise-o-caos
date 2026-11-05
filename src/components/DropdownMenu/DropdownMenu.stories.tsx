@@ -17,6 +17,13 @@ import { Avatar, AvatarPlus } from '../Avatar';
 import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
 import type { PhotoName } from '../Avatar/Avatar.sample-data';
 import { Button } from '../Button';
+import type { IconName } from '../Icon/Icon.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { formatLiteral } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './DropdownMenu.doc';
+import docsJson from './DropdownMenu.docs.json';
 
 const TYPE_OPTIONS: DropdownMenuType[] = ['simple', 'search'];
 const MODE_OPTIONS: DropdownMenuMode[] = ['menu', 'list'];
@@ -32,7 +39,7 @@ const PEOPLE: { name: string; photo: PhotoName }[] = [
 
 const photo = (name: PhotoName) => <Avatar variant="photo" size="xs" src={PHOTO_SRC[name]} alt="" />;
 
-/** Dos ítems del tipo pedido, como en las muestras de Figma. */
+/** Dos ítems del tipo indicado, como en las muestras de Figma. */
 function SampleItems({ itemType, secondSelected = false }: { itemType: DropdownMenuItemType; secondSelected?: boolean }) {
   const common = (i: number) => ({
     type: itemType,
@@ -51,26 +58,71 @@ function SampleItems({ itemType, secondSelected = false }: { itemType: DropdownM
   );
 }
 
+/** Acciones del menú de Interactive y del código de Desarrollo. */
+const ACTIONS: { label: string; icon: IconName; handler: string; disabled?: boolean }[] = [
+  { label: 'Duplicar', icon: 'document-copy', handler: 'duplicate' },
+  { label: 'Compartir', icon: 'share', handler: 'share' },
+  { label: 'Archivar', icon: 'archive', handler: 'archive', disabled: true },
+  { label: 'Eliminar', icon: 'trash', handler: 'remove' },
+];
+
+/** Valor de una prop escrito como en JSX. */
+const jsxProp = (name: string, value: unknown) =>
+  typeof value === 'string' ? `${name}="${value.replace(/"/g, '&quot;')}"` : value === true ? name : `${name}={${formatLiteral(value, 1)}}`;
+
+/**
+ * Código de Desarrollo: el mismo menú del lienzo, listo para copiar (recetas R2 y R6). Los ítems llevan su `onSelect`
+ * (en modo `list` no se activan) y la búsqueda, su valor y su manejador; el filtrado lo hace quien usa el menú.
+ */
+function docsCode(args: Record<string, unknown>) {
+  const { children: _children, ...rest } = args;
+  const isList = rest.mode === 'list';
+  const props = [
+    ...Object.entries(rest).map(([name, value]) => jsxProp(name, value)),
+    ...(rest.type === 'search' ? ['searchValue={query}', 'onSearchChange={(value) => setQuery(value)}'] : []),
+  ];
+  const items = ACTIONS.map(({ label, icon, handler, disabled }) => {
+    const attrs = [`type="icon"`, `icon="${icon}"`, disabled ? 'disabled' : '', isList || disabled ? '' : `onSelect={() => ${handler}()}`].filter(Boolean);
+    return `  <DropdownMenuItem ${attrs.join(' ')}>${label}</DropdownMenuItem>`;
+  });
+  return ['<DropdownMenu', ...props.map((p) => `  ${p}`), '>', ...items, '</DropdownMenu>'].join('\n');
+}
+
 const meta = {
   title: 'Overlays/Dropdown menu',
   component: DropdownMenu,
   subcomponents: { DropdownMenuPanel, DropdownMenuItem, DropdownMenuList, DropdownMenuNavList },
-  parameters: { layout: 'centered' },
-  tags: ['autodocs'],
-  argTypes: {
-    type: { control: 'radio', options: TYPE_OPTIONS, type: { name: 'enum', value: TYPE_OPTIONS }, description: 'Type de Figma: simple o search' },
-    mode: { control: 'radio', options: MODE_OPTIONS, type: { name: 'enum', value: MODE_OPTIONS }, description: 'menu (acciones, Menu Button) o list (lista informativa)' },
-    align: { control: 'radio', options: ['start', 'end'], type: { name: 'enum', value: ['start', 'end'] }, description: 'Alineación con el disparador' },
-    side: { control: 'radio', options: ['bottom', 'top'], type: { name: 'enum', value: ['bottom', 'top'] }, description: 'Lado preferido' },
-    scrollbar: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Scroll bar de Figma' },
-    searchLabel: { control: 'text', type: { name: 'string' }, description: 'Label del campo de búsqueda' },
+  // La página Docs usa la plantilla de documentación (DropdownMenu.doc.tsx) con la referencia de código al final
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo abre y cierra el menú de verdad (capa superior); `open` y `defaultOpen` los maneja el propio menú y
+    // `searchValue`, el lienzo (R6). El código muestra los ítems, sus manejadores y la búsqueda (R2)
+    docsLive: { story: 'Interactive', code: docsCode, exclude: ['open', 'defaultOpen', 'searchValue'] },
   },
+  tags: ['autodocs'],
+  // Las descripciones salen de DropdownMenu.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    type: { control: 'radio', options: TYPE_OPTIONS, type: { name: 'enum', value: TYPE_OPTIONS } },
+    mode: { control: 'radio', options: MODE_OPTIONS, type: { name: 'enum', value: MODE_OPTIONS } },
+    align: { control: 'radio', options: ['start', 'end'], type: { name: 'enum', value: ['start', 'end'] } },
+    side: { control: 'radio', options: ['bottom', 'top'], type: { name: 'enum', value: ['bottom', 'top'] } },
+    offset: { control: { type: 'number', min: 0, step: 1 }, type: { name: 'number' } },
+    scrollbar: { control: 'boolean', type: { name: 'boolean' } },
+    searchLabel: { control: 'text', type: { name: 'string' } },
+    maxHeight: { control: 'text', type: { name: 'string' } },
+    trigger: { control: false },
+    children: { control: false },
+    searchValue: { control: false },
+  }),
   args: {
     type: 'simple',
     mode: 'menu',
     align: 'end',
     side: 'bottom',
+    offset: 4,
     scrollbar: true,
+    maxHeight: '20rem',
     'aria-label': 'Acciones',
     searchLabel: 'Buscar',
     trigger: <Button variant="secondary" size="sm">Acciones</Button>,
@@ -80,18 +132,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Menú de acciones con disparador (patrón Menu Button): iconos, un checkbox y un ítem deshabilitado. */
-export const Interactive: Story = {
-  render: (args) => (
+/** Menú de Interactive: con `type="search"`, el campo filtra las acciones (el filtrado lo hace quien usa el menú). */
+function InteractiveMenu(args: DropdownMenuProps) {
+  const [query, setQuery] = useState('');
+  const isSearch = args.type === 'search';
+  const shown = isSearch ? ACTIONS.filter((a) => a.label.toLowerCase().includes(query.trim().toLowerCase())) : ACTIONS;
+  return (
     <div className="flex min-h-80 w-[28rem] max-w-full items-start justify-end p-4">
-      <DropdownMenu {...args}>
-        <DropdownMenuItem type="icon" icon="add-circle">Nuevo archivo</DropdownMenuItem>
-        <DropdownMenuItem type="icon" icon="add-circle">Duplicar</DropdownMenuItem>
-        <DropdownMenuItem type="icon" icon="add-circle" disabled>Archivar</DropdownMenuItem>
-        <DropdownMenuItem>Compartir</DropdownMenuItem>
+      <DropdownMenu {...args} {...(isSearch ? { searchValue: query, onSearchChange: setQuery } : {})}>
+        {shown.map(({ label, icon, disabled }) => (
+          <DropdownMenuItem key={label} type="icon" icon={icon} disabled={disabled}>
+            {label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenu>
     </div>
-  ),
+  );
+}
+
+/** Menú de acciones con disparador (patrón Menu Button): ítems con ícono y uno deshabilitado. */
+export const Interactive: Story = {
+  render: (args) => <InteractiveMenu {...args} />,
 };
 
 function typeStory(itemType: DropdownMenuItemType): Story {
@@ -196,7 +257,7 @@ export const StandaloneList: Story = {
     <div className="w-[310px] rounded-ds-radius-field-md bg-ds-background-field-surface p-ds-space-field-sm">
       <DropdownMenuList aria-label="Opciones de la cuenta" className="flex flex-col gap-1">
         <DropdownMenuItem type="icon" icon="add-circle">Mi perfil</DropdownMenuItem>
-        <DropdownMenuItem type="icon" icon="add-circle" disabled>Facturación</DropdownMenuItem>
+        <DropdownMenuItem type="icon" icon="add-circle" disabled>Notificaciones</DropdownMenuItem>
         <DropdownMenuItem type="icon" icon="add-circle" href="#ajustes">Ajustes</DropdownMenuItem>
         <DropdownMenuItem type="icon" icon="add-circle">Cerrar sesión</DropdownMenuItem>
       </DropdownMenuList>
@@ -210,11 +271,11 @@ export const StandaloneList: Story = {
  */
 export const NavigationList: Story = {
   render: () => (
-    <nav aria-label="Pagos" className="w-70 bg-ds-background-container-surface p-ds-space-general-lg">
+    <nav aria-label="Documentos" className="w-70 bg-ds-background-container-surface p-ds-space-general-lg">
       <DropdownMenuNavList className="gap-1">
-        <li><DropdownMenuItem href="#historial">Historial de pagos</DropdownMenuItem></li>
-        <li><DropdownMenuItem href="#facturas" selected>Facturas</DropdownMenuItem></li>
-        <li><DropdownMenuItem href="#metodos">Métodos de pago</DropdownMenuItem></li>
+        <li><DropdownMenuItem href="#recientes">Recientes</DropdownMenuItem></li>
+        <li><DropdownMenuItem href="#compartidos" selected>Compartidos</DropdownMenuItem></li>
+        <li><DropdownMenuItem href="#archivados">Archivados</DropdownMenuItem></li>
       </DropdownMenuNavList>
     </nav>
   ),
@@ -421,7 +482,7 @@ export const ListKeyboardTest: Story = {
   render: () => (
     <DropdownMenuList aria-label="Opciones de la cuenta" initialFocus="first" className="flex w-[310px] flex-col gap-1">
       <DropdownMenuItem>Mi perfil</DropdownMenuItem>
-      <DropdownMenuItem disabled>Facturación</DropdownMenuItem>
+      <DropdownMenuItem disabled>Notificaciones</DropdownMenuItem>
       <DropdownMenuItem href="#ajustes">Ajustes</DropdownMenuItem>
       <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
     </DropdownMenuList>
@@ -505,17 +566,47 @@ export const NavigationListTest: Story = {
   tags: ['!autodocs'],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const nav = canvas.getByRole('navigation', { name: 'Pagos' });
+    const nav = canvas.getByRole('navigation', { name: 'Documentos' });
     expect(within(nav).queryByRole('menu')).toBeNull();
     expect(within(nav).queryByRole('menuitem')).toBeNull();
     expect(within(within(nav).getByRole('list')).getAllByRole('listitem')).toHaveLength(3);
-    const facturas = within(nav).getByRole('link', { name: 'Facturas' });
-    expect(facturas).toHaveAttribute('aria-current', 'page');
-    expect(within(nav).getByRole('link', { name: 'Historial de pagos' })).not.toHaveAttribute('aria-current');
+    const compartidos = within(nav).getByRole('link', { name: 'Compartidos' });
+    expect(compartidos).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getByRole('link', { name: 'Recientes' })).not.toHaveAttribute('aria-current');
     // En el orden de Tab
     await userEvent.tab();
-    expect(within(nav).getByRole('link', { name: 'Historial de pagos' })).toHaveFocus();
+    expect(within(nav).getByRole('link', { name: 'Recientes' })).toHaveFocus();
     await userEvent.tab();
-    expect(facturas).toHaveFocus();
+    expect(compartidos).toHaveFocus();
+  },
+};
+
+/** Página de documentación (plantilla v2): encabezado, pestañas, secciones, marcadores de anatomía y tabla de props. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Dropdown menu' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Dropdown menu en Figma:']);
+    // Anatomía: un marcador por pauta (5 + 4 + 6 + 4) y las vistas son ilustraciones (inert)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(4);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(19));
+    // Los paneles de las muestras van en el flujo, sin capa superior
+    await expect(canvasElement.querySelector('[popover]')).toBeNull();
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de DropdownMenu' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

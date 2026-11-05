@@ -4,6 +4,11 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { AlertModal, AlertModalPanel } from './AlertModal';
 import type { AlertModalProps, AlertModalType } from './Modal.types';
 import { Button } from '../Button';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './AlertModal.doc';
+import docsJson from './AlertModal.docs.json';
 
 const TYPE_OPTIONS: AlertModalType[] = ['info', 'error', 'alert', 'success'];
 const SURFACE = 'bg-ds-background-general-black';
@@ -15,22 +20,53 @@ const LOREM_2 =
 
 type DemoArgs = AlertModalProps & { withSecondary?: boolean; withTertiary?: boolean };
 
+/** Texto de una prop como atributo JSX (`title="…"`, o entre llaves si lleva comillas). */
+const attr = (name: string, value: string) => (value.includes('"') ? `${name}={${JSON.stringify(value)}}` : `${name}="${value}"`);
+
+/**
+ * Código de Desarrollo: el disparador, el estado `open` y el `AlertModal` con lo que muestra el lienzo. El código
+ * generado por defecto omitiría `open`, `onOpenChange` y las acciones, así que se escribe aquí.
+ */
+function docsCode(args: Record<string, unknown>): string {
+  const { withSecondary, withTertiary, children, ...props } = args;
+  const lines: string[] = ['open={open}', 'onOpenChange={setOpen}'];
+  for (const [name, value] of Object.entries(props)) {
+    if (typeof value === 'string') lines.push(attr(name, value));
+    else if (typeof value === 'boolean') lines.push(value ? name : `${name}={false}`);
+    else if (typeof value === 'number') lines.push(`${name}={${value}}`);
+  }
+  lines.push("primaryAction={{ label: 'Eliminar' }}");
+  if (withSecondary === true) lines.push("secondaryAction={{ label: 'Cancelar' }}");
+  if (withTertiary === true) lines.push("tertiaryAction={{ label: 'Ver detalles' }}");
+  const text = typeof children === 'string' && children !== '' ? children : undefined;
+  return [
+    'const [open, setOpen] = useState(false);',
+    '',
+    '<Button onClick={() => setOpen(true)}>Abrir aviso</Button>',
+    '<AlertModal',
+    ...lines.map((line) => `  ${line}`),
+    text ? `>\n  ${text}\n</AlertModal>` : '/>',
+  ].join('\n');
+}
+
 const meta = {
   title: 'Overlays/AlertModal',
   component: AlertModal,
   subcomponents: { AlertModalPanel },
-  parameters: { layout: 'centered' },
+  // La página Docs usa la plantilla de documentación (AlertModal.doc.tsx); el lienzo abre y cierra el diálogo real
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson), docsLive: { code: docsCode, exclude: ['open', 'defaultOpen'] } },
   tags: ['autodocs'],
-  argTypes: {
-    type: { control: 'radio', options: TYPE_OPTIONS, type: { name: 'enum', value: TYPE_OPTIONS }, description: 'Type de Figma' },
-    title: { control: 'text', type: { name: 'string' }, description: 'Text heading de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: '↪ Text description1 de Figma (semibold)' },
-    children: { control: 'text', type: { name: 'string' }, description: '↪ Text descriptio2 de Figma (regular)' },
-    closable: { control: 'boolean', type: { name: 'boolean' }, description: 'Icon close de Figma' },
+  // Las descripciones salen de AlertModal.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    type: { control: 'radio', options: TYPE_OPTIONS, type: { name: 'enum', value: TYPE_OPTIONS } },
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    children: { control: 'text', type: { name: 'string' } },
+    closable: { control: 'boolean', type: { name: 'boolean' } },
     closeOnBackdrop: { control: 'boolean', type: { name: 'boolean' } },
     withSecondary: { control: 'boolean', type: { name: 'boolean' }, description: 'Btn secondary de Figma (solo en la historia)' },
     withTertiary: { control: 'boolean', type: { name: 'boolean' }, description: 'Btn tertiary de Figma (solo en la historia)' },
-  },
+  }),
   args: {
     type: 'alert',
     title: '¿Eliminar el documento?',
@@ -230,3 +266,33 @@ function ActionsDemo() {
     </>
   );
 }
+
+/** Test de la página de documentación (plantilla v2): encabezado, pestañas, secciones, marcadores y tabla de props. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'AlertModal' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente AlertModal en Figma:']);
+    // Anatomía: un marcador por pauta en cada lienzo (6 y 4), y las vistas son ilustraciones (inert)
+    const views = canvasElement.querySelectorAll('[data-doc-anatomy-view="marks"]');
+    await expect(views).toHaveLength(2);
+    for (const view of views) await expect(view).toHaveAttribute('inert');
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(10));
+    // Las superficies de la documentación son ilustraciones: ningún diálogo real en la página
+    await expect(canvasElement.querySelector('dialog')).toBeNull();
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de AlertModal' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+  },
+};

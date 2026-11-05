@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Modal, ModalPanel } from './Modal';
+import { doc } from './Modal.doc';
+import docsJson from './Modal.docs.json';
 import type { ModalProps } from './Modal.types';
 import { Avatar } from '../Avatar';
 import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
@@ -11,6 +13,10 @@ import { InteractiveCard } from '../InteractiveCard';
 import { ListItem } from '../ListItem';
 import { ProfileCard } from '../ProfileCard';
 import { Tag } from '../Tag';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { formatLiteral } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
 
 const SURFACE = 'bg-ds-background-general-black';
 const LABEL = 'font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm text-ds-text-neutral-gray';
@@ -19,44 +25,45 @@ const SECTION_TITLE = [
   'text-ds-typography-heading-size-md leading-ds-typography-heading-line-height-md text-ds-text-neutral-heading',
 ].join(' ');
 
+const ICON_OPTIONS = ['notification', 'info-circle', 'folder', 'document-text'];
+
 type DemoArgs = ModalProps & { withTertiary?: boolean };
 
-/** Args de los controles → props del Modal que arma `Demo` (acciones del pie), para el código de Desarrollo. */
-function docsArgs({ withTertiary, ...args }: Record<string, unknown>): Record<string, unknown> {
-  return {
-    ...args,
-    primaryAction: { label: 'Mover' },
-    secondaryAction: { label: 'Cancelar' },
-    tertiaryAction: withTertiary ? { label: 'Nueva carpeta' } : undefined,
-  };
-}
+/** Valor de una prop escrito como en JSX. */
+const jsxProp = (name: string, value: unknown) =>
+  typeof value === 'string' ? `${name}="${value.replace(/"/g, '&quot;')}"` : value === true ? name : `${name}={${formatLiteral(value)}}`;
 
 /**
- * Lienzo de Desarrollo: el `<dialog>` se abre en el top layer, por encima de la página y fuera del lienzo, así que ahí
- * se dibuja la superficie (`ModalPanel`) con los mismos args. La historia sola (botón "Abrir modal") sigue en
- * "Abrir en una pestaña nueva".
+ * Código de Desarrollo: el mismo modal del lienzo con su estado y los manejadores definidos, listo para copiar. El
+ * código generado omite las funciones, así que las acciones se escriben aquí (receta R5).
  */
-function DocsCanvas(args: Record<string, unknown>) {
-  const { lateral, withTertiary, title, description, icon, closable, closeLabel, headingLevel, bodyLabel } = args as DemoArgs;
-  const panel = (
-    <ModalPanel
-      lateral={lateral}
-      title={title}
-      description={description}
-      icon={icon}
-      closable={closable}
-      closeLabel={closeLabel}
-      headingLevel={headingLevel}
-      bodyLabel={bodyLabel}
-      primaryAction={{ label: 'Mover' }}
-      secondaryAction={{ label: 'Cancelar' }}
-      tertiaryAction={withTertiary ? { label: 'Nueva carpeta' } : undefined}
-    >
-      <FolderPicker titles={lateral ? ['Proyectos', 'Archivo', 'Compartido'] : undefined} />
-    </ModalPanel>
-  );
-  // El lateral ocupa todo el alto de su contenedor
-  return lateral ? <div className="h-150">{panel}</div> : panel;
+function docsCode(args: Record<string, unknown>) {
+  const { primaryAction: _p, secondaryAction: _s, tertiaryAction: _t, children: _c, open: _o, defaultOpen: _d, withTertiary: _w, ...rest } = args;
+  const props = [
+    'open={open}',
+    'onOpenChange={setOpen}',
+    ...Object.entries(rest).map(([name, value]) => jsxProp(name, value)),
+    "primaryAction={{ label: 'Mover', onClick: moveFiles }}",
+    "secondaryAction={{ label: 'Cancelar' }}",
+    "tertiaryAction={{ label: 'Nueva carpeta', onClick: createFolder }}",
+  ];
+  return [
+    'const [open, setOpen] = useState(false);',
+    '',
+    '// Tras onClick el modal se cierra, salvo que llames a event.preventDefault()',
+    'const moveFiles = () => { /* mueve los archivos */ };',
+    'const createFolder = (event) => {',
+    '  event.preventDefault(); // el modal sigue abierto',
+    '  /* crea la carpeta */',
+    '};',
+    '',
+    '<Button onClick={() => setOpen(true)}>Abrir modal</Button>',
+    '<Modal',
+    ...props.map((p) => `  ${p}`),
+    '>',
+    '  <p>Los archivos elegidos pasan al nuevo destino.</p>',
+    '</Modal>',
+  ].join('\n');
 }
 
 const meta = {
@@ -66,17 +73,21 @@ const meta = {
   parameters: {
     layout: 'centered',
     // Apertura y cierre son del diálogo, que el lienzo no abre: esas props quedan solo en la tabla Props
-    docsLive: { render: DocsCanvas, args: docsArgs, exclude: ['open', 'defaultOpen', 'closeOnBackdrop'] },
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo es la historia Interactive: un botón abre el Modal real; el código lleva el estado y los manejadores
+    docsLive: { code: docsCode, exclude: ['open', 'defaultOpen'] },
   },
   tags: ['autodocs'],
-  argTypes: {
-    lateral: { control: 'boolean', type: { name: 'boolean' }, description: 'Lateral de Figma: panel lateral derecho' },
-    title: { control: 'text', type: { name: 'string' }, description: 'Heading de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Description2 de Figma' },
-    closable: { control: 'boolean', type: { name: 'boolean' }, description: 'Icon close de Figma' },
+  // Las descripciones salen de Modal.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    lateral: { control: 'boolean', type: { name: 'boolean' } },
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    icon: { control: 'select', options: ICON_OPTIONS, type: { name: 'enum', value: ICON_OPTIONS } },
+    headingLevel: { control: 'radio', options: [2, 3, 4], type: { name: 'enum', value: [2, 3, 4] } },
+    closable: { control: 'boolean', type: { name: 'boolean' } },
     closeOnBackdrop: { control: 'boolean', type: { name: 'boolean' } },
-    withTertiary: { control: 'boolean', type: { name: 'boolean' }, description: 'Btn tertiary de Figma (solo en la historia)' },
-  },
+  }),
   args: {
     lateral: false,
     title: 'Mover a una carpeta',
@@ -84,7 +95,7 @@ const meta = {
     icon: 'notification',
     closable: true,
     closeOnBackdrop: true,
-    withTertiary: false,
+    withTertiary: true,
   },
 } satisfies Meta<DemoArgs>;
 
@@ -343,5 +354,36 @@ export const LateralTest: Story = {
     await userEvent.click(modal.getByRole('button', { name: 'Cerrar' }));
     await waitFor(() => expect(dialog).not.toHaveAttribute('open'));
     await expect(trigger).toHaveFocus();
+  },
+};
+
+/** Página de documentación (plantilla v2): la revisan vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Modal' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    // Sin los títulos de los paneles de ejemplo, que también son h2 (`data-figma-part`)
+    const h2 = () =>
+      canvas
+        .getAllByRole('heading', { level: 2 })
+        .filter((h) => !h.hasAttribute('data-figma-part'))
+        .map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Modal en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 del modal centrado + 5 del lateral)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(11);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Modal' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -1,18 +1,18 @@
 {
   "name": "Modal",
   "component": "Modal",
-  "description": "Complex modal de Figma (set 14446:66166, Lateral off / on): encabezado con Avatar icon On card (48, 40 en móvil), título y descripción; contenido libre (slot Container) que ocupa el alto disponible y se desplaza con ScrollArea (con desborde es una región con nombre y tabulable, y deja 8 entre el contenido y la barra); pie con acciones Tertiary · Secondary · Primary alineadas a la derecha. Lateral=off: centrado (500 de ancho, hasta el 90 % del alto) con el Button corner de cerrar en la muesca de la silueta. Lateral=on: panel lateral derecho a todo el alto (576) con radios 32 a la izquierda y el cerrar (ícono de 24) en una fila sobre el encabezado. En móvil (< 48rem) los dos son una hoja inferior con asa, encabezado centrado, sin botón cerrar y botones apilados a todo el ancho (Primary arriba). Es un <dialog> con showModal() (patrón APG Dialog Modal, pieza interna ModalDialog): foco atrapado e inerte el resto, Escape y clic en el fondo cierran, el documento no se desplaza debajo y al cerrar el foco vuelve a quien lo abrió. Al abrir, el foco va al título (tabIndex -1) para leer desde el principio aunque el contenido sea largo. Controlado o no (open / defaultOpen / onOpenChange). El contenido de ejemplo de Figma (Interactive card, List item, Profile card) no es parte del componente: va en children. ModalPanel es la superficie sola (sin diálogo), para documentación.",
+  "description": "Complex modal de Figma (Lateral off / on): diálogo con encabezado (Avatar icon On card de 48, de 40 en móvil, título y descripción), contenido libre (slot Container) que ocupa el alto disponible y se desplaza con ScrollArea, y pie con acciones Tertiary, Secondary y Primary alineadas a la derecha. Lateral off: centrado (500 de ancho y hasta el 90% del alto) con el Button corner de cerrar en la muesca de la silueta. Lateral on: panel lateral derecho a todo el alto (576) con radios de 32 a la izquierda y el cerrar (ícono de 24) en una fila sobre el encabezado. En móvil (menos de 48rem) los dos son una hoja inferior con asa, encabezado centrado, sin botón cerrar y botones apilados a todo el ancho (Primary arriba). Es un <dialog> con showModal() (patrón APG Dialog Modal): el foco queda atrapado, el resto de la página queda inerte, Escape y el clic en el fondo cierran, el documento no se desplaza debajo y al cerrar el foco vuelve a quien lo abrió. Al abrir, el foco va al título para leer desde el principio aunque el contenido sea largo; sin título, va al primer elemento enfocable (el botón cerrar). Con desborde, el contenido es una región con nombre (bodyLabel) que se puede tabular y deja 8 hasta la barra. Controlado o no (open, defaultOpen y onOpenChange). El contenido de ejemplo de Figma (Interactive card, List item, Profile card) no es parte del componente: va en children. ModalPanel es la superficie sola, sin diálogo, para documentación.",
   "category": "Overlays",
   "props": {
     "lateral": {
       "type": "boolean",
       "default": false,
-      "description": "Lateral de Figma: panel lateral derecho a todo el alto; si no, centrado con el cerrar en la muesca."
+      "description": "Panel lateral derecho a todo el alto (Lateral en Figma). Si no, centrado con el cerrar en la muesca."
     },
     "open": {
       "type": "boolean",
       "required": false,
-      "description": "Abierto (controlado). Usar con onOpenChange."
+      "description": "Abierto (controlado). Úsalo con onOpenChange."
     },
     "defaultOpen": {
       "type": "boolean",
@@ -27,7 +27,7 @@
     "title": {
       "type": "ReactNode",
       "required": false,
-      "description": "Título (Heading / Text heading de Figma); da el nombre accesible al diálogo (aria-labelledby). Sin título, pasar aria-label."
+      "description": "Título (Heading en Figma). Da el nombre accesible al diálogo (aria-labelledby). Sin título, pasa aria-label."
     },
     "headingLevel": {
       "type": "2 | 3 | 4",
@@ -37,12 +37,12 @@
     "description": {
       "type": "ReactNode",
       "required": false,
-      "description": "Descripción bajo el título (Description2); aria-describedby."
+      "description": "Descripción bajo el título (Description2 en Figma). Describe el diálogo (aria-describedby)."
     },
     "icon": {
       "type": "IconName",
       "required": false,
-      "description": "Ícono del encabezado en un Avatar icon (prop Icon de Figma; en Figma, notification). Decorativo."
+      "description": "Ícono del encabezado, dentro de un Avatar icon (Icon en Figma). Es decorativo; sin él no se dibuja."
     },
     "bodyLabel": {
       "type": "string",
@@ -52,22 +52,22 @@
     "children": {
       "type": "ReactNode",
       "required": false,
-      "description": "Contenido (slot Container), en columna con gap 32."
+      "description": "Contenido (slot Container en Figma), en columna con separación de 32."
     },
     "primaryAction": {
       "type": "ModalAction",
       "required": false,
-      "description": "Button Primary. ModalAction = { label, onClick?, disabled?, loading?, state?, leftIcon?, rightIcon?, iconSize?, aria-label? }. Tras onClick cierra, salvo event.preventDefault()."
+      "description": "Acción principal (Button Primary). ModalAction = { label, onClick?, disabled?, loading?, state?, leftIcon?, rightIcon?, iconSize?, aria-label? }. Tras onClick cierra, salvo event.preventDefault()."
     },
     "secondaryAction": {
       "type": "ModalAction",
       "required": false,
-      "description": "Button Secondary (Btn secondary de Figma)."
+      "description": "Acción secundaria (Button Secondary, Btn secondary en Figma)."
     },
     "tertiaryAction": {
       "type": "ModalAction",
       "required": false,
-      "description": "Button Tertiary (Btn tertiary de Figma)."
+      "description": "Acción terciaria (Button Tertiary, Btn tertiary en Figma)."
     },
     "actions": {
       "type": "ReactNode",
@@ -77,7 +77,7 @@
     "closable": {
       "type": "boolean",
       "default": true,
-      "description": "Botón cerrar (Icon close de Figma). En móvil Figma no lo dibuja: cierran Escape, el fondo o una acción."
+      "description": "Botón cerrar (Icon close en Figma). En móvil Figma no lo dibuja: cierran Escape, el fondo o una acción."
     },
     "closeLabel": {
       "type": "string",
@@ -92,21 +92,21 @@
     "initialFocus": {
       "type": "RefObject<HTMLElement | null>",
       "required": false,
-      "description": "Elemento que recibe el foco al abrir (sustituye al de por defecto)."
+      "description": "Elemento que recibe el foco al abrir. Por defecto, el título; sin title, el primer elemento enfocable (el botón cerrar)."
     }
   },
   "examples": [
     {
       "title": "Centrado",
-      "code": "<Modal open={open} onOpenChange={setOpen} icon=\"notification\" title=\"Mover a una carpeta\" description=\"Elige el destino de los archivos.\" primaryAction={{ label: 'Mover', onClick: mover }} secondaryAction={{ label: 'Cancelar' }}>{contenido}</Modal>"
+      "code": "const [open, setOpen] = useState(false);\n\n// Tras onClick el modal se cierra, salvo que llames a event.preventDefault()\nconst moveFiles = () => { /* mueve los archivos */ };\n\n<Button onClick={() => setOpen(true)}>Abrir modal</Button>\n<Modal\n  open={open}\n  onOpenChange={setOpen}\n  icon=\"notification\"\n  title=\"Mover a una carpeta\"\n  description=\"Elige el destino de los archivos.\"\n  primaryAction={{ label: 'Mover', onClick: moveFiles }}\n  secondaryAction={{ label: 'Cancelar' }}\n>\n  <p>Los archivos elegidos pasan al nuevo destino.</p>\n</Modal>"
     },
     {
       "title": "Lateral",
-      "code": "<Modal lateral open={open} onOpenChange={setOpen} title=\"Detalles\" primaryAction={{ label: 'Guardar' }} secondaryAction={{ label: 'Cancelar' }} tertiaryAction={{ label: 'Restablecer', onClick: (e) => { e.preventDefault(); restablecer(); } }}>{contenido}</Modal>"
+      "code": "const [open, setOpen] = useState(false);\n\nconst saveChanges = () => { /* guarda los cambios */ };\nconst resetForm = (event) => {\n  event.preventDefault(); // el modal sigue abierto\n  /* restablece los campos */\n};\n\n<Button onClick={() => setOpen(true)}>Abrir detalles</Button>\n<Modal\n  lateral\n  open={open}\n  onOpenChange={setOpen}\n  title=\"Detalles\"\n  primaryAction={{ label: 'Guardar', onClick: saveChanges }}\n  secondaryAction={{ label: 'Cancelar' }}\n  tertiaryAction={{ label: 'Restablecer', onClick: resetForm }}\n>\n  <p>Revisa los datos antes de guardar.</p>\n</Modal>"
     },
     {
       "title": "Sin título visible",
-      "code": "<Modal aria-label=\"Vista previa\" open={open} onOpenChange={setOpen}>{vistaPrevia}</Modal>"
+      "code": "const [open, setOpen] = useState(false);\n\n<Button onClick={() => setOpen(true)}>Ver vista previa</Button>\n<Modal aria-label=\"Vista previa\" open={open} onOpenChange={setOpen}>\n  <p>Así se verá el documento al publicarlo.</p>\n</Modal>"
     }
   ]
 }

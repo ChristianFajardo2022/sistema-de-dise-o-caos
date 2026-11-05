@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 /**
- * Popover — set "Atom tooltip" de Figma (11112:6700): Type Simple/Complex × Position (8 flechas) × Photo; 16 variantes
+ * Popover — set "Popover" de Figma (11112:6700): Type Simple/Complex × Position (8 flechas) × Photo; 16 variantes
  * (Simple ⇔ Photo=no, Complex ⇔ Photo=yes).
  *
  * - Raíz transparente de 305 de ancho (FIXED en Figma): la flecha y el "Content" en columna (flecha arriba o abajo) o
@@ -98,7 +98,7 @@ export const popoverInnerVariants = cva('flex flex-col', {
   defaultVariants: { type: 'simple' },
 });
 
-/** Bloque de medios (Photo=yes): marco "Frame 6" de 169.47 con la forma "Subtract" (muesca del Button corner de 40). */
+/** Bloque de medios (Photo=yes): marco "Frame 6" de 169.47 con la forma "Subtract" (muesca del Button corner sm de 32). */
 export const popoverMediaClass = 'relative isolate h-[169.47px] shrink-0';
 
 export const popoverTextVariants = cva('flex flex-col gap-ds-space-general-lg', {
