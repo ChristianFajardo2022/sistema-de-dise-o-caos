@@ -5,12 +5,21 @@ import { NotificationGroup } from './NotificationGroup';
 import { NotificationGroupItem } from './NotificationGroupItem';
 import { NotificationCard } from '../NotificationCard';
 import { FIGMA_LOREM } from '../NotificationItem/NotificationItem.shared';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NotificationGroup.doc';
+import docsJson from './NotificationGroup.docs.json';
 
 const meta = {
   title: 'Data Display/NotificationGroup',
   component: NotificationGroup,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { story: 'Interactive', exclude: ['children', 'rootProps', 'contentProps', 'expanded', 'defaultExpanded', 'onExpandedChange', 'onDelete', 'revealed', 'defaultRevealed', 'onRevealedChange'] },
+  },
   decorators: [
     (Story, { parameters }) =>
       parameters.bare ? (
@@ -22,6 +31,7 @@ const meta = {
       ),
   ],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     title: { control: 'text', type: { name: 'string' }, description: 'Prop Heading de Figma' },
     time: { control: 'text', type: { name: 'string' }, description: 'Hora relativa de la última notificación' },
     unread: { control: 'boolean', type: { name: 'boolean' }, description: 'State=Unread de Figma' },
@@ -30,7 +40,7 @@ const meta = {
     revealed: { control: 'boolean', type: { name: 'boolean' }, description: 'Type=Group delete de Figma' },
   },
   args: {
-    title: 'Actualizaciones de la cuenta',
+    title: 'Actualizaciones del perfil',
     time: 'Hace 22 min',
     unread: true,
   },
@@ -44,7 +54,7 @@ const items = (unread: boolean[]) =>
     <NotificationGroupItem
       key={i}
       time={`Hace ${22 + i * 20} min`}
-      description={['Cambiaste tu contraseña.', 'Confirmamos tu correo nuevo.', 'Recibimos tu pago.'][i]}
+      description={['Se actualizó la imagen de perfil.', 'Se guardaron los ajustes de privacidad.', 'Se añadió una nota de reunión.'][i]}
       unread={u}
     />
   ));
@@ -68,7 +78,7 @@ export const Read: Story = {
 
 /** Con `onDelete` el botón eliminar quita todo el grupo. */
 function DeleteDemo() {
-  const [groups, setGroups] = useState(['Pago de octubre', 'Pago de noviembre']);
+  const [groups, setGroups] = useState(['Notas del equipo', 'Cambios de perfil']);
   return (
     <ul role="list" className="m-0 flex w-[351px] list-none flex-col gap-2 p-0">
       {groups.map((g) => (
@@ -164,18 +174,18 @@ export const FigmaMatrix: Story = {
 export const DisclosureTest: Story = {
   tags: ['!autodocs'],
   render: () => (
-    <NotificationGroup title="Pago de octubre" time="Hace 22 min" unread onExpandedChange={fn()}>
+    <NotificationGroup title="Notas de reunión" time="Hace 22 min" unread onExpandedChange={fn()}>
       {items([true, true, false])}
     </NotificationGroup>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const toggle = canvas.getByRole('button', { name: 'Mostrar notificaciones Pago de octubre' });
+    const toggle = canvas.getByRole('button', { name: 'Mostrar notificaciones Notas de reunión' });
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await expect(toggle).toHaveAccessibleDescription('Hace 22 min No leído');
     await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
     await userEvent.click(toggle);
-    await waitFor(() => expect(canvas.getByRole('button', { name: 'Ocultar notificaciones Pago de octubre' })).toHaveAttribute('aria-expanded', 'true'));
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Ocultar notificaciones Notas de reunión' })).toHaveAttribute('aria-expanded', 'true'));
     await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
     await expect(toggle).toHaveAttribute('aria-controls', canvas.getAllByRole('list')[1].id);
     await userEvent.keyboard('{Enter}');
@@ -190,7 +200,26 @@ export const DeleteFocusTest: Story = {
   render: () => <DeleteDemo />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'Eliminar notificación: Pago de octubre' }));
-    await waitFor(() => expect(canvas.getByRole('button', { name: 'Mostrar notificaciones Pago de noviembre' })).toHaveFocus());
+    await userEvent.click(canvas.getByRole('button', { name: 'Eliminar notificación: Notas del equipo' }));
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Mostrar notificaciones Cambios de perfil' })).toHaveFocus());
+  },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NotificationGroup' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((tab) => tab.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const headings = () => canvas.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent);
+    await expect(headings()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NotificationGroup en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(headings()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    await userEvent.click(tabs[2]);
+    await expect(headings()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
   },
 };

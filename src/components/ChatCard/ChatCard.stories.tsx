@@ -7,11 +7,20 @@ import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
 import type { PhotoName } from '../Avatar/Avatar.sample-data';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ChatCard.doc';
+import docsJson from './ChatCard.docs.json';
 
 const meta = {
   title: 'Data Display/ChatCard',
   component: ChatCard,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: ['leading', 'actions', 'rootProps'] },
+  },
   tags: ['autodocs'],
   decorators: [
     (Story, { parameters }) =>
@@ -24,6 +33,7 @@ const meta = {
       ),
   ],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     title: { control: 'text', type: { name: 'string' }, description: 'Prop Filename de Figma' },
     description: { control: 'text', type: { name: 'string' }, description: 'Prop Status de Figma (último mensaje)' },
     time: { control: 'text', type: { name: 'string' }, description: 'Hora del último mensaje' },
@@ -60,6 +70,13 @@ const avatar = (photo: PhotoName = 'Woman_1') => <Avatar variant="photo" size="m
 export const Interactive: Story = {
   args: { onClick: fn() },
   render: (args) => <ChatCard {...args} leading={avatar()} />,
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
 };
 
 /** Lista de conversaciones: la seleccionada cambia al hacer clic. */

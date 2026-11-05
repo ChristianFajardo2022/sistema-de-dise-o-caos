@@ -8,14 +8,24 @@ import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
 import { Button } from '../Button';
 import { FileCard } from '../FileCard';
 import { Icon } from '../Icon';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ChatDetailsPanel.doc';
+import docsJson from './ChatDetailsPanel.docs.json';
 
 const meta = {
   title: 'Data Display/ChatDetailsPanel',
   component: ChatDetailsPanel,
   subcomponents: { ChatDetailsHeader, ChatDetailsProfile, ChatDetailsLink, ChatDetailsGrid },
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: ['children', 'collapsed', 'defaultCollapsed', 'onCollapsedChange'] },
+  },
   tags: ['autodocs'],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     collapsible: { control: 'boolean', type: { name: 'boolean' } },
     defaultCollapsed: { control: 'boolean', type: { name: 'boolean' } },
   },
@@ -248,5 +258,24 @@ export const NavigationTest: Story = {
     const expand = canvas.getByRole('button', { name: 'Mostrar detalles' });
     await expect(expand).toHaveAttribute('aria-expanded', 'false');
     await expect(canvas.getByRole('button', { name: 'Fotografías' })).toBeInTheDocument();
+  },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'ChatDetailsPanel' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((tab) => tab.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const headings = () => canvas.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent);
+    await expect(headings()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente ChatDetailsPanel en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(headings()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    await userEvent.click(tabs[2]);
+    await expect(headings()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
   },
 };
