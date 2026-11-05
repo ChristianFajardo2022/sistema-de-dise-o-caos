@@ -117,6 +117,34 @@ function LeafLink({ leaf, active, onSelect }: LinkProps) {
   );
 }
 
+/** Página de entrada de un fundamento: su Docs si lo tiene; si no, la primera historia (la pestaña Definición). */
+const entryLeaf = (branch: Branch) => branch.leaves.find((l) => l.type === 'docs') ?? branch.leaves[0];
+
+/**
+ * Fundamento: primer nivel sin desplegable. Entra directo a su documentación; las pestañas de la página cambian de
+ * sección. Se marca como elegido si la historia actual es de este fundamento.
+ */
+function FoundationLink({ branch, activeId, onSelect }: { branch: Branch; activeId?: string; onSelect: (id: string) => void }) {
+  const entry = entryLeaf(branch);
+  if (!entry) return null;
+  const active = !!activeId && branch.leaves.some((l) => l.id === activeId);
+  return (
+    <a
+      className="caos-sb-top-btn caos-sb-top-link"
+      data-state={active ? 'select' : undefined}
+      href={leafHref(entry)}
+      aria-current={active ? 'page' : undefined}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        onSelect(entry.id);
+      }}
+    >
+      <span className="caos-sb-top-text">{branch.label}</span>
+    </a>
+  );
+}
+
 /** Hamburguer menu atom (With text / Dropdown Select): primer nivel, abre su lista debajo. */
 function TopItem({
   label,
@@ -381,7 +409,13 @@ export function CaosSidebar({ api, onModeChange }: Props) {
               {!!results.foundations.length && (
                 <section aria-label="Fundamentos">
                   <p className="caos-sb-caption">Fundamentos ({results.foundations.length})</p>
-                  <ul className="caos-sb-sub caos-sb-sub--flush">{renderHits(results.foundations)}</ul>
+                  <ul className="caos-sb-sub caos-sb-sub--flush">
+                    {results.foundations.map((hit) => (
+                      <li key={hit.branch.key}>
+                        <FoundationLink branch={hit.branch} activeId={snap.storyId} onSelect={selectStory} />
+                      </li>
+                    ))}
+                  </ul>
                 </section>
               )}
               {!!results.components.length && (
@@ -396,18 +430,9 @@ export function CaosSidebar({ api, onModeChange }: Props) {
           {tab === 'foundations' && (
             <ul className="caos-sb-list">
               {tree.foundations.map((f) => (
-                <TopItem
-                  key={f.key}
-                  label={f.label}
-                  open={openTop.foundations === f.key}
-                  onToggle={() => setOpenTop((o) => ({ ...o, foundations: o.foundations === f.key ? null : f.key }))}
-                >
-                  {f.leaves.map((leaf) => (
-                    <li key={leaf.id}>
-                      <LeafLink leaf={leaf} active={leaf.id === snap.storyId} onSelect={selectStory} />
-                    </li>
-                  ))}
-                </TopItem>
+                <li key={f.key} className="caos-sb-top">
+                  <FoundationLink branch={f} activeId={snap.storyId} onSelect={selectStory} />
+                </li>
               ))}
             </ul>
           )}

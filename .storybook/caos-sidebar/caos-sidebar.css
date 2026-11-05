@@ -229,6 +229,7 @@
   line-height: var(--ds-responsive-typography-field-line-height-md);
   color: var(--color-ds-text-neutral-body);
   text-align: left;
+  text-decoration: none; /* los fundamentos son enlaces directos */
   cursor: pointer;
 }
 
