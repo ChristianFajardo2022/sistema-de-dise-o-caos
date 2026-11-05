@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '../../utils/cn';
-import { ScrollRegion } from '../_doc';
+import { ScrollRegion } from '../_doc/ScrollRegion';
 
-/** Colores de los diagramas (tokens semánticos que cambian con el tema) */
+/** Colores de los diagramas (tokens semánticos que cambian con el modo) */
 export const COLUMN_CLASS = 'bg-ds-background-graphic-error-secondary-opacity';
 export const MARGIN_CLASS = 'bg-ds-background-graphic-information-secondary-opacity';
 export const PANEL_CLASS = 'bg-ds-background-graphic-information-firts-opacity';
@@ -75,7 +75,7 @@ export function GridDiagram({
       >
         {chrome && (
           <>
-            <div className="absolute inset-x-0 top-0 bg-ds-text-neutral-heading" style={{ height: pct(navH, height) }} />
+            <div className="absolute inset-x-0 top-0 bg-ds-background-graphic-neutral-secondary" style={{ height: pct(navH, height) }} />
             <div className="absolute inset-x-0 bottom-0 bg-ds-background-graphic-neutral-secondary-opacity" style={{ height: pct(footH, height) }} />
           </>
         )}
@@ -106,16 +106,21 @@ export function GridDiagram({
           <div className={cn('absolute inset-0 border-ds-border-semantic-information', PANEL_CLASS)} style={{ top: pct(navH, height) }} />
         )}
       </div>
-      {label && <figcaption className="text-center text-ds-primitives-typography-size-sm leading-snug text-ds-text-neutral-body">{label}</figcaption>}
+      {label && (
+        <figcaption className="text-center font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-sm leading-ds-primitives-typography-line-height-md text-ds-text-neutral-body">{label}</figcaption>
+      )}
     </figure>
   );
 }
 
-/** Fila de pantallas a la misma escala: cada una ocupa un ancho proporcional a su ancho real. Hace scroll propio en pantallas angostas. */
-export function ScreenRow({ screens, name }: { screens: { width: number; node: ReactNode }[]; name: string }) {
+/**
+ * Fila de pantallas a la misma escala: cada una ocupa un ancho proporcional a su ancho real. Por debajo de `minWidth` hace
+ * scroll propio (región con nombre), para que los pies de cada pantalla no se corten.
+ */
+export function ScreenRow({ screens, name, minWidth = 560 }: { screens: { width: number; node: ReactNode }[]; name: string; minWidth?: number }) {
   return (
     <ScrollRegion label={name}>
-      <div className="flex min-w-[560px] items-end gap-ds-space-general-4xl">
+      <div className="flex items-end gap-ds-space-general-4xl" style={{ minWidth }}>
         {screens.map((s, i) => (
           <div key={i} className="min-w-0" style={{ flex: `${s.width} 1 0%` }}>
             {s.node}
@@ -129,7 +134,11 @@ export function ScreenRow({ screens, name }: { screens: { width: number; node: R
 /** Leyenda de colores de un diagrama */
 export function Legend({ items }: { items: { className: string; label: string }[] }) {
   return (
-    <ul className="m-0 flex list-none flex-wrap gap-x-ds-space-general-4xl gap-y-ds-space-general-md p-0 text-ds-primitives-typography-size-md text-ds-text-neutral-body">
+    <ul
+      role="list"
+      aria-label="Leyenda"
+      className="m-0 flex list-none flex-wrap gap-x-ds-space-general-4xl gap-y-ds-space-general-md p-0 font-ds-primitives-typography-family-primary text-ds-primitives-typography-size-md leading-ds-typography-body-line-height-short-md text-ds-text-neutral-body"
+    >
       {items.map((it) => (
         <li key={it.label} className="flex items-center gap-ds-space-general-lg">
           <span aria-hidden="true" className={cn('size-4 border border-ds-border-general-default-on-card', it.className)} />
