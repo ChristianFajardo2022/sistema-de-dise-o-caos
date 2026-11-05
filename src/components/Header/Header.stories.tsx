@@ -2,13 +2,80 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Header } from './Header';
-import type { HeaderNavItem } from './Header.types';
+import type { HeaderNavItem, HeaderProps } from './Header.types';
 import { Button } from '../Button';
 import { DropdownMenuItem } from '../DropdownMenu';
 import { NotificationCard } from '../NotificationCard';
 import { NotificationItem } from '../NotificationItem';
 import { NotificationPanel, NotificationPanelHeading } from '../NotificationPanel';
 import type { NotificationPanelTab } from '../NotificationPanel';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { cn } from '../../utils/cn';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Header.doc';
+import docsJson from './Header.docs.json';
+
+// ───────────────────────── Desarrollo (docsLive) ─────────────────────────
+
+/**
+ * Lienzo de Desarrollo. El Header ocupa el ancho del lienzo hasta 1440 (la columna de la grilla va de 0 a 1440: el
+ * lienzo no lo reduce con `zoom` y lo deja crecer) y con `layout="auto"` decide la composición por ese ancho. La hoja
+ * móvil se coloca bajo la barra con `position: absolute` y, en el lienzo, mide lo que su contenido (`h-auto`): mientras
+ * está abierta, el lienzo reserva su alto (padding responsive `space/general/3xl`, buscador de 40 y enlaces de 34 con 8
+ * entre filas) para que no la recorte. `menuOpen` lo maneja el botón de menú (R6).
+ */
+function DocsCanvas(args: Record<string, unknown>) {
+  const { menuClassName, onMenuOpenChange, ...rest } = args as HeaderProps;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const items = rest.items ?? [];
+  const search = rest.search ?? true;
+  const rows = items.reduce((n, item) => n + 1 + (item.items?.length ?? 0), 0);
+  const list = items.length > 0 ? rows * 34 + (2 * items.length - 1) * 8 : 0;
+  // Barra (2 paddings + 32) y hoja (2 paddings, buscador, un padding entre buscador y lista, lista)
+  const pads = 4 + (search && items.length > 0 ? 1 : 0);
+  const fixed = 32 + (search ? 40 : 0) + list;
+  return (
+    <div
+      className="grid w-full items-start"
+      style={{
+        gridTemplateColumns: 'minmax(0, 1440px)',
+        minHeight: menuOpen ? `calc(var(--ds-responsive-space-general-3xl) * ${pads} + ${fixed}px)` : undefined,
+      }}
+    >
+      <Header
+        {...rest}
+        menuOpen={menuOpen}
+        onMenuOpenChange={(open) => {
+          setMenuOpen(open);
+          onMenuOpenChange?.(open);
+        }}
+        menuClassName={cn('h-auto', menuClassName)}
+      />
+    </div>
+  );
+}
+
+/** Manejadores de ejemplo de los ítems del menú de perfil, por su texto. */
+const PROFILE_HANDLERS: Record<string, string> = { 'Mi perfil': 'openProfile', Ajustes: 'openSettings', Ayuda: 'openHelp' };
+
+/** Código de Personalizar: el generado más las funciones que usa, declaradas arriba (`logout`, `openProfile`…). */
+function docsCode(args: Record<string, unknown>): string {
+  let code = buildCode('Header', args, {});
+  const declarations: string[] = [];
+  if (args.user) {
+    declarations.push('const logout = () => {};');
+    code = code.includes('<Header\n') ? code.replace('<Header\n', '<Header\n  onLogout={logout}\n') : code.replace('<Header', '<Header onLogout={logout}');
+  }
+  for (const [label, handler] of Object.entries(PROFILE_HANDLERS)) {
+    const item = `<DropdownMenuItem>${label}</DropdownMenuItem>`;
+    if (!code.includes(item)) continue;
+    code = code.replace(item, `<DropdownMenuItem onSelect={${handler}}>${label}</DropdownMenuItem>`);
+    declarations.push(`const ${handler} = () => {};`);
+  }
+  return declarations.length > 0 ? `${declarations.join('\n')}\n\n${code}` : code;
+}
 
 const meta = {
   title: 'Navigation/Header',
@@ -16,22 +83,26 @@ const meta = {
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
-    // Desarrollo: el panel de notificaciones es una capa del top layer (se pinta sobre la página, fuera del lienzo, y
-    // se cierra al tocar fuera) y los default* solo cuentan al montar: sin control en Personalizar, siguen en Props
-    docsLive: { exclude: ['notificationsOpen', 'defaultNotificationsOpen', 'defaultMenuOpen'] },
-    // Varias cabeceras en la misma página de documentación: el landmark banner y el nav se repiten solo allí
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      // El panel de notificaciones es una capa del top layer (se pinta sobre la página, fuera del lienzo, y se cierra al
+      // tocar fuera) y los default* solo cuentan al montar: sin control en Personalizar, siguen en Props
+      exclude: ['notificationsOpen', 'defaultNotificationsOpen', 'defaultMenuOpen', 'menuOpen'],
+      // Lienzo a todo el ancho y con el alto de la hoja móvil abierta (ver `DocsCanvas`)
+      render: (args: Record<string, unknown>) => <DocsCanvas {...args} />,
+      // El código se copia y compila tal cual: declara `logout` y los manejadores del menú de perfil (el código generado
+      // omite las funciones)
+      code: docsCode,
+    },
+    // Varias cabeceras en la misma página de historias: el landmark banner y el nav se repiten solo allí
     a11y: { config: { rules: [{ id: 'landmark-no-duplicate-banner', enabled: false }, { id: 'landmark-unique', enabled: false }] } },
   },
-  argTypes: {
-    layout: {
-      control: 'radio',
-      options: ['auto', 'desktop', 'mobile'],
-      type: { name: 'enum', value: ['auto', 'desktop', 'mobile'] },
-      description: 'Header desktop, Header mobile o según el espacio del propio Header (auto)',
-    },
-    search: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Searcher de Figma' },
-    notificationCount: { control: { type: 'number', min: 0 }, type: { name: 'number' }, description: 'No leídas en la campana' },
-  },
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    layout: { control: 'radio', options: ['auto', 'desktop', 'mobile'], type: { name: 'enum', value: ['auto', 'desktop', 'mobile'] } },
+    search: { control: 'boolean', type: { name: 'boolean' } },
+    notificationCount: { control: { type: 'number', min: 0 }, type: { name: 'number' } },
+  }),
   args: { layout: 'auto', search: true },
 } satisfies Meta<typeof Header>;
 
@@ -42,12 +113,12 @@ type Story = StoryObj<typeof meta>;
 
 const ITEMS: HeaderNavItem[] = [
   {
-    id: 'pagos',
-    label: 'Pagos',
+    id: 'proyectos',
+    label: 'Proyectos',
     items: [
-      { label: 'Facturas', href: '#facturas' },
-      { label: 'Métodos de pago', href: '#metodos' },
-      { label: 'Historial de pagos', href: '#historial' },
+      { label: 'Activos', href: '#activos' },
+      { label: 'Archivados', href: '#archivados' },
+      { label: 'Plantillas', href: '#plantillas' },
     ],
   },
   {
@@ -63,8 +134,8 @@ const ITEMS: HeaderNavItem[] = [
 ];
 
 const NOTES = [
-  { id: 1, title: 'Pago recibido', description: 'Recibimos tu pago de la factura de octubre.', unread: true },
-  { id: 2, title: 'Mensaje nuevo', description: 'Tienes una respuesta sobre tu solicitud de soporte.', unread: true },
+  { id: 1, title: 'Documento compartido', description: 'Ana Pérez compartió Informe anual contigo.', unread: true },
+  { id: 2, title: 'Mensaje nuevo', description: 'Hugo García respondió tu mensaje.', unread: true },
   { id: 3, title: 'Cuenta actualizada', description: 'Cambiaste el correo de tu cuenta.', unread: false },
 ];
 
@@ -78,21 +149,21 @@ const simplePanel = (
 
 const TABS: NotificationPanelTab[] = [
   { value: 'all', label: 'Todas' },
-  { value: 'payments', label: 'Pagos' },
+  { value: 'docs', label: 'Documentos' },
 ];
 
 const complexPanel = (
   <NotificationPanel variant="complex" tabs={TABS} onSettingsClick={() => {}}>
     <NotificationPanelHeading>Hoy</NotificationPanelHeading>
-    <NotificationCard time="Hace 22 min" title="Factura lista" description="Ya puedes descargar la factura de octubre." unread />
-    <NotificationCard time="Hace 2 h" title="Pago recibido" description="Recibimos tu pago de la factura de octubre." />
+    <NotificationCard time="Hace 22 min" title="Documento compartido" description="Ana Pérez compartió Informe anual contigo." unread />
+    <NotificationCard time="Hace 2 h" title="Reunión reprogramada" description="La reunión de equipo pasó a las 3:00 p.m." />
   </NotificationPanel>
 );
 
 const profileItems = (
   <>
     <DropdownMenuItem>Mi perfil</DropdownMenuItem>
-    <DropdownMenuItem>Configuración</DropdownMenuItem>
+    <DropdownMenuItem>Ajustes</DropdownMenuItem>
     <DropdownMenuItem>Ayuda</DropdownMenuItem>
   </>
 );
@@ -154,7 +225,7 @@ export const SignedOut: Story = {
 };
 
 function ControlledDemo() {
-  const [open, setOpen] = useState<string | null>('pagos');
+  const [open, setOpen] = useState<string | null>('proyectos');
   return (
     <div className="min-h-64">
       <Header items={ITEMS} openItem={open} onOpenItemChange={setOpen} homeHref="#inicio" />
@@ -269,14 +340,14 @@ export const LandmarksAndNavigationTest: Story = {
     const nav = canvas.getByRole('navigation', { name: 'Navegación principal' });
     await expect(within(nav).getByRole('link', { name: 'Mensajes' })).toHaveAttribute('aria-current', 'page');
     await expect(canvas.getByRole('search')).toBeVisible();
-    const trigger = within(nav).getByRole('button', { name: 'Pagos' });
+    const trigger = within(nav).getByRole('button', { name: 'Proyectos' });
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     await userEvent.click(trigger);
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     // La lista es parte de la navegación y sigue a su botón: Tab entra a sus enlaces
-    await expect(within(nav).getByRole('link', { name: 'Historial de pagos' })).toBeVisible();
+    await expect(within(nav).getByRole('link', { name: 'Plantillas' })).toBeVisible();
     await userEvent.tab();
-    await expect(within(nav).getByRole('link', { name: 'Facturas' })).toHaveFocus();
+    await expect(within(nav).getByRole('link', { name: 'Activos' })).toHaveFocus();
     await userEvent.keyboard('{Escape}');
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     await expect(trigger).toHaveFocus();
@@ -387,8 +458,34 @@ export const MobileMenuTest: Story = {
     // Activar un enlace de la hoja también la cierra; los enlaces no son ítems de menú
     await userEvent.click(toggle);
     await expect(canvas.queryByRole('menuitem')).toBeNull();
-    await userEvent.click(canvas.getByRole('link', { name: 'Facturas' }));
+    await userEvent.click(canvas.getByRole('link', { name: 'Activos' }));
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    await expect(canvas.queryByRole('link', { name: 'Facturas' })).toBeNull();
+    await expect(canvas.queryByRole('link', { name: 'Activos' })).toBeNull();
+  },
+};
+
+// ───────────────────────── página de documentación ─────────────────────────
+
+/** Test: la página de documentación (plantilla v2) con sus tres pestañas, secciones y la tabla de props. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Header' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Header en Figma:']);
+    // Marcadores: uno por pauta en cada lienzo de la anatomía
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThanOrEqual(10);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Header' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

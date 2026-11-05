@@ -1,40 +1,93 @@
 {
   "name": "NavBar",
   "component": "NavBar",
-  "description": "Barra de navegación inferior del sistema de diseño CAOS, fiel al component set Nav bar de Figma (14259:44045, 8 variantes: Style 3 o 4 options × tab 1-4) y al átomo Options tab bar (14018:26460: Default, Select, Focus). Estilo '4 options': cuatro opciones (ícono de 20 + texto de 10/14) en una píldora de 64 de alto, con una muesca y un punto de acento sobre la opción activa. Estilo '3 options' (cuando hay moreItems): tres opciones y un botón redondo 'más' que abre una hoja inferior con las opciones extra (Dropdown list de Figma, DropdownMenuList); la variante tab=4 de Figma es esa hoja abierta, sin opción activa dibujada. Semántica: <nav> con nombre accesible y lista de enlaces (con href) o botones, aria-current='page' en la activa, foco visible con outline de 2px (agregado, no está en Figma). El botón 'más' sigue el patrón Menu Button: aria-haspopup, aria-expanded, el foco entra en el primer ítem al abrir (initialFocus de DropdownMenuList), flechas/Inicio/Fin/letra inicial los da DropdownMenuList, Tab cierra y sigue, Escape y clic fuera cierran, y el foco vuelve al botón. La posición fija en la parte inferior de la pantalla la decide quien lo usa (por ejemplo fixed inset-x-0 bottom-0); el componente fluye en el documento.",
+  "description": "Barra de navegación inferior del sistema de diseño CAOS. Tiene dos estilos (Style en Figma, con 8 variantes: Style 3 o 4 options × tab 1 a 4) y se apoya en el átomo Options tab bar (Propiedad 1 en Figma: Default, Select, Focus). Estilo \"4 options\": cuatro opciones (ícono de 20 y texto de 10/14) en una píldora de 64 de alto, con una muesca y un punto de acento sobre la opción activa. Estilo \"3 options\" (cuando hay moreItems): tres opciones y un botón redondo \"más\" que abre una hoja inferior con las opciones extra (DropdownMenuList). La variante tab=4 de Figma es esa hoja abierta, sin opción activa dibujada. Semántica: nav con nombre accesible y lista de enlaces (con href) o botones, aria-current=\"page\" en la activa y foco visible con contorno de 2 px (agregado, no está en Figma). El botón \"más\" sigue el patrón Menu Button: aria-haspopup, aria-expanded y el foco entra en el primer ítem al abrir con el botón. Las flechas, Inicio, Fin y la letra inicial mueven el foco, Tab cierra la hoja y sigue, Escape y el clic fuera la cierran, y el foco vuelve al botón. La posición fija abajo de la pantalla la decide quien lo usa (por ejemplo fixed inset-x-0 bottom-0); el componente fluye en el documento.",
   "category": "Navigation",
   "props": {
-    "aria-label": { "type": "string", "required": true, "description": "Nombre accesible de la región <nav>." },
-    "items": { "type": "NavBarItemData[]", "required": false, "description": "Opciones { value, label, icon, href? }. 4 sin moreItems, 3 con moreItems (el resto se ignora)." },
-    "children": { "type": "ReactNode", "required": false, "description": "Composición con NavBarItem en lugar de items." },
-    "value": { "type": "string", "required": false, "description": "Opción activa (controlada)." },
-    "defaultValue": { "type": "string", "required": false, "description": "Opción activa inicial (no controlada). Por defecto la primera." },
-    "onValueChange": { "type": "(value: string) => void", "required": false, "description": "Se llama al elegir una opción." },
-    "moreItems": { "type": "NavBarMoreItem[]", "required": false, "description": "Opciones extra { value, label, icon, disabled?, onSelect? }. Con ellas la barra pasa al estilo '3 options'." },
-    "moreLabel": { "type": "string", "default": "'Más opciones'", "description": "Nombre accesible del botón 'más' y del menú." },
-    "moreOpen": { "type": "boolean", "required": false, "description": "Hoja 'más' abierta (controlada): Style=3 options, tab=4." },
-    "defaultMoreOpen": { "type": "boolean", "default": false, "description": "Hoja 'más' abierta al inicio (no controlada)." },
-    "onMoreOpenChange": { "type": "(open: boolean) => void", "required": false, "description": "Se llama al abrir o cerrar la hoja." },
-    "onMoreSelect": { "type": "(value: string) => void", "required": false, "description": "Se llama al activar una opción del menú 'más'." }
-  },
-  "subcomponents": {
-    "NavBarItem": {
-      "description": "Opción de la barra (Options tab bar). Con href es <a>; sin él, <button>. Toma la opción activa del contexto de NavBar.",
-      "props": {
-        "value": { "type": "string", "required": true },
-        "label": { "type": "string", "required": true, "description": "Texto visible y nombre accesible." },
-        "icon": { "type": "IconName", "required": true, "description": "Ícono CAOS: línea si está inactiva, relleno si está activa." },
-        "href": { "type": "string", "required": false },
-        "current": { "type": "boolean", "required": false, "description": "Fuerza la opción activa (aria-current='page')." },
-        "state": { "type": "'default' | 'select' | 'focus'", "required": false, "description": "Fuerza el aspecto de Figma, solo para documentación." }
-      }
+    "aria-label": {
+      "type": "string",
+      "required": true,
+      "description": "Nombre accesible de la región nav. Si hay varias barras en la página, cada una lleva un nombre distinto."
+    },
+    "items": {
+      "type": "NavBarItemData[]",
+      "required": false,
+      "description": "Opciones { value, label, icon, href? }. Caben 4 sin moreItems y 3 con moreItems; el resto se ignora."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Composición con NavBarItem en lugar de items."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Opción activa (controlada)."
+    },
+    "defaultValue": {
+      "type": "string",
+      "required": false,
+      "description": "Opción activa inicial (no controlada). Por defecto, la primera. Debe ser el value de una opción."
+    },
+    "onValueChange": {
+      "type": "(value: string) => void",
+      "required": false,
+      "description": "Se llama al elegir una opción."
+    },
+    "moreItems": {
+      "type": "NavBarMoreItem[]",
+      "required": false,
+      "description": "Opciones extra { value, label, icon, disabled?, onSelect? }. Con ellas la barra pasa al estilo \"3 options\"."
+    },
+    "moreLabel": {
+      "type": "string",
+      "default": "'Más opciones'",
+      "description": "Nombre accesible del botón \"más\" y de la hoja."
+    },
+    "moreOpen": {
+      "type": "boolean",
+      "required": false,
+      "description": "Hoja \"más\" abierta (controlada). En Figma, Style=3 options con tab=4."
+    },
+    "defaultMoreOpen": {
+      "type": "boolean",
+      "default": false,
+      "description": "Hoja \"más\" abierta al inicio (no controlada). El foco no entra en ella hasta que la persona la abre con el botón."
+    },
+    "onMoreOpenChange": {
+      "type": "(open: boolean) => void",
+      "required": false,
+      "description": "Se llama al abrir o cerrar la hoja."
+    },
+    "onMoreSelect": {
+      "type": "(value: string) => void",
+      "required": false,
+      "description": "Se llama con el value de la opción del menú \"más\" que se activa."
     }
   },
+  "subcomponents": {
+    "NavBarItem": "Opción de la barra (Options tab bar en Figma). Con href es un enlace; sin él, un botón. Toma la opción activa de la barra. Props: value, label y icon (obligatorias), href, target, rel, current y state."
+  },
   "examples": [
-    { "title": "Cuatro opciones", "code": "<NavBar aria-label=\"Principal\" items={items} defaultValue=\"inicio\" />" },
-    { "title": "Tres opciones y más", "code": "<NavBar aria-label=\"Principal\" items={items.slice(0, 3)} moreItems={extras} onMoreSelect={abrir} />" },
-    { "title": "Controlada", "code": "<NavBar aria-label=\"Principal\" items={items} value={ruta} onValueChange={irA} />" },
-    { "title": "Con enlaces", "code": "<NavBar aria-label=\"Principal\" defaultValue=\"a\"><NavBarItem value=\"a\" label=\"Inicio\" icon=\"add-circle\" href=\"/\" /></NavBar>" },
-    { "title": "Fija abajo", "code": "<NavBar className=\"fixed inset-x-0 bottom-0\" aria-label=\"Principal\" items={items} />" }
+    {
+      "title": "Cuatro opciones",
+      "code": "<NavBar\n  aria-label=\"Principal\"\n  defaultValue=\"inicio\"\n  items={[\n    { value: 'inicio', label: 'Inicio', icon: 'homepage' },\n    { value: 'documentos', label: 'Documentos', icon: 'document' },\n    { value: 'proyectos', label: 'Proyectos', icon: 'folder' },\n    { value: 'perfil', label: 'Perfil', icon: 'user' },\n  ]}\n/>"
+    },
+    {
+      "title": "Tres opciones y más",
+      "code": "const [extra, setExtra] = useState('');\n\n<NavBar\n  aria-label=\"Principal\"\n  items={[\n    { value: 'inicio', label: 'Inicio', icon: 'homepage' },\n    { value: 'documentos', label: 'Documentos', icon: 'document' },\n    { value: 'proyectos', label: 'Proyectos', icon: 'folder' },\n  ]}\n  moreItems={[\n    { value: 'ajustes', label: 'Ajustes', icon: 'setting' },\n    { value: 'notas', label: 'Notas', icon: 'note-favorite' },\n  ]}\n  onMoreSelect={(value) => setExtra(value)}\n/>"
+    },
+    {
+      "title": "Controlada",
+      "code": "const [section, setSection] = useState('inicio');\n\n<NavBar\n  aria-label=\"Principal\"\n  value={section}\n  onValueChange={(value) => setSection(value)}\n  items={[\n    { value: 'inicio', label: 'Inicio', icon: 'homepage' },\n    { value: 'documentos', label: 'Documentos', icon: 'document' },\n    { value: 'proyectos', label: 'Proyectos', icon: 'folder' },\n    { value: 'perfil', label: 'Perfil', icon: 'user' },\n  ]}\n/>"
+    },
+    {
+      "title": "Con enlaces",
+      "code": "<NavBar aria-label=\"Principal\" defaultValue=\"inicio\">\n  <NavBarItem value=\"inicio\" label=\"Inicio\" icon=\"homepage\" href=\"/\" />\n  <NavBarItem value=\"documentos\" label=\"Documentos\" icon=\"document\" href=\"/documentos\" />\n  <NavBarItem value=\"proyectos\" label=\"Proyectos\" icon=\"folder\" href=\"/proyectos\" />\n</NavBar>"
+    },
+    {
+      "title": "Fija abajo",
+      "code": "<NavBar\n  className=\"fixed inset-x-0 bottom-0\"\n  aria-label=\"Principal\"\n  defaultValue=\"inicio\"\n  items={[\n    { value: 'inicio', label: 'Inicio', icon: 'homepage' },\n    { value: 'documentos', label: 'Documentos', icon: 'document' },\n    { value: 'proyectos', label: 'Proyectos', icon: 'folder' },\n    { value: 'perfil', label: 'Perfil', icon: 'user' },\n  ]}\n/>"
+    }
   ]
 }

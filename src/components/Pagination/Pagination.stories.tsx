@@ -3,23 +3,61 @@ import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { Pagination } from './Pagination';
 import type { PaginationProps, PaginationType } from './Pagination.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { formatLiteral } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Pagination.doc';
+import docsJson from './Pagination.docs.json';
+
+/**
+ * Lienzo de Desarrollo (`docsLive.render`, receta R6): la página la lleva el lienzo con `useState` y la paginación va
+ * controlada, así que los botones, los números, el campo y Mostrar más cambian de página de verdad. `defaultPage` es la
+ * página inicial del estado.
+ */
+function DocsCanvas(args: Record<string, unknown>) {
+  const { page: _page, defaultPage, onPageChange: _onPageChange, ...rest } = args as Partial<PaginationProps>;
+  const [page, setPage] = useState(defaultPage ?? 1);
+  return (
+    <div className="w-full">
+      <Pagination totalPages={20} {...rest} page={page} onPageChange={setPage} />
+    </div>
+  );
+}
+
+/** Valor de una prop escrito como en JSX. */
+const jsxProp = (name: string, value: unknown) =>
+  typeof value === 'string' ? `${name}="${value.replace(/"/g, '&quot;')}"` : value === true ? name : `${name}={${formatLiteral(value)}}`;
+
+/** Código de Desarrollo: el mismo estado del lienzo, listo para copiar (receta R6). */
+function docsCode(args: Record<string, unknown>) {
+  const { page: _page, defaultPage, onPageChange: _onPageChange, children: _children, ...rest } = args;
+  const props = [
+    ...Object.entries({ totalPages: 20, ...rest }).map(([name, value]) => jsxProp(name, value)),
+    'page={page}',
+    'onPageChange={(next) => setPage(next)}',
+  ];
+  return [`const [page, setPage] = useState(${formatLiteral(defaultPage ?? 1)});`, '', '<Pagination', ...props.map((p) => `  ${p}`), '/>'].join('\n');
+}
 
 const meta = {
   title: 'Navigation/Pagination',
   component: Pagination,
-  parameters: { layout: 'centered' },
-  tags: ['autodocs'],
-  argTypes: {
-    type: {
-      control: 'radio',
-      options: ['numeric', 'input', 'more'],
-      type: { name: 'enum', value: ['numeric', 'input', 'more'] },
-      description: 'Type de Figma: numeric, input o more',
-    },
-    totalPages: { control: 'number', type: { name: 'number' }, description: 'Total de páginas' },
-    siblingCount: { control: 'number', type: { name: 'number' }, description: 'Páginas a cada lado de la actual' },
-    boundaryCount: { control: 'number', type: { name: 'number' }, description: 'Páginas fijas en los extremos (con puntos suspensivos)' },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    // La página es del estado del lienzo (R6): `page` queda fuera de Personalizar y `labels` no se puede escribir en un control
+    docsLive: { render: DocsCanvas, code: docsCode, exclude: ['page', 'labels'] },
   },
+  tags: ['autodocs'],
+  // Las descripciones salen de Pagination.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    type: { control: 'radio', options: ['numeric', 'input', 'more'], type: { name: 'enum', value: ['numeric', 'input', 'more'] } },
+    totalPages: { control: 'number', type: { name: 'number' } },
+    defaultPage: { control: 'number', type: { name: 'number' } },
+    siblingCount: { control: 'number', type: { name: 'number' } },
+    boundaryCount: { control: 'number', type: { name: 'number' } },
+  }),
   args: { type: 'numeric', totalPages: 20, siblingCount: 2, boundaryCount: 0 },
 } satisfies Meta<typeof Pagination>;
 
@@ -57,7 +95,7 @@ export const CustomLabels: Story = {
 
 /**
  * Los 7 variantes del set `Pagination` (12048:7622) sobre la superficie del tema. La ventana numérica de 5 números
- * va centrada en la página actual (Figma dibuja la actual al inicio de la ventana; para diseño).
+ * empieza en la página actual, como en Figma.
  */
 const FIGMA: { name: string; type: PaginationType; page: number }[] = [
   { name: 'Type=numeric, Pages=initial', type: 'numeric', page: 1 },
@@ -187,5 +225,31 @@ export const MoreTest: Story = {
     await expect(args.onPageChange).toHaveBeenCalledWith(2);
     await expect(c.getByText('Página 2 de 2')).toBeInTheDocument();
     await expect(c.getByRole('button', { name: 'Mostrar más' })).toBeDisabled();
+  },
+};
+
+/** Página de documentación (plantilla v2), con Page dentro: la revisan vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Pagination' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Pagination en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 de numeric + 5 de input + 3 de more + 3 de Page)
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(17);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Pagination' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -1,22 +1,19 @@
 {
   "name": "Breadcrumb",
   "component": "Breadcrumb",
-  "description": "Ruta de navegación del sistema de diseño CAOS, fiel a los component sets Breadcrumb (11679:10314, con slot List) y Text Breadcrumb (11679:10460: Type Default/Select, Text, Chevron). Se compone de Breadcrumb (raíz: <nav aria-label=\"Ruta de navegación\"> con <ol>) y BreadcrumbItem (<li>). Default es un enlace 14/20 regular en text/neutral/gray; Select (current) es la página actual: sin enlace, aria-current=\"page\", semibold en text/neutral/white. El chevron (chevron-right, 14, line) es un separador decorativo (aria-hidden) y sigue la prop Chevron de Figma: por defecto aparece en todos los ítems salvo el último; chevron={true} lo fuerza y chevron={false} lo oculta. El ícono home (home1, 16, fill) es opcional por ítem con la prop home: solo va con nombre accesible \"Inicio\" (texto sr-only) o con texto visible si se pasa children. Textos largos: envuelven por defecto; con truncate se recortan (máx. 12rem) y llevan title. Hover y press de enlace no están en Figma: se usan los tokens de link (para diseño). Foco con teclado: outline de 2px (agregado, no está en Figma).",
+  "description": "Ruta de navegación del sistema de diseño CAOS, fiel a los component sets Breadcrumb (con slot List) y Text Breadcrumb (Type Default o Select, Text, Chevron). Se compone de Breadcrumb (raíz: <nav aria-label=\"Ruta de navegación\"> con <ol>) y BreadcrumbItem (<li>, un nivel). Default es un enlace 14/20 regular en text/neutral/gray; Select (current) es la página actual: sin enlace, aria-current=\"page\", semibold en text/neutral/white. El chevron (chevron-right, 14, line) es un separador decorativo (aria-hidden) y sigue la prop Chevron de Figma: por defecto aparece en todos los niveles salvo el último; chevron={true} lo fuerza y chevron={false} lo oculta. El ícono home (home1, 16, fill) es opcional por nivel con la prop home: sin children lleva el nombre accesible \"Inicio\" (texto sr-only) y con children muestra el texto. Los textos largos envuelven por defecto; con truncate se recortan (máx. 12 rem) y llevan title. Hover y press del enlace no están en Figma: usan los tokens de enlace. El foco con teclado es un anillo de 2 px que no está en Figma.",
   "category": "Navigation",
   "props": {
-    "aria-label": { "type": "string", "default": "'Ruta de navegación'", "description": "Breadcrumb. Nombre accesible del landmark nav." },
-    "children": { "type": "ReactNode", "required": false, "description": "BreadcrumbItem en orden, del más general al más específico (rellena el slot List de Figma)." },
-    "href": { "type": "string", "required": false, "description": "BreadcrumbItem. Destino del enlace (Type=Default). Sin href ni current el nivel es texto plano." },
-    "current": { "type": "boolean", "default": false, "description": "BreadcrumbItem. Página actual, Type=Select: sin enlace, aria-current=\"page\", semibold." },
-    "homeLabel": { "type": "string", "default": "'Inicio'", "description": "BreadcrumbItem. Texto sr-only del ícono home cuando no hay children; cámbialo para otro idioma." },
-    "home": { "type": "boolean", "default": false, "description": "BreadcrumbItem. Ícono home de 16. Sin children el nombre accesible es \"Inicio\"." },
-    "chevron": { "type": "boolean", "required": false, "description": "BreadcrumbItem. Chevron de Figma. Sin definir: visible salvo en el último ítem; true lo fuerza; false lo oculta. Siempre aria-hidden." },
-    "truncate": { "type": "boolean", "default": false, "description": "BreadcrumbItem. Recorta con elipsis (máx. 12rem) y pone title si children es texto." },
-    "linkProps": { "type": "AnchorHTMLAttributes", "required": false, "description": "BreadcrumbItem. Atributos extra del <a> (onClick para routers, etc.)." }
+    "aria-label": { "type": "string", "default": "'Ruta de navegación'", "description": "Nombre accesible del landmark nav. Si la página tiene más de una ruta, cada una necesita un nombre distinto." },
+    "children": { "type": "ReactNode", "required": false, "description": "BreadcrumbItem en orden, del más general al más específico (el slot List de Figma)." },
+    "className": { "type": "string", "required": false, "description": "Clases del <nav>." }
+  },
+  "subcomponents": {
+    "BreadcrumbItem": "Un nivel de la ruta (Text Breadcrumb en Figma, <li>). href lo vuelve un enlace (Type Default); current lo marca como página actual (Type Select): sin enlace y con aria-current=\"page\"; sin ninguno de los dos es texto plano. home dibuja el ícono home de 16 antes del texto y, sin children, su nombre accesible es \"Inicio\" (homeLabel lo cambia). chevron (Chevron en Figma) fuerza o oculta el separador; sin definir aparece en todos los niveles salvo el último y siempre es aria-hidden. truncate recorta el texto con elipsis (máx. 12 rem) y pone title si children es texto. linkProps pasa atributos al <a> (onClick para un router); className va al <li>."
   },
   "examples": [
-    { "title": "Con home", "code": "<Breadcrumb>\n  <BreadcrumbItem href=\"/\" home />\n  <BreadcrumbItem href=\"/productos\">Productos</BreadcrumbItem>\n  <BreadcrumbItem current>Zapatillas</BreadcrumbItem>\n</Breadcrumb>" },
-    { "title": "Solo texto", "code": "<Breadcrumb aria-label=\"Ubicación\">\n  <BreadcrumbItem href=\"/\">Inicio</BreadcrumbItem>\n  <BreadcrumbItem current>Cuenta</BreadcrumbItem>\n</Breadcrumb>" },
-    { "title": "Texto largo recortado", "code": "<BreadcrumbItem href=\"/docs\" truncate>Documentación técnica de la plataforma</BreadcrumbItem>" }
+    { "title": "Con home", "code": "<Breadcrumb>\n  <BreadcrumbItem href=\"/\" home />\n  <BreadcrumbItem href=\"/proyectos\">Proyectos</BreadcrumbItem>\n  <BreadcrumbItem current>Informe trimestral</BreadcrumbItem>\n</Breadcrumb>" },
+    { "title": "Solo texto", "code": "<Breadcrumb aria-label=\"Ubicación\">\n  <BreadcrumbItem href=\"/\">Inicio</BreadcrumbItem>\n  <BreadcrumbItem current>Perfil</BreadcrumbItem>\n</Breadcrumb>" },
+    { "title": "Texto largo recortado", "code": "<BreadcrumbItem href=\"/documentos\" truncate>Carpeta de documentos compartidos del equipo</BreadcrumbItem>" }
   ]
 }

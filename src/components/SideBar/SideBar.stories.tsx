@@ -1,13 +1,89 @@
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { SideBar } from './SideBar';
 import { SideBarItem, SideBarSubItem } from './SideBarItem';
-import type { SideBarItemData, SideBarItemState, SideBarItemType } from './SideBar.types';
+import type { SideBarItemData, SideBarItemState, SideBarItemType, SideBarProps } from './SideBar.types';
 import { Avatar } from '../Avatar';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { NotificationBell } from '../NotificationBell';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { cn } from '../../utils/cn';
+import { useIsMobile } from '../../utils/useMediaQuery';
+import { doc } from './SideBar.doc';
+import docsJson from './SideBar.docs.json';
+
+// ───────────────────────── Desarrollo (docsLive) ─────────────────────────
+
+/**
+ * Lienzo de Desarrollo. Con `layout="auto"` la barra decide por el ancho de la ventana (48rem): escritorio a 1440 y
+ * móvil a 390. La barra de escritorio ocupa el alto de su contenedor (`h-full`): aquí mide 640. La móvil ocupa el ancho
+ * disponible (grilla `minmax(0, 1440px)`) y su hoja se coloca bajo la barra con `position: absolute`: en el lienzo mide
+ * lo que su contenido (`h-auto`) y, mientras está abierta, el lienzo reserva el alto de la barra más el de la hoja
+ * (medidos con `offsetHeight`, que no cambia con el `zoom` del lienzo). `open` lo maneja el botón de menú (R6).
+ */
+function DocsCanvas(args: Record<string, unknown>) {
+  const props = args as unknown as SideBarProps;
+  const isMobileViewport = useIsMobile();
+  const mobile = props.layout === 'mobile' || (props.layout !== 'desktop' && isMobileViewport);
+  const ref = useRef<HTMLDivElement>(null);
+  const [room, setRoom] = useState(0);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !mobile) return;
+    const measure = () => {
+      const bar = root.querySelector<HTMLElement>('[data-figma-part="Header mobile"]');
+      const sheet = root.querySelector<HTMLElement>('[data-figma-part="Dropdown"]');
+      setRoom(bar && sheet ? bar.offsetHeight + sheet.offsetHeight : 0);
+    };
+    measure();
+    // Abrir o cerrar la hoja o un submenú cambia el DOM; cambiar el ancho de la ventana, los paddings responsive
+    const observer = new MutationObserver(measure);
+    observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'aria-expanded'] });
+    window.addEventListener('resize', measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [mobile]);
+  return (
+    <div
+      ref={ref}
+      className={cn('w-full', mobile ? 'grid items-start' : 'flex h-160 justify-center')}
+      style={mobile ? { gridTemplateColumns: 'minmax(0, 1440px)', minHeight: room > 0 ? room : undefined } : undefined}
+    >
+      <SideBar {...props} menuClassName={cn('h-auto', props.menuClassName)} />
+    </div>
+  );
+}
+
+/**
+ * Código de Personalizar: el generado más los manejadores que usan las acciones de ejemplo (el botón de modo y la
+ * campana), declarados arriba. La barra maneja sola su valor, sus submenús, si está contraída y su menú móvil.
+ */
+function docsCode(args: Record<string, unknown>): string {
+  let code = buildCode('SideBar', args, {});
+  const declarations: string[] = [];
+  // El manejador va en su propia línea si el elemento se escribe en varias, o junto al atributo si va en una
+  const handlers: [RegExp, string][] = [
+    [/(\n *)?aria-label="Cambiar a modo claro"/, 'toggleTheme'],
+    [/<NotificationBell/, 'openNotifications'],
+  ];
+  for (const [marker, handler] of handlers) {
+    if (!marker.test(code)) continue;
+    code = code.replace(marker, (match, indent: unknown) => `${match}${typeof indent === 'string' ? indent : ' '}onClick={${handler}}`);
+    declarations.push(`const ${handler} = () => {};`);
+  }
+  return declarations.length > 0 ? `${declarations.join('\n')}\n\n${code}` : code;
+}
+
+/** Ids de los ítems y subenlaces de ejemplo (lista de `defaultValue` en Personalizar). */
+const ITEM_IDS = ['inicio', 'mensajes', 'proyectos', 'activos', 'archivados', 'plantillas', 'documentos', 'ajustes', 'perfil', 'seguridad', 'ayuda'];
 
 const meta = {
   title: 'Navigation/Side bar',
@@ -15,20 +91,31 @@ const meta = {
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
-    // Varias barras en la misma página de documentación: los nav con el mismo nombre se repiten solo allí
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      // Lienzo con el alto de la barra de escritorio y el de la hoja móvil abierta (ver `DocsCanvas`)
+      render: (args: Record<string, unknown>) => <DocsCanvas {...args} />,
+      // El código se copia y compila tal cual: declara los manejadores de las acciones de ejemplo
+      code: docsCode,
+      // Controladas (el lienzo deja que la barra las maneje sola): siguen en Props. Sus equivalentes no controlados
+      // (`defaultValue`, `defaultCollapsed`, `defaultOpen`) sí tienen control
+      exclude: ['value', 'openItems', 'defaultOpenItems', 'collapsed', 'open'],
+    },
+    // Varias barras en la misma página de historias: los nav con el mismo nombre se repiten solo allí
     a11y: { config: { rules: [{ id: 'landmark-unique', enabled: false }] } },
   },
-  argTypes: {
-    layout: {
-      control: 'radio',
-      options: ['auto', 'desktop', 'mobile'],
-      type: { name: 'enum', value: ['auto', 'desktop', 'mobile'] },
-      description: 'Menu desktop, Menu mobile o según el ancho (48rem)',
-    },
-    collapsed: { control: 'boolean', type: { name: 'boolean' }, description: 'Type Default (contraída) de Menu desktop' },
-    collapsible: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Arrow de Figma' },
-    open: { control: 'boolean', type: { name: 'boolean' }, description: 'Móvil: Type Menu list (menú abierto)' },
-  },
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    items: { control: false },
+    layout: { control: 'radio', options: ['auto', 'desktop', 'mobile'], type: { name: 'enum', value: ['auto', 'desktop', 'mobile'] } },
+    defaultValue: { control: 'select', options: ITEM_IDS, type: { name: 'enum', value: ITEM_IDS } },
+    collapsed: { control: 'boolean', type: { name: 'boolean' } },
+    defaultCollapsed: { control: 'boolean', type: { name: 'boolean' } },
+    collapsible: { control: 'boolean', type: { name: 'boolean' } },
+    open: { control: 'boolean', type: { name: 'boolean' } },
+    defaultOpen: { control: 'boolean', type: { name: 'boolean' } },
+  }),
   args: { items: [], layout: 'desktop', collapsible: true, onValueChange: fn(), onCollapsedChange: fn(), onOpenChange: fn() },
   decorators: [
     (Story, { parameters }) =>
@@ -51,16 +138,16 @@ const ITEMS: SideBarItemData[] = [
   { id: 'inicio', label: 'Inicio', icon: 'home1', href: '#inicio' },
   { id: 'mensajes', label: 'Mensajes', icon: 'sms', href: '#mensajes', badge: 3, badgeLabel: 'sin leer' },
   {
-    id: 'pagos',
-    label: 'Pagos',
-    icon: 'wallet',
+    id: 'proyectos',
+    label: 'Proyectos',
+    icon: 'folder',
     items: [
-      { id: 'facturas', label: 'Facturas', href: '#facturas' },
-      { id: 'metodos', label: 'Métodos de pago', href: '#metodos' },
-      { id: 'historial', label: 'Historial', href: '#historial' },
+      { id: 'activos', label: 'Activos', href: '#activos' },
+      { id: 'archivados', label: 'Archivados', href: '#archivados' },
+      { id: 'plantillas', label: 'Plantillas', href: '#plantillas' },
     ],
   },
-  { id: 'calendario', label: 'Calendario', icon: 'calendar', href: '#calendario' },
+  { id: 'documentos', label: 'Documentos', icon: 'document', href: '#documentos' },
   {
     id: 'ajustes',
     label: 'Ajustes',
@@ -70,9 +157,18 @@ const ITEMS: SideBarItemData[] = [
       { id: 'seguridad', label: 'Seguridad', href: '#seguridad' },
     ],
   },
+  { id: 'ayuda', label: 'Ayuda', icon: 'message-question', href: '#ayuda' },
 ];
 
-const ThemeButton = () => (
+/** Botón de modo del pie (prop Mode de Figma). Un elemento y no un componente: el código generado lo escribe tal cual. */
+const THEME_BUTTON: ReactNode = (
+  <Button iconOnly variant="secondary" contrast="low" size="xs" aria-label="Cambiar a modo claro">
+    <Icon name="sun" size={16} variant="fill" />
+  </Button>
+);
+
+/** El mismo botón con su nodo de Figma, para el comparador de las matrices. */
+const FIGMA_THEME_BUTTON: ReactNode = (
   <Button iconOnly variant="secondary" contrast="low" size="xs" aria-label="Cambiar a modo claro" data-figma-part="Button">
     <Icon name="sun" size={16} variant="fill" />
   </Button>
@@ -85,16 +181,19 @@ const MOBILE_ACTIONS: ReactNode = (
   </>
 );
 
-const FULL = { items: ITEMS, defaultValue: 'mensajes', footer: <ThemeButton />, homeHref: '#inicio', mobileActions: MOBILE_ACTIONS };
+const FULL = { items: ITEMS, defaultValue: 'mensajes', footer: THEME_BUTTON, homeHref: '#inicio', mobileActions: MOBILE_ACTIONS };
 
-/** Playground: escritorio expandida, con la sección actual y el pie (modo y flecha). */
-export const Interactive: Story = { args: FULL };
+/**
+ * Playground: con `layout="auto"`, escritorio expandida (con la sección actual y el pie: modo y flecha) o, por debajo de
+ * 48rem, la barra móvil.
+ */
+export const Interactive: Story = { args: { ...FULL, layout: 'auto' } };
 
 /** Escritorio contraída a solo íconos: cada ítem se nombra con su texto y muestra un tooltip a la derecha. */
 export const Collapsed: Story = { args: { ...FULL, defaultCollapsed: true } };
 
 /** Subenlace actual: su sección arranca abierta y seleccionada. */
-export const SubmenuCurrent: Story = { args: { ...FULL, defaultValue: 'metodos' } };
+export const SubmenuCurrent: Story = { args: { ...FULL, defaultValue: 'archivados' } };
 
 /** Móvil: barra con menú, logo, campana y avatar; el botón despliega el menú bajo la barra. */
 export const Mobile: Story = {
@@ -183,7 +282,7 @@ export const FigmaMatrixDesktop: Story = {
             data-figma={v.name}
             items={FIGMA_ITEMS}
             collapsed={v.collapsed}
-            footer={<ThemeButton />}
+            footer={FIGMA_THEME_BUTTON}
             navLabel={`Navegación principal (${v.name})`}
           />
         </div>
@@ -242,7 +341,7 @@ export const NavigationKeyboardTest: Story = {
     const canvas = within(canvasElement);
     const nav = canvas.getByRole('navigation', { name: 'Navegación principal' });
     await expect(within(nav).getByRole('link', { name: 'Mensajes 3 sin leer' })).toHaveAttribute('aria-current', 'page');
-    const trigger = within(nav).getByRole('button', { name: 'Pagos' });
+    const trigger = within(nav).getByRole('button', { name: 'Proyectos' });
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     trigger.focus();
     await userEvent.keyboard('{Enter}');
@@ -251,11 +350,11 @@ export const NavigationKeyboardTest: Story = {
     await expect(list).toBeVisible();
     // La lista sigue a su botón en el orden de Tab
     await userEvent.tab();
-    const facturas = within(nav).getByRole('link', { name: 'Facturas' });
-    await expect(facturas).toHaveFocus();
-    await userEvent.click(facturas);
-    await expect(args.onValueChange).toHaveBeenCalledWith('facturas');
-    await expect(facturas).toHaveAttribute('aria-current', 'page');
+    const activos = within(nav).getByRole('link', { name: 'Activos' });
+    await expect(activos).toHaveFocus();
+    await userEvent.click(activos);
+    await expect(args.onValueChange).toHaveBeenCalledWith('activos');
+    await expect(activos).toHaveAttribute('aria-current', 'page');
     // Espacio cierra la lista
     trigger.focus();
     await userEvent.keyboard(' ');
@@ -281,14 +380,14 @@ export const CollapseTest: Story = {
     await expect(within(nav).getByRole('link', { name: 'Mensajes, 3 sin leer' })).toBeVisible();
     // Contraída no hay textos visibles en las filas
     await expect(nav.querySelector('[data-figma-part="Texto default"]')).toBeNull();
-    const pagos = within(nav).getByRole('button', { name: 'Pagos' });
-    await expect(pagos).toHaveAttribute('aria-expanded', 'false');
-    pagos.focus();
+    const proyectos = within(nav).getByRole('button', { name: 'Proyectos' });
+    await expect(proyectos).toHaveAttribute('aria-expanded', 'false');
+    proyectos.focus();
     await userEvent.keyboard('{Enter}');
-    await waitFor(() => expect(pagos).toHaveAttribute('aria-expanded', 'true'));
+    await waitFor(() => expect(proyectos).toHaveAttribute('aria-expanded', 'true'));
     await expect(args.onCollapsedChange).toHaveBeenLastCalledWith(false);
-    await expect(pagos).toHaveFocus();
-    await expect(within(nav).getByRole('link', { name: 'Facturas' })).toBeVisible();
+    await expect(proyectos).toHaveFocus();
+    await expect(within(nav).getByRole('link', { name: 'Activos' })).toBeVisible();
   },
 };
 
@@ -315,9 +414,35 @@ export const MobileMenuTest: Story = {
     await expect(canvas.queryByRole('navigation', { name: 'Navegación principal' })).toBeNull();
     // Activar un enlace también cierra el menú
     await userEvent.click(toggle);
-    await userEvent.click(canvas.getByRole('link', { name: 'Calendario' }));
-    await expect(args.onValueChange).toHaveBeenCalledWith('calendario');
+    await userEvent.click(canvas.getByRole('link', { name: 'Documentos' }));
+    await expect(args.onValueChange).toHaveBeenCalledWith('documentos');
     await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
     await expect(canvas.queryByRole('navigation', { name: 'Navegación principal' })).toBeNull();
+  },
+};
+
+// ───────────────────────── página de documentación ─────────────────────────
+
+/** Test: la página de documentación (plantilla v2) con sus tres pestañas, secciones y la tabla de props. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Side bar' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Side bar en Figma:']);
+    // Marcadores: uno por pauta en cada lienzo de la anatomía
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThanOrEqual(14);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de SideBar' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

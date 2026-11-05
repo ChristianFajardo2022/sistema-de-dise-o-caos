@@ -14,7 +14,7 @@
     "className": { "type": "string", "required": false, "description": "Clases adicionales." }
   },
   "examples": [
-    { "title": "Con submenú", "code": "<ButtonMenu iconRight aria-expanded={open} aria-controls=\"submenu\" onClick={toggle}>Servicios</ButtonMenu>" },
+    { "title": "Con submenú", "code": "const [open, setOpen] = useState(false);\n\n<ButtonMenu iconRight aria-expanded={open} aria-controls=\"submenu-proyectos\" onClick={() => setOpen(!open)}>\n  Proyectos\n</ButtonMenu>" },
     { "title": "Enlace de la sección actual", "code": "<ButtonMenu href=\"/inicio\" selected>Inicio</ButtonMenu>" }
   ]
 }

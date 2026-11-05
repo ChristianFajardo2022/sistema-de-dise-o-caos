@@ -1,20 +1,21 @@
 {
   "name": "PageHeader",
   "component": "PageHeader",
-  "description": "Encabezado de página del sistema de diseño CAOS, fiel al component set Page Header de Figma (17265:93494, 1 variante). Es un <header> con una fila (flecha de volver chevron-left de 24, título) y una descripción opcional. El título es un heading real (h1 por defecto, cambia con headingLevel): Prospero semibold, heading 2xl (32/36 en escritorio, 24/32 en móvil). La descripción usa body lg regular en text/neutral/body. La flecha de volver es un botón nativo de 24×24 con nombre accesible (backLabel, por defecto \"Volver\") y foco con outline de 2px (agregado, no está en Figma). Las migas (breadcrumb) y las acciones a la derecha no están en Figma: son slots opcionales; usa Breadcrumb para las migas. Los espacios de Figma enlazan gap/general/lg, que no existe en tokens.css: se usa space/general/xl (12).",
+  "description": "Encabezado de página del sistema de diseño CAOS, fiel al component set Page Header de Figma (1 variante). Es un <header> con una fila (flecha de volver chevron-left de 24 y título) y una descripción opcional. El título es un heading real (h1 por defecto, cambia con headingLevel): Prospero semibold, heading 2xl (32/36 en escritorio y tableta, 24/32 en móvil). La descripción usa body lg regular (16/22, 14/20 en móvil) en text/neutral/body. La flecha de volver es un botón nativo de 24 × 24 px, solo con onBack, con nombre accesible (backLabel, por defecto \"Volver\") y foco con anillo de 2 px (agregado, no está en Figma). Las migas (breadcrumb) y las acciones a la derecha del título tampoco están en Figma: son slots opcionales; usa Breadcrumb para las migas. Figma enlaza el espacio entre filas a gap/general/lg, que no existe en tokens.css: se usa space/general/xl (12). Dentro de main, el header no cuenta como el banner de la página.",
   "category": "Navigation",
   "props": {
-    "title": { "type": "ReactNode", "required": true, "description": "Text header de Figma. Se dibuja como heading." },
-    "headingLevel": { "type": "1 | 2 | 3 | 4 | 5 | 6", "default": "1", "description": "Nivel del heading del título." },
-    "description": { "type": "ReactNode", "required": false, "description": "Text description. Sin valor no se dibuja (Description=false)." },
-    "onBack": { "type": "() => void", "required": false, "description": "Dibuja la flecha de volver como botón." },
-    "backLabel": { "type": "string", "default": "'Volver'", "description": "Nombre accesible del botón de volver." },
-    "breadcrumb": { "type": "ReactNode", "required": false, "description": "Migas sobre el título (no está en Figma)." },
-    "actions": { "type": "ReactNode", "required": false, "description": "Acciones a la derecha del título (no está en Figma)." }
+    "title": { "type": "ReactNode", "required": true, "description": "Título de la página (Text header en Figma). Se dibuja como heading." },
+    "headingLevel": { "type": "1 | 2 | 3 | 4 | 5 | 6", "default": "1", "description": "Nivel del heading del título. Baja el nivel si la vista ya tiene su h1." },
+    "description": { "type": "ReactNode", "required": false, "description": "Descripción bajo el título (Text description en Figma). Sin valor no se dibuja (Description en false)." },
+    "onBack": { "type": "() => void", "required": false, "description": "Dibuja la flecha de volver como botón que llama a esta función. Sin valor, no hay flecha." },
+    "backLabel": { "type": "string", "default": "'Volver'", "description": "Nombre accesible del botón de volver. Solo con onBack." },
+    "breadcrumb": { "type": "ReactNode", "required": false, "description": "Migas sobre el título (no está en Figma). Pasa un Breadcrumb con su propio aria-label." },
+    "actions": { "type": "ReactNode", "required": false, "description": "Acciones a la derecha del título (no está en Figma). No se encogen: el título ajusta línea." },
+    "className": { "type": "string", "required": false, "description": "Clases del <header>." }
   },
   "examples": [
-    { "title": "Básico", "code": "<PageHeader title=\"Encabezado\" description=\"Descripción de la página\" />" },
-    { "title": "Con volver", "code": "<PageHeader title=\"Detalle\" onBack={() => history.back()} />" },
-    { "title": "Con migas y acciones", "code": "<PageHeader title=\"Cuenta\" breadcrumb={<Breadcrumb>…</Breadcrumb>} actions={<Button size=\"sm\">Guardar</Button>} />" }
+    { "title": "Básico", "code": "<PageHeader title=\"Ajustes de perfil\" description=\"Cambia tus datos y tus preferencias.\" />" },
+    { "title": "Con volver", "code": "const goBack = () => {};\n\n<PageHeader title=\"Informe trimestral\" onBack={goBack} />" },
+    { "title": "Con migas y acciones", "code": "<PageHeader\n  title=\"Ajustes\"\n  breadcrumb={\n    <Breadcrumb>\n      <BreadcrumbItem href=\"/\">Inicio</BreadcrumbItem>\n      <BreadcrumbItem current>Ajustes</BreadcrumbItem>\n    </Breadcrumb>\n  }\n  actions={<Button size=\"sm\">Guardar</Button>}\n/>" }
   ]
 }

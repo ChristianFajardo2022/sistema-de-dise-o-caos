@@ -1,23 +1,81 @@
 {
   "name": "TopAppBar",
   "component": "TopAppBar",
-  "description": "Barra superior de pantalla móvil del sistema de diseño CAOS, fiel al component set Top App Bar de Figma (17295:110677, 8 variantes: Type Ios | Android × Position Centered Title | Left-Aligned | With Action Only | Title Only). Es un <header>; el título es un heading real (h1 por defecto, cambia con headingLevel). `platform` solo cambia medidas y el tipo de botón: Ios usa botones circulares de 44 y alto 54 (With Action Only: 125); Android usa botones de 48 y alto 64 (With Action Only: 120). `titlePosition` elige la disposición. El botón de volver (`onBack`, `backLabel`) usa ButtonCorner con ícono de 20 en Ios y Button tertiary solo-ícono en Android, siempre con nombre accesible; `leading` lo reemplaza (por ejemplo, un botón de menú). `actions` es el slot de la derecha (Espacio): pasa Button de solo ícono con aria-label (en Ios, `<Button variant=\"primary\" iconOnly touchTarget>`: círculo blanco de 44×44 sin forzar medidas). `avatar` recibe un Avatar md. La barra de estado del teléfono (Status Bar) es decorativa y no se dibuja. Notas de Figma: el Centered Title de Android no trae título en el archivo (solo menú y búsqueda); Android usa el ícono arrow-left2 (21854:44921) e iOS chevron-left.",
+  "description": "Barra superior de una pantalla móvil. Es un <header> con el botón de volver o de menú, el título con subtítulo opcional y las acciones. El título es un heading real: h1 por defecto, y headingLevel cambia el nivel. platform (Type en Figma) cambia las medidas y el tipo de botón: iOS usa botones circulares de 44 y alto 54 (With Action Only: 125); Android usa botones de 48 y alto 64 (With Action Only: 120). titlePosition (Position en Figma) elige la disposición. El botón de volver (onBack y backLabel) es un Button corner con ícono de 20 en iOS y un Button tertiary solo ícono en Android, siempre con nombre accesible. leading lo reemplaza, por ejemplo con un botón de menú. actions es el slot de la derecha: pasa botones de solo ícono con aria-label; en iOS, un Button primary con iconOnly y touchTarget. avatar recibe un Avatar de tamaño md. La barra de estado del teléfono (Status Bar en Figma) es decorativa y no se dibuja. El Centered Title de Android no trae título en Figma (solo el menú y la búsqueda); el código sí lo admite.",
   "category": "Navigation",
   "props": {
-    "title": { "type": "ReactNode", "required": false, "description": "Title de Figma. Se dibuja como heading." },
-    "headingLevel": { "type": "1 | 2 | 3 | 4 | 5 | 6", "default": "1", "description": "Nivel del heading del título." },
-    "subtitle": { "type": "ReactNode", "required": false, "description": "Subtitletext. No se dibuja en title-only." },
-    "platform": { "type": "'ios' | 'android'", "default": "'ios'", "description": "Type de Figma: medidas y tipo de botón de volver." },
-    "titlePosition": { "type": "'centered' | 'left' | 'action-only' | 'title-only'", "default": "'centered'", "description": "Position de Figma." },
-    "onBack": { "type": "() => void", "required": false, "description": "Dibuja el botón de volver." },
-    "backLabel": { "type": "string", "default": "'Volver'", "description": "Nombre accesible del botón de volver." },
-    "leading": { "type": "ReactNode", "required": false, "description": "Reemplaza el botón de volver (p. ej. menú)." },
-    "actions": { "type": "ReactNode", "required": false, "description": "Slot de la derecha (Espacio / Button rigth)." },
-    "avatar": { "type": "ReactNode", "required": false, "description": "Avatar entre el botón y el título (no aplica en action-only)." }
+    "title": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Título (Title en Figma). Se dibuja como heading."
+    },
+    "headingLevel": {
+      "type": "1 | 2 | 3 | 4 | 5 | 6",
+      "default": "1",
+      "description": "Nivel del heading del título."
+    },
+    "subtitle": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Subtítulo (Subtitletext en Figma). No se dibuja con titlePosition title-only."
+    },
+    "platform": {
+      "type": "'ios' | 'android'",
+      "default": "'ios'",
+      "description": "Plataforma (Type en Figma): cambia las medidas y el tipo de botón de volver."
+    },
+    "titlePosition": {
+      "type": "'centered' | 'left' | 'action-only' | 'title-only'",
+      "default": "'centered'",
+      "description": "Disposición (Position en Figma): Centered Title, Left-Aligned, With Action Only o Title Only."
+    },
+    "onBack": {
+      "type": "() => void",
+      "required": false,
+      "description": "Dibuja el botón de volver. No aplica si pasas leading."
+    },
+    "backLabel": {
+      "type": "string",
+      "default": "'Volver'",
+      "description": "Nombre accesible del botón de volver."
+    },
+    "leading": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Reemplaza el botón de volver, por ejemplo con un botón de menú."
+    },
+    "actions": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Slot de la derecha (Espacio y Button rigth en Figma): botones de solo ícono con aria-label."
+    },
+    "avatar": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Avatar de tamaño md entre el botón y el título. No aplica con titlePosition action-only."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para el <header>."
+    }
   },
   "examples": [
-    { "title": "Ios centrado", "code": "<TopAppBar title=\"Título\" subtitle=\"Subtítulo\" onBack={volver} actions={<Button variant=\"primary\" size=\"sm\" iconOnly aria-label=\"Agregar\">…</Button>} />" },
-    { "title": "Android con menú", "code": "<TopAppBar platform=\"android\" titlePosition=\"left\" title=\"Título\" leading={<MenuButton />} actions={<SearchButton />} />" },
-    { "title": "Título grande", "code": "<TopAppBar titlePosition=\"action-only\" title=\"Título\" subtitle=\"Subtítulo\" onBack={volver} />" }
+    {
+      "title": "iOS con título centrado",
+      "code": "const goBack = () => {};\n\n<TopAppBar\n  title=\"Documentos\"\n  subtitle=\"Carpeta compartida\"\n  onBack={goBack}\n  actions={\n    <Button variant=\"primary\" iconOnly touchTarget aria-label=\"Agregar\">\n      <Icon name=\"add-2\" variant=\"fill\" size={20} />\n    </Button>\n  }\n/>"
+    },
+    {
+      "title": "Android con botón de menú",
+      "code": "<TopAppBar\n  platform=\"android\"\n  titlePosition=\"left\"\n  title=\"Documentos\"\n  leading={\n    <Button variant=\"tertiary\" size=\"sm\" iconOnly aria-label=\"Abrir menú\">\n      <Icon name=\"menu\" variant=\"fill\" size={24} />\n    </Button>\n  }\n  actions={\n    <Button variant=\"tertiary\" size=\"sm\" iconOnly aria-label=\"Buscar\">\n      <Icon name=\"search\" variant=\"fill\" size={24} />\n    </Button>\n  }\n/>"
+    },
+    {
+      "title": "Título grande",
+      "code": "const goBack = () => {};\n\n<TopAppBar\n  titlePosition=\"action-only\"\n  title=\"Documentos\"\n  subtitle=\"Carpeta compartida\"\n  onBack={goBack}\n/>"
+    },
+    {
+      "title": "Android con avatar",
+      "code": "const goBack = () => {};\n\n<TopAppBar\n  platform=\"android\"\n  titlePosition=\"left\"\n  title=\"Ana Pérez\"\n  subtitle=\"En línea\"\n  onBack={goBack}\n  avatar={<Avatar variant=\"initials\" size=\"md\" name=\"Ana Pérez\" />}\n/>"
+    }
   ]
 }

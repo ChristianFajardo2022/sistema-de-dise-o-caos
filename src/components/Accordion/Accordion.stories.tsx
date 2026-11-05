@@ -1,13 +1,18 @@
 import { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { ArgTypes, Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Accordion, AccordionItem } from './Accordion';
-import type { AccordionContrast, AccordionProps } from './Accordion.types';
+import type { AccordionContrast, AccordionHeadingLevel, AccordionItemProps } from './Accordion.types';
 import { Button } from '../Button';
 import { ButtonLink } from '../ButtonLink';
 import { Icon } from '../Icon';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Accordion.doc';
+import docsJson from './Accordion.docs.json';
 
-const TABLE_CELLS = ['8937484782', 'Nombre del item', 'Nombre del item', 'Nombre del item', 'Nombre del item'];
+const TABLE_CELLS = ['INF-204', 'Informe', 'Ana Pérez', 'Aprobado', 'Hoy'];
 
 const CONTRAST_OPTIONS: AccordionContrast[] = ['on-canva', 'on-card'];
 
@@ -16,12 +21,12 @@ function SampleContent() {
   return (
     <>
       <p className="m-0 self-stretch font-ds-primitives-typography-family-primary text-ds-typography-body-size-md leading-ds-typography-body-line-height-large-md text-ds-text-neutral-body">
-        Lorem ipsum dolor sit amet consectetur. Viverra imperdiet accumsan amet mauris sagittis mattis neque. Ut tempus
-        ultricies et pulvinar mattis. Nunc purus sit magna ac aliquam egestas in adipiscing venenatis. Sapien molestie
-        porttitor aliquam neque eget tellus. Blandit sed nascetur lobortis nam nibh nulla.{' '}
-        <a href="#enlace" className="text-ds-text-link-default underline">
-          Enlace
+        Texto de apoyo con el detalle del archivo: quién lo revisó, qué cambió y cuándo se actualizó por última vez. Para
+        ver el historial completo, abre el{' '}
+        <a href="#historial" className="text-ds-text-link-default underline">
+          historial
         </a>
+        .
       </p>
       <div className="self-stretch">
         <ButtonLink
@@ -30,21 +35,71 @@ function SampleContent() {
           icon={<Icon name="export2" variant="line" size={12} data-figma-part="Icon-sizes" />}
           data-figma-part="Button"
         >
-          Button
+          Ver historial
         </ButtonLink>
       </div>
       <Button variant="secondary" size="sm">
-        Button
+        Descargar
       </Button>
     </>
   );
+}
+
+/** El `type` de `AccordionItem` (Type de Figma). En el meta, `type` es el del grupo (single o multiple). */
+const ITEM_TYPE_ARGTYPES: Partial<ArgTypes<AccordionItemProps>> = {
+  type: {
+    control: 'radio',
+    options: ['normal', 'table'],
+    type: { name: 'enum', value: ['normal', 'table'] },
+    description: 'Type de Figma: normal o table (fila de celdas en el encabezado)',
+  },
+};
+
+/**
+ * Código de Personalizar del grupo: con estado propio (`value` y `onValueChange`), como se usa en una pantalla.
+ * Recibe solo los args que cambian respecto de los valores por defecto.
+ */
+function playgroundCode(args: Record<string, unknown>) {
+  const multiple = args['type'] === 'multiple';
+  const props: string[] = [];
+  if (multiple) props.push('type="multiple"');
+  props.push('value={value}', 'onValueChange={(next) => setValue(next)}');
+  if (args['collapsible'] === false && !multiple) props.push('collapsible={false}');
+  if (typeof args['contrast'] === 'string') props.push(`contrast="${args['contrast']}"`);
+  if (typeof args['headingLevel'] === 'number') props.push(`headingLevel={${args['headingLevel']}}`);
+  const itemProps: string[] = [];
+  if (args['icon'] === false) itemProps.push('icon={false}');
+  if (typeof args['description'] === 'string' && args['description'] !== '') itemProps.push(`description=${JSON.stringify(args['description'])}`);
+  const items = [
+    ['a', 'Primer archivo', 'primer'],
+    ['b', 'Segundo archivo', 'segundo'],
+    ['c', 'Tercer archivo', 'tercer'],
+  ].map(([value, title, ordinal]) =>
+    [`  <AccordionItem value="${value}" title="${title}"${itemProps.map((p) => ` ${p}`).join('')}>`, `    Contenido del ${ordinal} archivo`, '  </AccordionItem>'].join('\n')
+  );
+  return [
+    multiple ? "const [value, setValue] = useState<string[]>(['a']);" : "const [value, setValue] = useState('a');",
+    '',
+    `<Accordion\n${props.map((p) => `  ${p}`).join('\n')}\n>`,
+    ...items,
+    '</Accordion>',
+  ].join('\n');
 }
 
 const meta = {
   title: 'Layout/Accordion',
   component: AccordionItem,
   subcomponents: { Accordion },
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo de Desarrollo es el grupo con estado propio (`Playground`). Lo que sale de los ítems o de su estado queda fuera de Personalizar y sigue en Props.
+    docsLive: {
+      story: 'Playground',
+      exclude: ['title', 'value', 'defaultValue', 'value (AccordionItem)', 'type (AccordionItem)', 'cells', 'iconName', 'open', 'defaultOpen'],
+      code: playgroundCode,
+    },
+  },
   tags: ['autodocs'],
   // La tarjeta ocupa el ancho de su contenedor; Figma la muestra a 1286
   decorators: [
@@ -58,31 +113,16 @@ const meta = {
         </div>
       ),
   ],
-  argTypes: {
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Props Description y Description-2 de Figma' },
-    type: {
-      control: 'radio',
-      options: ['normal', 'table'],
-      type: { name: 'enum', value: ['normal', 'table'] },
-      description: 'Type de Figma: normal o table (fila de celdas en el encabezado)',
-    },
-    icon: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Icon de Figma' },
-    contrast: {
-      name: 'contrast',
-      control: 'radio',
-      options: CONTRAST_OPTIONS,
-      type: { name: 'enum', value: CONTRAST_OPTIONS },
-      description: 'Contrast de Figma: on-canva u on-card',
-    },
-    headingLevel: {
-      control: 'radio',
-      options: [2, 3, 4, 5, 6],
-      type: { name: 'enum', value: [2, 3, 4, 5, 6] },
-      description: 'Nivel del encabezado que envuelve el botón',
-    },
-    defaultOpen: { control: 'boolean', type: { name: 'boolean' }, description: 'State=Dropdown al inicio (no controlado)' },
-  },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    type: { control: 'radio', options: ['single', 'multiple'], type: { name: 'enum', value: ['single', 'multiple'] } },
+    collapsible: { control: 'boolean', type: { name: 'boolean' } },
+    icon: { control: 'boolean', type: { name: 'boolean' } },
+    contrast: { control: 'radio', options: CONTRAST_OPTIONS, type: { name: 'enum', value: CONTRAST_OPTIONS } },
+    headingLevel: { control: 'radio', options: [2, 3, 4, 5, 6], type: { name: 'enum', value: [2, 3, 4, 5, 6] } },
+    defaultOpen: { control: 'boolean', type: { name: 'boolean' } },
+  }),
   args: {
     title: 'Nombre del archivo',
     description: 'Estado',
@@ -97,14 +137,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Interactive: Story = {};
+export const Interactive: Story = { argTypes: ITEM_TYPE_ARGTYPES };
 
 /** Type=Table: el encabezado es una fila de celdas; al abrir, título y contenido van en un marco interior. */
 export const Table: Story = {
+  argTypes: ITEM_TYPE_ARGTYPES,
   args: { type: 'table', cells: TABLE_CELLS, contrast: 'on-canva', defaultOpen: false },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByRole('button', { name: /8937484782/ });
+    const trigger = canvas.getByRole('button', { name: /INF-204/ });
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     await userEvent.click(trigger);
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
@@ -114,6 +155,7 @@ export const Table: Story = {
 
 /** Sin ícono ni descripción (props Icon y Description de Figma en false): el alto mínimo sigue siendo 70. */
 export const Minimal: Story = {
+  argTypes: ITEM_TYPE_ARGTYPES,
   args: { icon: false, description: undefined, defaultOpen: false },
 };
 
@@ -326,6 +368,7 @@ export const StandaloneAndMultipleTest: Story = {
 
 /** Título largo: envuelve en 2-3 líneas sin cortarse; la silueta con muesca y el Button corner siguen en su sitio. */
 export const LongTitle: Story = {
+  argTypes: ITEM_TYPE_ARGTYPES,
   args: {
     title:
       'Un título de archivo muy largo que ocupa varias líneas para comprobar que el texto envuelve sin cortarse ni solaparse con el botón de la esquina',
@@ -341,26 +384,56 @@ export const LongTitle: Story = {
   ],
 };
 
-/** Grupo con controles: `type`, `collapsible`, `contrast` y `headingLevel` (también por URL). */
-export const Playground: StoryObj<typeof Accordion> = {
-  tags: ['!autodocs'],
+interface PlaygroundArgs {
+  type?: 'single' | 'multiple';
+  collapsible?: boolean;
+  contrast?: AccordionContrast;
+  headingLevel?: AccordionHeadingLevel;
+  icon?: boolean;
+  description?: string;
+}
+
+const PLAYGROUND_ITEMS: { value: string; title: string; ordinal: string }[] = [
+  { value: 'a', title: 'Primer archivo', ordinal: 'primer' },
+  { value: 'b', title: 'Segundo archivo', ordinal: 'segundo' },
+  { value: 'c', title: 'Tercer archivo', ordinal: 'tercer' },
+];
+
+/** Grupo con estado propio (controlado): abre y cierra con el puntero y el teclado. */
+function PlaygroundDemo({ type = 'single', collapsible = true, contrast = 'on-card', headingLevel = 3, icon = true, description }: PlaygroundArgs) {
+  const [single, setSingle] = useState('a');
+  const [multiple, setMultiple] = useState<string[]>(['a']);
+  const items = PLAYGROUND_ITEMS.map(({ value, title, ordinal }) => (
+    <AccordionItem key={value} value={value} title={title} icon={icon} description={description || undefined}>
+      Contenido del {ordinal} archivo
+    </AccordionItem>
+  ));
+  return (
+    <div className={contrast === 'on-canva' ? 'w-full bg-ds-background-general-black p-6' : 'w-full bg-ds-background-container-default-on-canva p-6'}>
+      {type === 'multiple' ? (
+        <Accordion type="multiple" value={multiple} onValueChange={(next) => setMultiple(next)} contrast={contrast} headingLevel={headingLevel}>
+          {items}
+        </Accordion>
+      ) : (
+        <Accordion value={single} onValueChange={(next) => setSingle(next)} collapsible={collapsible} contrast={contrast} headingLevel={headingLevel}>
+          {items}
+        </Accordion>
+      )}
+    </div>
+  );
+}
+
+/** Grupo con controles: `type`, `collapsible`, `contrast`, `headingLevel`, `icon` y `description` (también por URL). Alimenta el lienzo de Desarrollo. */
+export const Playground: StoryObj<Record<string, unknown>> = {
   argTypes: {
     type: { control: 'radio', options: ['single', 'multiple'], type: { name: 'enum', value: ['single', 'multiple'] } },
     collapsible: { control: 'boolean', type: { name: 'boolean' } },
     contrast: { control: 'radio', options: CONTRAST_OPTIONS, type: { name: 'enum', value: CONTRAST_OPTIONS } },
     headingLevel: { control: 'radio', options: [2, 3, 4, 5, 6], type: { name: 'enum', value: [2, 3, 4, 5, 6] } },
   },
-  args: { type: 'single', collapsible: true, contrast: 'on-card', headingLevel: 3 },
-  render: (args) => (
-    <Accordion {...(args as AccordionProps)}>
-      <AccordionItem value="a" title="Primer archivo" description="Estado">
-        <SampleContent />
-      </AccordionItem>
-      <AccordionItem value="b" title="Segundo archivo">
-        <SampleContent />
-      </AccordionItem>
-    </Accordion>
-  ),
+  args: { title: undefined, children: undefined, defaultOpen: undefined, description: 'Al día', icon: true, contrast: 'on-card', headingLevel: 3 },
+  parameters: { layout: 'padded' },
+  render: (args) => <PlaygroundDemo {...(args as PlaygroundArgs)} />,
 };
 
 /** Pruebas: `collapsible={false}` deja `aria-disabled` en el ítem abierto y el clic no lo cierra. */
@@ -438,5 +511,30 @@ export const ControlledTest: Story = {
 
     await expect(canvas.getByRole('heading', { level: 4, name: 'Nivel' })).toBeVisible();
     await expect(canvas.getByRole('heading', { level: 3, name: 'Propio' })).toBeVisible();
+  },
+};
+
+/** Página de documentación (plantilla v2): la revisan vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Accordion' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Accordion en Figma:']);
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThan(0);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Accordion' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

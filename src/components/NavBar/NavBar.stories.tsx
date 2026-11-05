@@ -3,12 +3,17 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { NavBar, NavBarItem } from './NavBar';
 import type { NavBarItemData, NavBarMoreItem, NavBarProps } from './NavBar.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NavBar.doc';
+import docsJson from './NavBar.docs.json';
 
 const ITEMS: NavBarItemData[] = [
-  { value: 'inicio', label: 'Inicio', icon: 'add-circle' },
-  { value: 'pagos', label: 'Pagos', icon: 'add-circle' },
-  { value: 'ahorro', label: 'Ahorro', icon: 'add-circle' },
-  { value: 'perfil', label: 'Perfil', icon: 'add-circle' },
+  { value: 'inicio', label: 'Inicio', icon: 'homepage' },
+  { value: 'documentos', label: 'Documentos', icon: 'document' },
+  { value: 'proyectos', label: 'Proyectos', icon: 'folder' },
+  { value: 'perfil', label: 'Perfil', icon: 'user' },
 ];
 
 const MORE: NavBarMoreItem[] = [
@@ -16,21 +21,35 @@ const MORE: NavBarMoreItem[] = [
   { value: 'galeria', label: 'Galería', icon: 'image' },
   { value: 'recomendados', label: 'Recomendados', icon: 'like' },
   { value: 'notas', label: 'Notas', icon: 'note-favorite' },
-  { value: 'tienda', label: 'Tienda', icon: 'shop-add' },
+  { value: 'ajustes', label: 'Ajustes', icon: 'setting' },
 ];
 
 const meta = {
   title: 'Navigation/Nav bar',
   component: NavBar,
   subcomponents: { NavBarItem },
-  parameters: { layout: 'centered' },
-  tags: ['autodocs'],
-  argTypes: {
-    value: { control: 'text', type: { name: 'string' }, description: 'Opción activa (controlada)' },
-    defaultValue: { control: 'text', type: { name: 'string' }, description: 'Opción activa inicial' },
-    moreLabel: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible del botón "más"' },
-    moreOpen: { control: 'boolean', type: { name: 'boolean' }, description: 'Hoja "más" abierta (controlada)' },
+  parameters: {
+    layout: 'centered',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      // El lienzo muestra el estilo "3 options": el botón "más" abre la hoja de verdad
+      story: 'With More',
+      // La hoja y la opción activa las manejan el botón y las opciones (R6): `moreOpen` y `value` controlados se quedarían fijos
+      exclude: ['moreOpen', 'defaultMoreOpen', 'value'],
+    },
   },
+  tags: ['autodocs'],
+  // Tipos explícitos en las uniones: sin ellos Storybook descarta los args de la URL
+  argTypes: argTypesFromDocsJson(docsJson, {
+    value: { control: 'text', type: { name: 'string' } },
+    defaultValue: {
+      control: 'select',
+      options: ['inicio', 'documentos', 'proyectos'],
+      type: { name: 'enum', value: ['inicio', 'documentos', 'proyectos'] },
+    },
+    moreLabel: { control: 'text', type: { name: 'string' } },
+    moreOpen: { control: 'boolean', type: { name: 'boolean' } },
+  }),
   args: { 'aria-label': 'Navegación principal', items: ITEMS, defaultValue: 'inicio' },
   decorators: [
     (Story, { parameters }) =>
@@ -56,7 +75,7 @@ export const WithMore: Story = {
 };
 
 function Controlled(args: NavBarProps) {
-  const [value, setValue] = useState('pagos');
+  const [value, setValue] = useState('documentos');
   return (
     <div>
       <NavBar {...args} value={value} onValueChange={setValue} />
@@ -74,27 +93,27 @@ export const ControlledValue: Story = {
 export const Composition: Story = {
   render: (args) => (
     <NavBar aria-label={args['aria-label']} defaultValue="b">
-      <NavBarItem value="a" label="Inicio" icon="add-circle" href="#inicio" />
-      <NavBarItem value="b" label="Pagos" icon="add-circle" href="#pagos" />
-      <NavBarItem value="c" label="Ahorro" icon="add-circle" href="#ahorro" />
+      <NavBarItem value="a" label="Inicio" icon="homepage" href="#inicio" />
+      <NavBarItem value="b" label="Documentos" icon="document" href="#documentos" />
+      <NavBarItem value="c" label="Proyectos" icon="folder" href="#proyectos" />
     </NavBar>
   ),
 };
 
-const LABELS = 'Transferencia';
-const TRANSFER: NavBarItemData[] = [1, 2, 3, 4].map((n) => ({ value: `t${n}`, label: LABELS, icon: 'add-circle' as const }));
+const LABELS = 'Documentos';
+const MATRIX_ITEMS: NavBarItemData[] = [1, 2, 3, 4].map((n) => ({ value: `t${n}`, label: LABELS, icon: 'add-circle' as const }));
 
 /** Una variante de la spec: 3 o 4 opciones, `tab` 1-4 (en "3 options" el 4 es la hoja "más" abierta). */
 function Variant({ style, tab }: { style: 3 | 4; tab: 1 | 2 | 3 | 4 }) {
   const name = `Style=${style} options, tab=${tab}`;
   if (style === 4) {
-    return <NavBar aria-label={name} data-figma={name} items={TRANSFER} defaultValue={`t${tab}`} />;
+    return <NavBar aria-label={name} data-figma={name} items={MATRIX_ITEMS} defaultValue={`t${tab}`} />;
   }
   return (
     <NavBar
       aria-label={name}
       data-figma={name}
-      items={TRANSFER.slice(0, 3)}
+      items={MATRIX_ITEMS.slice(0, 3)}
       moreItems={MORE}
       defaultValue={tab === 4 ? 't1' : `t${tab}`}
       defaultMoreOpen={tab === 4}
@@ -121,7 +140,7 @@ export const FigmaOptionsTabBar: Story = {
         <NavBarItem
           key={state}
           value="x"
-          label="Transferencia"
+          label="Documentos"
           icon="add-circle"
           state={state}
           className="w-[75px] flex-none"
@@ -139,7 +158,7 @@ export const RoleTest: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('navigation', { name: 'Navegación principal' })).toBeInTheDocument();
     await expect(canvas.getByRole('button', { name: 'Inicio' })).toHaveAttribute('aria-current', 'page');
-    await expect(canvas.getByRole('button', { name: 'Pagos' })).not.toHaveAttribute('aria-current');
+    await expect(canvas.getByRole('button', { name: 'Documentos' })).not.toHaveAttribute('aria-current');
   },
 };
 
@@ -149,14 +168,14 @@ export const SelectTest: Story = {
   args: { onValueChange: fn() },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole('button', { name: 'Pagos' }));
-    await expect(canvas.getByRole('button', { name: 'Pagos' })).toHaveAttribute('aria-current', 'page');
-    await expect(args.onValueChange).toHaveBeenCalledWith('pagos');
+    await userEvent.click(canvas.getByRole('button', { name: 'Documentos' }));
+    await expect(canvas.getByRole('button', { name: 'Documentos' })).toHaveAttribute('aria-current', 'page');
+    await expect(args.onValueChange).toHaveBeenCalledWith('documentos');
     await userEvent.tab();
-    await expect(canvas.getByRole('button', { name: 'Ahorro' })).toHaveFocus();
+    await expect(canvas.getByRole('button', { name: 'Proyectos' })).toHaveFocus();
     await userEvent.keyboard('{Enter}');
-    await expect(canvas.getByRole('button', { name: 'Ahorro' })).toHaveAttribute('aria-current', 'page');
-    await expect(canvas.getByRole('button', { name: 'Pagos' })).not.toHaveAttribute('aria-current');
+    await expect(canvas.getByRole('button', { name: 'Proyectos' })).toHaveAttribute('aria-current', 'page');
+    await expect(canvas.getByRole('button', { name: 'Documentos' })).not.toHaveAttribute('aria-current');
   },
 };
 
@@ -165,8 +184,8 @@ export const LinkTest: Story = {
   tags: ['!autodocs'],
   render: (args) => (
     <NavBar aria-label={args['aria-label']} defaultValue="a">
-      <NavBarItem value="a" label="Inicio" icon="add-circle" href="#inicio" />
-      <NavBarItem value="b" label="Pagos" icon="add-circle" href="#pagos" />
+      <NavBarItem value="a" label="Inicio" icon="homepage" href="#inicio" />
+      <NavBarItem value="b" label="Documentos" icon="document" href="#documentos" />
     </NavBar>
   ),
   play: async ({ canvasElement }) => {
@@ -192,7 +211,7 @@ export const MoreMenuTest: Story = {
     await userEvent.keyboard('{ArrowDown}');
     await expect(canvas.getByRole('menuitem', { name: 'Galería' })).toHaveFocus();
     await userEvent.keyboard('{End}');
-    await expect(canvas.getByRole('menuitem', { name: 'Tienda' })).toHaveFocus();
+    await expect(canvas.getByRole('menuitem', { name: 'Ajustes' })).toHaveFocus();
     // Con vuelta, Inicio y letra inicial (teclado de DropdownMenuList)
     await userEvent.keyboard('{ArrowDown}');
     await expect(canvas.getByRole('menuitem', { name: 'Favoritos' })).toHaveFocus();
@@ -207,5 +226,29 @@ export const MoreMenuTest: Story = {
     await userEvent.click(canvas.getByRole('menuitem', { name: 'Notas' }));
     await expect(args.onMoreSelect).toHaveBeenCalledWith('notas');
     await expect(canvas.queryByRole('menu')).not.toBeInTheDocument();
+  },
+};
+
+/** Test de la página de documentación (plantilla v2): encabezado, pestañas y secciones. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', sinMarco: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Nav bar' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Nav bar en Figma:']);
+    // Marcadores: uno por pauta en cada lienzo de la anatomía
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThanOrEqual(10);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de NavBar' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

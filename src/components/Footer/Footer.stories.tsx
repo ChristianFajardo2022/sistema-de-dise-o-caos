@@ -1,10 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
 import { Footer } from './Footer';
-import type { FooterSection, FooterSocialLink } from './Footer.types';
+import type { FooterProps, FooterSection, FooterSocialLink } from './Footer.types';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { Logo } from '../Logo';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Footer.doc';
+import docsJson from './Footer.docs.json';
 
 const SOCIAL: FooterSocialLink[] = [
   { name: 'Facebook', href: '#facebook', icon: <Icon name="facebook-circle" size={24} className="text-ds-icon-general-default" /> },
@@ -14,49 +19,32 @@ const SOCIAL: FooterSocialLink[] = [
 const CONTACT: FooterSection = {
   title: 'Contacto',
   items: [
-    { label: 'Línea de atención al cliente:', value: '000 000 0000', href: 'tel:0000000000' },
-    { label: 'Línea secundaria:', value: '000 000 0000', href: 'tel:0000000000' },
-    { label: 'Horarios de atención:', value: (<>Lunes a viernes 9:00 am a 5:00 pm.<br />Sábados 10:00 am a 2:00 pm y domingos 11:00 am a 1:00 pm.</>) },
-    { label: 'Horarios de atención chat:', value: 'Lunes a viernes 9:00 am a 4:30 pm. Sábados 9:00 am a 1:00 pm' },
-    { label: 'Correo electrónico:', value: 'contacto@ejemplo.com', href: 'mailto:contacto@ejemplo.com' },
+    { label: 'Teléfono:', value: '000 000 0000', href: 'tel:0000000000' },
+    { label: 'Horario de atención:', value: (<>Lunes a viernes, 9:00 am a 5:00 pm.<br />Sábados, 10:00 am a 2:00 pm.</>) },
+    { label: 'Horario del chat:', value: 'Lunes a viernes, 9:00 am a 4:30 pm' },
+    { label: 'Correo electrónico:', value: 'ayuda@ejemplo.com', href: 'mailto:ayuda@ejemplo.com' },
   ],
 };
 
 const LEGAL: FooterSection = {
   title: 'Legal',
   items: [
-    { label: 'Política de seguridad y salud', href: '#a' },
-    { label: 'Políticas de privacidad', href: '#b' },
-    { label: 'Política de navegación', href: '#c' },
-    { label: 'Política de seguridad', href: '#d' },
+    { label: 'Términos y condiciones', href: '#a' },
+    { label: 'Política de privacidad', href: '#b' },
+    { label: 'Política de cookies', href: '#c' },
+    { label: 'Aviso legal', href: '#d' },
   ],
 };
 
 const link = (label: string) => ({ label, href: '#' });
 const WEB_SECTIONS: FooterSection[] = [
+  { title: 'Ayuda', items: ['Preguntas frecuentes', 'Guías de uso', 'Soporte', 'Estado del servicio'].map(link) },
+  { title: 'Legal', items: ['Términos y condiciones', 'Política de privacidad', 'Política de cookies', 'Aviso legal'].map(link) },
+  { title: 'Recursos', items: ['Documentación', 'Novedades', 'Descargas', 'Comunidad'].map(link) },
+  { title: 'Documentos', items: ['Informe anual', 'Código de conducta', 'Manual de uso', 'Glosario'].map(link) },
   {
-    title: 'Políticas y normas:',
-    items: [
-      link('Aviso de privacidad y protección de la información'),
-      link('Código de conducta'),
-      link('Informe anual'),
-      link('Línea de ayuda'),
-      link('Manual de gestión'),
-      link('Manual de cumplimiento'),
-      link('Misión y visión'),
-      link('Política de gestión integral de riesgos'),
-      link('Políticas de cumplimiento'),
-    ],
-  },
-  { title: 'Legal y contratos:', items: ['Contrato de servicio', 'Contrato marco', 'Condiciones de uso', 'Tablas documentales'].map(link) },
-  { title: 'Regulación:', items: ['Documento de ejemplo uno', 'Documento de ejemplo dos', 'Indicadores', 'Recomendaciones de uso'].map(link) },
-  { title: 'Otros documentos:', items: ['Documento de ejemplo tres', 'Documento de ejemplo cuatro', 'Política de seguridad', 'Términos y condiciones del portal'].map(link) },
-  {
-    title: 'Líneas de atención:',
-    items: [
-      { value: '000 000 0000' },
-      { label: 'Oficina principal:', value: 'Avenida Principal 123, Ciudad' },
-    ],
+    title: 'Contacto',
+    items: [{ value: '000 000 0000' }, { label: 'Dirección:', value: 'Avenida Principal 123, Ciudad' }],
   },
 ];
 
@@ -89,20 +77,34 @@ const ACTION = (
 const MOBILE_ACTION = <Button variant="primary" size="md">Ayuda</Button>;
 
 const ABOUT =
-  'Lorem ipsum dolor sit amet consectetur. Cursus aliquet mattis id urna. Diam hendrerit vitae amet sed morbi. Eget pulvinar eu blandit commodo eget tincidunt. Non tincidunt montes tincidunt feugiat elit varius.';
+  'Texto de ejemplo que presenta el sitio y su propósito. Sirve para ver cómo se comporta el bloque con varias líneas.';
 
 const meta = {
   title: 'Navigation/Footer',
   component: Footer,
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      // El Footer decide su composición por su propio ancho: la columna de la grilla va de 0 a 1440 (el lienzo no la reduce con
+      // `zoom`) y le da el ancho disponible. Los títulos de grupo van en h3 para no sumar h2 a los de la página
+      render: (a: Record<string, unknown>) => (
+        <div className="grid w-full" style={{ gridTemplateColumns: 'minmax(0, 1440px)' }}>
+          <Footer {...(a as FooterProps)} headingLevel={3} />
+        </div>
+      ),
+      exclude: ['headingLevel'],
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     type: { type: { name: 'enum', value: ['portals', 'web'] }, control: 'inline-radio', options: ['portals', 'web'] },
     headingLevel: { type: { name: 'enum', value: [2, 3, 4, 5, 6] }, control: 'select', options: [2, 3, 4, 5, 6] },
     mobileAccordion: { type: { name: 'boolean' }, control: 'boolean' },
     navLabel: { control: 'text' },
     socialLabel: { control: 'text' },
-  },
+  }),
 } satisfies Meta<typeof Footer>;
 
 export default meta;
@@ -113,14 +115,14 @@ export const Interactive: Story = {
   args: {
     type: 'portals',
     logo: <Logo type="logo" size="lg" />,
-    aboutTitle: 'Acerca de nosotros:',
-    about: 'Somos una empresa de ejemplo. Este texto sirve para ver cómo se comporta el bloque "acerca de" con varias líneas.',
+    aboutTitle: 'Acerca de',
+    about: 'Texto de ejemplo que presenta el sitio y su propósito. Sirve para ver cómo se comporta el bloque con varias líneas.',
     contact: CONTACT,
     sections: [LEGAL],
     social: SOCIAL,
     action: ACTION,
     mobileAction: MOBILE_ACTION,
-    copyright: 'Copyright © 2026 - Interrapidisimo.com',
+    copyright: 'Copyright © 2026',
     legal: 'Todos los derechos reservados',
   },
 };
@@ -135,7 +137,7 @@ export const Web: Story = {
     badges: <Badges widths={WIDTHS} />,
     action: ACTION,
     mobileAction: MOBILE_ACTION,
-    copyright: 'Copyright © 2026 - Interrapidisimo.com - Todos los derechos reservados',
+    copyright: 'Copyright © 2026 - Todos los derechos reservados',
   },
 };
 
@@ -144,7 +146,7 @@ export const SinAcordeonMovil: Story = {
   args: { ...Web.args, mobileAccordion: false },
 };
 
-/** Cada variante de Figma una vez (a 1440). El logo, el nombre de la marca y el copyright son los reales; el resto de los textos (contacto, enlaces, sellos) sigue genérico. */
+/** Cada variante de Figma una vez (a 1440). Los textos de contacto, enlaces y sellos son de ejemplo. */
 export const FigmaMatrix: Story = {
   // Dos footers en la misma página (una variante cada uno): el landmark contentinfo y el nav se repiten solo aquí
   parameters: { a11y: { config: { rules: [{ id: 'landmark-no-duplicate-contentinfo', enabled: false }, { id: 'landmark-unique', enabled: false }] } } },
@@ -154,13 +156,13 @@ export const FigmaMatrix: Story = {
         data-figma="Type=Portals"
         type="portals"
         logo={<Logo type="logo" size="lg" />}
-        aboutTitle="Acerca de nosotros:"
+        aboutTitle="Acerca de"
         about={ABOUT}
         contact={CONTACT}
         sections={[LEGAL]}
         social={SOCIAL}
         action={ACTION}
-        copyright="Copyright © 2026 - Interrapidisimo.com"
+        copyright="Copyright © 2026"
         legal="Todos los derechos reservados"
       />
       <Footer
@@ -171,7 +173,7 @@ export const FigmaMatrix: Story = {
         social={SOCIAL}
         badges={<Badges widths={WIDTHS} />}
         action={ACTION}
-        copyright="Copyright © 2026 - Interrapidisimo.com - Todos los derechos reservados"
+        copyright="Copyright © 2026 - Todos los derechos reservados"
       />
     </div>
   ),
@@ -186,9 +188,9 @@ export const AccessibilityTest: Story = {
     await expect(canvas.getByRole('contentinfo')).toBeVisible();
     const nav = canvas.getByRole('navigation', { name: 'Enlaces del pie de página' });
     await expect(within(nav).getByRole('heading', { name: 'Legal' })).toBeVisible();
-    await expect(within(nav).getByRole('link', { name: 'Políticas de privacidad' })).toHaveAttribute('href', '#b');
+    await expect(within(nav).getByRole('link', { name: 'Política de privacidad' })).toHaveAttribute('href', '#b');
     await expect(canvas.getByRole('link', { name: 'Facebook' })).toHaveAttribute('href', '#facebook');
-    await expect(canvas.getAllByRole('link', { name: /000 000 0000/ })).toHaveLength(2);
+    await expect(canvas.getAllByRole('link', { name: /000 000 0000/ })).toHaveLength(1);
     await expect(canvas.getByRole('button', { name: 'Ayuda' })).toBeVisible();
   },
 };
@@ -215,5 +217,29 @@ export const LandmarksTest: Story = {
     await expect(canvas.getAllByRole('heading', { level: 2 })).toHaveLength(5);
     await expect(canvas.getByRole('list', { name: 'Síguenos' })).toBeVisible();
     await expect(canvas.queryByRole('list', { name: 'Redes sociales' })).toBeNull();
+  },
+};
+
+/** Página de documentación (plantilla v2): la revisan vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Footer' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Footer en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Footer' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

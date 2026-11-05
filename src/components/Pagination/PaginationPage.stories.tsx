@@ -7,7 +7,8 @@ const meta = {
   title: 'Navigation/Pagination/Page',
   component: PaginationPage,
   parameters: { layout: 'centered' },
-  tags: ['autodocs'],
+  // Se documenta dentro de la página de Pagination
+  tags: ['!autodocs'],
   argTypes: {
     number: { control: 'number', type: { name: 'number' }, description: 'Número de página' },
     selected: { control: 'boolean', type: { name: 'boolean' }, description: 'Página actual' },

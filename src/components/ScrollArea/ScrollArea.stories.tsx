@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
 import { ScrollArea } from './ScrollArea';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ScrollArea.doc';
+import docsJson from './ScrollArea.docs.json';
 import type { ScrollAreaOrientation } from './ScrollArea.types';
 
 const ORIENTATION_OPTIONS: ScrollAreaOrientation[] = ['vertical', 'horizontal', 'both'];
@@ -15,29 +20,38 @@ const Content = ({ wide }: { wide?: boolean }) => (
   </ul>
 );
 
+/** Contenido que muestra el código de Desarrollo (`docsLive.args`): el lienzo dibuja la lista larga de la historia. */
+const DOCS_CODE_CHILDREN = (
+  <ul>
+    {Array.from({ length: 20 }, (_, i) => (
+      <li key={i}>{`Documento ${i + 1}`}</li>
+    ))}
+  </ul>
+);
+
 const meta = {
   title: 'Layout/Scroll area',
   component: ScrollArea,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson),
+    docsLive: { story: 'Interactive', args: (args: Record<string, unknown>) => ({ ...args, children: DOCS_CODE_CHILDREN }) },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     orientation: {
       name: 'orientation',
       control: 'radio',
       options: ORIENTATION_OPTIONS,
       type: { name: 'enum', value: ORIENTATION_OPTIONS },
-      description: 'Eje de desplazamiento',
     },
     scrollbarGap: {
       name: 'scrollbarGap',
       control: 'radio',
       options: ['none', 'md', 'lg', 'xl'],
       type: { name: 'enum', value: ['none', 'md', 'lg', 'xl'] },
-      description: 'Espacio entre el contenido y la barra (solo con desborde)',
     },
-    maxHeight: { control: 'text', type: { name: 'string' }, description: 'Alto máximo (CSS)' },
-    'aria-label': { control: 'text', type: { name: 'string' }, description: 'Nombre accesible de la región' },
-  },
+    maxHeight: { control: 'text', type: { name: 'string' } },
+    'aria-label': { control: 'text', type: { name: 'string' } },
+  }),
   args: { orientation: 'vertical', maxHeight: '314px', 'aria-label': 'Contenido desplazable' },
 } satisfies Meta<typeof ScrollArea>;
 
@@ -46,8 +60,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Interactive: Story = {
   render: (args) => (
-    <ScrollArea {...args} className="w-72 max-w-full bg-ds-background-general-black p-ds-space-general-md">
-      <Content wide={args.orientation !== 'vertical'} />
+    <ScrollArea {...args} className="w-72 max-w-full bg-ds-background-general-black">
+      <div className="p-ds-space-general-md">
+        <Content wide={args.orientation !== 'vertical'} />
+      </div>
     </ScrollArea>
   ),
 };
@@ -81,8 +97,10 @@ export const FigmaMatrix: Story = {
       </div>
       <div className="flex flex-col gap-2">
         <span className="text-xs text-ds-text-neutral-body">ScrollArea</span>
-        <ScrollArea maxHeight="314px" aria-label="Ejemplo de área con scroll" className="w-72 max-w-full p-ds-space-general-md">
-          <Content />
+        <ScrollArea maxHeight="314px" aria-label="Ejemplo de área con scroll" className="w-72 max-w-full">
+          <div className="p-ds-space-general-md">
+            <Content />
+          </div>
         </ScrollArea>
       </div>
       </div>
@@ -169,5 +187,29 @@ export const ScrollbarGapTest: Story = {
     const canvas = within(canvasElement);
     await expect(getComputedStyle(canvas.getByTestId('over')).paddingRight).toBe('8px');
     await expect(getComputedStyle(canvas.getByTestId('fits')).paddingRight).toBe('0px');
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Scroll area' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    await expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Scroll area en Figma:']);
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBe(6);
+    await userEvent.click(tabs[1]);
+    await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de ScrollArea' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

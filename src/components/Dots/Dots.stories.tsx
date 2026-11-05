@@ -5,6 +5,11 @@ import { Dots } from './Dots';
 import type { DotsProps, DotsSize, DotsState } from './Dots.types';
 import { DropdownMenu, DropdownMenuItem, DropdownMenuPanel } from '../DropdownMenu';
 import { cn } from '../../utils/cn';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './Dots.doc';
+import docsJson from './Dots.docs.json';
 
 const SIZE_OPTIONS: DotsSize[] = ['xs', 'sm', 'md'];
 const STATE_OPTIONS: DotsState[] = ['default', 'hover', 'focus', 'press', 'inactive'];
@@ -14,21 +19,21 @@ const FRAME_SIZE: Record<DotsSize, string> = { xs: 'size-8', sm: 'size-12', md: 
 const meta = {
   title: 'Navigation/Dots',
   component: Dots,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', docs: componentDocsParameters(doc, docsJson), docsLive: { exclude: ['type'] } },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     size: { control: 'radio', options: SIZE_OPTIONS, type: { name: 'enum', value: SIZE_OPTIONS }, description: 'Size de Figma: xs 32, sm 48, md 56' },
-    state: { control: 'select', options: [undefined, ...STATE_OPTIONS], type: { name: 'enum', value: STATE_OPTIONS }, description: 'State forzado, solo para documentación' },
+    state: { control: 'select', options: STATE_OPTIONS, type: { name: 'enum', value: STATE_OPTIONS }, description: 'State forzado, solo para documentación' },
     label: { control: 'text', type: { name: 'string' }, description: 'Nombre accesible' },
     disabled: { control: 'boolean', type: { name: 'boolean' }, description: 'Inactive de Figma' },
-  },
+  }),
   args: { size: 'md', label: 'Más opciones', disabled: false },
 } satisfies Meta<typeof Dots>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Interactive: Story = {};
+export const Interactive: Story = { args: { label: 'Acciones de la fila' } };
 
 /** Dots como disparador de `DropdownMenu`: el menú pone `aria-expanded`, que Dots dibuja como Press. */
 function MenuDemo(args: DotsProps) {
@@ -148,5 +153,27 @@ export const MenuTriggerTest: Story = {
     await expect(trigger).toHaveAttribute('aria-expanded', 'false');
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Dots' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Dots en Figma:']);
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThan(0);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Dots' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
 import { Tab, TabList, TabOverflow, TabPanel, Tabs } from './Tabs';
+import { doc } from './Tabs.doc';
+import docsJson from './Tabs.docs.json';
 import type { TabState, TabsActivationMode, TabsContrast, TabsProps, TabsSize } from './Tabs.types';
 import { DropdownMenuItem } from '../DropdownMenu';
 
@@ -9,34 +14,59 @@ const SIZE_OPTIONS: TabsSize[] = ['md', 'sm'];
 const CONTRAST_OPTIONS: TabsContrast[] = ['on-canva', 'on-card'];
 const ACTIVATION_OPTIONS: TabsActivationMode[] = ['automatic', 'manual'];
 
+// Código copiable de Personalizar: el estado de la pestaña seleccionada y las pestañas del ejemplo del lienzo
+const liveCode = ({ defaultValue: _defaultValue, value: _value, ...a }: Record<string, unknown>) => {
+  const props = [
+    'value={value}',
+    'onValueChange={(value) => setValue(value)}',
+    ...Object.entries(a).flatMap(([name, v]) => (typeof v === 'string' ? [`${name}="${v}"`] : [])),
+  ];
+  return `const [value, setValue] = useState('inicio');
+
+<Tabs
+${props.map((p) => `  ${p}`).join('\n')}
+>
+  <TabList aria-label="Secciones del espacio">
+    <Tab value="inicio" icon="homepage" badge={3} badgeLabel="sin leer">
+      Inicio
+    </Tab>
+    <Tab value="documentos" icon="document" badge={12} badgeLabel="sin leer">
+      Documentos
+    </Tab>
+    <Tab value="proyectos" icon="folder">
+      Proyectos
+    </Tab>
+    <Tab value="archivo" icon="archive" disabled>
+      Archivo
+    </Tab>
+  </TabList>
+  <TabPanel value="inicio">Tienes tres mensajes sin leer.</TabPanel>
+  <TabPanel value="documentos">Hay doce documentos sin leer.</TabPanel>
+  <TabPanel value="proyectos">Sin proyectos activos hoy.</TabPanel>
+  <TabPanel value="archivo">Archivo no disponible.</TabPanel>
+</Tabs>`;
+};
+
 const meta = {
   title: 'Navigation/Tabs',
   component: Tabs,
   subcomponents: { TabList, Tab, TabPanel, TabOverflow },
-  parameters: { layout: 'padded' },
-  tags: ['autodocs'],
-  argTypes: {
-    size: {
-      control: 'radio',
-      options: SIZE_OPTIONS,
-      type: { name: 'enum', value: SIZE_OPTIONS },
-      description: 'Size de Figma: md o sm',
-    },
-    contrast: {
-      control: 'radio',
-      options: CONTRAST_OPTIONS,
-      type: { name: 'enum', value: CONTRAST_OPTIONS },
-      description: 'Contrast de Figma: on-canva u on-card',
-    },
-    activationMode: {
-      control: 'radio',
-      options: ACTIVATION_OPTIONS,
-      type: { name: 'enum', value: ACTIVATION_OPTIONS },
-      description: 'automatic: las flechas seleccionan; manual: Enter o Espacio',
-    },
-    defaultValue: { control: 'text', type: { name: 'string' }, description: 'Pestaña inicial (no controlado)' },
+  parameters: {
+    layout: 'padded',
+    // La página Docs usa la plantilla de documentación (Tabs.doc.tsx) con la referencia de código al final
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo cambia de pestaña con clic y teclado. La selección la lleva el render (`defaultValue`): sin controles
+    docsLive: { story: 'Interactive', exclude: ['value', 'defaultValue'], code: liveCode },
   },
-  args: { size: 'md', contrast: 'on-canva', activationMode: 'automatic', defaultValue: 'pendientes' },
+  tags: ['autodocs'],
+  // Las descripciones salen de Tabs.docs.json; aquí solo los controles y los tipos explícitos
+  argTypes: argTypesFromDocsJson(docsJson, {
+    size: { control: 'radio', options: SIZE_OPTIONS, type: { name: 'enum', value: SIZE_OPTIONS } },
+    contrast: { control: 'radio', options: CONTRAST_OPTIONS, type: { name: 'enum', value: CONTRAST_OPTIONS } },
+    activationMode: { control: 'radio', options: ACTIVATION_OPTIONS, type: { name: 'enum', value: ACTIVATION_OPTIONS } },
+    defaultValue: { control: 'text', type: { name: 'string' } },
+  }),
+  args: { size: 'md', contrast: 'on-canva', activationMode: 'automatic', defaultValue: 'inicio' },
 } satisfies Meta<typeof Tabs>;
 
 export default meta;
@@ -44,33 +74,33 @@ type Story = StoryObj<typeof meta>;
 
 const panelText = 'm-0 pt-4 font-ds-primitives-typography-family-primary text-ds-typography-body-size-md text-ds-text-neutral-body';
 
-function OrdersTabs(args: TabsProps) {
+function SampleTabs(args: TabsProps) {
   return (
     <Tabs {...args}>
-      <TabList aria-label="Estado de las solicitudes">
-        <Tab value="pendientes" icon="heart" badge={3} badgeLabel="solicitudes">
-          Pendientes
+      <TabList aria-label="Secciones del espacio">
+        <Tab value="inicio" icon="homepage" badge={3} badgeLabel="sin leer">
+          Inicio
         </Tab>
-        <Tab value="en-proceso" icon="heart" badge={12} badgeLabel="solicitudes">
-          En proceso
+        <Tab value="documentos" icon="document" badge={12} badgeLabel="sin leer">
+          Documentos
         </Tab>
-        <Tab value="enviados" icon="heart">
-          Enviados
+        <Tab value="proyectos" icon="folder">
+          Proyectos
         </Tab>
-        <Tab value="archivados" icon="heart" disabled>
-          Archivados
+        <Tab value="archivo" icon="archive" disabled>
+          Archivo
         </Tab>
       </TabList>
-      <TabPanel value="pendientes">
-        <p className={panelText}>Tres solicitudes esperan confirmación.</p>
+      <TabPanel value="inicio">
+        <p className={panelText}>Tienes tres mensajes sin leer.</p>
       </TabPanel>
-      <TabPanel value="en-proceso">
-        <p className={panelText}>Doce solicitudes están en proceso.</p>
+      <TabPanel value="documentos">
+        <p className={panelText}>Hay doce documentos sin leer.</p>
       </TabPanel>
-      <TabPanel value="enviados">
-        <p className={panelText}>Sin envíos hoy.</p>
+      <TabPanel value="proyectos">
+        <p className={panelText}>Sin proyectos activos hoy.</p>
       </TabPanel>
-      <TabPanel value="archivados">
+      <TabPanel value="archivo">
         <p className={panelText}>Archivo no disponible.</p>
       </TabPanel>
     </Tabs>
@@ -85,7 +115,7 @@ const SURFACE: Record<TabsContrast, string> = {
 export const Interactive: Story = {
   render: (args) => (
     <div className={`p-6 ${SURFACE[args.contrast ?? 'on-canva']}`}>
-      <OrdersTabs {...args} />
+      <SampleTabs {...args} />
     </div>
   ),
 };
@@ -134,7 +164,7 @@ export const FullWidth: Story = {
   ),
 };
 
-const SECTIONS = ['Resumen', 'Pedidos', 'Clientes', 'Productos', 'Inventario', 'Envíos', 'Reportes', 'Ajustes'];
+const SECTIONS = ['Inicio', 'Documentos', 'Proyectos', 'Equipos', 'Calendario', 'Reportes', 'Perfil', 'Ajustes'];
 const VISIBLE = 4;
 
 /**
@@ -237,10 +267,10 @@ export const FigmaMatrixAtom: Story = {
                     if (ATOM_MISSING.has(name)) return <span key={st.state} />;
                     const common = { value: name, size, contrast: s.contrast, state: st.state, icon: 'heart', badge: BADGE_00, 'data-figma': name } as const;
                     return single === 'Yes' ? (
-                      <Tab key={st.state} {...common} aria-label="En alistamiento" />
+                      <Tab key={st.state} {...common} aria-label="Mis documentos" />
                     ) : (
                       <Tab key={st.state} {...common}>
-                        En alistamiento
+                        Mis documentos
                       </Tab>
                     );
                   })}
@@ -288,14 +318,14 @@ export const FigmaMatrix: Story = {
                   overflow={
                     'more' in o ? (
                       <TabOverflow label={`Más pestañas ${name}`}>
-                        <DropdownMenuItem>En alistamiento</DropdownMenuItem>
+                        <DropdownMenuItem>Mis documentos</DropdownMenuItem>
                       </TabOverflow>
                     ) : undefined
                   }
                 >
                   {Array.from({ length: o.n }, (_, i) => (
                     <Tab key={i} value={`t${i}`} icon="heart" badge={BADGE_00}>
-                      <span data-figma-part="En alistamiento">En alistamiento</span>
+                      <span data-figma-part="En alistamiento">Mis documentos</span>
                     </Tab>
                   ))}
                 </TabList>
@@ -325,55 +355,55 @@ export const FigmaMatrix: Story = {
 export const KeyboardAutomaticTest: Story = {
   tags: ['!autodocs'],
   args: { onValueChange: fn() },
-  render: (args) => <OrdersTabs {...args} />,
+  render: (args) => <SampleTabs {...args} />,
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    const list = canvas.getByRole('tablist', { name: 'Estado de las solicitudes' });
-    const pendientes = canvas.getByRole('tab', { name: /Pendientes/ });
-    const alistamiento = canvas.getByRole('tab', { name: /En proceso/ });
-    const enviados = canvas.getByRole('tab', { name: /Enviados/ });
-    const archivados = canvas.getByRole('tab', { name: /Archivados/ });
-    await expect(list).toContainElement(pendientes);
-    await expect(pendientes).toHaveAccessibleName('Pendientes 3 solicitudes');
+    const list = canvas.getByRole('tablist', { name: 'Secciones del espacio' });
+    const inicio = canvas.getByRole('tab', { name: /Inicio/ });
+    const documentos = canvas.getByRole('tab', { name: /Documentos/ });
+    const proyectos = canvas.getByRole('tab', { name: /Proyectos/ });
+    const archivo = canvas.getByRole('tab', { name: /Archivo/ });
+    await expect(list).toContainElement(inicio);
+    await expect(inicio).toHaveAccessibleName('Inicio 3 sin leer');
 
     // Selección inicial, paneles enlazados y roving tabindex
-    await expect(pendientes).toHaveAttribute('aria-selected', 'true');
-    await waitFor(() => expect(pendientes).toHaveAttribute('tabindex', '0'));
-    await expect(alistamiento).toHaveAttribute('tabindex', '-1');
+    await expect(inicio).toHaveAttribute('aria-selected', 'true');
+    await waitFor(() => expect(inicio).toHaveAttribute('tabindex', '0'));
+    await expect(documentos).toHaveAttribute('tabindex', '-1');
     const panel = canvas.getByRole('tabpanel');
-    await expect(panel).toHaveAttribute('id', pendientes.getAttribute('aria-controls'));
-    await expect(panel).toHaveAccessibleName(/Pendientes/);
-    await expect(archivados).toBeDisabled();
+    await expect(panel).toHaveAttribute('id', inicio.getAttribute('aria-controls'));
+    await expect(panel).toHaveAccessibleName(/Inicio/);
+    await expect(archivo).toBeDisabled();
 
     // Tab entra en la pestaña seleccionada; flechas mueven y seleccionan
     await userEvent.tab();
-    await expect(pendientes).toHaveFocus();
+    await expect(inicio).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
-    await expect(alistamiento).toHaveFocus();
-    await expect(alistamiento).toHaveAttribute('aria-selected', 'true');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('en-proceso');
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('Doce solicitudes');
+    await expect(documentos).toHaveFocus();
+    await expect(documentos).toHaveAttribute('aria-selected', 'true');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('documentos');
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('doce documentos');
 
-    // Fin salta a la última habilitada (Archivados está deshabilitada) y la derecha vuelve al principio
+    // Fin salta a la última habilitada (Archivo está deshabilitada) y la derecha vuelve al principio
     await userEvent.keyboard('{End}');
-    await expect(enviados).toHaveFocus();
+    await expect(proyectos).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
-    await expect(pendientes).toHaveFocus();
+    await expect(inicio).toHaveFocus();
     await userEvent.keyboard('{ArrowLeft}');
-    await expect(enviados).toHaveFocus();
+    await expect(proyectos).toHaveFocus();
     await userEvent.keyboard('{Home}');
-    await expect(pendientes).toHaveFocus();
-    await expect(pendientes).toHaveAttribute('aria-selected', 'true');
+    await expect(inicio).toHaveFocus();
+    await expect(inicio).toHaveAttribute('aria-selected', 'true');
 
     // Tab sale del tablist al panel (enfocable)
     await userEvent.tab();
     await expect(canvas.getByRole('tabpanel')).toHaveFocus();
 
     // Clic selecciona; la deshabilitada no
-    await userEvent.click(enviados);
-    await expect(enviados).toHaveAttribute('aria-selected', 'true');
-    await userEvent.click(archivados);
-    await expect(enviados).toHaveAttribute('aria-selected', 'true');
+    await userEvent.click(proyectos);
+    await expect(proyectos).toHaveAttribute('aria-selected', 'true');
+    await userEvent.click(archivo);
+    await expect(proyectos).toHaveAttribute('aria-selected', 'true');
   },
 };
 
@@ -381,26 +411,26 @@ export const KeyboardAutomaticTest: Story = {
 export const KeyboardManualTest: Story = {
   tags: ['!autodocs'],
   args: { activationMode: 'manual', onValueChange: fn() },
-  render: (args) => <OrdersTabs {...args} />,
+  render: (args) => <SampleTabs {...args} />,
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    const pendientes = canvas.getByRole('tab', { name: /Pendientes/ });
-    const alistamiento = canvas.getByRole('tab', { name: /En proceso/ });
-    const enviados = canvas.getByRole('tab', { name: /Enviados/ });
-    await waitFor(() => expect(pendientes).toHaveAttribute('tabindex', '0'));
-    pendientes.focus();
+    const inicio = canvas.getByRole('tab', { name: /Inicio/ });
+    const documentos = canvas.getByRole('tab', { name: /Documentos/ });
+    const proyectos = canvas.getByRole('tab', { name: /Proyectos/ });
+    await waitFor(() => expect(inicio).toHaveAttribute('tabindex', '0'));
+    inicio.focus();
     await userEvent.keyboard('{ArrowRight}');
-    await expect(alistamiento).toHaveFocus();
-    await expect(alistamiento).toHaveAttribute('aria-selected', 'false');
+    await expect(documentos).toHaveFocus();
+    await expect(documentos).toHaveAttribute('aria-selected', 'false');
     await expect(args.onValueChange).not.toHaveBeenCalled();
     await userEvent.keyboard('{Enter}');
-    await expect(alistamiento).toHaveAttribute('aria-selected', 'true');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith('en-proceso');
+    await expect(documentos).toHaveAttribute('aria-selected', 'true');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('documentos');
     await userEvent.keyboard('{ArrowRight}');
-    await expect(enviados).toHaveFocus();
+    await expect(proyectos).toHaveFocus();
     await userEvent.keyboard(' ');
-    await expect(enviados).toHaveAttribute('aria-selected', 'true');
-    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('Sin envíos');
+    await expect(proyectos).toHaveAttribute('aria-selected', 'true');
+    await expect(canvas.getByRole('tabpanel')).toHaveTextContent('Sin proyectos');
   },
 };
 
@@ -473,7 +503,7 @@ export const NarrowReflowTest: Story = {
   tags: ['!autodocs'],
   render: (args) => (
     <div data-testid="narrow" className="w-80 max-w-full overflow-hidden">
-      <OrdersTabs {...args} />
+      <SampleTabs {...args} />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -484,10 +514,10 @@ export const NarrowReflowTest: Story = {
     await expect(list).toHaveStyle({ overflowX: 'auto' });
     const doc = canvasElement.ownerDocument.documentElement;
     await expect(doc.scrollWidth).toBeLessThanOrEqual(canvasElement.ownerDocument.defaultView?.innerWidth ?? Infinity);
-    canvas.getByRole('tab', { name: /Pendientes/ }).focus();
+    canvas.getByRole('tab', { name: /Inicio/ }).focus();
     await userEvent.keyboard('{End}');
-    // Archivados está deshabilitada: End va a Enviados
-    const last = canvas.getByRole('tab', { name: /Enviados/ });
+    // Archivo está deshabilitada: End va a Proyectos
+    const last = canvas.getByRole('tab', { name: /Proyectos/ });
     await expect(last).toHaveFocus();
     await waitFor(() => {
       const t = last.getBoundingClientRect();
@@ -496,5 +526,28 @@ export const NarrowReflowTest: Story = {
       expect(t.left).toBeGreaterThanOrEqual(l.left - 1);
     });
     await expect(box.scrollWidth).toBeLessThanOrEqual(box.clientWidth);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Tabs' })).toBeInTheDocument();
+    // Las muestras traen sus propias pestañas: las de la página son las tres primeras del documento
+    const tabs = canvas.getAllByRole('tab').slice(0, 3);
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente Tabs en Figma:']);
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBeGreaterThan(0);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}'); // activación automática
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de Tabs' }); // sin Storybook: solo lectura
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };
