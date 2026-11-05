@@ -75,7 +75,7 @@ export const FileUploadItem = forwardRef<HTMLDivElement, FileUploadItemProps>(
             <Avatar
               variant="icon"
               size="sm"
-              contrast="on-card"
+              contrast="on-canva"
               icon={status === 'loading' ? icon : STATUS_ICON[status]}
               className={fileUploadIconColor[status]}
             />

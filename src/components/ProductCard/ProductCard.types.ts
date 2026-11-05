@@ -18,7 +18,7 @@ export interface ProductCardProps
   price: string;
   /** Calificación promedio de 0 a 5 (Number rating). Sin ella no se dibuja. */
   rating?: number;
-  /** Total de reseñas: solo se anuncia junto a la calificación (Figma no lo dibuja). */
+  /** Total de reseñas: se dibuja «N reseñas» junto a la calificación y se anuncia con ella. */
   ratingCount?: number;
   /** Foto del producto (relleno de la silueta Subtract). */
   src: string;

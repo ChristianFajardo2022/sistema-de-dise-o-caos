@@ -17,7 +17,7 @@ const has = (node: unknown) => node != null && node !== false;
 
 /**
  * Tarjeta de dato: avatar de ícono, título y descripción, un slot gráfico y un control opcional.
- * Es una composición: el gráfico llega como `children` y el control como `action`. Usa la superficie interna común de
+ * Es una molécula: el gráfico llega como `children` y el control como `action`. Usa la superficie interna común de
  * las tarjetas (sin muesca ni sombra).
  */
 export const DataCard = forwardRef<HTMLDivElement, DataCardProps>(
@@ -42,7 +42,7 @@ export const DataCard = forwardRef<HTMLDivElement, DataCardProps>(
     const current = inactive ? 'inactive' : selected ? 'select' : (state ?? 'auto');
     const raised = current === 'hover' || current === 'select' || current === 'inactive';
     return (
-      <div ref={ref} {...restProps} className={cn(dataCardVariants({ state: current }), className)}>
+      <div ref={ref} data-slot="card" {...restProps} className={cn(dataCardVariants({ state: current }), className)}>
         <NotchedSurface />
         {leading === undefined ? (
           <Avatar
@@ -72,7 +72,11 @@ export const DataCard = forwardRef<HTMLDivElement, DataCardProps>(
             {children}
           </div>
         )}
-        {has(action) && <div className={dataCardActionVariants()}>{action}</div>}
+        {has(action) && (
+          <div data-slot="action" className={dataCardActionVariants()}>
+            {action}
+          </div>
+        )}
       </div>
     );
   }

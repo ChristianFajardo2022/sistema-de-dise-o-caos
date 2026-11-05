@@ -3,9 +3,8 @@ import { cva } from 'class-variance-authority';
 /**
  * CAOS Design System — FeatureCard Variants
  *
- * Fuente: component set "Cards para destacar" de Figma (16903:57057). El set tiene errores en Figma (no se pueden leer
- * sus props) y sus variantes se llaman "Type=File card, State=default", "Type=canva, State=default" y "Type=File card":
- * aquí son `variant` photo, cutout y surface.
+ * Fuente: component set "Featured card" de Figma (16903:57057). El set solo tiene la variante `Type=2`, que es `cutout`;
+ * `photo` y `surface` no tienen set en Figma y se conservan del código.
  *
  * - photo (498×654, ancho fluido con la misma proporción): foto de fondo con radius/general/2xl (24) y effect/shadow sm
  *   (utilidad shadow-ds-on-card en la raíz, alfa 0 en oscuro). El texto va en un
@@ -21,7 +20,7 @@ import { cva } from 'class-variance-authority';
  *   icon/general/gray-high-contrast y text/neutral/body.
  * - cutout (612×681 como mínimo; crece si el texto no cabe): foto con effect/shadow md (drop-shadow) y un recorte escalonado abajo a la
  *   izquierda con esquinas de radius/general/2xl; el texto va en el recorte, sobre la superficie de la página.
- *   Línea corta Prospero semibold 14/18 (heading/size/xs de Figma = heading-sm de tokens.css) en text/neutral/white y
+ *   Línea corta Prospero semibold 12/16 (heading/size/xs de tokens.css) en text/neutral/white y
  *   título Prospero bold 40/44 (size/5xl, line-height/9xl) en text/neutral/heading. Gap 11 de Figma sin variable →
  *   space/general/xl (12). El recorte se ajusta al bloque de texto (ver FeatureCard.tsx).
  */
@@ -107,7 +106,7 @@ export const featureCardCutoutShadowClass =
 
 /** Cutout: forma "Subtract" (foto recortada con máscara). */
 export const featureCardCutoutShapeClass =
-  'absolute inset-0 block overflow-hidden rounded-ds-radius-general-2xl bg-ds-background-container-default-on-card';
+  'absolute inset-0 block overflow-hidden rounded-ds-radius-general-2xl rounded-bl-none bg-ds-background-container-default-on-card';
 
 /**
  * Cutout: bloque de texto en el recorte. Pegado abajo a la izquierda, 16 de aire arriba (space/general/2xl) y 24 a la

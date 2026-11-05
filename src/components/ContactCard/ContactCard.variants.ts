@@ -6,7 +6,8 @@ import { cva } from 'class-variance-authority';
  * Fuente: component set "Call/chat card" de Figma (18867:20091), Propiedad 1 = More | Communication | External Link
  * (498×82). Mismo componente con tres acciones a la derecha, sobre la superficie interna de las tarjetas.
  *
- * - Raíz transparente, fila, centrada, alto mínimo 82 (min-h-20.5), padding 16 (space/general/2xl), gap 16.
+ * - Raíz transparente, fila, centrada, alto mínimo 82 (min-h-20.5), padding space/container/on-card (24 en Desktop y
+ *   Tablet, 16 en Mobile), gap 16 (space/general/2xl).
  *   Superficie background/container/default-on-card, radius/general/2xl (24); con muesca (More y External Link)
  *   el Button corner va arriba a la derecha.
  * - "Item card" (Avatar 56): pieza común `_internal/ItemCardMark` (contenedor 56×56 relativo) (con -3 de margen vertical: el alto de 82 de Figma

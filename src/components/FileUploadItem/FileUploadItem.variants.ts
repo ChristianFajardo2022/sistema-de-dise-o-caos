@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
  * - Raíz: columna, padding 24 (space/container/on-card), gap 16 (gap/general/xl ->
  *   space/general/2xl), radius/general/2xl (24), relleno background/container/default-on-card. Ancho fluido (287.6 en Figma);
  *   alto 108 con barra y 70 sin ella.
- * - Fila: grupo (Avatar icon de 32 + textos, gap 8 space/general/lg) y acciones (Button tertiary xs solo ícono, gap 0
+ * - Fila: grupo (Avatar icon sm (40 en el código; Figma 32 con ícono de 16, tamaño que Avatar no tiene) + textos, gap 8 space/general/lg) y acciones (Button tertiary xs solo ícono, gap 0
  *   gap/general/xs), gap 16.
  * - Nombre: Helvetica semibold 14/18 (typography/size/md, field/line-height/sm) text/neutral/heading, una línea.
  * - Estado: Helvetica Neue regular 14/20 (body/md, body/line-height-large/md): success-secondary en Loading y Complete,

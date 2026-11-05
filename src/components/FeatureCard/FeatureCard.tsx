@@ -94,17 +94,17 @@ export const FeatureCard = forwardRef<HTMLElement, FeatureCardProps>(
     const isCutout = variant === 'cutout';
 
     // Cutout: el recorte de la foto sigue el tamaño del bloque de texto (variables --fc-cut-w y --fc-cut-h). Antes de
-    // la primera medida (o sin JS) valen lo de reserva de las clases. Medidas fraccionarias (getBoundingClientRect) y
-    // acotadas a la tarjeta, para que la máscara nunca quede con tamaños negativos ni fuera de la foto.
+    // la primera medida (o sin JS) valen lo de reserva de las clases. Se mide en espacio de maquetación
+    // (`offsetWidth`/`offsetHeight`, enteros y sin escala): `getBoundingClientRect` sale escalado cuando la tarjeta
+    // vive dentro de un `transform` (la plantilla de documentación) y la máscara no coincide con el texto. Acotadas a
+    // la tarjeta, para que nunca queden negativas ni fuera de la foto.
     useLayoutEffect(() => {
       const root = rootRef.current;
       const text = textRef.current;
       if (!isCutout || !root || !text) return;
       const update = () => {
-        const box = text.getBoundingClientRect();
-        const card = root.getBoundingClientRect();
-        root.style.setProperty('--fc-cut-w', `${Math.max(0, Math.min(box.width, card.width))}px`);
-        root.style.setProperty('--fc-cut-h', `${Math.max(0, Math.min(box.height, card.height))}px`);
+        root.style.setProperty('--fc-cut-w', `${Math.max(0, Math.min(Math.ceil(text.offsetWidth), root.offsetWidth))}px`);
+        root.style.setProperty('--fc-cut-h', `${Math.max(0, Math.min(Math.ceil(text.offsetHeight), root.offsetHeight))}px`);
       };
       update();
       if (typeof ResizeObserver === 'undefined') return;

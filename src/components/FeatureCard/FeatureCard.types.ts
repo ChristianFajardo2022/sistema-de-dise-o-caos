@@ -2,10 +2,10 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import type { CardHeadingLevel } from '../_internal/types';
 
 /**
- * Tipo de tarjeta (el set de Figma no expone sus props: los nombres salen de las capas).
- * - `photo` = "Type=File card, State=default": foto de fondo, texto arriba y un botón.
- * - `surface` = "Type=File card": superficie con muesca para el Button corner y un espacio para contenido (lista).
- * - `cutout` = "Type=canva, State=default": foto grande recortada abajo a la izquierda, donde va el texto.
+ * Tipo de tarjeta. El set de Figma solo tiene `Type=2`, que es `cutout`; `photo` y `surface` no tienen set.
+ * - `photo`: foto de fondo, texto arriba y un botón.
+ * - `surface`: superficie con muesca para el Button corner y un espacio para contenido (lista).
+ * - `cutout` (`Type=2`): foto grande recortada abajo a la izquierda, donde va el texto.
  */
 export type FeatureCardVariant = 'photo' | 'surface' | 'cutout';
 

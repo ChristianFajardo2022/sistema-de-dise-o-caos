@@ -23,7 +23,7 @@ export type ProfileCardSelection = 'checkbox' | 'radio';
 /** Nivel del encabezado con el nombre de la persona (criterio común de las tarjetas). */
 export type ProfileCardHeadingLevel = CardHeadingLevel;
 
-/** Un contador de la fila Counters de Figma ("Ventas", "Reseñas", "Calificaciones"). */
+/** Un contador de la fila Counters de Figma ("Proyectos", "Reseñas", "Calificaciones"). */
 export interface ProfileCardStat {
   /** Cifra (texto grande). */
   value: ReactNode;
@@ -43,7 +43,7 @@ export interface ProfileCardProps
   extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'children' | 'defaultChecked' | 'defaultValue' | 'onChange'> {
   /** Type de Figma. Por defecto `vertical`. `hero` es un alias `@deprecated` de `full`. */
   layout?: ProfileCardLayout;
-  /** Prop Title de Figma: nombre de la persona o de la tienda. Es el encabezado y el nombre accesible de la tarjeta. */
+  /** Prop Title de Figma: nombre de la persona o del equipo. Es el encabezado y el nombre accesible de la tarjeta. */
   title: ReactNode;
   /**
    * Prop Subtittle de Figma (capa "Description Block"): datos cortos bajo el nombre. Con un arreglo se separan

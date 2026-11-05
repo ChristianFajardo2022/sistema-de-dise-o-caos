@@ -12,11 +12,10 @@ import { cva } from 'class-variance-authority';
  *   (space/general/3xl), radio inferior 24. En Default abraza el contenido; en Hover y "+" mide 361 (empieza a 52 del
  *   borde superior) y apila el contenido abajo.
  * - Textos (gap 8, space/general/lg): título en Prospero semibold, heading/size/xs y heading/line-height/xs de Figma
- *   (14/18), recortado a una línea; descripción en Helvetica Neue regular 14/18 (typography/size/md y
- *   body/line-height-short/md) en text/neutral/gray 2; fila de precio (Prospero semibold, heading/size/sm de Figma,
+ *   (12/16), recortado a una línea; descripción en Helvetica Neue regular 14/18 (typography/size/md y
+ *   body/line-height-short/md) en text/neutral/gray 2; fila de precio (Prospero semibold, heading/size/md de Figma,
  *   16/20) y Number rating, gap 10. Título y precio en text/neutral/white-unicolor.
- *   tokens.css corre la escala de heading un paso (heading/xs = 12/16, heading/sm = 14/18): se usan heading/sm (14/18)
- *   para el título y heading/md (16/20) para el precio. text/neutral/gray 2 de Figma (G07) es text/neutral/gray aquí.
+ *   text/neutral/gray 2 de Figma (G07) es text/neutral/gray aquí.
  * - Acciones (Hover, frame "Desktop", gap 8, alineado a la derecha): Button primary sm "Agregar al carrito" (FILL) y
  *   Button secondary sm solo ícono (`edit`). En "+": Number picker input sm (FILL, 56 de alto).
  * - El bloque Text es un `MediaScrim` (`data-theme="dark"`): el velo oscuro no cambia con el tema, así que su contenido

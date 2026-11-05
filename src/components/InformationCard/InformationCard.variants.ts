@@ -21,7 +21,8 @@ import { cva } from 'class-variance-authority';
  *   Gap título/descripción: 8 (space/general/lg); con etiquetas bajo el título, 16 (space/general/2xl).
  * - Título: el cuadro de Figma mide 18 (line-height 20, truncado).
  * - Pie: línea de 0.5 (border/general/md) en border/general/default-on-card y fila con gap 24 (space/general/3xl), separadas 32;
- *   botones con gap 8 alineados a la derecha.
+ *   botones con gap 8 alineados a la derecha. El `footer` ocupa lo que sobra (`flex-auto`) y las acciones miden lo que
+ *   miden sus botones, como en Figma; si no caben en la misma línea, las acciones pasan a la siguiente, a la derecha.
  */
 
 const primary =
@@ -98,6 +99,6 @@ export const informationCardDividerVariants = cva(
 
 export const informationCardFooterRowVariants = cva('flex min-w-0 flex-wrap items-center gap-ds-space-general-3xl');
 
-export const informationCardFooterStartVariants = cva('flex min-w-0 flex-1 items-center');
+export const informationCardFooterStartVariants = cva('flex min-w-0 flex-auto items-center');
 
-export const informationCardActionsVariants = cva('flex flex-1 flex-wrap items-center justify-end gap-ds-space-general-lg');
+export const informationCardActionsVariants = cva('ml-auto flex flex-wrap items-center justify-end gap-ds-space-general-lg');

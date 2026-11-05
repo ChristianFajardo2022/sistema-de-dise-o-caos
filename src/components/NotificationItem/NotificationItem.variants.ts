@@ -29,7 +29,7 @@ export const notificationItemVariants = cva(
 );
 
 export const notificationItemHeadingVariants = cva(
-  'flex min-w-0 items-center gap-ds-space-general-2xl max-md:gap-ds-space-general-xl'
+  'flex min-w-0 items-center gap-ds-space-general-2xl mobile:gap-ds-space-general-xl'
 );
 
 export const notificationItemTitleVariants = cva(
