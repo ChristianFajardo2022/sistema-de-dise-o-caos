@@ -335,6 +335,26 @@ export const ClearTest: Story = {
   },
 };
 
+/** Test: en un ancho angosto el título con su badge se parte y no invade el botón de la derecha. */
+export const NarrowTitleTest: Story = {
+  tags: ['!autodocs'],
+  args: { defaultValue: ['aprobado', 'pendiente'], title: 'Estados de la solicitud en revisión administrativa' },
+  render: (args) => (
+    <div style={{ width: 200 }} className="bg-ds-background-container-default-on-canva p-6">
+      <FilterSection {...args}>{() => <span>Contenido</span>}</FilterSection>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole('button', { name: /^Estados de la solicitud/ });
+    const row = within(trigger).getByText(/^Estados de la solicitud/).parentElement as HTMLElement;
+    await expect(getComputedStyle(row).flexWrap).toBe('wrap');
+    const rowBox = row.getBoundingClientRect();
+    const triggerBox = trigger.getBoundingClientRect();
+    await expect(rowBox.right).toBeLessThanOrEqual(triggerBox.right);
+    await expect(row.scrollWidth).toBeLessThanOrEqual(row.clientWidth + 1);
+  },
+};
+
 function ControlledSection() {
   const [value, setValue] = useState<FilterValue>(['aprobado']);
   return (

@@ -34,7 +34,7 @@ export const FilterButton = forwardRef<HTMLButtonElement, FilterButtonProps>(
     const badgeId = useId();
     const mobileViewport = useIsMobile();
     const resolved = layout === 'auto' ? (mobileViewport ? 'mobile' : 'desktop') : layout;
-    const showBadge = badge && (typeof count === 'number' ? count > 0 : typeof count === 'string' && count !== '');
+    const showBadge = badge && (typeof count === 'number' ? count > 0 : typeof count === 'string' && count !== '' && Number(count) !== 0);
     const described = [describedBy, showBadge ? badgeId : null].filter(Boolean).join(' ') || undefined;
 
     return (

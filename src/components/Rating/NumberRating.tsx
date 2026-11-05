@@ -8,10 +8,12 @@ import { RATING_SUFFIX, formatCount, formatRating } from '../../utils/format';
 /** Promedio numérico con una estrella y, opcionalmente, el total de reseñas. Se lee como una sola frase. */
 export const NumberRating = forwardRef<HTMLSpanElement, NumberRatingProps>(
   ({ value, total, label, className, ...restProps }, ref) => {
-    const average = formatRating(value);
+    const hasValue = typeof value === 'number' && Number.isFinite(value);
+    const average = hasValue ? formatRating(value) : '–';
     const reviews =
       total === undefined ? undefined : `${formatCount(total)} ${total === 1 ? 'reseña' : 'reseñas'}`;
-    const text = label ?? `${average} ${RATING_SUFFIX}${reviews ? `, ${reviews}` : ''}`;
+    const rating = hasValue ? `${average} ${RATING_SUFFIX}` : 'Sin calificación';
+    const text = label ?? `${rating}${reviews ? `, ${reviews}` : ''}`;
 
     return (
       <span

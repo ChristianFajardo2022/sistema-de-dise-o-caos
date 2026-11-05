@@ -13,6 +13,7 @@ export interface LogoProps extends Omit<SVGProps<SVGSVGElement>, 'children' | 'w
   size?: LogoSize;
   /**
    * Nombre accesible. Por defecto, el nombre de la marca tal como se lee en el logo ("Inter Rapidísimo").
+   * Un `title` vacío se ignora y se usa el nombre de la marca (nunca se escribe un nombre vacío).
    * Si el nombre ya está en el texto contiguo, usa `decorative`.
    */
   title?: string;

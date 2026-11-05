@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, userEvent, within } from 'storybook/test';
-import { Logo } from './Logo';
+import { LOGO_BRAND_NAME, Logo } from './Logo';
 import type { LogoSize, LogoType } from './Logo.types';
 import { ComponentDoc } from '../../docs/ComponentDoc';
 import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
@@ -77,14 +77,17 @@ export const AccessibleNameTest: Story = {
       <Logo />
       <Logo type="icon" size="sm" title="Inicio" />
       <Logo type="icon" size="xs" decorative data-testid="deco" />
+      <Logo type="icon" size="xs" title="" data-testid="vacio" />
     </div>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('img', { name: 'Inter Rapidísimo' })).toBeVisible();
-    await expect(canvas.getByRole('img', { name: 'Inicio' })).toBeVisible();
-    await expect(canvas.getAllByRole('img')).toHaveLength(2);
+        await expect(canvas.getByRole('img', { name: 'Inicio' })).toBeVisible();
+    await expect(canvas.getAllByRole('img')).toHaveLength(3);
     await expect(canvas.getByTestId('deco')).toHaveAttribute('aria-hidden', 'true');
+    // title vacío: no se emite aria-label vacío, se usa el nombre de la marca
+    await expect(canvas.getByTestId('vacio')).toHaveAttribute('aria-label', LOGO_BRAND_NAME);
+    await expect(canvas.getAllByRole('img', { name: LOGO_BRAND_NAME })).toHaveLength(2);
   },
 };
 

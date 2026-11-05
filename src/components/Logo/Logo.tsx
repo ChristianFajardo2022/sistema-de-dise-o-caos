@@ -15,6 +15,8 @@ export const LOGO_BRAND_NAME = 'Inter Rapidísimo';
 export const Logo = forwardRef<SVGSVGElement, LogoProps>(
   ({ type = 'logo', size = 'lg', title = LOGO_BRAND_NAME, decorative = false, className, ...restProps }, ref) => {
     const { width, height, padX, padY, markup } = LOGO_DRAWINGS[type][size];
+    // Un `title` vacío o solo con espacios no nombra nada: se usa el nombre de la marca
+    const accessibleName = title.trim() === '' ? LOGO_BRAND_NAME : title;
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +27,7 @@ export const Logo = forwardRef<SVGSVGElement, LogoProps>(
         fill="currentColor"
         focusable="false"
         role={decorative ? undefined : 'img'}
-        aria-label={decorative ? undefined : title}
+        aria-label={decorative ? undefined : accessibleName}
         aria-hidden={decorative ? true : undefined}
         {...restProps}
         ref={ref}

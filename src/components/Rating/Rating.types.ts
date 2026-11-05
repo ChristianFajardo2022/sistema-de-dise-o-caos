@@ -64,7 +64,7 @@ export type RatingBarDisplay = 'percentage' | 'count';
 export interface RatingBarProps extends Omit<HTMLAttributes<HTMLUListElement>, 'children'> {
   /** Distribución de reseñas, en el orden en que se dibujan las filas (típicamente 5 a 1). */
   distribution: RatingBarItem[];
-  /** Total que equivale al 100 %. Por defecto, la suma de `count` de todas las filas. */
+  /** Total que equivale al 100 %. Por defecto, la suma de `count` de todas las filas; si es menor que esa suma se usa la suma. */
   total?: number;
   /** Texto de cada fila: porcentaje sobre el total (Figma) o cantidad. Por defecto `percentage`. */
   display?: RatingBarDisplay;
@@ -75,8 +75,11 @@ export interface RatingBarProps extends Omit<HTMLAttributes<HTMLUListElement>, '
 }
 
 export interface NumberRatingProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children' | 'role' | 'aria-label'> {
-  /** Promedio de 0 a 5. Se formatea con `Intl.NumberFormat('es')`, como máximo un decimal ("4,5"). */
-  value: number;
+  /**
+   * Promedio de 0 a 5. Se formatea con `Intl.NumberFormat('es')`, como máximo un decimal ("4,5").
+   * Si está vacío (`undefined`, `null`, `''` o no numérico) dibuja "–" y se lee "Sin calificación".
+   */
+  value: number | null | undefined;
   /** Total de reseñas. Si se pasa, se escribe junto al promedio ("128 reseñas"). */
   total?: number;
   /** Nombre accesible. Por defecto "4,5 de 5 estrellas, 128 reseñas". */

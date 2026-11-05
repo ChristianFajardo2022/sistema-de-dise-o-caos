@@ -254,7 +254,7 @@ export const doc: ComponentDocContent = {
               <strong>Lista con nombre:</strong> pasa <code>label</code> para que el lector de pantalla anuncie la lista. Cada barra dice su calificación y su valor, por ejemplo &quot;5 estrellas, 68%&quot;.
             </>,
             <>
-              <strong>Reseñas fuera del desglose:</strong> si dejas calificaciones fuera de la lista, pasa <code>total</code> con el total real, nunca menor que la suma de las filas. Las filas sin reseñas se muestran en 0, no se quitan.
+              <strong>Reseñas fuera del desglose:</strong> si dejas calificaciones fuera de la lista, pasa <code>total</code> con el total real, si es menor que la suma de las filas, el componente usa la suma. Las filas sin reseñas se muestran en 0, no se quitan.
             </>,
           ],
           avoid: [
@@ -356,11 +356,11 @@ export const doc: ComponentDocContent = {
               preview: bar(),
             },
             {
-              kind: 'dont',
+              kind: 'do',
               framed: true,
-              title: 'Total menor',
-              description: 'No fijes un total menor que la suma: la primera fila llena la barra y las demás quedan infladas.',
-              preview: bar({ total: 60 }),
+              title: 'Total con reseñas fuera',
+              description: 'Si hay reseñas fuera del desglose, pasa el total real. Uno menor que la suma se ignora y se usa la suma.',
+              preview: bar({ total: 352 }),
             },
             {
               kind: 'do',

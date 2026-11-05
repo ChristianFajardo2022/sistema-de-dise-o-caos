@@ -73,7 +73,7 @@ export const filterPanelFooterClass = [
 export const filterSectionContentClass = 'flex w-full flex-col gap-ds-space-general-2xl';
 
 /** Título con su badge de conteo. */
-export const filterSectionTitleRowClass = 'inline-flex items-center gap-ds-space-general-lg';
+export const filterSectionTitleRowClass = 'flex flex-wrap items-center gap-x-ds-space-general-lg gap-y-ds-space-general-md';
 
 /** "Individual filter": raíz en columna. */
 export const filterSectionPlainVariants = cva('flex w-full flex-col gap-ds-space-general-lg');

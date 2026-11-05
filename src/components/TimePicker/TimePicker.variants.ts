@@ -8,11 +8,11 @@ import { cva } from 'class-variance-authority';
  * inputLabelVariants, inputControlVariants).
  *
  * - Fila: gap space/general/lg (8); hora, minutos y el par AM/PM ocupan un tercio cada uno.
- * - Par AM/PM: gap space/general/md (4); cada botón con alto de campo, padding X 16, radio field/sm (12),
+ * - Par AM/PM: gap space/general/md (4); cada botón con alto de campo, padding X 16 (4 si la raíz mide menos de 21rem = 336, para que el recuadro no se salga), radio field/sm (12),
  *   borde de 1px por dentro y texto 12/16. El seleccionado lleva el borde activo (border/field/active).
  * - El mensaje va debajo con NotificationText, separado 8 (gap de la raíz; la región viva vacía no suma gap).
  */
-export const timePickerRootVariants = cva('flex flex-col gap-ds-space-general-lg', {
+export const timePickerRootVariants = cva('@container/time-picker flex flex-col gap-ds-space-general-lg', {
   variants: {
     fullWidth: {
       true: 'w-full',
@@ -31,7 +31,7 @@ export const timePickerRowVariants = cva('flex items-center gap-ds-space-general
 /** Opción AM/PM (el recuadro visible); el radio nativo va oculto como hermano anterior (`peer`). */
 export const timePickerPeriodVariants = cva(
   [
-    'justify-center cursor-pointer rounded-ds-radius-field-sm px-ds-space-general-2xl select-none',
+    'justify-center cursor-pointer rounded-ds-radius-field-sm min-w-0 px-ds-space-general-md select-none @min-[21rem]/time-picker:px-ds-space-general-2xl',
     'text-ds-typography-field-size-xs leading-(--ds-responsive-typography-field-line-height-xs) text-(color:--val)',
     // Anillo de foco de teclado (no está en Figma): 2px con el token de borde activo
     'peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-solid peer-focus-visible:outline-ds-border-field-active',

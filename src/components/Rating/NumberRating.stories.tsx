@@ -49,6 +49,10 @@ export const AccessibleNameTest: Story = {
       <NumberRating value={4.5} />
       <NumberRating value={4} total={1280} />
       <NumberRating value={5} total={1} />
+      <NumberRating value={undefined} />
+      <NumberRating value={null} total={12} />
+      <NumberRating value={'' as unknown as number} data-testid="vacio" />
+      <NumberRating value={Number.NaN} data-testid="nan" />
     </div>
   ),
   play: async ({ canvasElement }) => {
@@ -56,6 +60,11 @@ export const AccessibleNameTest: Story = {
     await expect(canvas.getByRole('img', { name: '4,5 de 5 estrellas' })).toBeInTheDocument();
     await expect(canvas.getByRole('img', { name: '4 de 5 estrellas, 1280 reseñas' })).toBeInTheDocument();
     await expect(canvas.getByRole('img', { name: '5 de 5 estrellas, 1 reseña' })).toBeInTheDocument();
+    // Sin valor: "–" y "Sin calificación", nunca "NaN"
+    await expect(canvas.getByRole('img', { name: 'Sin calificación, 12 reseñas' })).toBeInTheDocument();
+    await expect(canvas.getAllByRole('img', { name: 'Sin calificación' })).toHaveLength(3);
+    await expect(canvas.getByTestId('vacio')).toHaveTextContent('–');
+    await expect(canvas.getByTestId('nan')).not.toHaveTextContent('NaN');
   },
 };
 

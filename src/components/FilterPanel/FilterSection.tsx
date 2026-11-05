@@ -129,7 +129,9 @@ export const FilterSection = forwardRef<HTMLDivElement, FilterSectionProps>(
         data-filter-section={id}
         title={
           <span className={filterSectionTitleRowClass}>
-            <span id={labelId}>{title}</span>
+            <span id={labelId} className="min-w-0 break-words">
+              {title}
+            </span>
             {badge}
           </span>
         }

@@ -5,7 +5,7 @@
   "category": "Data Display/Rating",
   "props": {
     "distribution": { "type": "{ stars: number; count: number }[]", "required": true, "description": "Filas en el orden en que se dibujan (típicamente 5 a 1)." },
-    "total": { "type": "number", "required": false, "description": "Total que equivale al 100%. Debe ser al menos la suma de count; por defecto, la suma." },
+    "total": { "type": "number", "required": false, "description": "Total que equivale al 100%. Si es menor que la suma de count se usa la suma (nunca se recorta una fila); por defecto, la suma." },
     "display": { "type": "'percentage' | 'count'", "default": "'percentage'", "description": "Texto de la píldora de cada fila." },
     "label": { "type": "string", "required": false, "description": "Nombre accesible de la lista." },
     "barProps": { "type": "Partial<ProgressBarProps>", "required": false, "description": "Props extra para cada ProgressBar (p. ej. status)." }

@@ -282,6 +282,44 @@ export const ApiTest: Story = {
   },
 };
 
+/** Test: con la raíz angosta (280) AM/PM y los campos se encogen y ningún recuadro se sale del grupo; a 432 conservan 16 de padding */
+export const NarrowTest: Story = {
+  tags: ['!autodocs'],
+  args: { defaultValue: '09:30' },
+  render: (args) => (
+    <div className="flex flex-col gap-6">
+      <div style={{ width: 280 }} data-testid="angosto">
+        <TimePicker {...args} fullWidth />
+      </div>
+      <div style={{ width: 432 }} data-testid="normal">
+        <TimePicker {...args} fullWidth />
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const narrow = canvas.getByTestId('angosto');
+    const limit = narrow.getBoundingClientRect().right + 0.5;
+    for (const el of narrow.querySelectorAll<HTMLElement>('[data-figma-part="AM"], [data-figma-part="PM"], [data-figma-part="Input hora"], [data-figma-part="Input minutos"]')) {
+      await expect(el.getBoundingClientRect().right).toBeLessThanOrEqual(limit);
+      await expect(el.scrollWidth).toBeLessThanOrEqual(el.clientWidth + 1);
+    }
+    // El texto de AM/PM cabe dentro de su recuadro (con el padding fijo de 16 se salía)
+    for (const part of ['AM', 'PM']) {
+      const box = narrow.querySelector<HTMLElement>(`[data-figma-part="${part}"]`)!;
+      const range = document.createRange();
+      range.selectNodeContents(box);
+      const text = range.getBoundingClientRect();
+      const frame = box.getBoundingClientRect();
+      const style = getComputedStyle(box);
+      await expect(text.left).toBeGreaterThanOrEqual(frame.left + parseFloat(style.paddingLeft) - 0.5);
+      await expect(text.right).toBeLessThanOrEqual(frame.right - parseFloat(style.paddingRight) + 0.5);
+    }
+    const am = canvas.getByTestId('normal').querySelector<HTMLElement>('[data-figma-part="AM"]')!;
+    await expect(getComputedStyle(am).paddingLeft).toBe('16px');
+  },
+};
+
 export const DocPageTest: Story = {
   tags: ['!autodocs'],
   parameters: { layout: 'fullscreen' },

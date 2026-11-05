@@ -77,6 +77,28 @@ export const CountTest: Story = {
   },
 };
 
+/** Test: `count` "0" (texto) no dibuja badge, igual que 0 y ""; "99+" sí. */
+export const ZeroCountTest: Story = {
+  tags: ['!autodocs'],
+  args: { layout: 'desktop' },
+  render: (args) => (
+    <div className="flex flex-col items-start gap-2">
+      {(['0', 0, '', '99+'] as const).map((c) => (
+        <div key={String(c)} data-testid={`c-${String(c)}`}>
+          <FilterButton {...args} count={c} />
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const c of ['0', '0', '']) {
+      await expect(canvas.getAllByTestId(`c-${c}`)[0].querySelector('[data-figma-part="Badge"]')).toBeNull();
+    }
+    await expect(canvas.getByTestId('c-99+').querySelector('[data-figma-part="Badge"]')).not.toBeNull();
+  },
+};
+
 /** Test: en móvil es solo ícono pero conserva nombre y descripción; Inactive no se activa. */
 export const MobileAndInactiveTest: Story = {
   tags: ['!autodocs'],

@@ -95,6 +95,26 @@ export const AccessibleNameTest: Story = {
   },
 };
 
+/** Test: un `total` menor que la suma de las filas no recorta ninguna fila */
+export const SmallTotalTest: Story = {
+  tags: ['!autodocs'],
+  decorators: [narrow],
+  render: (args) => <RatingBar {...args} total={10} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sum = DISTRIBUTION.reduce((acc, row) => acc + row.count, 0);
+    for (const row of DISTRIBUTION) {
+      const bar = canvas.getByRole('progressbar', { name: `${row.stars} ${row.stars === 1 ? 'estrella' : 'estrellas'}` });
+      await expect(bar).toHaveAttribute('aria-valuenow', String(row.count));
+      await expect(bar).toHaveAttribute('aria-valuemax', String(sum));
+    }
+    await expect(canvas.getByRole('progressbar', { name: '5 estrellas' })).toHaveAttribute(
+      'aria-valuetext',
+      `${Math.round((DISTRIBUTION[0].count / sum) * 100)}%`
+    );
+  },
+};
+
 /** Test: la página de documentación (plantilla v2) con sus pestañas y secciones */
 export const DocPageTest: Story = {
   tags: ['!autodocs'],

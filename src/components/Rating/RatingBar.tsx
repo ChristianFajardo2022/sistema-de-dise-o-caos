@@ -13,7 +13,9 @@ import { formatCount } from '../../utils/format';
  */
 export const RatingBar = forwardRef<HTMLUListElement, RatingBarProps>(
   ({ distribution, total: totalProp, display = 'percentage', label, barProps, className, ...restProps }, ref) => {
-    const total = totalProp ?? distribution.reduce((sum, row) => sum + Math.max(row.count, 0), 0);
+    const sum = distribution.reduce((acc, row) => acc + Math.max(row.count, 0), 0);
+    // Un `total` menor que la suma recortaría las filas: el 100 % nunca baja de la suma
+    const total = Math.max(totalProp ?? sum, sum);
 
     return (
       <ul

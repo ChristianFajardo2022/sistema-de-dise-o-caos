@@ -188,6 +188,9 @@ export const doc: ComponentDocContent = {
               <strong>Lectura en una frase:</strong> el lector de pantalla dice &quot;4,5 de 5 estrellas, 1280 reseñas&quot;. El número, la estrella y el total quedan ocultos para no leerlos dos veces.
             </>,
             <>
+              <strong>Sin calificación:</strong> si <code>value</code> viene vacío o no es numérico, dibuja &quot;–&quot; con la estrella y el lector de pantalla dice &quot;Sin calificación&quot;, en lugar de &quot;NaN&quot;.
+            </>,
+            <>
               <strong>Nombre con contexto:</strong> <code>label</code> reemplaza el nombre accesible cuando la página necesita decir qué se califica.
             </>,
           ],

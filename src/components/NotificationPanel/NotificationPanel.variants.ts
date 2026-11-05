@@ -7,12 +7,12 @@ import { cva } from 'class-variance-authority';
  * Type = No notification | Notification × State = Default | Dropdown. La tarjeta es el marco "Profile card" (400 de ancho).
  *
  * - Tarjeta: relleno background/container/default-on-canva, radio radius/container/On card (24 en escritorio), trazo de
- *   border/general/md (0.5) en border/general/default-on-card (box-shadow inset), gap space/general/2xl (16). Simple:
- *   relleno space/container/default (24 escritorio / 20 móvil; no existe el token: se usa container/on-card, 24 y 16);
- *   Complex: relleno 16 (space/container/second-level, tampoco existe: space/general/2xl).
- * - Encabezado: título Prospero semibold 16/20 (Figma enlaza heading/size/sm, que en tokens.css vale 14: se usan los
- *   primitivos size/lg y line-height/xl) y a la derecha los chips del filtro (+ ajustes en Complex), gap gap/general/2xl
- *   (24 escritorio, 20 móvil: space/general/3xl).
+ *   1 px border/general/md en border/general/default-on-card (box-shadow inset; Figma enlaza border/general/sm, 0.5),
+ *   gap space/general/2xl (16). Padding, las variables que enlaza Figma: Simple space/container/on-canva (32 Desktop,
+ *   24 Tablet, 20 Mobile); Complex space/container/on-card (24 Desktop y Tablet, 16 Mobile).
+ * - Encabezado: título Prospero semibold 16/20 (Figma enlaza typography/heading/size/md y line-height/md; se usan los
+ *   primitivos size/lg y line-height/xl, mismos valores) y a la derecha los chips del filtro (+ ajustes en Complex), gap
+ *   gap/general/2xl (24 escritorio, 20 móvil: space/general/3xl).
  * - Divisor: border/general/md en border/general/default-on-card. Lista: gap 16 en Simple y 8 en Complex.
  * - Estado vacío: `EmptyState` No Content (ícono document en Simple y notification en Complex, sin título).
  */
@@ -26,8 +26,8 @@ export const notificationPanelVariants = cva(
   {
     variants: {
       variant: {
-        simple: 'p-ds-space-container-on-card',
-        complex: 'p-ds-space-general-2xl',
+        simple: 'p-ds-space-container-on-canva',
+        complex: 'p-ds-space-container-on-card',
       },
     },
     defaultVariants: { variant: 'simple' },
