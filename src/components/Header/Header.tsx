@@ -131,7 +131,8 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
             variant="search-header"
             label={searchLabel}
             fullWidth
-            className={cn(mobile && 'h-10 py-ds-space-field-sm', searchProps?.className)}
+            // Móvil: la caja del campo mide 40 (Input search-header mide 48); el área del texto (40) queda centrada en ella
+            className={cn(mobile && '[&_[data-slot=field]]:h-10', searchProps?.className)}
           />
         </form>
       );

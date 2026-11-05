@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority';
  * CAOS Design System — IconMenu Variants
  *
  * Fuente: component set "Icon menu (Atom)" de Figma (13616:14074), Property 1 = 1 | 2 | 3. Marco de 32×32 con rayas
- * de 24 de largo y trazo `border/general/xl` (1.5) en `border/general/white`.
+ * de 24 de largo y trazo `border/general/lg` (1.5) en `border/general/white`.
  *
  * - 1 (menu): rayas horizontales con centro en y = 8, 16 y 24.
  * - 2 (half): la de arriba y la de abajo giradas +15° y -15° sobre su centro (Figma las coloca en x = 4.41); la del

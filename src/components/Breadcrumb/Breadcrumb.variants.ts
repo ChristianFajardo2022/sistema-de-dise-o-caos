@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
  * - Texto 14/20 Helvetica Neue (typography/body/size/md, line-height-large/md).
  * - Default: regular, text/neutral/gray. Select: semibold, text/neutral/white, marco con padding
  *   inferior space/general/sm (2) que lo deja en 22 de alto.
- * - Chevron y home: icon/general/white; chevron en variante line (Outline Yes), home en fill.
+ * - Chevron y home: icon/general/default; chevron en variante line (Outline Yes), home en fill.
  * - Hover/Press de enlace: Figma no los define; se usan los tokens de link (para diseño).
  * - Foco con teclado: no existe en Figma; outline de 2px (WCAG 2.4.7).
  */

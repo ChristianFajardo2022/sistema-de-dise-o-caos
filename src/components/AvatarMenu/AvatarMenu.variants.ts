@@ -8,7 +8,7 @@ import { cva } from 'class-variance-authority';
  *
  * - Botón: el Avatar (initials, 48 `md`), sin marco propio. El contorno de foco es de 2 con el token de borde activo.
  * - Tarjeta: ancho según el contenido (Hug; 233 con los textos de Figma), relleno background/container/default-on-canva,
- *   trazo de 1 en border/general/default-on-card (cuenta en el layout, como en Figma), radio radius/container/on-card
+ *   trazo de 1 (border/general/md, alineado INSIDE en Figma) en border/general/default-on-card, dibujado con box-shadow inset (no cuenta en el layout), radio radius/container/on-card
  *   (24), padding space/container/on-canva (32 escritorio, 24 tableta, 20 móvil) y gap space/general/2xl (16).
  * - Encabezado: Avatar xs (24) + nombre (16/20 typography/weight/Semibold, text/neutral/white) y correo (12/16,
  *   text/acent/firts), gap 8.
@@ -29,7 +29,8 @@ export const avatarMenuPanelVariants = cva(
   [
     'box-border flex w-max max-w-full flex-col gap-ds-space-general-2xl p-ds-space-container-on-canva',
     'rounded-ds-radius-container-on-card bg-ds-background-container-default-on-canva',
-    'border-ds-border-general-lg border-solid border-ds-border-general-default-on-card',
+    // Trazo INSIDE como en Figma: sombra interior (Chrome redondea border-width y no cambia las medidas)
+    'shadow-[inset_0_0_0_var(--ds-responsive-border-general-md)_var(--color-ds-border-general-default-on-card)]',
     '[font-family:var(--ds-primitives-typography-family-primary),sans-serif]',
   ].join(' ')
 );

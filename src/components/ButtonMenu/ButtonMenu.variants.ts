@@ -9,10 +9,11 @@ import { cva } from 'class-variance-authority';
  * - Caja: alto 32 (padding vertical space/button/lg = 8, el texto mide dimention/button/container/xs = 16), sin padding
  *   horizontal (space/general/xs = 0), gap gap/button/internal-margin-md (4) entre ícono, texto y chevron.
  * - Texto 14 (typography/button/size/md-uniform). Regular en Default, Hover e Inactive; typography/weight/Semibold en
- *   Focus y Press/select (el botón pasa de 43 a 44 de ancho, como en Figma). Color de texto `text/button/menu/*` y de
- *   ícono `icon/button/menu/*`: default, hover, focus-press-select e inactive.
- * - Focus y Press/select dibujan lo mismo (texto blanco y Semibold); el foco con teclado añade el contorno de 2 con el
- *   token de borde activo (no existe en Figma; WCAG 2.4.7).
+ *   Focus y Press/select (el ancho sigue al texto y crece un poco con el peso, como en Figma). Color de texto
+ *   `text/button/menu/*` y de ícono `icon/button/menu/*`: default, hover, focus-press-select e inactive; los valores
+ *   cambian por modo y no siempre se aclaran (ver tokens.css).
+ * - Focus y Press/select dibujan lo mismo (color focus-press-select y Semibold); el foco con teclado (y `state="focus"`)
+ *   añade el contorno de 2 con el token de borde activo (no existe en Figma; WCAG 2.4.7).
  */
 export const buttonMenuVariants = cva(
   [
@@ -35,7 +36,7 @@ export const buttonMenuVariants = cva(
         ],
         hover: 'cursor-pointer [--bm-text:var(--color-ds-text-button-menu-hover)] [--bm-icon:var(--color-ds-icon-button-menu-hover)]',
         focus:
-          'cursor-pointer [--bm-text:var(--color-ds-text-button-menu-focus-press-select)] [--bm-icon:var(--color-ds-icon-button-menu-focus-press-select)] [--bm-weight:var(--ds-primitives-typography-weight-semibold)]',
+          'cursor-pointer outline-2 outline-offset-2 outline-solid outline-ds-border-field-active [--bm-text:var(--color-ds-text-button-menu-focus-press-select)] [--bm-icon:var(--color-ds-icon-button-menu-focus-press-select)] [--bm-weight:var(--ds-primitives-typography-weight-semibold)]',
         press:
           'cursor-pointer [--bm-text:var(--color-ds-text-button-menu-focus-press-select)] [--bm-icon:var(--color-ds-icon-button-menu-focus-press-select)] [--bm-weight:var(--ds-primitives-typography-weight-semibold)]',
         inactive: 'cursor-not-allowed [--bm-text:var(--color-ds-text-button-menu-inactive)] [--bm-icon:var(--color-ds-icon-button-menu-inactive)]',

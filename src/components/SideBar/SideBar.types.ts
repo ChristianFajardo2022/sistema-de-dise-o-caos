@@ -125,6 +125,12 @@ export interface SideBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   footer?: ReactNode;
   /** Nombre accesible de la navegación. Por defecto "Navegación principal". */
   navLabel?: string;
+  /**
+   * Nombre de la zona desplazable de la lista. Solo se anuncia cuando la lista no cabe (pasa a `region` para poder
+   * desplazarla con el teclado); va distinto de `navLabel` para no repetir el nombre de la navegación. Por defecto
+   * "Lista de secciones".
+   */
+  listLabel?: string;
   /** Móvil: menú abierto (controlado). Es el Type Menu list de "Menu mobile". */
   open?: boolean;
   /** Móvil: abierto al inicio (no controlado). */

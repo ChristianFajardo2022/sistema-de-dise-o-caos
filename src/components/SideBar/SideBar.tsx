@@ -73,6 +73,7 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
       homeLabel = 'Inicio',
       footer,
       navLabel = 'Navegación principal',
+      listLabel = 'Lista de secciones',
       open: openProp,
       defaultOpen = false,
       onOpenChange,
@@ -214,7 +215,7 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
               {menuOpen && (
                 <div id={sheetId} {...sheetProps} className={cn(sideBarSheetClass, menuClassName)} data-figma-part="Dropdown">
                   <nav aria-label={navLabel} className="flex min-h-0 flex-1 flex-col">
-                    <ScrollArea aria-label={navLabel} className="min-h-0 flex-1">
+                    <ScrollArea aria-label={listLabel} className="min-h-0 flex-1">
                       <ul className={sideBarListVariants({ collapsed: false })} data-figma-part="List items">
                         {renderItems('expanded', closeMenu)}
                       </ul>
@@ -241,7 +242,7 @@ export const SideBar = forwardRef<HTMLDivElement, SideBarProps>(
           {logoNode(brand(collapsed ? 'icon' : 'logo', 'md'))}
         </div>
         <nav id={navId} aria-label={navLabel} className={sideBarOptionsVariants({ collapsed })} data-figma-part="Opciones">
-          <ScrollArea aria-label={navLabel} className="min-h-0 w-full flex-1">
+          <ScrollArea aria-label={listLabel} className="min-h-0 w-full flex-1">
             <ul className={sideBarListVariants({ collapsed })} data-figma-part="Espacio">
               {renderItems(collapsed ? 'collapsed' : 'expanded')}
             </ul>

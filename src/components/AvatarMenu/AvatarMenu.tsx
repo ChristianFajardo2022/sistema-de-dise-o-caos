@@ -17,7 +17,7 @@ const ITEM_SELECTOR = '[role^="menuitem"]:not([aria-disabled="true"])';
  * Avatar que abre el menú de perfil ("Avatar+dropdown (Atom)" de Figma). Type Default = cerrado; Type
  * Dropdown = abierto (`open`).
  *
- * - Es una composición, no un átomo nuevo: el botón envuelve un `Avatar` (initials) y la tarjeta reutiliza `Avatar`,
+ * - Es una molécula, no un átomo nuevo: el botón envuelve un `Avatar` (initials) y la tarjeta reutiliza `Avatar`,
  *   `DropdownMenuList`/`DropdownMenuItem` y el divisor de las notificaciones. No usa `DropdownMenu` porque su panel es otra superficie
  *   (lista sin encabezado) y solo admite ítems; aquí la tarjeta lleva la identidad de la persona arriba.
  * - Nombre del botón: empieza con las iniciales visibles ("HG, menú de perfil de Hugo García"; WCAG 2.5.3).

@@ -10,7 +10,7 @@ import { cn } from '../../utils/cn';
  * Botón de la navegación principal ("Button menu (Atom)" de Figma).
  *
  * - Es un componente propio y no una variante de `Button` ni de `ButtonLink`: usa los tokens `text/button/menu/*` e
- *   `icon/button/menu/*` (gris que se aclara hasta blanco), no tiene fondo ni trazo y su caja es de 32 de alto sin
+ *   `icon/button/menu/*` (un color por estado, que cambia por modo), no tiene fondo ni trazo y su caja es de 32 de alto sin
  *   padding horizontal; ninguna variante de Button o ButtonLink pinta eso.
  * - Sin `href` es un `<button type="button">` que abre un submenú: `iconRight` dibuja el chevron y el botón expone
  *   `aria-expanded` (lo inyectan `DropdownMenu` o el Header). Con `href` es un enlace `<a>`.

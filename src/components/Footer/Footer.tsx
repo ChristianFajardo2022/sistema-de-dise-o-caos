@@ -38,7 +38,8 @@ function useCompact(ref: RefObject<HTMLElement | null>): boolean {
     if (!el) return;
     const check = () => {
       const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      setCompact(el.getBoundingClientRect().width < DESKTOP_REM * rem);
+      // Ancho de maquetación, como las container queries: getBoundingClientRect cambia con transform: scale.
+      setCompact(el.offsetWidth < DESKTOP_REM * rem);
     };
     check();
     if (typeof ResizeObserver === 'undefined') return;

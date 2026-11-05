@@ -20,10 +20,14 @@ function minRowWidth(row: HTMLElement): number {
  * Lo mínimo que ocupa un hijo de la barra: su ancho si no encoge (logo, campana, avatar, acciones); la suma de sus
  * hijos si es otra fila flex que encoge (logo + navegación); su `min-width` (buscador); si no, su contenido completo
  * (`scrollWidth`, la navegación aunque esté apretada).
+ *
+ * Todo se mide en el espacio de maquetación (`offsetWidth`, `scrollWidth`, estilos computados), sin `zoom` ni
+ * `transform`: `getBoundingClientRect` da el ancho ya escalado y, mezclado con el padding computado (sin escalar), una
+ * cabecera reducida con `zoom` (p. ej. una muestra de la documentación) pasaba a la composición móvil aunque cupiera.
  */
 function minItemWidth(el: HTMLElement): number {
   const cs = getComputedStyle(el);
-  if (cs.flexShrink === '0') return el.getBoundingClientRect().width;
+  if (cs.flexShrink === '0') return el.offsetWidth;
   if (cs.display.endsWith('flex') && cs.flexDirection.startsWith('row')) return minRowWidth(el);
   const min = px(cs.minWidth);
   return min > 0 ? min : el.scrollWidth;
@@ -39,7 +43,8 @@ interface Required {
 function fitsDesktop(header: HTMLElement, required: Required): boolean {
   const bar = header.querySelector<HTMLElement>(':scope > [data-header-bar="desktop"]');
   if (bar) required.width = minRowWidth(bar);
-  return header.getBoundingClientRect().width + 0.5 >= required.width;
+  // offsetWidth redondea al entero: 1 px de margen
+  return header.offsetWidth + 1 >= required.width;
 }
 
 /**

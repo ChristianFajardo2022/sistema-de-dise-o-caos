@@ -91,7 +91,11 @@ export const sideBarItemRowVariants = cva(
 /** Ícono de la fila: toma el color del estado de la fila. */
 export const sideBarItemIconClass = 'shrink-0 text-(--sidebar-icon)';
 
-/** Texto de la fila. */
+/**
+ * Texto de la fila. Límite del componente: la fila mide 44 y el texto va en una línea; si no cabe, se corta con puntos
+ * suspensivos (el nombre accesible conserva el texto completo). No es un comportamiento recomendado: los nombres de las
+ * secciones deben caber enteros.
+ */
 export const sideBarItemLabelClass = 'min-w-0 flex-1 truncate select-none';
 
 /** Barra "Select" de 4 a la izquierda (Dropdown y Single icon seleccionados). */

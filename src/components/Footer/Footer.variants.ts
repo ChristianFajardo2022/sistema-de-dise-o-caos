@@ -57,7 +57,7 @@ export const footerContentVariants = cva(
 
 /** Sellos (Logos gov): fila 2 en móvil; en escritorio, en la celda de las columnas, abajo a la derecha. */
 export const footerBadgesClass =
-  'col-start-1 row-start-2 flex flex-wrap items-center gap-ds-primitives-space-5xl @5xl:row-start-1 @5xl:flex-nowrap @5xl:items-center @5xl:justify-center @5xl:self-end @5xl:justify-self-end';
+  'col-start-1 row-start-2 flex flex-wrap items-center justify-center gap-ds-primitives-space-5xl @5xl:row-start-1 @5xl:flex-nowrap @5xl:items-center @5xl:justify-center @5xl:self-end @5xl:justify-self-end';
 
 export const footerColumnVariants = cva('flex min-w-0 flex-col gap-ds-space-general-2xl @max-5xl:gap-ds-space-general-xl', {
   variants: {
