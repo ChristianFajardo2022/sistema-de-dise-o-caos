@@ -143,7 +143,7 @@ export const doc: ComponentDocContent = {
         { kind: 'dont', framed: true, title: 'Duración no disponible', description: 'No presentes una onda buscable cuando no conoces la duración real.', preview: player({ duration: 0 }) },
         { kind: 'do', framed: true, title: 'Etiquetas descriptivas', description: 'Mantén nombres que expliquen reproducir, pausar y buscar para la tecnología de asistencia.', preview: player({ playLabel: 'Reproducir nota de voz', pauseLabel: 'Pausar nota de voz', seekLabel: 'Posición de la nota de voz' }) },
         { kind: 'dont', framed: true, title: 'Etiquetas genéricas', description: 'No reemplaces los nombres accesibles por etiquetas sin contexto.', preview: player({ playLabel: 'Botón', pauseLabel: 'Botón', seekLabel: 'Control' }) },
-        { kind: 'do', framed: true, title: 'Conecta la fuente', description: <>Pasa <code>src</code> cuando el reproductor deba gestionar el audio y mantener la posición sincronizada.</>, preview: player({ src: '/audios/nota.mp3' }) },
+        { kind: 'do', framed: true, title: 'Indica la fuente', description: <>Pasa <code>src</code> cuando el reproductor deba gestionar el audio y mantener la posición sincronizada.</>, preview: player({ src: '/audios/nota.mp3' }) },
         { kind: 'dont', framed: true, title: 'Fuente no conectada', description: <>No esperes reproducción de audio si omites <code>src</code>; sin fuente, el componente solo presenta estado.</>, preview: player() },
       ] }],
     },

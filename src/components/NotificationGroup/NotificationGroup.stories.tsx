@@ -208,7 +208,7 @@ export const DeleteFocusTest: Story = {
 /** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
 export const DocPageTest: Story = {
   tags: ['!autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', bare: true },
   render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);

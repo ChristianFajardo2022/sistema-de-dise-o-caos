@@ -18,7 +18,7 @@ const photoAvatar = (size: 'md' | 'sm' = 'md') => (
 
 const profileContent = () => (
   <>
-    <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" />
+    <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={3} />
     <ul className="m-0 list-none p-0">
       <ChatDetailsLink icon="folder">Documentos</ChatDetailsLink>
       <ChatDetailsLink icon="gallery">Fotografías</ChatDetailsLink>
@@ -203,7 +203,7 @@ export const doc: ComponentDocContent = {
         { kind: 'dont', framed: true, title: 'Contenido comprimido', description: 'No mantengas el perfil y la cuadrícula completos dentro del riel estrecho.', preview: panel(profileContent(), { defaultCollapsed: true }) },
         { kind: 'do', framed: true, title: 'Nombra la región', description: 'Da a cada región desplazable un nombre que identifique su contenido.', preview: filesPanel() },
         { kind: 'dont', framed: true, title: 'Región sin contexto', description: 'No reutilices un nombre genérico para las vistas de documentos y fotografías.', preview: panel(<><ChatDetailsHeader onBack={() => {}} /><ChatDetailsGrid aria-label="Contenido"><FileCard type="icon" title="Notas de reunión" /></ChatDetailsGrid></>, { collapsible: false }) },
-        { kind: 'do', framed: true, title: 'Nivel de título correcto', description: <>Ajusta <code>headingLevel</code> para mantener el orden de encabezados de la página.</>, preview: <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={2} /> },
+        { kind: 'do', framed: true, title: 'Nivel de título correcto', description: <>Ajusta <code>headingLevel</code> para mantener el orden de encabezados de la página.</>, preview: <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={3} /> },
         { kind: 'dont', framed: true, title: 'Nivel de título profundo', description: 'No elijas un nivel de encabezado solo por su tamaño visual.', preview: <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={6} /> },
       ] }],
     },
