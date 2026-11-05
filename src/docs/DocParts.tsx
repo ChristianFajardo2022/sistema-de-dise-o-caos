@@ -563,8 +563,9 @@ export function ShrinkToFit({
       if (available > 0 && minWidth > available + 0.5) {
         // Sin el tope de `max-w-full`: el contenido se dibuja a su ancho mínimo y el zoom lo hace caber
         content.style.maxWidth = 'none';
-        // Ancho entero hacia arriba y escala hacia abajo: el redondeo del zoom no debe dejar 1 px por fuera
-        const width = Math.ceil(minWidth);
+        // Ancho entero hacia arriba, con 4 px de holgura, y escala hacia abajo: bajo zoom Chrome redondea cada hijo
+        // (p. ej. botones de 32 que salen de 33) y la suma puede pasar del ancho mínimo medido a escala 1
+        const width = Math.ceil(minWidth) + 4;
         content.style.width = `${width}px`;
         content.style.zoom = String(Math.floor((available / width) * 1000) / 1000);
       } else {

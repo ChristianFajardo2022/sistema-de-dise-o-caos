@@ -517,7 +517,8 @@ function AnatomyCanvas({ canvas }: { canvas: DocAnatomyCanvas }) {
           {hasDims && <AnatomyView kind="dims" canvas={canvas} fit={fit} viewRef={dimViewRef} />}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 text-ds-text-neutral-heading">
             <svg className="absolute inset-0 size-full overflow-visible">
-              {dims.bands.map((b, i) => (
+              {/* Una cota cuyo elemento está oculto (p. ej. solo existe en otro breakpoint) mide negativo: no se dibuja */}
+              {dims.bands.filter((b) => b.w > 0 && b.h > 0).map((b, i) => (
                 <g key={`b${i}`} {...b.attrs} className={b.axis === 'x' ? 'text-ds-background-graphic-acent-secondary' : 'text-ds-background-graphic-success-secondary'}>
                   <rect x={b.x} y={b.y} width={b.w} height={b.h} className={b.axis === 'x' ? 'fill-ds-background-graphic-acent-secondary-opacity' : 'fill-ds-background-graphic-success-secondary-opacity'} />
                   {b.edges.map((e, k) => (

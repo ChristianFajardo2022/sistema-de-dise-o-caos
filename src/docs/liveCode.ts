@@ -302,3 +302,16 @@ export function buildCode(
   }
   return jsx(importName, props, childrenLines(args['children'] as ReactNode, 1), 0);
 }
+
+/** Hooks de React que pueden aparecer en un ejemplo y no se importan del paquete. */
+const REACT_HOOKS = new Set(['useState', 'useEffect', 'useRef', 'useMemo', 'useCallback', 'useId', 'useReducer', 'useContext', 'useLayoutEffect']);
+
+/**
+ * Nombres del paquete que usa un ejemplo: las etiquetas JSX en PascalCase (`<Toaster>`, `<NotificationBell>`) y los
+ * hooks propios (`useToastQueue`), para que la línea de importación traiga todo lo que el código necesita.
+ */
+export function packageNamesInCode(code: string): string[] {
+  const tags = [...code.matchAll(/<([A-Z][A-Za-z0-9]*)[\s/>]/g)].map((m) => m[1]);
+  const hooks = [...code.matchAll(/\b(use[A-Z][A-Za-z0-9]*)\s*\(/g)].map((m) => m[1]).filter((h) => !REACT_HOOKS.has(h));
+  return [...new Set([...tags, ...hooks])].filter((name) => name !== 'Fragment');
+}

@@ -1,4 +1,4 @@
-import { Component, isValidElement, useId, useMemo, useState } from 'react';
+import { Component, isValidElement, useEffect, useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Alert } from '../components/Alert';
 import { Button } from '../components/Button';
@@ -593,11 +593,14 @@ export function DocDevelopment({
   props,
   live,
   className,
+  onCodeChange,
 }: {
   importName: string;
   props: DocPropRow[];
   live?: DocLive;
   className?: string;
+  /** Recibe el código generado cada vez que cambia (la línea de importación lo usa para nombrar lo que el código usa). */
+  onCodeChange?: (code: string) => void;
 }) {
   const controls = useMemo(
     (): CustomizeControl[] =>
@@ -630,6 +633,9 @@ export function DocDevelopment({
     const shown = Object.fromEntries(Object.entries(source).filter(([name]) => known.has(name) || /^(aria|data)-/.test(name) || !(name in live.args)));
     return live.code ? live.code(changedArgs(shown, defaults)) : buildCode(importName, shown, defaults);
   }, [importName, props, live]);
+  useEffect(() => {
+    onCodeChange?.(code);
+  }, [code, onCodeChange]);
 
   return (
     <div className={cn('flex min-w-0 flex-col gap-ds-primitives-space-9xl', className)}>
