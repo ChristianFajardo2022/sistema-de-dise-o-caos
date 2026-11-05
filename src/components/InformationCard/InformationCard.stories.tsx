@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { InformationCard } from './InformationCard';
 import type { InformationCardProps } from './InformationCard.types';
 import { Avatar, AvatarGroup } from '../Avatar';
@@ -10,13 +10,19 @@ import { ListItem } from '../ListItem';
 import { ProgressBar } from '../ProgressBar';
 import { NumberRating } from '../Rating';
 import { Tag } from '../Tag';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './InformationCard.doc';
+import docsJson from './InformationCard.docs.json';
 
 const TAGS_POSITION_OPTIONS = ['header', 'content'] as const;
 
 const meta = {
   title: 'Data Display/InformationCard',
   component: InformationCard,
-  parameters: { layout: 'padded' },
+  // El lienzo de Desarrollo usa `Interactive`: sus args llevan los slots, así el código copiado da lo que se ve
+  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson), docsLive: { story: 'Interactive' } },
   tags: ['autodocs'],
   // Ancho de Figma, salvo en las historias con `parameters.fullWidth` (la matriz)
   decorators: [
@@ -29,23 +35,19 @@ const meta = {
         </div>
       ),
   ],
-  argTypes: {
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
-    subtitle: { control: 'text', type: { name: 'string' }, description: 'Prop Subtitle de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Prop Description de Figma' },
-    variant: { control: 'radio', options: ['default', 'simple'], type: { name: 'enum', value: ['default', 'simple'] }, description: 'Type de Figma: default = Option 1-3, simple = Type=Simple' },
-    image: { control: 'boolean', type: { name: 'boolean' }, description: 'Prop Image de Figma: rejilla de puntos de fondo' },
-    tagsPosition: {
-      control: 'radio',
-      options: TAGS_POSITION_OPTIONS,
-      type: { name: 'enum', value: [...TAGS_POSITION_OPTIONS] },
-      description: 'Etiquetas arriba (Option 2 y 3) o bajo el título (Option 1)',
-    },
-  },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    title: { control: 'text', type: { name: 'string' } },
+    subtitle: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    variant: { control: 'radio', options: ['default', 'simple'], type: { name: 'enum', value: ['default', 'simple'] } },
+    image: { control: 'boolean', type: { name: 'boolean' } },
+    tagsPosition: { control: 'radio', options: TAGS_POSITION_OPTIONS, type: { name: 'enum', value: [...TAGS_POSITION_OPTIONS] } },
+    headingLevel: { control: 'select', options: [2, 3, 4, 5, 6, 'none'], type: { name: 'enum', value: ['2', '3', '4', '5', '6', 'none'] } },
+  }),
   args: {
     title: 'Lanzamiento de la app',
     subtitle: 'Equipo de producto',
-    description: 'Versión con pagos en línea, notificaciones y un nuevo panel de pedidos para las tiendas.',
+    description: 'Versión con modo oscuro, notificaciones y un nuevo panel de ajustes para el equipo.',
     tagsPosition: 'header',
   },
 } satisfies Meta<typeof InformationCard>;
@@ -147,6 +149,39 @@ function RatingSummary({ figma = false }: { figma?: boolean }) {
     </div>
   );
 }
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'InformationCard' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente InformationCard en Figma:']);
+    // Marcadores: 6 de la composición completa y 3 de la simple
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(10));
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de InformationCard' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+  },
+};
+
+/** Con todos los controles de Personalizar: título, textos, tipo, rejilla, etiquetas y nivel del encabezado. Los slots van en los args. */
+export const Interactive: Story = {
+  args: {
+    leading: <Avatar variant="icon" size="lg" />,
+    tags: <Tag iconLeft={false}>Diseño</Tag>,
+    actions: <Button size="sm">Unirme</Button>,
+  },
+};
 
 /** Option 1: avatar arriba, etiquetas bajo el título y pie con participantes. */
 export const Option1: Story = {

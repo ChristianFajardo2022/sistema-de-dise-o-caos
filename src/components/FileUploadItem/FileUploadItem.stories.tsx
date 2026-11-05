@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './FileUploadItem.doc';
+import docsJson from './FileUploadItem.docs.json';
 import { FileUploadItem } from './FileUploadItem';
 import type { FileUploadItemProps, FileUploadStatus } from './FileUploadItem.types';
 
@@ -18,23 +23,57 @@ const FIGMA: Record<FileUploadStatus, { figma: string; message: string }> = {
   alert: { figma: 'State=Alert', message: 'Estado' },
 };
 
+const ICONS = ['folder', 'document', 'document-text', 'image', 'gallery'] as const;
+
+/**
+ * Código copiable de Personalizar: el generado omite las funciones, así que se agregan los manejadores que dibuja la
+ * tarjeta en cada estado (Descargar en `complete` y `error`, Reintentar en `loading-error` y `alert`; Eliminar siempre),
+ * con nombres genéricos declarados. `progress` solo cuenta con barra (`loading` y `alert`).
+ */
+function docsCode(args: Record<string, unknown>): string {
+  const status = (args['status'] as FileUploadStatus | undefined) ?? 'loading';
+  const hasBar = status === 'loading' || status === 'alert';
+  const lines: string[] = [];
+  for (const [name, value] of Object.entries(args)) {
+    if (value === undefined || value === '' || typeof value === 'function') continue;
+    if ((name === 'status' && value === 'loading') || (name === 'icon' && value === 'folder')) continue;
+    if (name === 'progress' && (!hasBar || value === 0)) continue;
+    lines.push(typeof value === 'string' ? `${name}="${value}"` : `${name}={${JSON.stringify(value)}}`);
+  }
+  const handlers: [string, string][] = [];
+  if (status === 'complete' || status === 'error') handlers.push(['onDownload', 'download']);
+  if (status === 'loading-error' || status === 'alert') handlers.push(['onRetry', 'retry']);
+  handlers.push(['onDelete', 'remove']);
+  const declarations = handlers.map(([, fnName]) => `const ${fnName} = () => {};`).join('\n');
+  const props = [...lines, ...handlers.map(([prop, fnName]) => `${prop}={() => ${fnName}()}`)];
+  return `${declarations}\n\n<FileUploadItem\n${props.map((l) => `  ${l}`).join('\n')}\n/>`;
+}
+
 const meta = {
   title: 'Data Display/FileUploadItem',
   component: FileUploadItem,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // Lo que dibuja `Interactive` con sus tres acciones; el código copiable lo escribe `docsCode`
+    docsLive: { story: 'Interactive', code: docsCode },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
+    icon: { control: 'select', options: ICONS, type: { name: 'enum', value: [...ICONS] } },
     status: {
       control: 'select',
       options: STATUSES,
       type: { name: 'enum', value: STATUSES },
-      description: 'State de Figma',
     },
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma' },
-    message: { control: 'text', type: { name: 'string' }, description: 'Props Alert / Error state / Loading error' },
+    title: { control: 'text', type: { name: 'string' } },
+    message: { control: 'text', type: { name: 'string' } },
+    deleteLabel: { control: 'text', type: { name: 'string' } },
+    downloadLabel: { control: 'text', type: { name: 'string' } },
+    retryLabel: { control: 'text', type: { name: 'string' } },
     progress: { control: { type: 'range', min: 0, max: 100 }, type: { name: 'number' } },
-  },
-  args: { title: 'Informe trimestral.pdf', status: 'loading', progress: 40 },
+  }),
+  args: { title: 'Informe.pdf', status: 'loading', progress: 40 },
   decorators: [
     (Story) => (
       <div className="w-[320px] bg-ds-background-general-black p-6">
@@ -131,5 +170,29 @@ export const TestAccessibility: Story = {
     await expect(args.onDelete).toHaveBeenCalledTimes(1);
     // Sin barra fuera de loading y alert
     await expect(c.getAllByRole('progressbar')).toHaveLength(1);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  decorators: [],
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'FileUploadItem' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente FileUploadItem en Figma:']);
+    // Marcadores de la anatomía: uno por pauta (6 + 4 + 4)
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-doc-mark]')).toHaveLength(14));
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de FileUploadItem' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

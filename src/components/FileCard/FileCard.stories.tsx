@@ -4,6 +4,12 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { FileCard } from './FileCard';
 import type { FileCardProps, FileCardSelection, FileCardState, FileCardType } from './FileCard.types';
 import { Tag } from '../Tag';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { formatLiteral } from '../../docs/liveCode';
+import { doc } from './FileCard.doc';
+import docsJson from './FileCard.docs.json';
 
 const TYPES: FileCardType[] = ['photo', 'icon', 'thumbnail'];
 const STATES: FileCardState[] = ['default', 'hover', 'select'];
@@ -16,12 +22,40 @@ const SELECTIONS: FileCardSelection[] = ['checkbox', 'radio'];
 const PHOTO_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 344 160'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2361a7f2'/%3E%3Cstop offset='1' stop-color='%23004999'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='344' height='160' fill='url(%23g)'/%3E%3C/svg%3E";
 
+/** Valor de una prop escrito como en JSX. */
+const jsxProp = (name: string, value: unknown) =>
+  typeof value === 'string' ? `${name}="${value.replace(/"/g, '&quot;')}"` : value === true ? name : `${name}={${formatLiteral(value)}}`;
+
+/**
+ * Código de Desarrollo: lo que el lienzo muestra, con los manejadores que cada tipo dibuja (miniatura: Descargar y
+ * Eliminar; Photo e Icon sin selección: más opciones). Los args no traen funciones, así que se escriben aquí.
+ */
+function docsCode(args: Record<string, unknown>) {
+  const handlers =
+    args.type === 'thumbnail'
+      ? { decl: ['const descargar = () => {};', 'const eliminar = () => {};'], props: ['onDownload={descargar}', 'onDelete={eliminar}'] }
+      : args.selection
+        ? { decl: [], props: [] }
+        : { decl: ['const abrirMenu = () => {};'], props: ['onMoreClick={abrirMenu}'] };
+  const props = [...Object.entries(args).map(([name, value]) => jsxProp(name, value)), ...handlers.props];
+  return [...handlers.decl, ...(handlers.decl.length ? [''] : []), '<FileCard', ...props.map((p) => `  ${p}`), '/>'].join('\n');
+}
+
 const meta = {
   title: 'Data Display/FileCard',
   component: FileCard,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      story: 'Interactive',
+      code: docsCode,
+      // Lo que el lienzo maneja por su cuenta o que con texto libre rompe la tarjeta
+      exclude: ['checked', 'icon', 'src', 'alt', 'selectionProps', 'moreButtonProps', 'children'],
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     type: {
       control: 'radio',
       options: TYPES,
@@ -45,7 +79,7 @@ const meta = {
     },
     disabled: { control: 'boolean', type: { name: 'boolean' } },
     src: { control: 'text', type: { name: 'string' } },
-  },
+  }),
   args: {
     type: 'icon',
     title: 'Informe trimestral.pdf',
@@ -66,7 +100,7 @@ type Story = StoryObj<typeof meta>;
 export const Interactive: Story = {
   args: { selection: 'checkbox' },
   render: (args: FileCardProps) => (
-    <div className={args.type === 'thumbnail' ? '' : args.type === 'photo' ? 'w-full max-w-[344px]' : 'w-full max-w-[498px]'}>
+    <div className={args.type === 'thumbnail' ? '' : args.type === 'photo' ? 'w-[344px] max-w-full' : 'w-[498px] max-w-full'}>
       <FileCard {...args} onMoreClick={fn()} onDownload={fn()} onDelete={fn()} />
     </div>
   ),
@@ -314,5 +348,26 @@ export const TestSelectionProps: Story = {
     await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
     await expect(args.onCheckedChange).toHaveBeenCalledTimes(1);
     await expect(args.selectionProps?.onChange).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'FileCard' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente FileCard en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de FileCard' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

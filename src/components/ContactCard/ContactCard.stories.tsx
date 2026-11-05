@@ -5,13 +5,49 @@ import type { ContactCardVariant } from './ContactCard.types';
 import { Avatar } from '../Avatar';
 import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
 import { DropdownMenuItem } from '../DropdownMenu';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ContactCard.doc';
+import docsJson from './ContactCard.docs.json';
 
 const VARIANT_OPTIONS: ContactCardVariant[] = ['more', 'communication', 'external-link'];
+
+/**
+ * Args de Personalizar → código copiable (`docsLive.args` y `docsLive.code`): lo mismo que dibuja `Interactive`.
+ * Agrega el avatar y, según la variante, el menú o los manejadores de los botones (nombres genéricos).
+ */
+function docsArgs(args: Record<string, unknown>): Record<string, unknown> {
+  const out = { ...args };
+  out['leading'] = <Avatar variant="photo" size="lg" src="/images/ana-perez.jpg" alt="" />;
+  if (out['variant'] === 'more' || out['variant'] === undefined) out['menuItems'] = <DropdownMenuItem>Ver perfil</DropdownMenuItem>;
+  return out;
+}
+
+const PHOTO_DECLARATION = "const foto = '/ruta/de/la/foto.jpg'; // usa la foto de la persona";
+
+function docsCode(args: Record<string, unknown>): string {
+  const code = buildCode('ContactCard', args, { variant: 'more', headingLevel: 3 }).replace('src="/images/ana-perez.jpg"', 'src={foto}');
+  const variant = args['variant'];
+  if (variant === 'communication') {
+    return `${PHOTO_DECLARATION}\nconst call = () => {};\nconst openChat = () => {};\n\n${code.replace(/\n\/>$/, '\n  onCall={() => call()}\n  onChat={() => openChat()}\n/>')}`;
+  }
+  if (variant === 'external-link') {
+    return `${PHOTO_DECLARATION}\nconst call = () => {};\n\n${code.replace(/\n\/>$/, '\n  onCall={() => call()}\n/>')}`;
+  }
+  return `${PHOTO_DECLARATION}\n\n${code}`;
+}
 
 const meta = {
   title: 'Data Display/ContactCard',
   component: ContactCard,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // Lo que no es texto ni número (avatar, menú, manejadores) lo pone el render; el código copiable lo escribe `docsCode`
+    docsLive: { story: 'Interactive', args: docsArgs, code: docsCode, exclude: ['leading', 'menuItems', 'actions'] },
+  },
   tags: ['autodocs'],
   decorators: [
     (Story, { parameters }) =>
@@ -24,16 +60,21 @@ const meta = {
       ),
   ],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     variant: {
       name: 'variant',
       control: 'radio',
       options: VARIANT_OPTIONS,
       type: { name: 'enum', value: VARIANT_OPTIONS },
-      description: 'Propiedad 1 de Figma: acción de la derecha',
     },
-    title: { control: 'text', type: { name: 'string' }, description: 'Encabezado: el nombre (capa Subtitulo de Figma)' },
-    eyebrow: { control: 'text', type: { name: 'string' }, description: 'Línea corta sobre el nombre (capa Titulo de Figma)' },
-    rating: { control: 'number', type: { name: 'number' }, description: 'Calificación del Badge sobre el avatar (0 a 5)' },
+    title: { control: 'text', type: { name: 'string' } },
+    eyebrow: { control: 'text', type: { name: 'string' } },
+    rating: { control: 'number', type: { name: 'number' } },
+    headingLevel: {
+      control: 'select',
+      options: [2, 3, 4, 5, 6, 'none'],
+      type: { name: 'enum', value: [2, 3, 4, 5, 6, 'none'] },
+    },
   },
   args: {
     variant: 'more',
@@ -57,7 +98,11 @@ const menu = (
 
 /** Playground: elige la acción desde los controles. */
 export const Interactive: Story = {
-  render: (args) => <ContactCard {...args} leading={avatar} menuItems={menu} onCall={fn()} onChat={fn()} />,
+  render: (args) => (
+    <div className="w-[400px] max-w-full">
+      <ContactCard {...args} leading={avatar} menuItems={menu} onCall={fn()} onChat={fn()} />
+    </div>
+  ),
 };
 
 export const More: Story = {
@@ -117,6 +162,28 @@ export const FigmaMatrix: Story = {
       </div>
     </div>
   ),
+};
+
+/** Página de documentación v2: la revisan vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'ContactCard' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente ContactCard en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de ContactCard' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
+  },
 };
 
 /** Test: artículo nombrado por el título, línea corta después del encabezado y acciones con el nombre de la persona. */

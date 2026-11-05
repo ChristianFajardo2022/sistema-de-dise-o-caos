@@ -1,39 +1,140 @@
 {
   "name": "InteractiveCard",
   "component": "InteractiveCard",
-  "description": "Tarjeta seleccionable del sistema de diseño CAOS, fiel al component set Interactive card de Figma (13219:38332): Type Simple/Complex × State Default/Hover/Select/Inactive. Toda la tarjeta es un radio: el control es un input type=radio real (con name se agrupa con otras tarjetas; flechas y Espacio nativos) nombrado por el título y descrito por el subtítulo. Para que toda la superficie sea clicable sin anidar botones dentro de otro control se usa el patrón de control estirado: el label del radio cubre la tarjeta con un pseudo-elemento y los controles internos quedan encima con su propio foco y clic: el Button corner, las acciones de InteractiveCardList y cualquier control propio marcado con data-card-action (el resto del contenido no se toca, así no se pisa su position). Simple: fila de 80 con Avatar icon de 40 (default-on-canva; default-on-card en Hover y Select), título 16/20, subtítulo 14/20 y Radio visible. Complex: columna con padding y gap 24, encabezado con Avatar de 56 (default-on-card; default-on-canva en Select e Inactive) y etiquetas, grupo Content (gap 16) en la prop content y secciones como children (InteractiveCardDetails, InteractiveCardList con ListItem (ver y eliminar / editar y eliminar en Figma), InteractiveCardStats con bloques de padding 24 en background/container/hover-on-canva); con cornerLabel se dibuja la silueta con muesca de 48 y el Button corner. Hover sale de :hover, Select del radio marcado e Inactive de disabled; la superficie y el Button corner cambian por CSS (también en grupos no controlados). Foco visible: anillo de 2px alrededor de la tarjeta (no está en Figma); en simple el anillo del Radio se apaga para que no se vean dos. Sombra: Simple en hover effect/shadow md (box-shadow shadow-ds-on-canva-md); Complex effect/shadow sm, con drop-shadow si hay muesca (sigue la silueta) y box-shadow shadow-ds-on-card si no. La superficie (NotchedSurface, interna) la comparten FileCard, InformationCard y DataCard. Criterio común de las tarjetas: title/subtitle para los textos, leading para el slot de la izquierda e icon para el ícono del avatar por defecto; ref al control (aquí, el input radio) y rootProps + className a la raíz, con className al final.",
+  "description": "Tarjeta seleccionable del sistema de diseño CAOS (set Interactive card en Figma): Type Simple o Complex y State Default, Hover, Select e Inactive. Toda la tarjeta es un radio: el control es un input type=radio real (con name se agrupa con otras tarjetas; las flechas mueven la selección y Espacio la confirma), nombrado por el título y descrito por el subtítulo. Para que toda la superficie sea clicable sin anidar botones dentro de otro control, el label del radio cubre la tarjeta con un pseudo-elemento y los controles internos quedan encima con su propio foco y clic: el Button corner, las acciones de InteractiveCardList y cualquier control propio marcado con data-card-action. El resto del contenido no se toca. Simple: fila de 80 px con avatar de ícono de 40, título de 16/20, subtítulo de 14/20 y Radio visible. Complex: columna con avatar de 56, etiquetas, un grupo de contenido (prop content) y secciones (children: InteractiveCardDetails, InteractiveCardList con ListItem, InteractiveCardStats); con cornerLabel se dibuja la silueta con muesca de 48 px y el Button corner. Hover sale de :hover, Select del radio marcado e Inactive de disabled; la superficie y el Button corner cambian por CSS, también en grupos no controlados. El foco con teclado dibuja un anillo de 2 px alrededor de la tarjeta (Figma no lo dibuja); en la Simple, el anillo del Radio se apaga para que no se vean dos. La superficie (NotchedSurface, interna) la comparten FileCard, InformationCard y DataCard. Criterio común de las tarjetas: title y subtitle para los textos, leading para el slot de la izquierda e icon para el ícono del avatar por defecto; ref al control (aquí, el input radio) y rootProps y className a la raíz, con className al final.",
   "category": "Data Display",
   "props": {
-    "variant": { "type": "'simple' | 'complex'", "default": "'simple'", "description": "Type de Figma." },
-    "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma. Nombre accesible del radio." },
-    "subtitle": { "type": "ReactNode", "required": false, "description": "Prop Subtittle2 de Figma. Descripción accesible del radio." },
-    "leading": { "type": "ReactNode", "required": false, "description": "Avatar u otro contenido a la izquierda. Por defecto un Avatar de ícono que sigue el estado de la tarjeta; null lo quita." },
-    "icon": { "type": "IconName", "default": "'folder'", "description": "Ícono del avatar por defecto." },
-    "tags": { "type": "ReactNode", "required": false, "description": "Solo complex: etiquetas del encabezado (Tag superior)." },
-    "content": { "type": "ReactNode", "required": false, "description": "Solo complex: resto del grupo Content (InteractiveCardHeader, InteractiveCardDescription, InteractiveCardTags), gap 16." },
-    "children": { "type": "ReactNode", "required": false, "description": "Solo complex: secciones con gap 24 (InteractiveCardDetails, InteractiveCardList, InteractiveCardStats o propias)." },
-    "indicator": { "type": "boolean", "default": true, "description": "Solo simple: dibuja el radio (Radio button). Sin él la tarjeta sigue siendo un radio accesible." },
-    "cornerLabel": { "type": "string", "required": false, "description": "Solo complex: nombre accesible del Button corner. Si se pasa se dibujan la muesca y el botón." },
-    "onCornerClick": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Solo complex: clic del Button corner (no marca la tarjeta)." },
-    "cornerIcon": { "type": "ReactNode", "required": false, "description": "Solo complex: ícono de 16 del Button corner. Por defecto arrow-diagonal-right." },
-    "checked": { "type": "boolean", "required": false, "description": "Seleccionada (controlado). Usar con onChange u onCheckedChange." },
-    "defaultChecked": { "type": "boolean", "required": false, "description": "Seleccionada al inicio (no controlado)." },
-    "onCheckedChange": { "type": "(checked: boolean) => void", "required": false, "description": "Se llama con true al marcarse, además del onChange nativo." },
-    "disabled": { "type": "boolean", "default": false, "description": "State Inactive: radio y Button corner deshabilitados; las sub-partes pintan sus textos deshabilitados. A Tag y ListItem hay que pasarles disabled." },
-    "state": { "type": "'default' | 'hover' | 'select' | 'inactive'", "required": false, "description": "Fuerza el aspecto, solo para documentación." },
-    "rootProps": { "type": "InteractiveCardRootProps (HTMLAttributes<HTMLDivElement> + data-*)", "required": false, "description": "Props del div raíz. El ref, name, value y el resto de props nativas van al input radio." },
-    "className": { "type": "string", "required": false, "description": "Clases para el div raíz; se aplican después de rootProps.className." }
+    "variant": {
+      "type": "'simple' | 'complex'",
+      "default": "'simple'",
+      "description": "Tipo de tarjeta (Type en Figma): Simple es una fila y Complex, una tarjeta con secciones."
+    },
+    "title": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Título (Tittle en Figma). Es el nombre accesible del radio."
+    },
+    "subtitle": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Subtítulo (Subtittle2 en Figma). Es la descripción accesible del radio."
+    },
+    "leading": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Contenido a la izquierda en lugar del avatar por defecto (Avatar en Figma); null lo quita."
+    },
+    "icon": {
+      "type": "IconName",
+      "default": "'folder'",
+      "description": "Ícono del avatar por defecto."
+    },
+    "tags": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Solo con variant complex: etiquetas a la derecha del encabezado (Tag superior en Figma)."
+    },
+    "content": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Solo con variant complex: resto del grupo de contenido, bajo el encabezado (InteractiveCardHeader, InteractiveCardDescription, InteractiveCardTags), con 16 px entre sí."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Solo con variant complex: secciones con 24 px entre sí (InteractiveCardDetails, InteractiveCardList, InteractiveCardStats o contenido propio con data-card-action en sus controles)."
+    },
+    "indicator": {
+      "type": "boolean",
+      "default": true,
+      "description": "Solo con variant simple: dibuja el radio (Radio button en Figma). Sin él, la tarjeta sigue siendo un radio accesible."
+    },
+    "cornerLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Solo con variant complex: nombre accesible del Button corner. Si se pasa, se dibujan la muesca y el botón."
+    },
+    "onCornerClick": {
+      "type": "MouseEventHandler<HTMLButtonElement>",
+      "required": false,
+      "description": "Solo con variant complex: clic del Button corner. No marca la tarjeta."
+    },
+    "cornerIcon": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Solo con variant complex: ícono de 16 px del Button corner. Por defecto arrow-diagonal-right."
+    },
+    "checked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Tarjeta seleccionada (controlado). Úsala con onChange u onCheckedChange."
+    },
+    "defaultChecked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Tarjeta seleccionada al inicio (no controlado)."
+    },
+    "onCheckedChange": {
+      "type": "(checked: boolean) => void",
+      "required": false,
+      "description": "Se llama con true cuando la tarjeta queda marcada, además del onChange nativo."
+    },
+    "disabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Estado Inactive de Figma: el radio y el Button corner quedan deshabilitados y los textos pasan a su tono deshabilitado. Pasa disabled también a cada Tag y ListItem de la tarjeta."
+    },
+    "state": {
+      "type": "'default' | 'hover' | 'select' | 'inactive'",
+      "required": false,
+      "description": "Fuerza el aspecto de un estado, solo para documentación. En uso real, Hover sale de :hover, Select del radio marcado e Inactive de disabled."
+    },
+    "rootProps": {
+      "type": "InteractiveCardRootProps (HTMLAttributes<HTMLDivElement> + data-*)",
+      "required": false,
+      "description": "Props del div raíz. El ref, name, value y el resto de props nativas van al input radio."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases para el div raíz; se aplican después de rootProps.className."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre del grupo de radios. Las tarjetas con el mismo name son excluyentes y se recorren con las flechas."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "Valor del radio, el que recibe el formulario al marcar la tarjeta."
+    },
+    "onChange": {
+      "type": "ChangeEventHandler<HTMLInputElement>",
+      "required": false,
+      "description": "Evento nativo del radio. Léelo con event.target.value."
+    }
   },
   "subcomponents": {
-    "InteractiveCardHeader": "Encabezado extra: leading, title, subtitle, tags; emphasis 'title' (Normal tittle) o 'subtitle' (Number tittle, dato grande) y subtitleIcon decorativo.",
-    "InteractiveCardDescription": "Párrafo 14/18 en text/neutral/body.",
-    "InteractiveCardTags": "Fila de etiquetas con gap 8.",
-    "InteractiveCardDetails / InteractiveCardDetail": "Lista de definiciones (dl) de pares término/valor, gap 4.",
-    "InteractiveCardList": "ul para ListItem; sus botones y enlaces quedan sobre el área de clic de la tarjeta.",
-    "InteractiveCardStats / InteractiveCardStat": "Bloques de dato (label, value, icon) en fila con gap 8."
+    "InteractiveCardHeader": "Encabezado extra: leading, title, subtitle y tags. Con emphasis \"subtitle\" destaca el subtítulo como dato (Number tittle en Figma) y subtitleIcon pone un ícono decorativo.",
+    "InteractiveCardDescription": "Párrafo de 14/18 con text-neutral-body.",
+    "InteractiveCardTags": "Fila de etiquetas con 8 px entre sí.",
+    "InteractiveCardDetails / InteractiveCardDetail": "Lista de definiciones (dl) de pares término y valor, con 4 px entre pares.",
+    "InteractiveCardList": "Lista (ul) para ListItem; sus botones y enlaces quedan sobre el área de clic de la tarjeta.",
+    "InteractiveCardStats / InteractiveCardStat": "Bloques de dato (label, value e icon) en fila, con 8 px entre sí."
   },
   "examples": [
-    { "title": "Grupo de tarjetas simples", "code": "<fieldset>\n  <legend>Elige un plan</legend>\n  <InteractiveCard name=\"plan\" value=\"mensual\" title=\"Plan mensual\" subtitle=\"Se renueva cada 30 días\" defaultChecked />\n  <InteractiveCard name=\"plan\" value=\"anual\" title=\"Plan anual\" subtitle=\"Dos meses gratis\" />\n</fieldset>" },
-    { "title": "Complex compuesta", "code": "<InteractiveCard\n  variant=\"complex\"\n  name=\"proyecto\"\n  title=\"Proyecto web\"\n  subtitle=\"Equipo de producto\"\n  tags={<Tag iconLeft={false}>Diseño</Tag>}\n  cornerLabel=\"Abrir proyecto web\"\n  onCornerClick={abrir}\n  content={<InteractiveCardDescription>Rediseño del sitio…</InteractiveCardDescription>}\n>\n  <InteractiveCardDetails>\n    <InteractiveCardDetail term=\"Entrega\">30 de marzo</InteractiveCardDetail>\n  </InteractiveCardDetails>\n  <InteractiveCardList>\n    <ListItem title=\"Brief inicial\" category=\"Documento\" onEdit={editar} onDelete={eliminar} />\n  </InteractiveCardList>\n  <InteractiveCardStats>\n    <InteractiveCardStat label=\"Tareas\" value=\"24\" />\n  </InteractiveCardStats>\n</InteractiveCard>" }
+    {
+      "title": "Grupo de tarjetas simples",
+      "code": "<fieldset>\n  <legend>Elige una vista</legend>\n  <InteractiveCard name=\"vista\" value=\"lista\" title=\"Vista de lista\" subtitle=\"Filas con detalle\" defaultChecked />\n  <InteractiveCard name=\"vista\" value=\"tarjetas\" title=\"Vista de tarjetas\" subtitle=\"Bloques con resumen\" />\n</fieldset>"
+    },
+    {
+      "title": "Grupo controlado",
+      "code": "const [vista, setVista] = useState('lista');\n\n<fieldset>\n  <legend>Elige una vista</legend>\n  <InteractiveCard\n    name=\"vista\"\n    value=\"lista\"\n    title=\"Vista de lista\"\n    subtitle=\"Filas con detalle\"\n    checked={vista === 'lista'}\n    onChange={(event) => setVista(event.target.value)}\n  />\n  <InteractiveCard\n    name=\"vista\"\n    value=\"tarjetas\"\n    title=\"Vista de tarjetas\"\n    subtitle=\"Bloques con resumen\"\n    checked={vista === 'tarjetas'}\n    onChange={(event) => setVista(event.target.value)}\n  />\n</fieldset>"
+    },
+    {
+      "title": "Complex compuesta",
+      "code": "const abrir = () => {};\nconst editar = () => {};\nconst eliminar = () => {};\n\n<InteractiveCard\n  variant=\"complex\"\n  name=\"proyecto\"\n  title=\"Proyecto web\"\n  subtitle=\"Equipo de producto\"\n  tags={<Tag iconLeft={false}>Diseño</Tag>}\n  cornerLabel=\"Abrir proyecto web\"\n  onCornerClick={abrir}\n  content={<InteractiveCardDescription>Rediseño del sitio con páginas nuevas.</InteractiveCardDescription>}\n>\n  <InteractiveCardDetails>\n    <InteractiveCardDetail term=\"Plazo\">30 de marzo</InteractiveCardDetail>\n  </InteractiveCardDetails>\n  <InteractiveCardList>\n    <ListItem title=\"Brief inicial\" category=\"Documento\" onEdit={editar} onDelete={eliminar} />\n  </InteractiveCardList>\n  <InteractiveCardStats>\n    <InteractiveCardStat label=\"Tareas\" value=\"24\" />\n  </InteractiveCardStats>\n</InteractiveCard>"
+    }
   ]
 }

@@ -2,13 +2,68 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { NotificationCard } from './NotificationCard';
+import type { NotificationCardProps } from './NotificationCard.types';
 import { FIGMA_LOREM } from '../NotificationItem/NotificationItem.shared';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NotificationCard.doc';
+import docsJson from './NotificationCard.docs.json';
+
+/**
+ * Lienzo de Desarrollo (`docsLive.render`): la tarjeta interactiva con el botón eliminar. `defaultRevealed` remonta la
+ * tarjeta al cambiar, así el deslizamiento sigue funcionando después de tocar el control.
+ */
+function DocsCanvas(args: Record<string, unknown>) {
+  const { defaultRevealed, ...rest } = args;
+  return (
+    <ul role="list" className="m-0 w-full max-w-[351px] list-none p-0">
+      <NotificationCard
+        key={String(defaultRevealed)}
+        {...(rest as Partial<NotificationCardProps>)}
+        title={String(rest.title ?? '')}
+        defaultRevealed={defaultRevealed === true}
+        onClick={() => {}}
+        onDelete={() => {}}
+      />
+    </ul>
+  );
+}
+
+/** Código de Desarrollo: igual que el lienzo, con sus manejadores declarados para copiarlo y que funcione. */
+function docsCode(args: Record<string, unknown>) {
+  const props = Object.entries(args)
+    .filter(([name]) => name !== 'children')
+    .map(([name, value]) =>
+      value === true ? `    ${name}` : `    ${name}=${typeof value === 'string' ? `"${value.replace(/"/g, '&quot;')}"` : `{${String(value)}}`}`
+    );
+  return [
+    'const open = () => {};',
+    'const remove = () => {};',
+    '',
+    '<ul role="list">',
+    '  <NotificationCard',
+    ...props,
+    '    onClick={open}',
+    '    onDelete={remove}',
+    '  />',
+    '</ul>',
+  ].join('\n');
+}
 
 const meta = {
   title: 'Data Display/NotificationCard',
   component: NotificationCard,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: {
+      render: DocsCanvas,
+      code: docsCode,
+      exclude: ['rootProps', 'contentProps', 'href', 'type', 'revealed', 'onRevealedChange', 'onDelete', 'onClick'],
+    },
+  },
   decorators: [
     (Story, { parameters }) =>
       parameters.bare ? (
@@ -19,14 +74,17 @@ const meta = {
         </ul>
       ),
   ],
-  argTypes: {
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Heading de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Prop Description de Figma' },
-    time: { control: 'text', type: { name: 'string' }, description: 'Hora relativa' },
-    unread: { control: 'boolean', type: { name: 'boolean' }, description: 'State=Unread de Figma' },
-    revealed: { control: 'boolean', type: { name: 'boolean' }, description: 'Type "… delete" de Figma: botón eliminar a la vista' },
-    href: { control: 'text', type: { name: 'string' }, description: 'Con href el título es un enlace' },
-  },
+  argTypes: argTypesFromDocsJson(docsJson, {
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    time: { control: 'text', type: { name: 'string' } },
+    unread: { control: 'boolean', type: { name: 'boolean' } },
+    unreadLabel: { control: 'text', type: { name: 'string' } },
+    deleteLabel: { control: 'text', type: { name: 'string' } },
+    defaultRevealed: { control: 'boolean', type: { name: 'boolean' } },
+    revealed: { control: 'boolean', type: { name: 'boolean' } },
+    href: { control: 'text', type: { name: 'string' } },
+  }),
   args: {
     title: 'Nuevo mensaje de Ana Pérez',
     description: 'Te escribió sobre la reunión de mañana.',
@@ -47,9 +105,9 @@ export const Read: Story = { args: { unread: false } };
 /** Con `onDelete` aparece el botón eliminar: desliza la tarjeta a la izquierda o enfócalo con Tab. */
 function DeleteDemo() {
   const [items, setItems] = useState([
-    { id: 1, title: 'Pago recibido', unread: true },
-    { id: 2, title: 'Factura lista', unread: true },
-    { id: 3, title: 'Cuenta actualizada', unread: false },
+    { id: 1, title: 'Nota de reunión', unread: true },
+    { id: 2, title: 'Perfil actualizado', unread: true },
+    { id: 3, title: 'Ajustes guardados', unread: false },
   ]);
   return (
     <ul role="list" className="m-0 flex w-[351px] list-none flex-col gap-2 p-0">
@@ -57,7 +115,7 @@ function DeleteDemo() {
         <NotificationCard
           key={n.id}
           title={n.title}
-          description="Revisa el detalle en tu cuenta."
+          description="Revisa el detalle en tu perfil."
           time="Hace 5 min"
           unread={n.unread}
           onClick={() => {}}
@@ -106,15 +164,15 @@ export const DeleteTest: Story = {
   render: () => <DeleteDemo />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const pago = canvas.getByRole('button', { name: 'Pago recibido' });
-    await expect(pago).toHaveAccessibleDescription('Hace 5 min No leída Revisa el detalle en tu cuenta.');
-    const remove = canvas.getByRole('button', { name: 'Eliminar notificación: Pago recibido' });
+    const pago = canvas.getByRole('button', { name: 'Nota de reunión' });
+    await expect(pago).toHaveAccessibleDescription('Hace 5 min No leída Revisa el detalle en tu perfil.');
+    const remove = canvas.getByRole('button', { name: 'Eliminar notificación: Nota de reunión' });
     await userEvent.click(remove);
-    await waitFor(() => expect(canvas.queryByRole('button', { name: 'Pago recibido' })).not.toBeInTheDocument());
-    await waitFor(() => expect(canvas.getByRole('button', { name: 'Factura lista' })).toHaveFocus());
+    await waitFor(() => expect(canvas.queryByRole('button', { name: 'Nota de reunión' })).not.toBeInTheDocument());
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Perfil actualizado' })).toHaveFocus());
     // Con Supr sobre el control también se elimina y el foco sigue a la vecina
     await userEvent.keyboard('{Delete}');
-    await waitFor(() => expect(canvas.getByRole('button', { name: 'Cuenta actualizada' })).toHaveFocus());
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Ajustes guardados' })).toHaveFocus());
     await expect(canvas.getAllByRole('listitem')).toHaveLength(1);
   },
 };
@@ -138,11 +196,11 @@ const swipeClickSpy = fn();
 /** Test: deslizar a la izquierda muestra el botón eliminar sin disparar el clic de la tarjeta; un clic normal sí. */
 export const SwipeNoClickTest: Story = {
   tags: ['!autodocs'],
-  render: () => <NotificationCard title="Pago recibido" description="Hola" unread onClick={swipeClickSpy} onDelete={fn()} />,
+  render: () => <NotificationCard title="Nota de reunión" description="Hola" unread onClick={swipeClickSpy} onDelete={fn()} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     swipeClickSpy.mockClear();
-    const card = canvas.getByRole('button', { name: 'Pago recibido' });
+    const card = canvas.getByRole('button', { name: 'Nota de reunión' });
     const box = card.getBoundingClientRect();
     const y = box.top + box.height / 2;
     await userEvent.pointer([
@@ -153,5 +211,27 @@ export const SwipeNoClickTest: Story = {
     await expect(swipeClickSpy).not.toHaveBeenCalled();
     await userEvent.click(card);
     await expect(swipeClickSpy).toHaveBeenCalledTimes(1);
+  },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', bare: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NotificationCard' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((tab) => tab.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const headings = () => canvas.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent);
+    await expect(headings()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NotificationCard en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(headings()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de NotificationCard' });
+    await expect(within(props).getAllByRole('columnheader').map((cell) => cell.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -1,68 +1,68 @@
 {
   "name": "NotificationCard",
   "component": "NotificationCard",
-  "description": "Tarjeta de notificación, fiel al component set Group notification (Atom) de Figma (14963:6348), Type Simple y Simple delete × State Unread y Read (351×114). Hora (12/16), título (Prospero semibold 14/18) con el punto verde si no está leída, y descripción 14/20. Unread: tarjeta con relleno background/container/hover-on-canva y radio 16. Read: sin relleno, con trazo inferior. Es un <li>: va en una lista (ul role=\"list\"). Interactiva solo con href u onClick (el título es el control, estirado sobre la tarjeta; la hora, \"No leída\" y la descripción son su descripción accesible). onDelete dibuja el botón eliminar (trash sobre fondo rojo, 48 de ancho) a la derecha: oculto hasta deslizar la tarjeta a la izquierda, pasar revealed o enfocarlo con Tab (siempre está en el DOM con nombre accesible); con el control enfocado, Supr también elimina. El foco pasa a la fila vecina (o al panel) antes de llamar a onDelete. Para varias notificaciones agrupadas, NotificationGroup.",
+  "description": "Tarjeta de notificación: hora, título y descripción, con relleno y un punto verde si no está leída. Corresponde a los tipos Simple y Simple delete del set Group notification (Atom) de Figma, en los estados Unread y Read. Unread lleva relleno background/container/hover-on-canva y radio de 16 px; Read no tiene relleno y dibuja un trazo inferior. La hora mide 12 px/16 px, el título (Prospero semibold) 12 px/16 px y la descripción 14 px/20 px. Es un <li>: va dentro de una lista (ul role=\"list\"). Es interactiva solo con href u onClick: el título es el control, estirado sobre la tarjeta, y la hora, \"No leída\" y la descripción forman su descripción accesible. Sin ninguno de los dos es informativa. onDelete dibuja el botón eliminar (ícono trash sobre fondo de error, 48 px de ancho) a la derecha: queda oculto hasta deslizar la tarjeta a la izquierda, pasar revealed o enfocarlo con Tab, y siempre está en el DOM con su nombre accesible. Con el control enfocado, Supr también elimina. El foco pasa a la tarjeta vecina (o al panel) antes de llamar a onDelete. Para varias notificaciones agrupadas, NotificationGroup. Para una fila simple, NotificationItem.",
   "category": "Data Display",
   "props": {
     "title": {
       "type": "ReactNode",
       "required": true,
-      "description": "Prop Heading de Figma. Nombre accesible del control."
+      "description": "Prop Heading de Figma: título. Es el nombre accesible del control si la tarjeta es interactiva."
     },
     "description": {
       "type": "ReactNode",
       "required": false,
-      "description": "Prop Description de Figma."
+      "description": "Prop Description de Figma: texto del mensaje."
     },
     "time": {
       "type": "ReactNode",
       "required": false,
-      "description": "Hora relativa (\"Hace 22m\")."
+      "description": "Hora relativa de la notificación (\"Hace 22 min\"), sobre el título."
     },
     "unread": {
       "type": "boolean",
       "default": false,
-      "description": "State=Unread de Figma: relleno y punto verde."
+      "description": "State Unread de Figma: relleno y punto verde. Sin ella, la tarjeta es Read: sin relleno y con trazo inferior."
     },
     "unreadLabel": {
       "type": "string",
       "default": "'No leída'",
-      "description": "Texto para lectores del punto."
+      "description": "Texto del punto de no leída para lectores de pantalla."
     },
     "href": {
       "type": "string",
       "required": false,
-      "description": "Con href el título es un enlace."
+      "description": "Con href el título es un enlace estirado sobre la tarjeta."
     },
     "type": {
       "type": "'button' | 'submit' | 'reset'",
       "default": "'button'",
-      "description": "Tipo del botón cuando el título es un button (con onClick)."
+      "description": "Tipo del botón cuando el título es un button. Solo con onClick."
     },
     "onDelete": {
       "type": "() => void",
       "required": false,
-      "description": "Elimina la notificación; dibuja el botón eliminar."
+      "description": "Elimina la notificación y dibuja el botón eliminar."
     },
     "deleteLabel": {
       "type": "string",
       "required": false,
-      "description": "Nombre accesible del botón eliminar. Por defecto \"Eliminar notificación: título\"."
+      "description": "Nombre accesible del botón eliminar. Por defecto \"Eliminar notificación\", con \": título\" si el título es texto."
     },
     "revealed": {
       "type": "boolean",
       "required": false,
-      "description": "Type \"… delete\" de Figma: botón eliminar a la vista (controlado)."
+      "description": "Botón eliminar a la vista (controlado). Equivale al Type Simple delete de Figma. Solo con onDelete."
     },
     "defaultRevealed": {
       "type": "boolean",
       "default": false,
-      "description": "Botón eliminar a la vista al inicio."
+      "description": "Botón eliminar a la vista al inicio (no controlado). Solo con onDelete."
     },
     "onRevealedChange": {
       "type": "(revealed: boolean) => void",
       "required": false,
-      "description": "Se llama al deslizar la tarjeta."
+      "description": "Se llama al deslizar la tarjeta para mostrar u ocultar el botón eliminar."
     },
     "rootProps": {
       "type": "NotificationRootProps",
@@ -82,8 +82,16 @@
   },
   "examples": [
     {
-      "title": "Eliminable",
-      "code": "<NotificationCard time=\"Hace 5 min\" title=\"Pago recibido\" description=\"Revisa el detalle.\" unread onClick={abrir} onDelete={() => quitar(id)} />"
+      "title": "Con detalle y eliminar",
+      "code": "const open = () => {};\nconst remove = () => {};\n\n<ul role=\"list\">\n  <NotificationCard\n    time=\"Hace 5 min\"\n    title=\"Nota de reunión\"\n    description=\"Revisa el detalle en tu perfil.\"\n    unread\n    onClick={open}\n    onDelete={remove}\n  />\n</ul>"
+    },
+    {
+      "title": "Como enlace",
+      "code": "<ul role=\"list\">\n  <NotificationCard\n    time=\"Hace 1 h\"\n    title=\"Perfil actualizado\"\n    description=\"Cambiaste la foto de tu perfil.\"\n    href=\"/perfil\"\n  />\n</ul>"
+    },
+    {
+      "title": "Lista con eliminar",
+      "code": "const [notes, setNotes] = useState([\n  { id: 1, title: 'Nota de reunión', unread: true },\n  { id: 2, title: 'Ajustes guardados', unread: false },\n]);\nconst open = () => {};\nconst remove = (id: number) => setNotes((all) => all.filter((note) => note.id !== id));\n\n<ul role=\"list\">\n  {notes.map((note) => (\n    <NotificationCard\n      key={note.id}\n      title={note.title}\n      unread={note.unread}\n      onClick={open}\n      onDelete={() => remove(note.id)}\n    />\n  ))}\n</ul>"
     }
   ]
 }

@@ -1,12 +1,42 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { NotificationItem } from './NotificationItem';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NotificationItem.doc';
+import docsJson from './NotificationItem.docs.json';
+
+/** Código de Desarrollo: la misma fila del lienzo (un botón con `onClick`), dentro de su lista, lista para copiar. */
+function docsCode(args: Record<string, unknown>) {
+  const text = (value: unknown) => (/["{}\\]/.test(String(value)) ? `{${JSON.stringify(String(value))}}` : `"${String(value)}"`);
+  const props = [
+    ...(args.title !== undefined ? [`title=${text(args.title)}`] : []),
+    ...(args.description ? [`description=${text(args.description)}`] : []),
+    ...(args.unread === true ? ['unread'] : []),
+    ...(args.unreadLabel ? [`unreadLabel=${text(args.unreadLabel)}`] : []),
+    'onClick={openNotification}',
+  ];
+  return [
+    'const openNotification = () => {};',
+    '',
+    '<ul role="list">',
+    '  <NotificationItem',
+    ...props.map((line) => `    ${line}`),
+    '  />',
+    '</ul>',
+  ].join('\n');
+}
 
 const meta = {
   title: 'Data Display/NotificationItem',
   component: NotificationItem,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { story: 'Interactive', code: docsCode, exclude: ['href', 'type', 'rootProps', 'className'] },
+  },
   decorators: [
     (Story, { parameters }) =>
       parameters.bare ? (
@@ -18,15 +48,16 @@ const meta = {
       ),
   ],
   argTypes: {
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Notification de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Prop Description de Figma' },
-    unread: { control: 'boolean', type: { name: 'boolean' }, description: 'Type=Active de Figma (no leída)' },
-    unreadLabel: { control: 'text', type: { name: 'string' }, description: 'Texto para lectores del punto' },
-    href: { control: 'text', type: { name: 'string' }, description: 'Con href el título es un enlace' },
+    ...argTypesFromDocsJson(docsJson),
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
+    unread: { control: 'boolean', type: { name: 'boolean' } },
+    unreadLabel: { control: 'text', type: { name: 'string' } },
+    href: { control: 'text', type: { name: 'string' } },
   },
   args: {
-    title: 'Factura lista',
-    description: 'Ya puedes descargar tu factura de octubre.',
+    title: 'Documento compartido',
+    description: 'Ana Pérez compartió Informe anual contigo.',
     unread: true,
   },
 } satisfies Meta<typeof NotificationItem>;
@@ -43,8 +74,8 @@ export const Interactive: Story = {
 export const ReadAndUnread: Story = {
   render: () => (
     <>
-      <NotificationItem title="Pago confirmado" description="Recibimos tu pago de la factura de octubre." unread />
-      <NotificationItem title="Factura disponible" description="Ya puedes descargar tu factura." />
+      <NotificationItem title="Comentario nuevo" description="Hugo García respondió tu comentario." unread />
+      <NotificationItem title="Reunión actualizada" description="El equipo cambió la sala del jueves." />
     </>
   ),
 };
@@ -90,8 +121,8 @@ export const RoleTest: Story = {
   args: { onClick: fn() },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const control = canvas.getByRole('button', { name: 'Factura lista' });
-    await expect(control).toHaveAccessibleDescription('No leída Ya puedes descargar tu factura de octubre.');
+    const control = canvas.getByRole('button', { name: 'Documento compartido' });
+    await expect(control).toHaveAccessibleDescription('No leída Ana Pérez compartió Informe anual contigo.');
     await userEvent.click(control);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
     await userEvent.tab();
@@ -115,5 +146,28 @@ export const InformativeTest: Story = {
     await expect(items).toHaveLength(2);
     await expect(items[0]).toHaveTextContent('No leída');
     await expect(items[1]).not.toHaveTextContent('No leída');
+  },
+};
+
+/** Página de documentación (plantilla v2) para vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', bare: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NotificationItem' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((tab) => tab.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const headings = () => canvas.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent);
+    await expect(headings()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NotificationItem en Figma:']);
+    await expect(canvasElement.querySelectorAll('[data-doc-mark]').length).toBe(8);
+    await userEvent.click(tabs[1]);
+    await expect(headings()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de NotificationItem' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

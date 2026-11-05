@@ -1,40 +1,161 @@
 {
   "name": "ProfileCard",
   "component": "ProfileCard",
-  "description": "Tarjeta de perfil del sistema de diseño CAOS, fiel al component set Profile card de Figma (12995:3291), Type Standar vertical, Standar horizontal, Full y Qualification. Las cuatro comparten piezas (avatar con Badge de calificación, nombre, datos separados por '·', etiquetas, descripción, acciones y contadores), así que es un solo componente con `layout` (vertical, horizontal, full, centered = Qualification; `hero` es alias deprecado de full) y slots; la fila de estrellas de Qualification es contenido (`stars`) y puede ir en cualquier disposición. Vertical y horizontal: superficie interna común con muesca de 48 (NotchedSurface) en background/container/default-on-card, padding 24 y gap 32, con el Button corner arriba a la derecha (selección real con Checkbox o Radio, o más opciones). Full: fila ancha con avatar, texto, acciones y Dots-moreoptions, y debajo etiquetas y contadores; bajo 42rem de contenedor pasa a la versión Mobile de Figma. Centered: todo centrado sobre default-on-canva con effect/shadow sm. Accesibilidad: raíz article nombrada por el nombre (encabezado h3 por defecto, `headingLevel`), Badge con texto para lectores ('4,5 de 5 estrellas'), estrellas como imagen con el puntaje, contadores como lista de definiciones (dt/dd), selección con input real nombrado 'Seleccionar <nombre>' y más opciones 'Más opciones de <nombre>'. Las acciones que se pasan deben llevar un nombre que incluya a la persona (p. ej. aria-label='Contactar a Ana Pérez' con el texto visible 'Contactar'). Bajo 48rem de pantalla las acciones ocupan todo el ancho (marco Mobile).",
+  "description": "Tarjeta de perfil del sistema de diseño CAOS, con cuatro disposiciones: vertical, horizontal, full y centered (Qualification en Figma). Comparten piezas (avatar con Badge de calificación, nombre, datos separados por «·», etiquetas, descripción, acciones y contadores), así que es un solo componente con `layout` y slots; `hero` es alias deprecado de `full`. La fila de estrellas de Qualification es contenido (`stars`) y puede ir en cualquier disposición. Vertical y horizontal: superficie con muesca para el Button corner, que lleva la selección real (Checkbox o Radio) o más opciones. Full: fila ancha con avatar, texto, acciones y más opciones, y debajo etiquetas y contadores; bajo 42 rem de ancho del contenedor pasa a su versión móvil. Centered: todo centrado sobre una superficie con sombra. Accesibilidad: raíz `article` nombrada por el nombre de la persona (encabezado de nivel 3 por defecto, `headingLevel`), Badge con texto para lectores («4,5 de 5 estrellas»), estrellas como imagen con el puntaje, contadores como lista de definiciones, selección con input real nombrado «Seleccionar <nombre>» y más opciones «Más opciones de <nombre>». Las acciones que se pasan deben llevar un nombre que incluya a la persona (aria-label=\"Contactar a Ana Pérez\" con el texto visible «Contactar»). Bajo 48 rem de ancho de pantalla las acciones ocupan todo el ancho.",
   "category": "Data Display",
   "props": {
-    "layout": { "type": "'vertical' | 'horizontal' | 'full' | 'centered' | 'hero'", "default": "'vertical'", "description": "Type de Figma: Standar vertical, Standar horizontal, Full, Qualification. `hero` es el nombre anterior de full (deprecado)." },
-    "title": { "type": "ReactNode", "required": true, "description": "Prop Title de Figma: nombre de la persona o la tienda. Encabezado y nombre accesible del article." },
-    "subtitle": { "type": "ReactNode | ReactNode[]", "required": false, "description": "Prop Subtittle de Figma. Con un arreglo se separa con '·'." },
-    "description": { "type": "ReactNode", "required": false, "description": "Prop Description de Figma." },
-    "leading": { "type": "ReactNode", "required": false, "description": "Prop Avatar de Figma: Avatar photo o brand de tamaño lg." },
-    "rating": { "type": "number", "required": false, "description": "Calificación en el Badge icon + number sobre el avatar (se escribe con Intl 'es': 4,5)." },
-    "ratingLabel": { "type": "string", "default": "'de 5 estrellas'", "description": "Texto para lectores que sigue a la cifra del Badge." },
-    "stars": { "type": "number", "required": false, "description": "Fila de estrellas de solo lectura (Star rating de Qualification)." },
-    "starsLabel": { "type": "string", "required": false, "description": "Nombre accesible de la fila de estrellas. Por defecto 'N de 5 estrellas'." },
-    "tags": { "type": "ReactNode", "required": false, "description": "Prop Tags de Figma (Tag sin ícono)." },
-    "stats": { "type": "{ value: ReactNode; label: ReactNode; icon?: ReactNode }[]", "required": false, "description": "Prop Counters de Figma: contadores con divisores, como lista de definiciones." },
-    "children": { "type": "ReactNode", "required": false, "description": "Contenido adicional bajo la descripción." },
-    "actions": { "type": "ReactNode", "required": false, "description": "Props Button / Icon buttons de Figma: grupo de acciones. Cada una con nombre que incluya a la persona." },
-    "onMoreClick": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Más opciones: Dots-moreoptions en full; Button corner Dots en vertical y horizontal sin selección." },
-    "moreLabel": { "type": "string", "required": false, "description": "Nombre accesible de más opciones. Por defecto 'Más opciones de <título>'." },
-    "moreButtonProps": { "type": "ButtonHTMLAttributes", "required": false, "description": "Props extra del botón de más opciones (aria-expanded, aria-controls)." },
-    "selection": { "type": "'checkbox' | 'radio'", "required": false, "description": "Prop Radius button de Figma: control real en el Button corner (vertical y horizontal)." },
-    "checked": { "type": "boolean", "required": false, "description": "Selección controlada." },
-    "defaultChecked": { "type": "boolean", "required": false, "description": "Selección inicial no controlada." },
-    "onCheckedChange": { "type": "(checked: boolean) => void", "required": false, "description": "Cambio de la selección." },
-    "name": { "type": "string", "required": false, "description": "name del input de selección." },
-    "value": { "type": "string", "required": false, "description": "value del input de selección." },
-    "disabled": { "type": "boolean", "required": false, "description": "Deshabilita la selección." },
-    "selectionLabel": { "type": "string", "required": false, "description": "Nombre accesible de la selección. Por defecto 'Seleccionar <título>'." },
-    "selectionProps": { "type": "InputHTMLAttributes & { ref }", "required": false, "description": "Props del input de selección, incluido su ref." },
-    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "3", "description": "Nivel del encabezado del nombre; 'none' lo deja como párrafo." },
-    "className": { "type": "string", "required": false, "description": "Clases para el article raíz." }
+    "layout": {
+      "type": "'vertical' | 'horizontal' | 'full' | 'centered' | 'hero'",
+      "default": "'vertical'",
+      "description": "Disposición (Type en Figma): Standar vertical, Standar horizontal, Full y Qualification (`centered`). `hero` es el nombre anterior de `full` (deprecado)."
+    },
+    "title": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Nombre de la persona o del equipo (Title en Figma). Es el encabezado y el nombre accesible del article."
+    },
+    "subtitle": {
+      "type": "ReactNode | ReactNode[]",
+      "required": false,
+      "description": "Datos cortos bajo el nombre (Subtittle en Figma). Con un arreglo se separan con «·»."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto breve sobre la persona (Description en Figma)."
+    },
+    "leading": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Avatar de la persona (Avatar en Figma): un Avatar photo o brand de tamaño lg."
+    },
+    "rating": {
+      "type": "number",
+      "required": false,
+      "description": "Calificación (0 a 5) en el Badge icon + number sobre el avatar; se escribe con coma decimal (4,5). Solo se dibuja si hay `leading`."
+    },
+    "ratingLabel": {
+      "type": "string",
+      "default": "'de 5 estrellas'",
+      "description": "Texto para lectores que sigue a la cifra del Badge."
+    },
+    "stars": {
+      "type": "number",
+      "required": false,
+      "description": "Fila de estrellas de solo lectura (Star rating en Qualification), de 0 a 5."
+    },
+    "starsLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre accesible de la fila de estrellas. Por defecto 'N de 5 estrellas'."
+    },
+    "tags": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Etiquetas (Tags en Figma): Tag sin ícono."
+    },
+    "stats": {
+      "type": "{ value: ReactNode; label: ReactNode; icon?: ReactNode }[]",
+      "required": false,
+      "description": "Contadores con divisores (Counters en Figma), como lista de definiciones."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Contenido adicional bajo la descripción."
+    },
+    "actions": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Grupo de acciones (Button e Icon buttons en Figma). Cada una con un nombre accesible que incluya a la persona."
+    },
+    "onMoreClick": {
+      "type": "MouseEventHandler<HTMLButtonElement>",
+      "required": false,
+      "description": "Más opciones: Dots en `full`; Button corner de tres puntos en `vertical` y `horizontal` sin `selection`. No aplica a `centered`."
+    },
+    "moreLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre accesible de más opciones. Por defecto 'Más opciones de <título>'."
+    },
+    "moreButtonProps": {
+      "type": "ButtonHTMLAttributes",
+      "required": false,
+      "description": "Props extra del botón de más opciones, como `aria-expanded` y `aria-controls` de un menú."
+    },
+    "selection": {
+      "type": "'checkbox' | 'radio'",
+      "required": false,
+      "description": "Control real en el Button corner (Radius button en Figma). Solo en `vertical` y `horizontal`; tiene prioridad sobre más opciones."
+    },
+    "checked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Selección controlada. Úsala con `onCheckedChange`."
+    },
+    "defaultChecked": {
+      "type": "boolean",
+      "required": false,
+      "description": "Selección inicial no controlada."
+    },
+    "onCheckedChange": {
+      "type": "(checked: boolean) => void",
+      "required": false,
+      "description": "Se llama con el nuevo valor al cambiar la selección."
+    },
+    "name": {
+      "type": "string",
+      "required": false,
+      "description": "`name` del input de selección. Los radios del mismo grupo comparten `name`."
+    },
+    "value": {
+      "type": "string",
+      "required": false,
+      "description": "`value` del input de selección."
+    },
+    "disabled": {
+      "type": "boolean",
+      "required": false,
+      "description": "Deshabilita la selección."
+    },
+    "selectionLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Nombre accesible de la selección. Por defecto 'Seleccionar <título>'."
+    },
+    "selectionProps": {
+      "type": "InputHTMLAttributes & { ref }",
+      "required": false,
+      "description": "Props del input de selección, incluido su ref."
+    },
+    "headingLevel": {
+      "type": "2 | 3 | 4 | 5 | 6 | 'none'",
+      "default": "3",
+      "description": "Nivel del encabezado del nombre; `'none'` lo deja como párrafo."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases para el article raíz."
+    }
   },
   "examples": [
-    { "title": "Vertical con selección", "code": "<ProfileCard\n  title=\"Ana Pérez\"\n  subtitle={['Diseñadora de interiores', 'Medellín']}\n  leading={<Avatar variant=\"photo\" size=\"lg\" src={foto} />}\n  rating={4.5}\n  tags={<Tag iconLeft={false}>Interiores</Tag>}\n  description=\"Proyectos de vivienda y locales pequeños.\"\n  selection=\"checkbox\"\n  onCheckedChange={setChecked}\n  actions={<Button variant=\"secondary\" size=\"sm\" aria-label=\"Contactar a Ana Pérez\">Contactar</Button>}\n/>" },
-    { "title": "Full", "code": "<ProfileCard\n  layout=\"full\"\n  title=\"Librería Central\"\n  leading={<Avatar variant=\"brand\" size=\"lg\" logo={<Logo />} />}\n  stats={[{ value: 128, label: 'Ventas' }, { value: '4,5', label: 'Calificaciones', icon: <IconStar state=\"select\" /> }]}\n  onMoreClick={abrirMenu}\n/>" },
-    { "title": "Qualification", "code": "<ProfileCard layout=\"centered\" title=\"Ana Pérez\" leading={…} rating={4.5} stars={4} actions={…} stats={…} />" }
+    {
+      "title": "Vertical con selección",
+      "code": "const [checked, setChecked] = useState(false);\n\n<ProfileCard\n  title=\"Ana Pérez\"\n  subtitle={['Diseñadora de producto', 'Medellín']}\n  leading={<Avatar variant=\"photo\" size=\"lg\" src=\"/images/ana-perez.jpg\" alt=\"\" />}\n  rating={4.5}\n  tags={<Tag iconLeft={false}>Producto</Tag>}\n  description=\"Proyectos de producto digital y servicios.\"\n  selection=\"checkbox\"\n  checked={checked}\n  onCheckedChange={setChecked}\n  actions={<Button variant=\"secondary\" size=\"sm\" aria-label=\"Contactar a Ana Pérez\">Contactar</Button>}\n/>"
+    },
+    {
+      "title": "Full con contadores",
+      "code": "const openMenu = () => {};\n\n<ProfileCard\n  layout=\"full\"\n  title=\"Equipo de diseño\"\n  subtitle={['Estudio de producto', 'Medellín']}\n  leading={<Avatar name=\"Equipo de diseño\" size=\"lg\" />}\n  tags={<Tag iconLeft={false}>Producto</Tag>}\n  stats={[\n    { value: 128, label: 'Proyectos' },\n    { value: 54, label: 'Reseñas' },\n    { value: '4,5', label: 'Calificaciones', icon: <IconStar state=\"select\" size={16} /> },\n  ]}\n  onMoreClick={openMenu}\n/>"
+    },
+    {
+      "title": "Qualification",
+      "code": "<ProfileCard\n  layout=\"centered\"\n  title=\"Ana Pérez\"\n  subtitle={['Diseñadora de producto', 'Medellín']}\n  leading={<Avatar variant=\"photo\" size=\"lg\" src=\"/images/ana-perez.jpg\" alt=\"\" />}\n  rating={4.5}\n  stars={4}\n  description=\"Proyectos de producto digital y servicios.\"\n  stats={[{ value: 54, label: 'Reseñas' }]}\n  actions={<Button size=\"sm\" aria-label=\"Contactar a Ana Pérez\">Contactar</Button>}\n/>"
+    },
+    {
+      "title": "Lista de selección única",
+      "code": "const [selected, setSelected] = useState('ana');\n\n<fieldset>\n  <legend>Profesional asignado</legend>\n  <ProfileCard\n    title=\"Ana Pérez\"\n    selection=\"radio\"\n    name=\"profesional\"\n    value=\"ana\"\n    checked={selected === 'ana'}\n    onCheckedChange={(on) => on && setSelected('ana')}\n  />\n  <ProfileCard\n    title=\"Hugo García\"\n    selection=\"radio\"\n    name=\"profesional\"\n    value=\"hugo\"\n    checked={selected === 'hugo'}\n    onCheckedChange={(on) => on && setSelected('hugo')}\n  />\n</fieldset>"
+    }
   ]
 }

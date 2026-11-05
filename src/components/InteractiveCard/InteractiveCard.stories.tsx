@@ -13,12 +13,54 @@ import {
   InteractiveCardTags,
 } from './InteractiveCard';
 import type { InteractiveCardProps, InteractiveCardState, InteractiveCardVariant } from './InteractiveCard.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
 import { Avatar } from '../Avatar';
 import { ListItem } from '../ListItem';
 import { Tag } from '../Tag';
+import { doc } from './InteractiveCard.doc';
+import docsJson from './InteractiveCard.docs.json';
 
 const VARIANT_OPTIONS: InteractiveCardVariant[] = ['simple', 'complex'];
 const STATE_OPTIONS: InteractiveCardState[] = ['default', 'hover', 'select', 'inactive'];
+
+/**
+ * Args del lienzo de Desarrollo. La Complex llega vacía desde los controles: se le suman las etiquetas, la descripción y
+ * las secciones de ejemplo para que el lienzo y el código copiable muestren lo mismo.
+ */
+function liveArgs(args: Record<string, unknown>): Record<string, unknown> {
+  const next: Record<string, unknown> = { ...args, name: 'opcion' };
+  if (args.variant === 'complex') {
+    const disabled = args.disabled ? true : undefined;
+    next.cornerLabel = args.cornerLabel || `Abrir ${String(args.title).toLowerCase()}`;
+    next.tags = (
+      <>
+        <Tag iconLeft={false} disabled={disabled}>
+          Diseño
+        </Tag>
+        <Tag type="success" iconLeft={false} disabled={disabled}>
+          Activo
+        </Tag>
+      </>
+    );
+    next.content = <InteractiveCardDescription>Resumen de la opción con sus datos principales.</InteractiveCardDescription>;
+    next.children = (
+      <InteractiveCardDetails>
+        <InteractiveCardDetail term="Elementos">24</InteractiveCardDetail>
+      </InteractiveCardDetails>
+    );
+  }
+  return next;
+}
+
+/** El código generado omite las funciones: el Button corner de la Complex necesita su `onCornerClick`. */
+function liveCode(args: Record<string, unknown>): string {
+  const code = buildCode('InteractiveCard', args, { variant: 'simple', indicator: true, disabled: false });
+  return args.variant === 'complex' ? `const abrir = () => {};\n\n${code.replace(/\n  cornerLabel=.*/, (line) => `${line}\n  onCornerClick={() => abrir()}`)}`
+    : code;
+}
 
 const meta = {
   title: 'Data Display/InteractiveCard',
@@ -33,7 +75,24 @@ const meta = {
     InteractiveCardStats,
     InteractiveCardStat,
   },
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo de Desarrollo usa la historia Interactive: un radio real que se marca con el puntero, el teclado o el clic.
+    // Excluidas: lo que controla el estado de la tarjeta (`checked`, `state`) y lo que el lienzo arma por su cuenta.
+    docsLive: {
+      story: 'Interactive',
+      exclude: ['checked', 'defaultChecked', 'onCheckedChange', 'state', 'name', 'value', 'rootProps', 'leading', 'tags', 'content', 'children', 'cornerIcon', 'onCornerClick'],
+      args: (args: Record<string, unknown>) => liveArgs(args),
+      // La tarjeta ocupa el ancho disponible: el lienzo la centra, así que se le da un ancho de muestra (no afecta al código)
+      render: (args: Record<string, unknown>) => (
+        <div className="w-[420px] max-w-full">
+          <InteractiveCard {...(liveArgs(args) as unknown as InteractiveCardProps)} />
+        </div>
+      ),
+      code: (args: Record<string, unknown>) => liveCode(args),
+    },
+  },
   tags: ['autodocs'],
   // Ancho de Figma, salvo en las historias con `parameters.fullWidth` (la matriz)
   decorators: [
@@ -46,7 +105,7 @@ const meta = {
         </div>
       ),
   ],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     variant: { control: 'radio', options: VARIANT_OPTIONS, type: { name: 'enum', value: VARIANT_OPTIONS }, description: 'Type de Figma' },
     title: { control: 'text', type: { name: 'string' }, description: 'Prop Tittle de Figma (nombre del radio)' },
     subtitle: { control: 'text', type: { name: 'string' }, description: 'Prop Subtittle2 de Figma' },
@@ -59,11 +118,11 @@ const meta = {
       description: 'Fuerza el aspecto, solo para documentación',
     },
     cornerLabel: { control: 'text', type: { name: 'string' }, description: 'Solo complex: nombre del Button corner' },
-  },
+  }),
   args: {
     variant: 'simple',
-    title: 'Plan mensual',
-    subtitle: 'Se renueva cada 30 días',
+    title: 'Vista de lista',
+    subtitle: 'Filas con detalle',
     disabled: false,
     indicator: true,
   },
@@ -72,33 +131,35 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Preview con controles (simple). */
-export const Interactive: Story = {};
+/** Preview con controles. Es un radio real: se marca con el puntero, con Tab y Espacio o con un clic. */
+export const Interactive: Story = {
+  render: (args) => <InteractiveCard {...(liveArgs(args) as unknown as InteractiveCardProps)} />,
+};
 
 /** Grupo de tarjetas simples: mismo `name`, flechas para moverse, Espacio para elegir. */
-function PlanGroup(args: InteractiveCardProps) {
-  const [plan, setPlan] = useState('mensual');
-  const plans = [
-    { value: 'mensual', title: 'Plan mensual', subtitle: 'Se renueva cada 30 días' },
-    { value: 'anual', title: 'Plan anual', subtitle: 'Dos meses gratis' },
-    { value: 'equipo', title: 'Plan de equipo', subtitle: 'Hasta 10 personas', disabled: true },
+function OptionGroup(args: InteractiveCardProps) {
+  const [selected, setSelected] = useState('lista');
+  const options = [
+    { value: 'lista', title: 'Vista de lista', subtitle: 'Filas con detalle' },
+    { value: 'tarjetas', title: 'Vista de tarjetas', subtitle: 'Bloques con resumen' },
+    { value: 'calendario', title: 'Vista de calendario', subtitle: 'Eventos por día', disabled: true },
   ];
   return (
     <fieldset className="m-0 flex flex-col gap-ds-space-general-lg border-0 p-0">
       <legend className="mb-ds-space-general-lg font-ds-primitives-typography-family-primary text-ds-typography-body-size-md text-ds-text-neutral-body">
-        Elige un plan
+        Elige una vista
       </legend>
-      {plans.map((p) => (
+      {options.map((p) => (
         <InteractiveCard
           {...args}
           key={p.value}
-          name="plan"
+          name="vista"
           value={p.value}
           title={p.title}
           subtitle={p.subtitle}
           disabled={p.disabled}
-          checked={plan === p.value}
-          onChange={(event) => setPlan(event.target.value)}
+          checked={selected === p.value}
+          onChange={(event) => setSelected(event.target.value)}
         />
       ))}
     </fieldset>
@@ -106,7 +167,7 @@ function PlanGroup(args: InteractiveCardProps) {
 }
 
 export const RadioGroup: Story = {
-  render: (args) => <PlanGroup {...args} />,
+  render: (args) => <OptionGroup {...args} />,
 };
 
 const folder = <Avatar variant="icon" size="sm" />;
@@ -118,7 +179,7 @@ function ComplexSections({ disabled = false, figma = false }: { disabled?: boole
     <>
       <InteractiveCardDetails>
         <InteractiveCardDetail term={t('Título', 'Inicio')}>{t('Descripción', '12 de enero')}</InteractiveCardDetail>
-        <InteractiveCardDetail term={t('Título', 'Entrega')}>{t('Descripción', '30 de marzo')}</InteractiveCardDetail>
+        <InteractiveCardDetail term={t('Título', 'Plazo')}>{t('Descripción', '30 de marzo')}</InteractiveCardDetail>
       </InteractiveCardDetails>
       <InteractiveCardList>
         <ListItem
@@ -280,10 +341,10 @@ export const SelectByClickTest: Story = {
   args: { onCheckedChange: fn() },
   play: async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
-    const radio = canvas.getByRole('radio', { name: 'Plan mensual' });
-    await expect(radio).toHaveAccessibleDescription('Se renueva cada 30 días');
+    const radio = canvas.getByRole('radio', { name: 'Vista de lista' });
+    await expect(radio).toHaveAccessibleDescription('Filas con detalle');
     await expect(radio).not.toBeChecked();
-    await clickAt(canvas.getByText('Se renueva cada 30 días'));
+    await clickAt(canvas.getByText('Filas con detalle'));
     await expect(radio).toBeChecked();
     await expect(args.onCheckedChange).toHaveBeenCalledWith(true);
   },
@@ -292,17 +353,17 @@ export const SelectByClickTest: Story = {
 /** Test: en un grupo, Tab entra al radio marcado, las flechas cambian la selección y la tarjeta deshabilitada se salta */
 export const KeyboardGroupTest: Story = {
   tags: ['!autodocs'],
-  render: (args) => <PlanGroup {...args} />,
+  render: (args) => <OptionGroup {...args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.tab();
-    const mensual = canvas.getByRole('radio', { name: 'Plan mensual' });
-    await expect(mensual).toHaveFocus();
+    const lista = canvas.getByRole('radio', { name: 'Vista de lista' });
+    await expect(lista).toHaveFocus();
     await userEvent.keyboard('{ArrowDown}');
-    const anual = canvas.getByRole('radio', { name: 'Plan anual' });
-    await expect(anual).toHaveFocus();
-    await expect(anual).toBeChecked();
-    await expect(canvas.getByRole('radio', { name: 'Plan de equipo' })).toBeDisabled();
+    const tarjetas = canvas.getByRole('radio', { name: 'Vista de tarjetas' });
+    await expect(tarjetas).toHaveFocus();
+    await expect(tarjetas).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: 'Vista de calendario' })).toBeDisabled();
   },
 };
 
@@ -339,5 +400,28 @@ export const InactiveTest: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('radio', { name: 'Proyecto web' })).toBeDisabled();
     await expect(canvas.getByRole('button', { name: 'Abrir proyecto web' })).toBeDisabled();
+  },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', fullWidth: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'InteractiveCard' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente InteractiveCard en Figma:']);
+    await expect(canvasElement.querySelectorAll('[data-doc-anatomy-canvas]')).toHaveLength(2);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de InteractiveCard' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

@@ -1,24 +1,25 @@
 {
   "name": "FileUploadItem",
   "component": "FileUploadItem",
-  "description": "Ítem de carga de archivo del sistema de diseño CAOS, fiel al component set \"File card\" 11557:17694 de la página Card de Figma (State Charging, Complete, Error, Charging error y Alert; en el código loading y loading-error). Tarjeta de radius/general/2xl con relleno default-on-card, padding 24 (on-card) y gap de 16. Fila con Avatar icon de 32 (folder, tick-circle, close-circle o warning con el color semántico del estado), nombre del archivo (una línea) y texto de estado, y acciones Button tertiary xs de solo ícono. Loading y Alert agregan la Progress bar (Linear text, Success o Alert). Accesibilidad: el estado se informa con texto (no solo color) en una región aria-live polite; la barra es role=\"progressbar\" (del ProgressBar) nombrada por el archivo y con el texto del estado en aria-valuetext; cada acción se nombra con el archivo, como ListItem (\"Eliminar informe.pdf\", \"Descargar…\", \"Reintentar…\"); si `title` no es texto, el nombre es genérico y el título llega por aria-describedby. Criterio común de las tarjetas: `title` es el texto principal, `icon` el ícono del avatar por defecto y los `*Label` reemplazan el nombre completo.",
+  "description": "Ítem de carga de archivo del sistema de diseño CAOS (component set File card de Figma con State Charging, Complete, Error, Charging error y Alert; en el código loading, complete, error, loading-error y alert). Tarjeta con radio de 24 px, relleno default-on-card, padding de 24 px (16 px en Mobile) y 16 px entre la fila y la barra. La fila lleva un Avatar icon (folder, tick-circle, close-circle o warning con el color semántico del estado), el nombre del archivo en una línea, el texto de estado y los botones de acción (Button tertiary xs de solo ícono). Charging y Alert agregan la Progress bar (Linear text, Success o Alert). No sube nada: quien lo usa describe `status` y `progress`. Accesibilidad: el estado se informa con texto (no solo con color) en una región aria-live polite que se anuncia al cambiar; la barra es role=\"progressbar\" (del ProgressBar), nombrada por el archivo y con el texto del estado en aria-valuetext; cada acción se nombra con el archivo, como ListItem (\"Eliminar Informe.pdf\", \"Descargar…\", \"Reintentar…\"); si `title` no es texto, el nombre es genérico y el título llega por aria-describedby. Criterio común de las tarjetas: `title` es el texto principal, `icon` el ícono del avatar por defecto y los `*Label` reemplazan el nombre completo.",
   "category": "Data Display",
   "props": {
-    "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma: nombre del archivo (antes `fileName`, mismo nombre que en FileCard)." },
-    "status": { "type": "'loading' | 'complete' | 'error' | 'loading-error' | 'alert'", "default": "'loading'", "description": "State de Figma (estado de la carga, no de interacción)." },
-    "message": { "type": "ReactNode", "required": false, "description": "Props Alert, Error state y Loading error de Figma: texto del estado. Tiene un texto por defecto por estado." },
-    "progress": { "type": "number", "default": "0", "description": "Progreso 0-100 (loading y alert)." },
-    "icon": { "type": "IconName", "default": "'folder'", "description": "Ícono del Avatar en loading." },
-    "onDelete": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Acción Eliminar (todas las variantes)." },
-    "onDownload": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Prop Download de Figma: acción Descargar (complete y error)." },
-    "onRetry": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Acción Reintentar (loading-error y alert)." },
-    "deleteLabel": { "type": "string", "default": "'Eliminar <título>'", "description": "Nombre accesible completo de Eliminar." },
-    "downloadLabel": { "type": "string", "default": "'Descargar <título>'", "description": "Nombre accesible completo de Descargar." },
-    "retryLabel": { "type": "string", "default": "'Reintentar <título>'", "description": "Nombre accesible completo de Reintentar." }
+    "title": { "type": "ReactNode", "required": true, "description": "Nombre del archivo (Tittle en Figma). Ocupa una línea, se recorta con puntos suspensivos y da nombre a la barra y a los botones." },
+    "status": { "type": "'loading' | 'complete' | 'error' | 'loading-error' | 'alert'", "default": "'loading'", "description": "Estado de la carga (State en Figma: Charging, Complete, Error, Charging error y Alert). No es un estado de interacción. Decide el ícono, el color del mensaje, la barra y las acciones." },
+    "message": { "type": "ReactNode", "required": false, "description": "Texto del estado bajo el nombre (Alert, Error state y Loading error en Figma). Se anuncia a lectores de pantalla al cambiar. Por defecto: \"Cargando\", \"Carga completa\", \"Error\", \"Error de carga\" o \"Carga con advertencias\" según `status`." },
+    "progress": { "type": "number", "default": "0", "description": "Progreso de 0 a 100 de la barra. Solo con `status` `loading` o `alert`." },
+    "icon": { "type": "IconName", "default": "'folder'", "description": "Ícono del Avatar. Solo con `status` `loading`: los demás estados usan su ícono de estado." },
+    "onDelete": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Acción Eliminar, en todos los estados. El botón se dibuja si pasas el manejador." },
+    "onDownload": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Acción Descargar (Download en Figma). Solo con `status` `complete` o `error`. El botón se dibuja si pasas el manejador." },
+    "onRetry": { "type": "MouseEventHandler<HTMLButtonElement>", "required": false, "description": "Acción Reintentar. Solo con `status` `loading-error` o `alert`. El botón se dibuja si pasas el manejador." },
+    "deleteLabel": { "type": "string", "default": "'Eliminar <título>'", "description": "Nombre accesible completo de Eliminar. Con un `title` que no es texto, el nombre es \"Eliminar\" y el título llega como descripción." },
+    "downloadLabel": { "type": "string", "default": "'Descargar <título>'", "description": "Nombre accesible completo de Descargar. Mismo criterio que `deleteLabel`. Solo con `status` `complete` o `error`." },
+    "retryLabel": { "type": "string", "default": "'Reintentar <título>'", "description": "Nombre accesible completo de Reintentar. Mismo criterio que `deleteLabel`. Solo con `status` `loading-error` o `alert`." }
   },
   "examples": [
-    { "title": "Subiendo", "code": "<FileUploadItem title=\"informe.pdf\" progress={40} onDelete={cancelar} />" },
-    { "title": "Completa", "code": "<FileUploadItem title=\"informe.pdf\" status=\"complete\" onDownload={bajar} onDelete={borrar} />" },
-    { "title": "Falló", "code": "<FileUploadItem title=\"informe.pdf\" status=\"loading-error\" onRetry={reintentar} onDelete={borrar} />" }
+    { "title": "Subiendo", "code": "const remove = () => {};\n\n<FileUploadItem\n  title=\"Informe.pdf\"\n  progress={40}\n  onDelete={() => remove()}\n/>" },
+    { "title": "Completa", "code": "const download = () => {};\nconst remove = () => {};\n\n<FileUploadItem\n  title=\"Informe.pdf\"\n  status=\"complete\"\n  onDownload={() => download()}\n  onDelete={() => remove()}\n/>" },
+    { "title": "Falló", "code": "const retry = () => {};\nconst remove = () => {};\n\n<FileUploadItem\n  title=\"Informe.pdf\"\n  status=\"loading-error\"\n  message=\"Sin conexión, intenta de nuevo\"\n  onRetry={() => retry()}\n  onDelete={() => remove()}\n/>" },
+    { "title": "Con advertencia", "code": "const retry = () => {};\nconst remove = () => {};\n\n<FileUploadItem\n  title=\"Notas.xlsx\"\n  status=\"alert\"\n  message=\"Faltan hojas\"\n  progress={70}\n  onRetry={() => retry()}\n  onDelete={() => remove()}\n/>" }
   ]
 }

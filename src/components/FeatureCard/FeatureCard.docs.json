@@ -1,25 +1,86 @@
 {
   "name": "FeatureCard",
   "component": "FeatureCard",
-  "description": "Tarjeta para destacar del sistema de diseño CAOS, según el component set Cards para destacar de Figma (16903:57057). El set tiene errores en Figma (sus props no se pueden leer), así que los tipos salen de los nombres de capa: photo = \"Type=File card, State=default\" (foto de fondo 498×654 con radio 24 y sombra effect/shadow sm, texto arriba y un Button secondary sm unicolor), surface = \"Type=File card\" (superficie interna común con muesca de 48 para el Button corner md On card, padding 24 y un slot para contenido, p. ej. una lista de ListItem) y cutout = \"Type=canva, State=default\" (foto 612×681 con sombra md y un recorte escalonado abajo a la izquierda donde va el texto: línea corta 14/18 y título Prospero bold 40/44; el recorte se ajusta al tamaño del bloque de texto; 612×681 es la proporción mínima y la tarjeta crece si el texto no cabe, así no se pierde contenido a 320 px ni con títulos largos; el encabezado va antes que la línea corta en el DOM y la línea se ve arriba). En photo el texto va sobre la foto con los tokens de Dark siempre (la foto no cambia con el tema) y un velo oscuro superior (G14, sin token en Figma) que garantiza el contraste con cualquier foto. Texto de photo y surface: fecha 10/14 en <time> con ícono calendar de 12, título Prospero semibold 32/36 y descripción 16/20. Raíz article nombrada por el título (h3 por defecto). No es interactiva: lo interactivo es la acción (action) y el contenido del slot. Las imágenes llegan por src; sin src se dibuja un marcador neutro. Nombre: FeatureCard porque el set agrupa tarjetas de contenido destacado (\"para destacar\"), distintas de FileCard (archivos) aunque Figma reutilice ese nombre de capa.",
+  "description": "Tarjeta para destacar contenido, según el component set Featured card de Figma. Tiene tres tipos: photo (foto de fondo de 498 × 654 px con radio 24, texto arriba y un Button secondary sm unicolor), surface (superficie con muesca de 48 px para un Button corner md On card, padding 24 y un espacio para contenido, como una lista de ListItem) y cutout (foto de 612 × 681 px con un recorte abajo a la izquierda donde van la línea corta y el titular). Figma solo tiene el set Type=2, que es cutout; photo y surface se conservan del código. En photo el texto va sobre la foto con los tokens del modo oscuro y un velo superior que garantiza el contraste con cualquier foto. En cutout el recorte se ajusta al bloque de texto y la tarjeta crece si el texto no cabe, así no se pierde contenido a 320 px ni con títulos largos. La raíz es un article nombrado por el título (h3 por defecto). No es interactiva: lo interactivo es la acción (action) y el contenido del slot. Las imágenes llegan por src; sin src se dibuja un marcador neutro. Para elegir entre opciones usa InteractiveCard; para un dato, DataCard; para un archivo, FileCard.",
   "category": "Data Display",
   "props": {
-    "variant": { "type": "'photo' | 'surface' | 'cutout'", "default": "'photo'", "description": "Tipo de tarjeta (nombres de capa de Figma: File card State=default, File card, canva)." },
-    "title": { "type": "ReactNode", "required": true, "description": "Encabezado y nombre accesible del article. En cutout, el texto grande (admite saltos de línea con \\n)." },
-    "description": { "type": "ReactNode", "required": false, "description": "Texto descriptivo (photo y surface)." },
-    "eyebrow": { "type": "ReactNode", "required": false, "description": "Solo cutout: línea corta sobre el título (capa Titulo)." },
-    "date": { "type": "ReactNode", "required": false, "description": "Fecha visible con ícono de calendario (photo y surface)." },
-    "dateTime": { "type": "string", "required": false, "description": "Fecha máquina para <time dateTime>." },
-    "src": { "type": "string", "required": false, "description": "Imagen (photo y cutout). Sin ella, marcador neutro." },
-    "alt": { "type": "string", "default": "''", "description": "Texto alternativo; vacío = decorativa." },
-    "action": { "type": "ReactNode", "required": false, "description": "photo: botón bajo el texto. surface: Button corner en la muesca (sin action no hay muesca). Con nombre accesible propio." },
-    "children": { "type": "ReactNode", "required": false, "description": "Slot Espacio bajo el texto (photo y surface), p. ej. una lista de ListItem." },
-    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "3", "description": "Nivel del encabezado del título; 'none' lo deja como párrafo." },
-    "className": { "type": "string", "required": false, "description": "Clases para el article raíz." }
+    "variant": {
+      "type": "'photo' | 'surface' | 'cutout'",
+      "default": "'photo'",
+      "description": "Tipo de tarjeta: photo, surface o cutout (Type=2 en Figma)."
+    },
+    "title": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Encabezado y nombre accesible del article. En cutout es el titular (Tittle en Figma) y admite saltos de línea con \\n."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto descriptivo bajo el título (Description en Figma). Solo con photo y surface."
+    },
+    "eyebrow": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Solo con variant cutout: línea corta sobre el titular (Subtittle en Figma)."
+    },
+    "date": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Fecha visible con ícono de calendario (Date en Figma). Solo con photo y surface."
+    },
+    "dateTime": {
+      "type": "string",
+      "required": false,
+      "description": "Fecha en formato máquina para el atributo dateTime de time, por ejemplo 2024-02-07."
+    },
+    "src": {
+      "type": "string",
+      "required": false,
+      "description": "Imagen de la tarjeta, con photo y cutout. Sin ella se dibuja un marcador neutro."
+    },
+    "alt": {
+      "type": "string",
+      "default": "''",
+      "description": "Texto alternativo de la imagen. Vacío la deja como decorativa, porque el título ya nombra la tarjeta."
+    },
+    "action": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Acción de la tarjeta. Con photo, un botón bajo el texto; con surface, un Button corner en la muesca (sin action no hay muesca). Con cutout no se usa. Debe tener nombre accesible propio."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Contenido bajo el texto (Espacio en Figma), por ejemplo una lista de ListItem. Solo con photo y surface."
+    },
+    "headingLevel": {
+      "type": "2 | 3 | 4 | 5 | 6 | 'none'",
+      "default": "3",
+      "description": "Nivel del encabezado del título (h2 a h6). Con 'none' el título queda como párrafo."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para el article raíz."
+    }
   },
   "examples": [
-    { "title": "photo", "code": "<FeatureCard\n  variant=\"photo\"\n  src={foto}\n  date=\"7 feb 2024\"\n  dateTime=\"2024-02-07\"\n  title=\"Nueva colección de empaques\"\n  description=\"Cajas rígidas en negro mate.\"\n  action={<Button variant=\"secondary\" size=\"sm\" unicolor>Ver colección</Button>}\n/>" },
-    { "title": "surface con lista", "code": "<FeatureCard\n  variant=\"surface\"\n  title=\"Tareas por revisar\"\n  action={<ButtonCorner contrast=\"on-card\" aria-label=\"Abrir Tareas por revisar\" />}\n>\n  <ul role=\"list\"><ListItem title=\"Pedido 1024\" leading={<Avatar name=\"Hugo García\" size=\"sm\" />} /></ul>\n</FeatureCard>" },
-    { "title": "cutout", "code": "<FeatureCard variant=\"cutout\" src={foto} eyebrow=\"Guía\" title={'Cómo preparar\\ntu primer envío'} />" }
+    {
+      "title": "Photo",
+      "code": "const foto = '/imagen-destacada.png'; // usa tu propia imagen\n\n<FeatureCard\n  variant=\"photo\"\n  src={foto}\n  date=\"7 feb 2024\"\n  dateTime=\"2024-02-07\"\n  title=\"Nueva guía de estilo\"\n  description=\"Reglas de color y tipografía para todo el equipo.\"\n  action={\n    <Button variant=\"secondary\" size=\"sm\" unicolor aria-label=\"Ver más sobre Nueva guía de estilo\">\n      Ver más\n    </Button>\n  }\n/>"
+    },
+    {
+      "title": "Surface con lista",
+      "code": "<FeatureCard\n  variant=\"surface\"\n  title=\"Tareas por revisar\"\n  description=\"Dos documentos esperan aprobación.\"\n  action={\n    <ButtonCorner\n      contrast=\"on-card\"\n      aria-label=\"Abrir Tareas por revisar\"\n      icon={<Icon name=\"arrow-diagonal-right\" size={16} variant=\"line\" />}\n    />\n  }\n>\n  <ul role=\"list\" className=\"m-0 flex min-w-0 flex-col p-0\">\n    <ListItem title=\"Informe trimestral\" leading={<Avatar name=\"Hugo García\" size=\"sm\" />} />\n    <ListItem variant=\"simple\" title=\"Acta de reunión\" />\n  </ul>\n</FeatureCard>"
+    },
+    {
+      "title": "Cutout",
+      "code": "const foto = '/imagen-destacada.png'; // usa tu propia imagen\n\n<FeatureCard variant=\"cutout\" src={foto} eyebrow=\"Guía\" title={'Cómo preparar\\nuna presentación'} />"
+    },
+    {
+      "title": "Nivel del encabezado",
+      "code": "<FeatureCard variant=\"surface\" title=\"Novedades\" headingLevel={2} />"
+    }
   ]
 }

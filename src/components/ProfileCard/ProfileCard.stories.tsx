@@ -10,6 +10,12 @@ import { Button } from '../Button';
 import { Icon } from '../Icon';
 import { IconStar } from '../Rating';
 import { Tag } from '../Tag';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ProfileCard.doc';
+import docsJson from './ProfileCard.docs.json';
 
 const LAYOUT_OPTIONS = ['vertical', 'horizontal', 'full', 'centered'] as const satisfies readonly ProfileCardLayout[];
 const HEADING_OPTIONS = [2, 3, 4, 5, 6, 'none'] as const;
@@ -23,10 +29,54 @@ const WIDTH: Record<ProfileCardLayout, string> = {
   centered: 'w-full max-w-[321px]',
 };
 
+const LAYOUT_DEFAULT = { layout: 'vertical', headingLevel: 3, ratingLabel: 'de 5 estrellas' };
+
+/**
+ * Args de Personalizar → código copiable (`docsLive.args` y `docsLive.code`): lo mismo que dibuja `Interactive`.
+ * Agrega el avatar, las etiquetas, los contadores y la acción (con el nombre de la persona en su `aria-label`).
+ */
+function docsArgs(args: Record<string, unknown>): Record<string, unknown> {
+  const out = { ...args };
+  const name = typeof args['title'] === 'string' ? args['title'] : 'Ana Pérez';
+  const layout = args['layout'] ?? 'vertical';
+  out['leading'] = <Avatar variant="photo" size="lg" src="/images/ana-perez.jpg" alt="" />;
+  out['tags'] = <Tag iconLeft={false}>Producto</Tag>;
+  if (layout === 'full' || layout === 'centered') out['stats'] = STATS;
+  out['actions'] = (
+    <Button variant={layout === 'vertical' || layout === 'horizontal' ? 'secondary' : 'primary'} size="sm" aria-label={`Contactar a ${name}`}>
+      Contactar
+    </Button>
+  );
+  return out;
+}
+
+function docsCode(args: Record<string, unknown>): string {
+  const code = buildCode('ProfileCard', args, LAYOUT_DEFAULT);
+  if (args['layout'] !== 'full') return code;
+  return `const openMenu = () => {};\n\n${code.replace(/\n\/>$/, '\n  onMoreClick={() => openMenu()}\n/>')}`;
+}
+
+const STATS: ProfileCardStat[] = [
+  { value: 128, label: 'Proyectos' },
+  { value: 54, label: 'Reseñas' },
+  { value: '4,5', label: 'Calificaciones', icon: <IconStar state="select" size={16} /> },
+];
+
 const meta = {
   title: 'Data Display/ProfileCard',
   component: ProfileCard,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // Lo que no es texto ni número (avatar, etiquetas, contadores, acciones) lo pone el render; el código lo escribe `docsCode`.
+    // `checked` queda fuera: lo controlaría el render sin un manejador; `defaultChecked` sí marca la selección.
+    docsLive: {
+      story: 'Interactive',
+      args: docsArgs,
+      code: docsCode,
+      exclude: ['leading', 'tags', 'stats', 'actions', 'children', 'checked', 'selectionProps', 'moreButtonProps'],
+    },
+  },
   tags: ['autodocs'],
   decorators: [
     (Story, { args, parameters }) =>
@@ -38,15 +88,14 @@ const meta = {
         </div>
       ),
   ],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     layout: {
       control: 'inline-radio',
       options: LAYOUT_OPTIONS,
       type: { name: 'enum', value: [...LAYOUT_OPTIONS] },
-      description: 'Type de Figma: Standar vertical, Standar horizontal, Full / Hero, Qualification (centered)',
     },
-    title: { control: 'text', type: { name: 'string' }, description: 'Prop Title de Figma' },
-    description: { control: 'text', type: { name: 'string' }, description: 'Prop Description de Figma' },
+    title: { control: 'text', type: { name: 'string' } },
+    description: { control: 'text', type: { name: 'string' } },
     rating: { control: { type: 'number', min: 0, max: 5, step: 0.1 }, type: { name: 'number' } },
     stars: { control: { type: 'number', min: 0, max: 5, step: 1 }, type: { name: 'number' } },
     headingLevel: {
@@ -59,12 +108,12 @@ const meta = {
       options: ['checkbox', 'radio'],
       type: { name: 'enum', value: ['checkbox', 'radio'] },
     },
-  },
+  }),
   args: {
     layout: 'vertical',
     title: 'Ana Pérez',
-    subtitle: ['Diseñadora de interiores', 'Medellín'],
-    description: 'Proyectos de vivienda y locales pequeños. Diez años de experiencia y visitas a domicilio.',
+    subtitle: ['Diseñadora de producto', 'Medellín'],
+    description: 'Proyectos de producto digital y servicios. Diez años de experiencia.',
     rating: 4.5,
   },
 } satisfies Meta<typeof ProfileCard>;
@@ -77,13 +126,13 @@ const brand = <Avatar variant="brand" size="lg" logo={<BrandLogo />} />;
 
 const realTags = (
   <>
-    <Tag iconLeft={false}>Interiores</Tag>
-    <Tag iconLeft={false}>Remodelación</Tag>
+    <Tag iconLeft={false}>Producto</Tag>
+    <Tag iconLeft={false}>Investigación</Tag>
   </>
 );
 
 const realStats: ProfileCardStat[] = [
-  { value: 128, label: 'Ventas' },
+  { value: 128, label: 'Proyectos' },
   { value: 54, label: 'Reseñas' },
   { value: '4,5', label: 'Calificaciones', icon: <IconStar state="select" size={16} /> },
 ];
@@ -95,11 +144,15 @@ export const Interactive: Story = {
     <ProfileCard
       {...args}
       leading={photo()}
-      tags={realTags}
+      tags={<Tag iconLeft={false}>Producto</Tag>}
       stats={args.layout === 'full' || args.layout === 'centered' ? realStats : undefined}
       onMoreClick={args.layout === 'full' ? () => {} : undefined}
       actions={
-        <Button variant={args.layout === 'vertical' || args.layout === 'horizontal' ? 'secondary' : 'primary'} size="sm" aria-label="Contactar a Ana Pérez">
+        <Button
+          variant={args.layout === 'vertical' || args.layout === 'horizontal' ? 'secondary' : 'primary'}
+          size="sm"
+          aria-label={`Contactar a ${typeof args.title === 'string' ? args.title : 'la persona'}`}
+        >
           Contactar
         </Button>
       }
@@ -157,9 +210,9 @@ export const Horizontal: Story = {
 export const Hero: Story = {
   args: {
     layout: 'full',
-    title: 'Librería Central',
-    subtitle: ['Libros y papelería', 'Cali'],
-    description: 'Libros nuevos y usados, pedidos especiales y envío a todo el país.',
+    title: 'Equipo de diseño',
+    subtitle: ['Estudio de producto', 'Cali'],
+    description: 'Proyectos de producto digital, con talleres con equipos.',
     rating: undefined,
   },
   render: (args) => (
@@ -171,13 +224,13 @@ export const Hero: Story = {
       onMoreClick={() => {}}
       actions={
         <>
-          <Button variant="secondary" size="sm" iconOnly aria-label="Compartir perfil de Librería Central">
+          <Button variant="secondary" size="sm" iconOnly aria-label="Compartir perfil de Equipo de diseño">
             <Icon name="export2" />
           </Button>
-          <Button variant="secondary" size="sm" iconOnly aria-label="Editar perfil de Librería Central">
+          <Button variant="secondary" size="sm" iconOnly aria-label="Editar perfil de Equipo de diseño">
             <Icon name="edit" />
           </Button>
-          <Button variant="primary" size="sm" aria-label="Seguir a Librería Central">
+          <Button variant="primary" size="sm" aria-label="Seguir a Equipo de diseño">
             Seguir
           </Button>
         </>
@@ -235,7 +288,7 @@ function RadioList() {
         <div key={p.id} className="w-full max-w-[352px]">
           <ProfileCard
             title={p.name}
-            subtitle={['Diseño de interiores', 'Medellín']}
+            subtitle={['Diseño de producto', 'Medellín']}
             leading={<Avatar variant="photo" size="lg" src={p.photo} />}
             rating={4.5}
             selection="radio"
@@ -256,7 +309,7 @@ const FIGMA: Pick<ProfileCardProps, 'title' | 'subtitle'> = {
 };
 const FIGMA_LOREM = 'Lorem ipsum dolor sit amet consectetur. Tempus ornare maecenas integer viverra vitae faucibus. ';
 const FIGMA_SHOP =
-  'Tienda oficial de artículos de papelería y oficina. Adquiere los productos originales y recíbelos con envío directo a todo el país.';
+  'Estudio de producto digital. Conoce sus proyectos y escríbele para pedir una reunión inicial.';
 const figmaTags = (
   <>
     <Tag iconLeft={false} data-figma-part="Text">
@@ -268,7 +321,7 @@ const figmaTags = (
   </>
 );
 const figmaStats: ProfileCardStat[] = [
-  { value: 0, label: 'Ventas' },
+  { value: 0, label: 'Proyectos' },
   { value: 0, label: 'Reseñas' },
   { value: 0, label: 'Calificaciones', icon: <IconStar state="select" size={16} /> },
 ];
@@ -412,11 +465,11 @@ export const HeroTest: Story = {
   render: (args) => <ProfileCard {...args} leading={brand} stats={realStats} />,
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('heading', { level: 2, name: 'Librería Central' })).toBeInTheDocument();
-    await userEvent.click(canvas.getByRole('button', { name: 'Más opciones de Librería Central' }));
+    await expect(canvas.getByRole('heading', { level: 2, name: 'Equipo de diseño' })).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: 'Más opciones de Equipo de diseño' }));
     await expect(args.onMoreClick).toHaveBeenCalledTimes(1);
     const terms = canvas.getAllByRole('term').map((t) => t.textContent);
-    await expect(terms).toEqual(['Ventas', 'Reseñas', 'Calificaciones']);
+    await expect(terms).toEqual(['Proyectos', 'Reseñas', 'Calificaciones']);
     await expect(canvas.getAllByRole('definition')[0]).toHaveTextContent('128');
   },
 };
@@ -429,5 +482,27 @@ export const CenteredTest: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('img', { name: '4 de 5 estrellas' })).toBeInTheDocument();
     await expect(canvas.getByRole('button', { name: 'Contactar a Ana Pérez' })).toBeInTheDocument();
+  },
+};
+
+/** Página de documentación v2: la revisan vitest y axe. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'ProfileCard' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente ProfileCard en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de ProfileCard' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };

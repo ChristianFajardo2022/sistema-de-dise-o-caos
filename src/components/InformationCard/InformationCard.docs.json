@@ -1,26 +1,95 @@
 {
   "name": "InformationCard",
   "component": "InformationCard",
-  "description": "Tarjeta de información del sistema de diseño CAOS, fiel al component set Information card de Figma (14195:31274), Type Option 1, 2 y 3 (498 de ancho). Las tres opciones son la misma tarjeta con secciones distintas, así que es un solo componente por slots (leading, tags, title, subtitle, description, children, footer, actions) sobre la superficie interna común de las tarjetas (NotchedSurface, sin muesca); las opciones de Figma son composiciones documentadas (historias Option1, Option2 y Option3). Raíz article nombrada por el título (encabezado h3 por defecto), padding 24 y gap 32, superficie background/container/default-on-canva con radio 24 y las sombras de Figma: effect/shadow sm (box-shadow shadow-ds-on-card) y md con spread −2 (shadow-ds-on-canva-md). Título 16/20 truncado, subtítulo 12/16 y descripción 14/18. Con footer se dibuja la línea divisoria de 0.5 y la fila del pie (gap 24) con las acciones a la derecha. No es interactiva: los controles son los que se le pasan (Button, ListItem, AvatarGroup, ProgressBar, NumberRating). `actions` es un grupo de botones del pie (en DataCard, `action` es un solo control al final de la fila: tienen sentido distinto). Criterio común de las tarjetas: title/subtitle/description para los textos, leading para el slot de la izquierda y headingLevel para el nivel del título.",
+  "description": "Tarjeta de información del sistema de diseño CAOS (Information card en Figma). Muestra un contenido persistente: título, subtítulo, descripción y etiquetas, con espacio para una lista, un bloque de progreso, un pie con participantes o calificación y hasta dos botones. Las opciones 1, 2 y 3 de Figma son la misma tarjeta con secciones distintas, así que es un solo componente por slots (leading, tags, title, subtitle, description, children, footer, actions) sobre la superficie interna común de las tarjetas, sin muesca; la variante simple muestra solo título y descripción. Es un article nombrado por el título (encabezado h3 por defecto). Padding de 32 px en Desktop (24 en Tablet, 20 en Mobile), separación de 32 px entre secciones (24 en Mobile), radio de 24 px y fondo background/container/default-on-canva. El título ocupa una sola línea; si no cabe, se corta con puntos suspensivos. Con footer se dibuja una línea divisoria de 0,5 px sobre el pie. No es interactiva ni avisa a lectores de pantalla: los controles son los que se le pasan (Button, ListItem, AvatarGroup, ProgressBar, NumberRating). Para un mensaje sobre un resultado o un estado usa Alert; para una tarjeta que se selecciona, InteractiveCard. actions es un grupo de botones del pie (en DataCard, action es un solo control al final de la fila).",
   "category": "Data Display",
   "props": {
-    "title": { "type": "ReactNode", "required": true, "description": "Prop Tittle de Figma. Encabezado y nombre accesible del article." },
-    "subtitle": { "type": "ReactNode", "required": false, "description": "Prop Subtitle de Figma." },
-    "description": { "type": "ReactNode", "required": false, "description": "Prop Description de Figma." },
-    "leading": { "type": "ReactNode", "required": false, "description": "Prop Icon de Figma: avatar arriba a la izquierda." },
-    "tags": { "type": "ReactNode", "required": false, "description": "Prop Tag de Figma." },
-    "variant": { "type": "'default' | 'simple'", "default": "'default'", "description": "Type de Figma: default = Option 1, 2 y 3 (composiciones por slots); simple = Type=Simple (483x232, título arriba y descripción abajo, solo title y description)." },
-    "image": { "type": "boolean", "default": "false", "description": "Prop Image de Figma: rejilla de puntos de fondo, decorativa (aria-hidden)." },
-    "tagsPosition": { "type": "'header' | 'content'", "default": "'header'", "description": "Etiquetas arriba (a la derecha del leading o solas; Option 2 y 3) o bajo el título (Option 1)." },
-    "children": { "type": "ReactNode", "required": false, "description": "Contenido entre la descripción y el pie: bloque de progreso (Progress) o lista de ListItem (List)." },
-    "footer": { "type": "ReactNode", "required": false, "description": "Lado izquierdo del pie (Avatar group, Content). Con footer se dibuja la línea divisoria." },
-    "actions": { "type": "ReactNode", "required": false, "description": "Prop Group button: botones a la derecha del pie." },
-    "headingLevel": { "type": "2 | 3 | 4 | 5 | 6 | 'none'", "default": "3", "description": "Nivel del encabezado del título; 'none' lo deja como párrafo. Mismo criterio que DataCard." },
-    "className": { "type": "string", "required": false, "description": "Clases para el article raíz." }
+    "title": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Encabezado y nombre accesible del article (Tittle en Figma). Obligatoria."
+    },
+    "subtitle": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Línea bajo el título (Subtitle en Figma). Solo con `variant` `default`."
+    },
+    "description": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Texto descriptivo (Description en Figma)."
+    },
+    "leading": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Avatar arriba a la izquierda (Icon en Figma); normalmente `Avatar` con `variant=\"icon\"`. Solo con `variant` `default`."
+    },
+    "tags": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Etiquetas (Tag en Figma); normalmente `Tag`. Solo con `variant` `default`."
+    },
+    "variant": {
+      "type": "'default' | 'simple'",
+      "default": "'default'",
+      "description": "Tipo de tarjeta (Type en Figma): `default` = Option 1, 2 y 3 (composición por slots); `simple` = Simple (título arriba y descripción abajo; solo usa `title`, `description` e `image`)."
+    },
+    "image": {
+      "type": "boolean",
+      "default": "false",
+      "description": "Rejilla de puntos de fondo (Image en Figma). Es decorativa y queda oculta para lectores de pantalla (`aria-hidden`)."
+    },
+    "tagsPosition": {
+      "type": "'header' | 'content'",
+      "default": "'header'",
+      "description": "Dónde van las etiquetas: `header` (arriba, a la derecha del `leading` o solas; Option 2 y 3) o `content` (bajo el título; Option 1). Solo con `variant` `default` y `tags`."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Contenido entre la descripción y el pie: un bloque de progreso (Progress en Figma) o una lista de `ListItem` (List). Solo con `variant` `default`."
+    },
+    "footer": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Lado izquierdo del pie (Avatar group y Content en Figma): un `AvatarGroup`, un texto con calificación… Con `footer` se dibuja la línea divisoria sobre el pie. Solo con `variant` `default`."
+    },
+    "actions": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Botones a la derecha del pie (Group button en Figma); normalmente `Button` con `size=\"sm\"`, dos como máximo. Solo con `variant` `default`."
+    },
+    "headingLevel": {
+      "type": "2 | 3 | 4 | 5 | 6 | 'none'",
+      "default": "3",
+      "description": "Nivel del encabezado del título (`2` a `6`) o `'none'` para dejarlo como párrafo, fuera del esquema de encabezados. Mismo criterio que DataCard."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases para el article raíz."
+    }
   },
   "examples": [
-    { "title": "Option 1", "code": "<InformationCard\n  leading={<Avatar variant=\"icon\" />}\n  title=\"Lanzamiento de la app\"\n  subtitle=\"Equipo de producto\"\n  tagsPosition=\"content\"\n  tags={<Tag>Diseño</Tag>}\n  description=\"Versión con pagos en línea…\"\n  footer={<AvatarGroup aria-label=\"Participantes\">…</AvatarGroup>}\n  actions={<><Button variant=\"secondary\" size=\"sm\">Ver detalle</Button><Button size=\"sm\">Unirme</Button></>}\n/>" },
-    { "title": "Option 2 (progreso)", "code": "<InformationCard title=\"Lanzamiento\" tags={<Tag iconLeft={false}>Web</Tag>} actions={…}>\n  <ProgressBar value={50} label=\"Avance del proyecto\" />\n</InformationCard>" },
-    { "title": "Option 3 (lista)", "code": "<InformationCard leading={<Avatar variant=\"icon\" />} title=\"Lanzamiento\" tags={…} footer={<NumberRating value={4.5} />} actions={…}>\n  <ul role=\"list\"><ListItem title=\"Diseño de pantallas\" selectable /></ul>\n</InformationCard>" }
+    {
+      "title": "Con avatar y pie (Option 1)",
+      "code": "const people = ['Ana Pérez', 'Hugo García', 'Sara Gil'];\n\n<InformationCard\n  leading={<Avatar variant=\"icon\" size=\"lg\" />}\n  title=\"Lanzamiento de la app\"\n  subtitle=\"Equipo de producto\"\n  description=\"Versión con modo oscuro, notificaciones y un nuevo panel de ajustes.\"\n  tagsPosition=\"content\"\n  tags={<Tag>Diseño</Tag>}\n  footer={\n    <AvatarGroup aria-label=\"Participantes\">\n      {people.map((name) => (\n        <Avatar key={name} name={name} />\n      ))}\n    </AvatarGroup>\n  }\n  actions={\n    <>\n      <Button variant=\"secondary\" size=\"sm\">Ver detalle</Button>\n      <Button size=\"sm\">Unirme</Button>\n    </>\n  }\n/>"
+    },
+    {
+      "title": "Con progreso (Option 2)",
+      "code": "<InformationCard\n  title=\"Lanzamiento de la app\"\n  description=\"Versión con modo oscuro, notificaciones y un nuevo panel de ajustes.\"\n  tags={<Tag iconLeft={false}>Web</Tag>}\n  actions={<Button size=\"sm\">Unirme</Button>}\n>\n  <ProgressBar value={50} label=\"Avance del proyecto\" />\n</InformationCard>"
+    },
+    {
+      "title": "Con lista y calificación (Option 3)",
+      "code": "<InformationCard\n  leading={<Avatar variant=\"icon\" size=\"lg\" />}\n  title=\"Lanzamiento de la app\"\n  description=\"Versión con modo oscuro, notificaciones y un nuevo panel de ajustes.\"\n  tags={<Tag iconLeft={false}>Web</Tag>}\n  footer={<NumberRating value={4.5} />}\n  actions={<Button size=\"sm\">Unirme</Button>}\n>\n  <ul role=\"list\" className=\"m-0 flex flex-col p-0\">\n    <ListItem title=\"Diseño de pantallas\" category=\"Tarea\" description=\"Vence el viernes\" selectable />\n    <ListItem title=\"Pruebas con usuarios\" category=\"Tarea\" description=\"Vence el lunes\" selectable />\n  </ul>\n</InformationCard>"
+    },
+    {
+      "title": "Simple",
+      "code": "<InformationCard\n  variant=\"simple\"\n  image\n  title=\"Notas de la reunión\"\n  description=\"Acuerdos y próximos pasos del equipo.\"\n/>"
+    },
+    {
+      "title": "Nivel del encabezado",
+      "code": "<InformationCard\n  headingLevel={2}\n  title=\"Resumen del proyecto\"\n  description=\"Estado general y próximos pasos.\"\n/>"
+    }
   ]
 }

@@ -1,18 +1,18 @@
 {
   "name": "ProductCard",
   "component": "ProductCard",
-  "description": "Tarjeta de producto del sistema de diseño CAOS, fiel al component set Card producto de Figma (15863:66763), 337×413. Foto recortada por la silueta con muesca (NotchedSurface) y Button corner Favorite arriba a la derecha; abajo, sobre un velo oscuro opaco bajo el texto (≥ 4,5:1 con cualquier foto), el nombre, el precio y la calificación (Number rating). State Hover = la tarjeta se expande con hover, foco dentro o en pantallas táctiles y muestra la descripción, \"Agregar al carrito\" y una acción secundaria opcional; plegadas siguen en el árbol de accesibilidad y en el orden de tabulación. State \"+\" = el producto ya está en el carrito: con `quantity` de 1 o más el botón se cambia por el selector de cantidad (NumberPicker); al quitar la última unidad vuelve el botón. El foco pasa de uno al otro. Favorito es un toggle con aria-pressed; el precio se anuncia como \"Precio: …\" y la calificación como texto (\"4,5 de 5 estrellas\"). Con `href`, el título es un enlace estirado que cubre la tarjeta y los controles quedan encima, sin anidarse. El bloque de texto usa siempre los tokens del modo Dark (el velo no cambia con el tema). Orden de tabulación: título (con `href`), \"Agregar al carrito\" o el selector de cantidad, la acción secundaria y, al final, el favorito (se ve arriba a la derecha pero va último en el DOM: la acción principal primero). Con `state=\"default\"` las partes plegadas se muestran si reciben el foco.",
+  "description": "Tarjeta de producto del sistema de diseño CAOS (set Card producto de Figma), de proporción 337 / 413. Una foto recortada por la silueta con muesca (NotchedSurface) lleva el Button corner favorito arriba a la derecha; abajo, sobre un velo oscuro opaco bajo el texto (≥ 4,5:1 con cualquier foto), van el nombre, el precio y la calificación (NumberRating). Hover = la tarjeta se expande con el puntero, con el foco dentro o en pantallas táctiles y muestra la descripción, \"Agregar al carrito\" y una acción secundaria opcional; plegadas, esas partes siguen en el árbol de accesibilidad y en el orden de tabulación. State \"+\" = el producto ya está en el carrito: con `quantity` de 1 o más, el botón se cambia por el selector de cantidad (NumberPicker); al quitar la última unidad vuelve el botón y el foco pasa de uno al otro. El favorito es un toggle con aria-pressed; el precio se anuncia como \"Precio: …\" y la calificación como texto (\"4,5 de 5 estrellas\"). Con `href`, el título es un enlace estirado que cubre la tarjeta y los controles quedan encima, sin anidarse. El bloque de texto usa siempre los tokens del modo Dark (el velo no cambia con el tema). Orden de tabulación: título (con `href`), \"Agregar al carrito\" o el selector de cantidad, la acción secundaria y, al final, el favorito (se ve arriba a la derecha pero va último en el DOM: la acción principal primero). Con `state=\"default\"`, las partes plegadas se muestran si reciben el foco. Para elegir entre opciones usa InteractiveCard; para destacar un contenido, FeatureCard; para un dato, DataCard.",
   "category": "Data Display",
   "props": {
     "title": {
       "type": "string",
       "required": true,
-      "description": "Nombre del producto (capa Filename). Una línea. Nombra las acciones."
+      "description": "Nombre del producto (capa Filename de Figma). Una línea. Nombra también las acciones."
     },
     "description": {
       "type": "ReactNode",
       "required": false,
-      "description": "Descripción corta (capa Status); visible al expandirse."
+      "description": "Descripción corta (capa Status de Figma). Se ve con la tarjeta expandida."
     },
     "price": {
       "type": "string",
@@ -22,12 +22,12 @@
     "rating": {
       "type": "number",
       "required": false,
-      "description": "Promedio de 0 a 5 (Number rating)."
+      "description": "Promedio de 0 a 5 (capa Number rating de Figma)."
     },
     "ratingCount": {
       "type": "number",
       "required": false,
-      "description": "Total de reseñas; solo se anuncia."
+      "description": "Total de reseñas: suma «N reseñas» junto a la calificación y se anuncia con ella."
     },
     "src": {
       "type": "string",
@@ -52,7 +52,7 @@
     "quantity": {
       "type": "number",
       "required": false,
-      "description": "Cantidad en el carrito (controlada). Con 1 o más, State \"+\" (selector de cantidad)."
+      "description": "Cantidad en el carrito (controlada). Con 1 o más se ve el State \"+\" de Figma (selector de cantidad)."
     },
     "defaultQuantity": {
       "type": "number",
@@ -72,7 +72,7 @@
     "onAddToCart": {
       "type": "MouseEventHandler<HTMLButtonElement>",
       "required": false,
-      "description": "Clic en \"Agregar al carrito\". preventDefault evita pasar a cantidad 1."
+      "description": "Clic en \"Agregar al carrito\". Con preventDefault no pasa a la cantidad 1."
     },
     "addToCartText": {
       "type": "string",
@@ -123,24 +123,33 @@
       "type": "'default' | 'hover'",
       "required": false,
       "description": "Fuerza el aspecto Default (plegado) o Hover (expandido), solo para documentación."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases adicionales para la raíz."
     }
   },
   "examples": [
     {
       "title": "Básica",
-      "code": "<ProductCard title=\"Audífonos inalámbricos\" price=\"$129.999\" rating={4.5} src={foto} />"
+      "code": "const foto = '/producto.jpg';\n\n<ProductCard title=\"Audífonos inalámbricos\" price=\"$129.999\" rating={4.5} src={foto} />"
     },
     {
       "title": "Carrito controlado",
-      "code": "<ProductCard title=\"Audífonos inalámbricos\" price=\"$129.999\" src={foto} quantity={qty} onQuantityChange={setQty} />"
+      "code": "const foto = '/producto.jpg';\nconst [qty, setQty] = useState(0);\n\n<ProductCard\n  title=\"Audífonos inalámbricos\"\n  price=\"$129.999\"\n  src={foto}\n  quantity={qty}\n  onQuantityChange={setQty}\n/>"
+    },
+    {
+      "title": "Favorito controlado",
+      "code": "const foto = '/producto.jpg';\nconst [favorite, setFavorite] = useState(false);\n\n<ProductCard\n  title=\"Audífonos inalámbricos\"\n  price=\"$129.999\"\n  src={foto}\n  favorite={favorite}\n  onFavoriteChange={setFavorite}\n/>"
     },
     {
       "title": "Con enlace a la ficha",
-      "code": "<ProductCard href=\"/productos/audifonos\" title=\"Audífonos inalámbricos\" price=\"$129.999\" src={foto} />"
+      "code": "const foto = '/producto.jpg';\n\n<ProductCard href=\"/productos/audifonos\" title=\"Audífonos inalámbricos\" price=\"$129.999\" src={foto} />"
     },
     {
       "title": "Con acción secundaria",
-      "code": "<ProductCard title=\"Audífonos\" price=\"$129.999\" src={foto} action={<Button variant=\"secondary\" size=\"sm\" iconOnly aria-label=\"Personalizar Audífonos\"><Icon name=\"edit\" size={20} /></Button>} />"
+      "code": "const foto = '/producto.jpg';\n\n<ProductCard\n  title=\"Audífonos inalámbricos\"\n  price=\"$129.999\"\n  src={foto}\n  action={\n    <Button variant=\"secondary\" size=\"sm\" iconOnly aria-label=\"Personalizar Audífonos inalámbricos\">\n      <Icon name=\"edit\" size={20} />\n    </Button>\n  }\n/>"
     }
   ]
 }

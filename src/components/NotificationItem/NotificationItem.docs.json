@@ -1,62 +1,67 @@
 {
   "name": "NotificationItem",
   "component": "NotificationItem",
-  "description": "Fila de notificación de texto, fiel al component set Text notification (Atom) de Figma (12571:4812), Type Default y Active (333×58.5). Título (16/20; medium si no está leída), descripción 14/18 y, si no está leída, un punto verde (Badge simple Success) al final de la fila con el texto \"No leída\" para lectores de pantalla. Trazo inferior de 0.5 en border/general/default-on-card. Es un <li>: va en una lista (ul con role=\"list\", como la del NotificationPanel). Es interactiva solo con href (el título es un enlace) u onClick (el título es un botón); el control se estira sobre toda la fila y la descripción accesible lleva \"No leída\" y la descripción. Sin acción es informativa (el título es un párrafo). No confundir con NotificationText, que son los mensajes de ayuda o error de los campos de formulario.",
+  "description": "Fila de notificación de texto, fiel al set Text notification (Atom) de Figma, con Type Default (leída) y Active (no leída). Muestra un título de 16/20 px (semibold si no está leída), una descripción opcional de 14/18 px y, si no está leída, un punto verde (Badge simple Success) al final de la fila con el texto \"No leída\" para lectores de pantalla. Tiene un trazo inferior de 0,5 px en border/general/default-on-card. Es un <li>: va en una lista (ul con role=\"list\", como la del NotificationPanel). Es interactiva solo con href (el título es un enlace) u onClick (el título es un botón); el control se estira sobre toda la fila y su descripción accesible reúne \"No leída\" y la descripción. Sin acción es informativa (el título es un párrafo). No muestra hora ni acción de eliminar (para eso, NotificationCard). No confundir con NotificationText, que son los mensajes de ayuda o error de los campos de formulario.",
   "category": "Data Display",
   "props": {
     "title": {
       "type": "ReactNode",
       "required": true,
-      "description": "Prop Notification de Figma. Nombre accesible del control."
+      "description": "Título de la notificación (Notification en Figma). Es el nombre accesible del control si la fila es interactiva."
     },
     "description": {
       "type": "ReactNode",
       "required": false,
-      "description": "Prop Description de Figma."
+      "description": "Texto bajo el título (Description en Figma). Si se omite, no se dibuja."
     },
     "unread": {
       "type": "boolean",
       "default": false,
-      "description": "Type=Active de Figma: no leída (título medium y punto verde)."
+      "description": "Notificación no leída (Type Active en Figma): título semibold y punto verde al final."
     },
     "unreadLabel": {
       "type": "string",
       "default": "'No leída'",
-      "description": "Texto para lectores del punto."
+      "description": "Texto del punto de no leída para lectores de pantalla. Solo se anuncia con unread."
     },
     "href": {
       "type": "string",
       "required": false,
-      "description": "Con href el título es un enlace."
+      "description": "Convierte el título en un enlace estirado sobre toda la fila. Si se pasa junto con onClick, manda href."
+    },
+    "onClick": {
+      "type": "MouseEventHandler<HTMLElement>",
+      "required": false,
+      "description": "Convierte el título en un botón estirado sobre toda la fila, si no hay href."
     },
     "type": {
       "type": "'button' | 'submit' | 'reset'",
       "default": "'button'",
-      "description": "Tipo del botón cuando el título es un <button>."
+      "description": "Tipo del botón. Solo con onClick y sin href."
     },
     "rootProps": {
       "type": "NotificationRootProps",
       "required": false,
-      "description": "Atributos del <li> raíz (data-*, id…)."
+      "description": "Atributos del <li> raíz (data-*, id…). El resto de props va al control del título."
     },
     "className": {
       "type": "string",
       "required": false,
-      "description": "Clases para el <li> raíz. ref y el resto de props van al control del título."
+      "description": "Clases para el <li> raíz."
     }
   },
   "examples": [
     {
       "title": "Abre la notificación",
-      "code": "<NotificationItem title=\"Factura lista\" description=\"Descárgala hoy.\" unread onClick={abrir} />"
+      "code": "const openNotification = () => {};\n\n<ul role=\"list\">\n  <NotificationItem title=\"Documento compartido\" description=\"Ana Pérez compartió Informe anual contigo.\" unread onClick={openNotification} />\n</ul>"
     },
     {
       "title": "Como enlace",
-      "code": "<NotificationItem title=\"Nueva factura\" href=\"/facturas/1042\" />"
+      "code": "<ul role=\"list\">\n  <NotificationItem title=\"Comentario nuevo\" href=\"/comentarios/1042\" />\n</ul>"
     },
     {
       "title": "En una lista",
-      "code": "<ul role=\"list\"><NotificationItem title=\"Aviso\" description=\"Mantenimiento programado.\" unread /></ul>"
+      "code": "<ul role=\"list\">\n  <NotificationItem title=\"Reunión actualizada\" description=\"El equipo cambió la sala del jueves.\" unread />\n  <NotificationItem title=\"Comentario nuevo\" description=\"Hugo García respondió tu comentario.\" />\n</ul>"
     }
   ]
 }

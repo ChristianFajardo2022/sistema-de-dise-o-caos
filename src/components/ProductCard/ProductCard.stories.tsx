@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { buildCode } from '../../docs/liveCode';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ProductCard.doc';
+import docsJson from './ProductCard.docs.json';
 import { ProductCard } from './ProductCard';
 import type { ProductCardProps, ProductCardState } from './ProductCard.types';
 import { Button } from '../Button';
@@ -9,10 +15,10 @@ import productPhoto from './assets/producto.jpg';
 
 const STATES: ProductCardState[] = ['default', 'hover'];
 
-/** Textos de Figma (variantes del set 15863:66763). */
+/** Textos de muestra de las variantes del set 15863:66763 (neutros, no los de Figma). */
 const FIGMA = {
-  title: 'Audífonos Bluetooth Pro',
-  description: 'Audífonos de alta fidelidad con cancelación de ruido activa y hasta 30 horas de batería continua.',
+  title: 'Audífonos inalámbricos',
+  description: 'Cancelación de ruido activa, 30 horas de batería y carga rápida por USB-C.',
   price: '$129.999',
   rating: 4.5,
 };
@@ -27,9 +33,31 @@ const editAction = (title: string) => (
 const meta = {
   title: 'Data Display/ProductCard',
   component: ProductCard,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // El lienzo usa la historia Interactive: agregar abre el selector de cantidad de verdad (sin estado propio). Fuera de
+    // Personalizar: la foto (texto libre), lo que controla el estado de la tarjeta (cantidad, favorito, `state`) y lo
+    // que el lienzo no arma (acción, `alt`). El código se escribe completo con la foto declarada.
+    docsLive: {
+      story: 'Interactive',
+      // Sin el marco de la historia (fondo y relleno): la tarjeta lleva su propio ancho de muestra
+      render: (args: Record<string, unknown>) => (
+        <div className="w-[337px] max-w-full">
+          <ProductCard {...(args as unknown as ProductCardProps)} />
+        </div>
+      ),
+      exclude: ['src', 'alt', 'action', 'state', 'quantity', 'defaultQuantity', 'favorite', 'defaultFavorite', 'favoriteButtonProps'],
+      code: (args: Record<string, unknown>) => {
+        const { src: _foto, ...rest } = args;
+        const code = buildCode('ProductCard', rest, { headingLevel: 3 });
+        const withPhoto = /^<ProductCard\n/.test(code) ? code.replace('<ProductCard\n', '<ProductCard\n  src={foto}\n') : code.replace('<ProductCard ', '<ProductCard src={foto} ');
+        return `const foto = '/producto.jpg';\n\n${withPhoto}`;
+      },
+    },
+  },
   tags: ['autodocs'],
-  argTypes: {
+  argTypes: argTypesFromDocsJson(docsJson, {
     title: { control: 'text', type: { name: 'string', required: true } },
     description: { control: 'text', type: { name: 'string' } },
     price: { control: 'text', type: { name: 'string', required: true } },
@@ -53,7 +81,7 @@ const meta = {
       description: 'State forzado, solo para documentación',
     },
     src: { control: false },
-  },
+  }),
   args: {
     title: 'Audífonos inalámbricos',
     description: 'Cancelación de ruido activa, 30 horas de batería y carga rápida por USB-C.',
@@ -202,5 +230,26 @@ export const TestKeyboardReveal: Story = {
     await expect(args.onAddToCart).toHaveBeenCalledTimes(1);
     // El enlace no anida controles
     await expect(link.querySelector('button')).toBeNull();
+  },
+};
+
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen', sinMarco: true },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'ProductCard' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((t) => t.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const h2 = () => canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    await expect(h2()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente ProductCard en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(h2()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    tabs[1].focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(tabs[2]).toHaveAttribute('aria-selected', 'true');
+    const props = canvas.getByRole('table', { name: 'Props de ProductCard' });
+    await expect(within(props).getAllByRole('columnheader').map((c) => c.textContent)).toEqual(['Prop', 'Tipo', 'Por defecto', 'Descripción']);
   },
 };
