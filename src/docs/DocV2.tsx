@@ -409,7 +409,8 @@ function ValueChip({ x, y, value, tone }: { x: number; y: number; value: number;
       )}
       style={{ left: x, top: y }}
     >
-      {value}
+      {/* Decimales con coma, como el resto de la documentación */}
+      {String(value).replace('.', ',')}
     </span>
   );
 }

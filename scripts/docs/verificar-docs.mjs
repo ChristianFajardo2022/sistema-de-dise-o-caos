@@ -69,6 +69,7 @@ function enPaginaDesbordes(raizSel) {
     const r = el.getBoundingClientRect();
     if (r.width <= 1 || r.height <= 1) continue; // sr-only y similares
     const pr = padre.getBoundingClientRect();
+    if (pr.width <= 1 || pr.height <= 1) continue; // hijo de un sr-only (p. ej. acciones plegadas de ProductCard)
     const interior = pr.width - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ps.borderLeftWidth) - parseFloat(ps.borderRightWidth);
     // Se compara con el ancho del padre (no con el interior) para no marcar márgenes negativos; tolerancia de 1 px.
     if (r.width > Math.max(pr.width, interior) + 1) fuera.push({ el: sel(el), padre: sel(padre), ancho: Math.round(r.width), anchoPadre: Math.round(pr.width) });
