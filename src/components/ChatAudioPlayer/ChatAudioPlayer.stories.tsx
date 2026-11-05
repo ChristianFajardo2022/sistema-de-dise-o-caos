@@ -2,13 +2,19 @@ import { useEffect, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
 import { ChatAudioPlayer } from './ChatAudioPlayer';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ChatAudioPlayer.doc';
+import docsJson from './ChatAudioPlayer.docs.json';
 
 const meta = {
   title: 'Data Display/ChatAudioPlayer',
   component: ChatAudioPlayer,
-  parameters: { layout: 'padded' },
+  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson) },
   tags: ['autodocs'],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     duration: { control: { type: 'number', min: 0 }, type: { name: 'number' }, description: 'Duración en segundos' },
     defaultCurrentTime: { control: { type: 'number', min: 0 }, type: { name: 'number' } },
     buttonVariant: {
@@ -122,4 +128,11 @@ export const WaveProgressTest: Story = {
     // La última barra visible queda dentro de la onda (no recortada)
     await expect(bars[bars.length - 1].getBoundingClientRect().right).toBeLessThanOrEqual(wave.getBoundingClientRect().right + 0.5);
   },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
 };

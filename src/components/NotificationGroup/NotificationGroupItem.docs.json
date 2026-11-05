@@ -1,7 +1,7 @@
 {
   "name": "NotificationGroupItem",
   "component": "NotificationGroupItem",
-  "description": "Fila del desplegable de un NotificationGroup, fiel al component set Dropdown group notification (Atom) de Figma (14914:1288), Type Default y Eliminate × State Unread y Read (316×77). Hora (12/16, con el punto verde antes si no está leída) y descripción 14/20: regular si está leída, semibold si no. Trazos superior e inferior de 0.5. Es un <li>. Interactiva solo con href u onClick (la descripción es el control, estirado sobre la fila; la hora y \"No leída\" son su descripción accesible). onDelete, revealed y el foco al eliminar funcionan como en NotificationCard.",
+  "description": "Fila del desplegable de un NotificationGroup, del component set Dropdown group notification (Atom) de Figma. Combina Type Default o Eliminate y State Unread o Read. La hora usa 12/16 y la descripción 14/20: regular si está leída, semibold si no. Los trazos superior e inferior miden 0.5. Es un li. La descripción se convierte en control con href u onClick; la hora y el estado de lectura forman su descripción accesible. onDelete y revealed habilitan la acción de eliminar, con la gestión de foco de NotificationCard.",
   "category": "Data Display",
   "props": {
     "description": {
@@ -29,6 +29,16 @@
       "required": false,
       "description": "Con href la descripción es un enlace."
     },
+    "onClick": {
+      "type": "(event: MouseEvent<HTMLElement>) => void",
+      "required": false,
+      "description": "Convierte la descripción en un botón."
+    },
+    "type": {
+      "type": "'button' | 'submit' | 'reset'",
+      "default": "'button'",
+      "description": "Tipo del botón cuando se usa onClick."
+    },
     "onDelete": {
       "type": "() => void",
       "required": false,
@@ -47,6 +57,7 @@
     "defaultRevealed": {
       "type": "boolean",
       "required": false,
+      "default": false,
       "description": "El botón eliminar está a la vista al inicio (no controlado)."
     },
     "onRevealedChange": {
@@ -73,7 +84,7 @@
   "examples": [
     {
       "title": "Fila que abre la notificación",
-      "code": "<NotificationGroupItem time=\"Hace 22 min\" description=\"Cambiaste tu contraseña.\" unread onClick={abrir} />"
+      "code": "<ul role=\"list\">\n  <NotificationGroupItem time=\"Hace 22 min\" description=\"Se actualizó la imagen de perfil.\" unread onClick={abrir} />\n</ul>"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "name": "NotificationGroup",
   "component": "NotificationGroup",
-  "description": "Grupo de notificaciones con desplegable, fiel al component set Group notification (Atom) de Figma (14963:6348), Type Group, Group delete y Dropdown group × State Unread y Read. Hora con el chevron, título con el contador (Badge número Success) y la lista de NotificationGroupItem: recogido muestra solo la primera; desplegado (expanded) las muestra todas. Patrón de divulgación: el botón del chevron lleva aria-expanded y aria-controls (la lista) y su área de clic cubre toda la tarjeta; las filas con acción quedan por encima. Su nombre es \"Mostrar notificaciones\" o \"Ocultar notificaciones\" más el título; la hora y \"No leído\" son su descripción accesible. onDelete, revealed y el foco al eliminar funcionan como en NotificationCard (elimina todo el grupo). Es un <li>: va en una lista (ul role=\"list\"). ref y las props nativas van al botón de desplegar.",
+  "description": "Grupo de notificaciones con desplegable del component set Group notification (Atom) de Figma, con Type Group, Group delete y Dropdown group y State Unread y Read. La cabecera reúne hora, título y contador; la lista de NotificationGroupItem recogida muestra la primera fila y desplegada muestra todas. El botón chevron expone aria-expanded y aria-controls, y su área de clic cubre la tarjeta; las filas interactivas quedan por encima. El botón se nombra Mostrar u Ocultar notificaciones junto al título; la hora y el estado de lectura forman su descripción accesible. onDelete habilita la acción que elimina el grupo y mantiene la gestión de foco de NotificationCard. El componente es un li y va dentro de una lista ul role=\"list\". El ref y las props nativas van al botón de desplegar.",
   "category": "Data Display",
   "props": {
     "title": {
@@ -105,10 +105,13 @@
       "description": "Clases para el <li> raíz."
     }
   },
+  "subcomponents": {
+    "NotificationGroupItem": "description, time, unread, unreadLabel, href, onClick, onDelete, deleteLabel, revealed, defaultRevealed, onRevealedChange"
+  },
   "examples": [
     {
       "title": "Con tres notificaciones",
-      "code": "<NotificationGroup title=\"Pago de octubre\" time=\"Hace 22 min\" unread>\n  <NotificationGroupItem time=\"Hace 22 min\" description=\"Cambiaste tu contraseña.\" unread />\n  <NotificationGroupItem time=\"Hace 1 h\" description=\"Recibimos tu pago.\" />\n</NotificationGroup>"
+      "code": "<NotificationGroup title=\"Actualizaciones del perfil\" time=\"Hace 22 min\" unread>\n  <NotificationGroupItem time=\"Hace 22 min\" description=\"Se actualizó la imagen de perfil.\" unread />\n  <NotificationGroupItem time=\"Hace 1 h\" description=\"Se guardaron los ajustes de privacidad.\" />\n</NotificationGroup>"
     }
   ]
 }

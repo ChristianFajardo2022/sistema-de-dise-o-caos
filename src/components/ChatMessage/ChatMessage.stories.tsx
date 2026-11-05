@@ -8,13 +8,23 @@ import { Avatar } from '../Avatar';
 import { PHOTO_SRC } from '../Avatar/Avatar.sample-data';
 import type { PhotoName } from '../Avatar/Avatar.sample-data';
 import { ChatAudioPlayer } from '../ChatAudioPlayer';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ChatMessage.doc';
+import docsJson from './ChatMessage.docs.json';
 
 const meta = {
   title: 'Data Display/ChatMessage',
   component: ChatMessage,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: ['children', 'avatar'] },
+  },
   tags: ['autodocs'],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     direction: {
       control: 'inline-radio',
       options: ['incoming', 'outgoing'],
@@ -36,7 +46,7 @@ const meta = {
     type: 'text',
     author: 'Ana Pérez',
     time: '20:14',
-    children: '¿Llegó el pedido de esta mañana?',
+    children: '¿Puedes revisar las notas de la reunión?',
   },
   decorators: [
     (Story) => (
@@ -73,15 +83,15 @@ interface Item {
 }
 
 const SEED: Item[] = [
-  { id: 1, direction: 'incoming', author: 'Ana Pérez', time: '09:12', text: 'Hola, ¿llegó el pedido de esta mañana?' },
-  { id: 2, direction: 'outgoing', author: 'Tú', time: '09:13', text: 'Sí, ya está en bodega.' },
-  { id: 3, direction: 'incoming', author: 'Ana Pérez', time: '09:14', text: 'Perfecto. ¿Me confirmas la factura?' },
-  { id: 4, direction: 'outgoing', author: 'Tú', time: '09:15', text: 'Te la envío en un momento.' },
+  { id: 1, direction: 'incoming', author: 'Ana Pérez', time: '09:12', text: 'Hola, ¿puedes revisar las notas?' },
+  { id: 2, direction: 'outgoing', author: 'Tú', time: '09:13', text: 'Ya revisé el documento.' },
+  { id: 3, direction: 'incoming', author: 'Ana Pérez', time: '09:14', text: '¿Puedes compartir la fecha de la reunión?' },
+  { id: 4, direction: 'outgoing', author: 'Tú', time: '09:15', text: 'Te confirmo antes de la reunión.' },
   { id: 5, direction: 'outgoing', author: 'Tú', time: '09:16', audio: 42 },
 ];
 
 /** Mensajes que llegan solos en la demo, uno cada 4 s. */
-const INCOMING = ['¿Te llegó mi correo?', 'Quedo atenta.', 'Gracias.'];
+const INCOMING = ['¿Puedes revisar las notas?', 'Quedo pendiente.', 'Gracias por la ayuda.'];
 
 /**
  * Registro de mensajes (`role="log"`): los nuevos se anuncian y la lista baja sola si ya estaba abajo. La demo recibe
@@ -147,7 +157,7 @@ export const FigmaMatrix: Story = {
             time="20:14"
             avatar={avatar(v.photo)}
           >
-            {v.type === 'audio' ? <ChatAudioPlayer duration={1214} defaultCurrentTime={(1214 * 10) / 179} timePosition="start" buttonPosition="end" /> : 'Tienda oficial del libro '}
+            {v.type === 'audio' ? <ChatAudioPlayer duration={1214} defaultCurrentTime={(1214 * 10) / 179} timePosition="start" buttonPosition="end" /> : '¿Puedes revisar las notas de la reunión?'}
           </ChatMessage>
         ))}
       </ul>
@@ -183,5 +193,24 @@ export const AccessibilityTest: Story = {
     await expect(canvas.getByRole('button', { name: 'Pausar audio' })).toHaveFocus();
     const seek = canvas.getByRole('slider', { name: 'Posición del audio' });
     await expect(seek).toHaveAttribute('aria-valuetext', '0:00 de 0:20');
+  },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'ChatMessage' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((tab) => tab.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const headings = () => canvas.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent);
+    await expect(headings()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente ChatMessage en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(headings()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    await userEvent.click(tabs[2]);
+    await expect(headings()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
   },
 };

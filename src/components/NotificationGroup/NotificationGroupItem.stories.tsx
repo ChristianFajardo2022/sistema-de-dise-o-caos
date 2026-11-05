@@ -2,12 +2,21 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import { NotificationGroupItem } from './NotificationGroupItem';
 import { FIGMA_LOREM } from '../NotificationItem/NotificationItem.shared';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './NotificationGroupItem.doc';
+import docsJson from './NotificationGroupItem.docs.json';
 
 const meta = {
   title: 'Data Display/NotificationGroupItem',
   component: NotificationGroupItem,
   tags: ['autodocs'],
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { story: 'Interactive', exclude: ['rootProps', 'contentProps', 'onDelete', 'revealed', 'defaultRevealed', 'onRevealedChange'] },
+  },
   decorators: [
     (Story, { parameters }) =>
       parameters.bare ? (
@@ -19,13 +28,14 @@ const meta = {
       ),
   ],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     description: { control: 'text', type: { name: 'string' }, description: 'Prop Description de Figma' },
     time: { control: 'text', type: { name: 'string' }, description: 'Prop Time de Figma' },
     unread: { control: 'boolean', type: { name: 'boolean' }, description: 'State=Unread de Figma' },
     revealed: { control: 'boolean', type: { name: 'boolean' }, description: 'Type=Eliminate de Figma' },
   },
   args: {
-    description: 'Tu pago de octubre fue confirmado.',
+    description: 'Se actualizó la imagen de perfil.',
     time: 'Hace 22 min',
     unread: true,
   },
@@ -76,9 +86,28 @@ export const RoleTest: Story = {
   args: { onClick: fn() },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const control = canvas.getByRole('button', { name: 'Tu pago de octubre fue confirmado.' });
+    const control = canvas.getByRole('button', { name: 'Se actualizó la imagen de perfil.' });
     await expect(control).toHaveAccessibleDescription('Hace 22 min No leída');
     await userEvent.click(control);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'NotificationGroupItem' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((tab) => tab.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const headings = () => canvas.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent);
+    await expect(headings()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente NotificationGroupItem en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(headings()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    await userEvent.click(tabs[2]);
+    await expect(headings()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
   },
 };

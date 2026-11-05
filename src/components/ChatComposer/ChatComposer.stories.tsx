@@ -7,13 +7,23 @@ import { Button } from '../Button';
 import { ChatAudioPlayer } from '../ChatAudioPlayer';
 import { Icon } from '../Icon';
 import type { IconName } from '../Icon/Icon.types';
+import { ComponentDoc } from '../../docs/ComponentDoc';
+import { argTypesFromDocsJson, codeFromDocsJson } from '../../docs/code';
+import { componentDocsParameters } from '../../docs/storybook';
+import { doc } from './ChatComposer.doc';
+import docsJson from './ChatComposer.docs.json';
 
 const meta = {
   title: 'Data Display/ChatComposer',
   component: ChatComposer,
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    docsLive: { exclude: ['value', 'defaultValue', 'textareaProps', 'attachments', 'audio'] },
+  },
   tags: ['autodocs'],
   argTypes: {
+    ...argTypesFromDocsJson(docsJson),
     placeholder: { control: 'text', type: { name: 'string' } },
     label: { control: 'text', type: { name: 'string' }, description: 'Etiqueta sr-only del campo' },
     touch: { control: 'boolean', type: { name: 'boolean' }, description: 'Botones grandes (composer móvil)' },
@@ -180,5 +190,24 @@ export const ImeEnterTest: Story = {
     await expect(args.onSend).not.toHaveBeenCalled();
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter', keyCode: 13 });
     await expect(args.onSend).toHaveBeenCalledWith('Hola');
+  },
+};
+
+/** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
+export const DocPageTest: Story = {
+  tags: ['!autodocs'],
+  parameters: { layout: 'fullscreen' },
+  render: () => <ComponentDoc doc={doc} code={codeFromDocsJson(docsJson)} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { level: 1, name: 'ChatComposer' })).toBeInTheDocument();
+    const tabs = canvas.getAllByRole('tab');
+    await expect(tabs.map((tab) => tab.textContent)).toEqual(['Definición', 'Aplicación', 'Desarrollo']);
+    const headings = () => canvas.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent);
+    await expect(headings()).toEqual(['Anatomía', 'Estados', 'Tokens y modos', 'Uso del componente ChatComposer en Figma:']);
+    await userEvent.click(tabs[1]);
+    await expect(headings()).toEqual(['Comportamiento', 'Aplicaciones de breakpoints', 'Do and Dont’s']);
+    await userEvent.click(tabs[2]);
+    await expect(headings()).toEqual(['Desarrollo', 'Props', 'Ejemplos de uso']);
   },
 };
