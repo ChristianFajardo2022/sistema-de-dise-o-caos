@@ -24,6 +24,9 @@ const twMerge = extendTailwindMerge({
       'font-family': [{ font: [(value: string) => /^ds-.*typography-family-/.test(value)] }],
       'font-weight': [{ font: [(value: string) => /^ds-.*typography-weight-/.test(value)] }],
       leading: [{ leading: [(value: string) => /^ds-/.test(value)] }],
+      // Anchos de trazo (`@utility border-ds-…` con border-width): sin esto los toma como color y, junto a
+      // border-ds-<color>, borra el ancho.
+      'border-w': [{ border: [(value: string) => /^ds-(?:border-general-(?:sm|md|lg)|primitives-stroke-)/.test(value)] }],
     },
   },
 });
