@@ -11,6 +11,26 @@ import { componentDocsParameters } from '../../docs/storybook';
 import { doc } from './NotificationGroup.doc';
 import docsJson from './NotificationGroup.docs.json';
 
+/** Código de Desarrollo: el mismo grupo del lienzo, con sus filas y desplegado, listo para copiar. */
+function docsCode(args: Record<string, unknown>) {
+  const { children: _children, defaultExpanded: _defaultExpanded, expanded: _expanded, ...rest } = args;
+  const props = Object.entries(rest).map(([name, value]) =>
+    value === true ? `  ${name}` : `  ${name}=${typeof value === 'string' ? `"${value.replace(/"/g, '&quot;')}"` : `{${String(value)}}`}`
+  );
+  return [
+    '<ul role="list">',
+    '  <NotificationGroup',
+    ...props.map((line) => `  ${line}`),
+    '    defaultExpanded',
+    '  >',
+    '    <NotificationGroupItem time="Hace 22 min" description="Se actualizó la imagen de perfil." unread />',
+    '    <NotificationGroupItem time="Hace 42 min" description="Se guardaron los ajustes de privacidad." unread />',
+    '    <NotificationGroupItem time="Hace 62 min" description="Se añadió una nota de reunión." />',
+    '  </NotificationGroup>',
+    '</ul>',
+  ].join('\n');
+}
+
 const meta = {
   title: 'Data Display/NotificationGroup',
   component: NotificationGroup,
@@ -18,7 +38,7 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: componentDocsParameters(doc, docsJson),
-    docsLive: { story: 'Interactive', exclude: ['children', 'rootProps', 'contentProps', 'expanded', 'defaultExpanded', 'onExpandedChange', 'onDelete', 'revealed', 'defaultRevealed', 'onRevealedChange'] },
+    docsLive: { story: 'Interactive', code: docsCode, exclude: ['children', 'rootProps', 'contentProps', 'expanded', 'defaultExpanded', 'onExpandedChange', 'onDelete', 'revealed', 'defaultRevealed', 'onRevealedChange'] },
   },
   decorators: [
     (Story, { parameters }) =>
@@ -61,6 +81,7 @@ const items = (unread: boolean[]) =>
 
 /** Playground: recogido muestra la primera; el botón del chevron (o toda la tarjeta) lo despliega. */
 export const Interactive: Story = {
+  args: { defaultExpanded: true },
   render: (args) => <NotificationGroup {...args}>{items([true, true, false])}</NotificationGroup>,
 };
 

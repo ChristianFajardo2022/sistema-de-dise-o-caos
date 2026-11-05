@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import type { ComponentDocContent, DocStateItem } from '../../docs/types';
 import { Button } from '../Button';
 import { ChatAudioPlayer } from '../ChatAudioPlayer';
@@ -49,24 +49,35 @@ const withAudio = (props: Partial<ComponentProps<typeof ChatComposer>> = {}) => 
   />
 );
 
+/**
+ * Superficie de muestra: el contenedor usa `background-container-default-on-card` y en oscuro vale lo mismo que el lienzo
+ * de la página, así que se funde. Se apoya en `background-general-black` (la misma que usa Accordion para On canva) y fija
+ * un ancho de muestra para que la plantilla no la encoja.
+ */
+const onSurface = (node: ReactNode) => (
+  <div style={{ width: 360 }} className="bg-ds-background-general-black p-ds-space-general-2xl">
+    {node}
+  </div>
+);
+
 const states: DocStateItem[] = [
   {
     label: 'Default',
     tone: 'neutral',
     description: 'Campo de texto con Enviar, Grabar y la fila opcional de adjuntos. Enter envía el texto; Shift+Enter agrega una línea.',
-    samples: [composer()],
+    samples: [onSurface(composer())],
   },
   {
     label: 'State3',
     tone: 'neutral',
     description: <>El audio grabado reemplaza el campo. En Figma, dos variantes comparten el nombre <code>State3</code>; el código activa este aspecto con <code>audio</code>.</>,
-    samples: [withAudio()],
+    samples: [onSurface(withAudio())],
   },
   {
     label: 'Disabled',
     tone: 'neutral',
     description: 'Deshabilita el campo y los botones propios. Los controles que se pasan por slots, como los adjuntos, mantienen su estado independiente.',
-    samples: [composer({ disabled: true })],
+    samples: [onSurface(composer({ disabled: true }))],
   },
 ];
 
@@ -84,17 +95,16 @@ export const doc: ComponentDocContent = {
       blocks: [{ type: 'anatomy', groups: [{
         canvases: [{
           label: 'Mensaje con adjuntos',
-          preview: composer(),
+          preview: onSurface(composer()),
           marks: [
-            { n: 1, selector: '[data-figma-part="Frame 1984080613"]', side: 'left' },
-            { n: 2, selector: '[data-figma-part="Escribe un mensaje..."]', side: 'top' },
-            { n: 3, selector: '[data-figma-part="Button"]', side: 'right' },
-            { n: 4, selector: '[data-figma-part="Button"]', index: -1, side: 'right' },
+            { n: 1, selector: 'form', side: 'left' },
+            { n: 2, selector: '[data-figma-part="Frame 1984080613"]', side: 'top' },
+            { n: 3, selector: '[data-figma-part="Escribe un mensaje..."]', side: 'bottom' },
+            { n: 4, selector: '[data-figma-part="Button"]', side: 'top' },
             { n: 5, selector: '[data-figma-part="CTA"]', side: 'bottom' },
           ],
           dimensions: [
-            { kind: 'height', selector: '[data-figma-part="Frame 1984080613"]' },
-            { kind: 'padding', selector: '[data-figma-part="Frame 1984080613"]', side: 'left' },
+            { kind: 'padding', selector: 'form', side: 'right' },
           ],
         }],
         guidelines: [
@@ -107,7 +117,7 @@ export const doc: ComponentDocContent = {
       }, {
         canvases: [{
           label: 'Audio listo para enviar',
-          preview: withAudio(),
+          preview: onSurface(withAudio()),
           marks: [
             { n: 1, selector: '[data-figma-part="Onda de audio"]', side: 'top' },
             { n: 2, selector: '[data-figma-part="CTA"]', side: 'bottom' },
@@ -123,7 +133,7 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Estados',
-      description: 'ChatComposer presenta el campo de texto, el modo con audio y el estado Disabled. El modo de audio reemplaza el campo y cambia las acciones disponibles.',
+      description: <>ChatComposer tiene 3 estados: Default y State3 son las variantes de Figma, y Disabled existe solo en código. State3 reemplaza el campo por el audio grabado y Disabled deshabilita el campo y los botones propios.</>,
       blocks: [{ type: 'states', items: states }],
     },
     {
@@ -132,7 +142,7 @@ export const doc: ComponentDocContent = {
       titleInside: true,
       blocks: [{ type: 'tokens', groups: [{
         title: 'Campo de mensaje',
-        preview: composer(),
+        preview: onSurface(composer()),
         entries: [
           { part: 'Fondo del contenedor', color: 'background-container-default-on-card' },
           { part: 'Borde', color: 'border-general-default-on-canva' },
@@ -169,8 +179,8 @@ export const doc: ComponentDocContent = {
         ],
         avoid: [
           <><strong>Campos de formulario generales:</strong> no uses este composer para datos distintos a un mensaje. (Alternativa: <code>Textarea</code>).</>,
-          <><strong>Enviar texto vacío:</strong> el formulario no llama a <code>onSend</code> si el texto solo contiene espacios. (Alternativa: pide contenido antes de enviar).</>,
-          <><strong>Subir archivos sin controles:</strong> no pases archivos directamente como texto ni reemplaces los botones de adjuntos. (Alternativa: coloca controles de carga accesibles en <code>attachments</code>).</>,
+          <><strong>Elegir entre respuestas fijas:</strong> no pidas escribir cuando la persona solo debe escoger una opción. (Alternativa: <code>Button</code> por cada respuesta).</>,
+          <><strong>Subir archivos sin botón:</strong> no esperes que la persona pegue el archivo en el campo como texto. (Alternativa: <code>Button</code> de solo ícono en <code>attachments</code>).</>,
         ],
       }],
     },
@@ -179,11 +189,11 @@ export const doc: ComponentDocContent = {
       description: 'Cada vista se dibuja con los valores responsive de su breakpoint. Tablet usa los mismos tokens que Desktop.',
       blocks: [{ type: 'breakpoints',
         desktop: { columns: [
-          { title: 'Mensaje', bullets: [<>Botones xs de 32 px e íconos de 16 px.</>, <>El campo permite hasta siete líneas en navegadores compatibles.</>], preview: composer() },
+          { title: 'Mensaje', bullets: [<>Contenedor con radio de 24 px (<code>radius/container/on-card</code>).</>, <>Botones xs de 32 px e íconos de 16 px.</>, <>El campo permite hasta siete líneas en navegadores compatibles.</>], preview: composer() },
           { title: 'Audio grabado', bullets: [<>El audio reemplaza el campo de texto.</>, <>Grabar y Enviar aparecen a la derecha de la fila inferior.</>], preview: withAudio() },
         ] },
-        mobile: { bullets: [<><strong>Modo táctil:</strong> activa <code>touch</code> para usar botones sm de 40 px e íconos de 20 px.</>, <>El padding del contenedor cambia a 8 px arriba, abajo y a la derecha, y 16 px a la izquierda.</>, <>La pantalla Chat usa un botón de adjunto <code>add-2</code>.</>], preview: touchComposer() },
-        tablet: { bullets: [<>Tablet usa los mismos tokens de tamaño que Desktop; <code>touch</code> se activa explícitamente.</>, <>Los botones son xs de 32 px y los íconos miden 16 px.</>, <>Activa <code>touch</code> si necesitas controles grandes en una superficie táctil.</>], preview: composer() },
+        mobile: { bullets: [<><strong>Radio:</strong> <code>radius/container/on-card</code> baja de 24 a 16 px por debajo de 48 rem.</>, <><strong>Modo táctil:</strong> <code>touch</code> es una prop, no cambia con el breakpoint. Activa botones sm de 40 px, íconos de 20 px y padding de 8 px arriba, abajo y a la derecha, y 16 px a la izquierda.</>, <>La pantalla Chat usa un botón de adjunto <code>add-2</code>.</>], preview: touchComposer() },
+        tablet: { bullets: [<><strong>Sin cambios:</strong> Tablet usa los mismos tokens que Desktop, con el radio de 24 px.</>, <>Los botones son xs de 32 px y los íconos miden 16 px.</>], preview: composer() },
       }],
     },
     {
@@ -192,8 +202,8 @@ export const doc: ComponentDocContent = {
       blocks: [{ type: 'practices', items: [
         { kind: 'do', framed: true, title: 'Etiqueta el campo', description: 'Define un nombre accesible que identifique el campo aunque la etiqueta no se vea.', preview: composer({ label: 'Mensaje' }) },
         { kind: 'dont', framed: true, title: 'Campo sin nombre', description: 'No dejes la etiqueta vacía: el campo perdería su nombre para lectores de pantalla.', preview: composer({ label: '' }) },
-        { kind: 'do', framed: true, title: 'Adjuntos en su fila', description: <>Pasa los botones por <code>attachments</code> para mantenerlos debajo del campo.</>, preview: composer({ attachments: attachmentButtons() }) },
-        { kind: 'dont', framed: true, title: 'Audio como adjunto', description: 'No pongas el reproductor en la fila de adjuntos mientras mantienes el campo de texto.', preview: composer({ attachments: audioPreview() }) },
+        { kind: 'do', framed: true, title: 'Adjuntos del mismo tamaño', description: <>Con <code>touch</code>, pasa por <code>attachments</code> botones sm de 40 px, como los del composer.</>, preview: composer({ touch: true, attachments: attachmentButtons(true) }) },
+        { kind: 'dont', framed: true, title: 'Adjuntos de otro tamaño', description: <>No mezcles botones xs en un composer con <code>touch</code>: la fila queda desigual y con áreas pequeñas.</>, preview: composer({ touch: true, attachments: attachmentButtons() }) },
         { kind: 'do', framed: true, title: 'Envía la grabación', description: <>Pasa <code>onSendAudio</code> para mostrar la acción Enviar junto al audio preparado.</>, preview: withAudio() },
         { kind: 'dont', framed: true, title: 'Audio sin envío', description: 'No presentes una grabación lista si la persona no tiene una acción para enviarla.', preview: <ChatComposer audio={audioPreview()} onRecord={() => {}} /> },
       ] }],

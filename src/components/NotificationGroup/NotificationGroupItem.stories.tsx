@@ -8,6 +8,14 @@ import { componentDocsParameters } from '../../docs/storybook';
 import { doc } from './NotificationGroupItem.doc';
 import docsJson from './NotificationGroupItem.docs.json';
 
+/** Código de Desarrollo: la fila interactiva del lienzo (botón con `onClick`), lista para copiar. */
+function docsCode(args: Record<string, unknown>) {
+  const props = Object.entries(args).map(([name, value]) =>
+    value === true ? `    ${name}` : `    ${name}=${typeof value === 'string' ? `"${value.replace(/"/g, '&quot;')}"` : `{${String(value)}}`}`
+  );
+  return ['const abrir = () => {};', '', '<ul role="list">', '  <NotificationGroupItem', ...props, '    onClick={abrir}', '  />', '</ul>'].join('\n');
+}
+
 const meta = {
   title: 'Data Display/NotificationGroupItem',
   component: NotificationGroupItem,
@@ -15,7 +23,7 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: componentDocsParameters(doc, docsJson),
-    docsLive: { story: 'Interactive', exclude: ['rootProps', 'contentProps', 'onDelete', 'revealed', 'defaultRevealed', 'onRevealedChange'] },
+    docsLive: { story: 'Interactive', code: docsCode, exclude: ['href', 'rootProps', 'contentProps', 'onDelete', 'revealed', 'defaultRevealed', 'onRevealedChange'] },
   },
   decorators: [
     (Story, { parameters }) =>

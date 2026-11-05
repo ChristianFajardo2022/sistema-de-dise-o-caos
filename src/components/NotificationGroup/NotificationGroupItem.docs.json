@@ -1,7 +1,7 @@
 {
   "name": "NotificationGroupItem",
   "component": "NotificationGroupItem",
-  "description": "Fila del desplegable de un NotificationGroup, del component set Dropdown group notification (Atom) de Figma. Combina Type Default o Eliminate y State Unread o Read. La hora usa 12/16 y la descripción 14/20: regular si está leída, semibold si no. Los trazos superior e inferior miden 0.5. Es un li. La descripción se convierte en control con href u onClick; la hora y el estado de lectura forman su descripción accesible. onDelete y revealed habilitan la acción de eliminar, con la gestión de foco de NotificationCard.",
+  "description": "Fila del desplegable de un NotificationGroup, del component set Dropdown group notification (Atom) de Figma. Combina Type Default o Eliminate y State Unread o Read. La hora usa 12/16 y la descripción 14/20: regular si está leída, semibold si no. Los trazos superior e inferior miden 0,5. Es un li. La descripción se convierte en control con href u onClick; la hora y el estado de lectura forman su descripción accesible. onDelete y revealed habilitan la acción de eliminar, con la gestión de foco de NotificationCard.",
   "category": "Data Display",
   "props": {
     "description": {
@@ -84,7 +84,7 @@
   "examples": [
     {
       "title": "Fila que abre la notificación",
-      "code": "<ul role=\"list\">\n  <NotificationGroupItem time=\"Hace 22 min\" description=\"Se actualizó la imagen de perfil.\" unread onClick={abrir} />\n</ul>"
+      "code": "const abrir = () => {};\n\n<ul role=\"list\">\n  <NotificationGroupItem time=\"Hace 22 min\" description=\"Se actualizó la imagen de perfil.\" unread onClick={abrir} />\n</ul>"
     }
   ]
 }

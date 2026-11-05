@@ -57,7 +57,7 @@ export const ChatCard = forwardRef<HTMLElement, ChatCardProps>(
     const unreadId = `${id}-unread`;
     const hasUnread = has(unread) && unread !== 0;
     const hasMeta = has(time) || hasUnread;
-    // Una referencia por pieza: el cálculo de la descripción las une con espacios ("20.00 3 sin leer")
+    // Una referencia por pieza: el cálculo de la descripción las une con espacios ("8:00 p.m. 3 sin leer")
     const describedBy =
       [
         rest['aria-describedby'],
@@ -80,6 +80,7 @@ export const ChatCard = forwardRef<HTMLElement, ChatCardProps>(
     return (
       <div
         {...rootProps}
+        data-figma-part="Chat card"
         data-selected={selected ? '' : undefined}
         className={cn(chatCardVariants({ selected }), rootProps?.className, className)}
       >

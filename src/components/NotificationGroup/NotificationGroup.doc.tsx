@@ -76,11 +76,11 @@ export const doc: ComponentDocContent = {
           label: 'Grupo recogido sin leer',
           preview: group({ unread: true }),
           marks: [
-            { n: 1, selector: 'li', side: 'left' },
+            { n: 1, selector: 'li', side: 'bottom' },
             { n: 2, selector: '[data-figma-part="Time"]', side: 'top' },
             { n: 3, selector: 'button[data-notification-control]', side: 'right' },
-            { n: 4, selector: 'p[data-figma-part="Heading"]', side: 'top' },
-            { n: 5, selector: '[data-figma-part="List"]', side: 'bottom' },
+            { n: 4, selector: '[data-figma-part="Heading"]', side: 'left' },
+            { n: 5, selector: '[data-figma-part="List"]', side: 'right' },
           ],
           dimensions: [
             { kind: 'padding', selector: '[data-figma-part="Content"]', side: 'left' },
@@ -115,7 +115,7 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Estados',
-      description: 'NotificationGroup combina los estados Unread y Read con los tipos Group, Dropdown group y Group delete de Figma.',
+      description: <>NotificationGroup tiene 5 estados del set Group notification (Atom) de Figma: Group y Dropdown group, cada uno en Unread y Read, más Group delete. Simple y Simple delete, del mismo set, son de <code>NotificationCard</code>.</>,
       blocks: [{ type: 'states', items: states }],
     },
     {
@@ -170,7 +170,7 @@ export const doc: ComponentDocContent = {
         avoid: [
           <><strong>Notificaciones no relacionadas:</strong> no agrupes elementos que la persona deba revisar por separado. (Alternativa: <code>NotificationItem</code>).</>,
           <><strong>Una sola notificación:</strong> no uses el desplegable para una fila aislada. (Alternativa: <code>NotificationCard</code>).</>,
-          <><strong>Contador distinto de las filas:</strong> no pases <code>count</code> con un valor que contradiga la cantidad real. (Alternativa: omite <code>count</code> y deja que se calcule desde los hijos).</>,
+          <><strong>Contador distinto del total:</strong> no pases <code>count</code> con un valor que contradiga el total real. (Alternativa: omite <code>count</code> y se calcula desde los hijos; úsalo solo si el total viene de una lista paginada).</>,
         ],
       }],
     },
@@ -179,11 +179,10 @@ export const doc: ComponentDocContent = {
       description: 'Cada vista se dibuja con los valores responsive de su breakpoint. Tablet usa los mismos tokens que Desktop.',
       blocks: [{ type: 'breakpoints',
         desktop: { columns: [
-          { title: 'Unread', bullets: [<>Padding de 24 px y radio de 16 px.</>, <>El grupo recogido muestra una fila y el contador total.</>], preview: group({ unread: true }) },
-          { title: 'Read', bullets: [<>Sin relleno; el trazo inferior aparece al recoger el grupo.</>, <>El despliegue mantiene el radio y muestra los trazos de las filas.</>], preview: group({ unread: false, defaultExpanded: true }, rows(undefined, [false, false, false])) },
+          { title: 'Grupo', bullets: [<>Padding de 24 px y radio de 16 px.</>, <>Recogido muestra una fila y el contador total.</>, <>Unread lleva relleno; Read no, y recogido dibuja un trazo inferior.</>], preview: group({ unread: true }) },
         ] },
         mobile: { bullets: [<><strong>Padding:</strong> el token <code>space/container/on-card</code> baja a 16 px.</>, <>El ancho depende del contenedor padre; la tarjeta ocupa el ancho disponible.</>, <>El control de despliegue mantiene toda la tarjeta como área de activación.</>], preview: group({ unread: true }) },
-        tablet: { bullets: [<><strong>Sin cambios:</strong> usa los mismos tokens que Desktop.</>, <>El padding es de 24 px y el radio de 16 px.</>, <>La tarjeta ocupa el ancho disponible de su contenedor.</>], preview: group({ unread: true, defaultExpanded: true }) },
+        tablet: { bullets: [<><strong>Sin cambios:</strong> usa los mismos tokens que Desktop.</>, <>El padding es de 24 px y el radio de 16 px.</>, <>La tarjeta ocupa el ancho disponible de su contenedor.</>], preview: group({ unread: true }) },
       }],
     },
     {
@@ -192,8 +191,8 @@ export const doc: ComponentDocContent = {
       blocks: [{ type: 'practices', items: [
         { kind: 'do', framed: true, title: 'Primero lo reciente', description: 'Ordena las filas de la más reciente a la más antigua para que la vista recogida adelante la última notificación.', preview: group({ unread: true }, rows(['Se actualizó la imagen de perfil.', 'Se guardaron los ajustes de privacidad.'], [true, false])) },
         { kind: 'dont', framed: true, title: 'Primero lo antiguo', description: 'No pongas primero una notificación anterior si la tarjeta recogida debe mostrar la más reciente.', preview: group({ unread: true }, rows(['Se guardaron los ajustes de privacidad.', 'Se actualizó la imagen de perfil.'], [false, true], ['Hace 42 min', 'Hace 22 min'])) },
-        { kind: 'do', framed: true, title: 'Cuenta automática', description: <>Omite <code>count</code> para mantener el Badge sincronizado con las filas del grupo.</>, preview: group({ unread: true }, rows(['Se actualizó la imagen de perfil.', 'Se guardaron los ajustes de privacidad.'], [true, false])) },
-        { kind: 'dont', framed: true, title: 'Conteo incorrecto', description: 'No declares un total distinto de la cantidad de filas visibles al desplegar.', preview: group({ unread: true, count: 9, defaultExpanded: true }, rows(['Se actualizó la imagen de perfil.', 'Se guardaron los ajustes de privacidad.'], [true, false])) },
+        { kind: 'do', framed: true, title: 'Cuenta automática', description: <>Omite <code>count</code> para mantener el Badge sincronizado con las filas del grupo.</>, preview: group({ unread: true, defaultExpanded: true }, rows(['Se actualizó la imagen de perfil.', 'Se guardaron los ajustes de privacidad.'], [true, false])) },
+        { kind: 'dont', framed: true, title: 'Conteo incorrecto', description: 'No declares un total que contradiga la lista: el contador dice 9 y el grupo tiene 2 filas.', preview: group({ unread: true, count: 9, defaultExpanded: true }, rows(['Se actualizó la imagen de perfil.', 'Se guardaron los ajustes de privacidad.'], [true, false])) },
         { kind: 'do', framed: true, title: 'Marca el grupo nuevo', description: <>Activa <code>unread</code> cuando el grupo tenga notificaciones pendientes de revisar.</>, preview: group({ unread: true }) },
         { kind: 'dont', framed: true, title: 'Estado contradictorio', description: 'No muestres filas sin leer dentro de un grupo marcado como leído.', preview: group({ unread: false }) },
       ] }],

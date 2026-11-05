@@ -11,7 +11,7 @@ import { cva } from 'class-variance-authority';
  * - Disposición con reproducir a la izquierda; abajo adjuntos a la izquierda y Grabar + Enviar a la derecha (ya no está
  *   en el set de Figma). La pantalla Chat móvil la usa con botones sm (40) y el ícono `add` como adjunto.
  *
- * - Raíz: background/container/default-on-card, trazo de 1 (border/general/default-on-canva, suma al alto como en Figma), radius/container/On card
+ * - Raíz: background/container/default-on-card, trazo de 1,5 px en escritorio (border/general/default-on-canva, suma al alto como en Figma), radius/container/On card
  *   (24 en escritorio, responsive), padding y gap space/general/2xl (16). Dos filas: gap space/general/2xl (16), con o
  *   sin audio. Móvil (`touch`): padding 8/8/8/16 (space/general/lg y 2xl), gap 3xl (24), sin trazo.
  * - Campo: alto 64, padding space/general/xl (12), radius/general/xl (16). Figma no enlaza el relleno (#45484d = G12):
@@ -27,7 +27,7 @@ export const chatComposerVariants = cva(
       touch: {
         false: [
           'gap-ds-space-general-2xl p-ds-space-general-2xl',
-          // Trazo de 1 que suma al alto, como en Figma (98 = 64 + 2 × 16 + 2 × 1)
+          // Trazo que da el token --ds-responsive-border-general-lg (1,5 px) y suma al alto. Figma lo dibuja de 1 (98 = 64 + 2 × 16 + 2 × 1); con 1,5 la raíz mide 99
           '[border:var(--ds-responsive-border-general-lg)_solid_var(--color-ds-border-general-default-on-canva)]',
         ].join(' '),
         true: 'gap-ds-space-general-3xl py-ds-space-general-lg pr-ds-space-general-lg pl-ds-space-general-2xl',

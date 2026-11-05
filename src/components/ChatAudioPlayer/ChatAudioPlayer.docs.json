@@ -1,7 +1,7 @@
 {
   "name": "ChatAudioPlayer",
   "component": "ChatAudioPlayer",
-  "description": "Reproductor de un mensaje de audio: el marco Reproductor que repiten Conversacion (Atom) 14948:8400 (Variant3), Audio (Atom) 14894:2745 y la pantalla Chat 14562:57994. No es un set propio de Figma: se mide dentro de ChatMessage y ChatComposer. Button xs solo ícono (secondary o primary) que alterna play/pause y su nombre (\"Reproducir audio\" / \"Pausar audio\"); onda de barras de 3 con separación 3 y alto máximo 26, reproducidas en background/acent/tertiary y las demás en background/general/gray-fifth; duración m:ss en text/neutral/body. La onda es un input type=\"range\" nativo e invisible estirado sobre las barras: flechas (1 s), Inicio/Fin, clic y arrastre, con aria-valuetext \"0:05 de 20:14\" y foco visible sobre la onda (el Slider del sistema no se usa porque su pista y pulgar no se parecen a la onda). Con src maneja un audio interno; sin él es presentación controlada (playing/currentTime) o no controlada.",
+  "description": "Reproductor de un mensaje de audio: el marco Reproductor que repiten Conversacion (Atom), Audio (Atom) y la pantalla Chat. No es un set propio de Figma: se mide dentro de ChatMessage y ChatComposer. Button xs solo ícono (secondary o primary) que alterna play/pause y su nombre (\"Reproducir audio\" / \"Pausar audio\"); onda de barras de 3 con separación 3 y alto máximo 26, reproducidas en background/acent/tertiary y las demás en background/general/gray-fifth; duración m:ss en text/neutral/body. La onda es un input type=\"range\" nativo e invisible estirado sobre las barras: flechas (1 s), Inicio/Fin, clic y arrastre, con aria-valuetext \"0:05 de 20:14\" y foco visible sobre la onda (el Slider del sistema no se usa porque su pista y pulgar no se parecen a la onda). Con src maneja un audio interno; sin él es presentación controlada (playing/currentTime) o no controlada.",
   "category": "Data Display",
   "props": {
     "duration": { "type": "number", "required": true, "description": "Duración en segundos (texto de la derecha)." },
@@ -22,6 +22,6 @@
   },
   "examples": [
     { "title": "Con audio real", "code": "<ChatAudioPlayer duration={42} src=\"/audios/nota.mp3\" />" },
-    { "title": "Controlado", "code": "<ChatAudioPlayer duration={30} playing={playing} onPlayingChange={setPlaying} currentTime={t} onCurrentTimeChange={setT} />" }
+    { "title": "Controlado", "code": "const [playing, setPlaying] = useState(false);\nconst [t, setT] = useState(0);\n\n<ChatAudioPlayer duration={30} playing={playing} onPlayingChange={setPlaying} currentTime={t} onCurrentTimeChange={setT} />" }
   ]
 }

@@ -26,7 +26,7 @@ export interface ChatMessageProps extends Omit<LiHTMLAttributes<HTMLLIElement>, 
    * mensaje del registro diga quién lo escribió.
    */
   author: string;
-  /** Hora del mensaje (p. ej. "20:14"). Se ve bajo el contenido (10/14), en un `<time>`. */
+  /** Hora del mensaje (p. ej. "8:14 p.m."). Se ve bajo el contenido (10/14), en un `<time>`. */
   time?: string;
   /** Valor `dateTime` del `<time>` (ISO 8601), si se conoce. */
   dateTime?: string;

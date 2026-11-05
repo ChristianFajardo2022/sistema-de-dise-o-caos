@@ -19,7 +19,15 @@ const meta = {
   parameters: {
     layout: 'padded',
     docs: componentDocsParameters(doc, docsJson),
-    docsLive: { exclude: ['leading', 'actions', 'rootProps'] },
+    docsLive: {
+      exclude: ['leading', 'actions', 'rootProps', 'online'],
+      // El lienzo dibuja el avatar de la historia y `unread` llega como texto: el código copiado debe dar lo mismo
+      args: (args: Record<string, unknown>) => ({
+        ...args,
+        unread: typeof args.unread === 'string' && /^\d+$/.test(args.unread) ? Number(args.unread) : args.unread,
+        leading: <Avatar variant="initials" size="md" name="Ana Pérez" />,
+      }),
+    },
   },
   tags: ['autodocs'],
   decorators: [
@@ -55,7 +63,7 @@ const meta = {
   args: {
     title: 'Ana Pérez',
     description: 'Nos vemos mañana en la reunión de diseño.',
-    time: '20.00',
+    time: '8:00 p.m.',
     unread: '3',
     selected: false,
   },
@@ -69,7 +77,7 @@ const avatar = (photo: PhotoName = 'Woman_1') => <Avatar variant="photo" size="m
 /** Playground */
 export const Interactive: Story = {
   args: { onClick: fn() },
-  render: (args) => <ChatCard {...args} leading={avatar()} />,
+  render: (args) => <ChatCard {...args} leading={<Avatar variant="initials" size="md" name="Ana Pérez" />} />,
 };
 
 /** Página de documentación v2 para revisar la estructura y la pestaña Desarrollo. */
@@ -82,9 +90,9 @@ export const DocPageTest: Story = {
 /** Lista de conversaciones: la seleccionada cambia al hacer clic. */
 function ConversationListDemo() {
   const items: { name: string; text: string; time: string; unread?: number; photo: PhotoName }[] = [
-    { name: 'Ana Pérez', text: 'Nos vemos mañana en la reunión.', time: '20.00', unread: 3, photo: 'Woman_1' },
-    { name: 'Hugo García', text: 'Te envío los archivos ahora.', time: '18.30', photo: 'Men_1' },
-    { name: 'Sara Molina', text: 'Gracias por la ayuda.', time: '09.15', unread: 12, photo: 'Woman_3' },
+    { name: 'Ana Pérez', text: 'Nos vemos mañana en la reunión.', time: '8:00 p.m.', unread: 3, photo: 'Woman_1' },
+    { name: 'Hugo García', text: 'Te envío los archivos ahora.', time: '6:30 p.m.', photo: 'Men_1' },
+    { name: 'Sara Molina', text: 'Gracias por la ayuda.', time: '9:15 a.m.', unread: 12, photo: 'Woman_3' },
   ];
   const [active, setActive] = useState(0);
   return (
@@ -151,7 +159,7 @@ function MatrixCards({ figma }: { figma: boolean }) {
           rootProps={{ 'data-figma': figma ? v.name : undefined }}
           title="Titulo"
           description="Descripción"
-          time="20.00"
+          time="8:00 p.m."
           unread="00"
           selected={v.selected}
           leading={avatar('Woman_1')}
@@ -186,7 +194,7 @@ export const SelectionTest: Story = {
   args: { onClick: fn() },
   render: (args) => (
     <div className="flex w-[767px] flex-col gap-4">
-      <ChatCard {...args} title="Ana Pérez" description="Hola" time="20.00" unread="3" leading={avatar()} presence="online" selected />
+      <ChatCard {...args} title="Ana Pérez" description="Hola" time="8:00 p.m." unread="3" leading={avatar()} presence="online" selected />
       <ChatCard title="Hugo García" description="Buenas" leading={avatar('Men_1')} presence="offline" />
       <ChatCard title="Sara Molina" href="#sara" leading={avatar('Woman_3')} />
     </div>
@@ -195,8 +203,8 @@ export const SelectionTest: Story = {
     const canvas = within(canvasElement);
     const ana = canvas.getByRole('button', { name: 'Ana Pérez' });
     await expect(ana).toHaveAttribute('aria-current', 'true');
-    // Una pieza por referencia: en línea, mensaje, hora y no leídos, separados (no "20.003 sin leer")
-    await expect(ana).toHaveAccessibleDescription(/^En línea Hola 20\.00 3 sin leer$/);
+    // Una pieza por referencia: en línea, mensaje, hora y no leídos, separados (no "8:00 p.m.3 sin leer")
+    await expect(ana).toHaveAccessibleDescription(/^En línea Hola 8:00 p\.m\. 3 sin leer$/);
     await expect(canvas.getByRole('button', { name: 'Hugo García' })).not.toHaveAttribute('aria-current');
     await expect(canvas.getByRole('button', { name: 'Hugo García' })).toHaveAccessibleDescription(/^Fuera de línea Buenas$/);
     await expect(canvas.getByRole('link', { name: 'Sara Molina' })).toHaveAttribute('href', '#sara');

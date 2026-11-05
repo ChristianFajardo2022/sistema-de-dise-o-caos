@@ -14,7 +14,7 @@ export interface ChatDetailsPanelProps extends Omit<HTMLAttributes<HTMLElement>,
    * `aria-expanded` que controla el contenido del panel.
    */
   collapsible?: boolean;
-  /** Plegado (controlado): el riel de 64 de ancho (Type=Type4 de Figma). Usar con `onCollapsedChange`. */
+  /** Plegado (controlado): el riel de 80 de ancho (Type=Type4 de Figma). Usar con `onCollapsedChange`. */
   collapsed?: boolean;
   /** Plegado al inicio (no controlado). */
   defaultCollapsed?: boolean;

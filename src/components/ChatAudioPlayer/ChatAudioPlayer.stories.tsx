@@ -11,7 +11,12 @@ import docsJson from './ChatAudioPlayer.docs.json';
 const meta = {
   title: 'Data Display/ChatAudioPlayer',
   component: ChatAudioPlayer,
-  parameters: { layout: 'padded', docs: componentDocsParameters(doc, docsJson) },
+  parameters: {
+    layout: 'padded',
+    docs: componentDocsParameters(doc, docsJson),
+    // `src` con texto libre carga una URL inválida (404): se queda en la tabla Props, sin control
+    docsLive: { exclude: ['src'] },
+  },
   tags: ['autodocs'],
   argTypes: {
     ...argTypesFromDocsJson(docsJson),

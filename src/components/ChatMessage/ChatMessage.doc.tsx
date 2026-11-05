@@ -19,13 +19,19 @@ const messageItem = (
   props: Partial<ComponentProps<typeof ChatMessage>> = {},
   content: ReactNode = 'Revisé las notas de la reunión.'
 ) => (
-  <ChatMessage author="Ana Pérez" time="09:12" dateTime="2026-11-04T09:12:00" avatar={avatar()} {...props}>
+  <ChatMessage author="Ana Pérez" time="9:12 a.m." dateTime="2026-11-04T09:12:00" avatar={avatar()} {...props}>
     {content}
   </ChatMessage>
 );
 
+/**
+ * Muestra de un mensaje: ancho fijo de 360 px y sobre `container-default-on-canva`. La burbuja entrante
+ * (`gray-seventh`) tiene el mismo valor que el fondo de la tarjeta de la plantilla y sin esta superficie se funde.
+ */
 const message = (props: Partial<ComponentProps<typeof ChatMessage>> = {}, content?: ReactNode) => (
-  <ul className="m-0 flex w-full list-none flex-col gap-ds-space-general-lg p-0">{messageItem(props, content)}</ul>
+  <div className="w-[360px] max-w-full rounded-ds-radius-general-xl bg-ds-background-container-default-on-canva p-ds-space-general-lg">
+    <ol className="m-0 flex w-full list-none flex-col gap-ds-space-general-lg p-0">{messageItem(props, content)}</ol>
+  </div>
 );
 
 const audioMessage = (props: Partial<ComponentProps<typeof ChatMessage>> = {}) => (
@@ -34,12 +40,6 @@ const audioMessage = (props: Partial<ComponentProps<typeof ChatMessage>> = {}) =
     <ChatAudioPlayer duration={42} defaultCurrentTime={8} timePosition="start" buttonPosition="end" />
   )
 );
-
-const audioItem = (props: Partial<ComponentProps<typeof ChatMessage>> = {}) =>
-  messageItem(
-    { type: 'audio', ...props },
-    <ChatAudioPlayer duration={42} defaultCurrentTime={8} timePosition="start" buttonPosition="end" />
-  );
 
 const states: DocStateItem[] = [
   {
@@ -50,13 +50,13 @@ const states: DocStateItem[] = [
   },
   {
     label: 'Variant2',
-    tone: 'accent',
+    tone: 'neutral',
     description: 'Mensaje de texto saliente. La burbuja y el avatar se alinean a la derecha.',
     samples: [message({ direction: 'outgoing', author: 'Hugo García', avatar: avatar('Men_4') })],
   },
   {
     label: 'Variant4',
-    tone: 'accent',
+    tone: 'neutral',
     description: 'Mensaje de audio saliente. La burbuja se estira para dar espacio al reproductor.',
     samples: [audioMessage({ direction: 'outgoing', author: 'Hugo García', avatar: avatar('Men_4') })],
   },
@@ -69,11 +69,18 @@ const states: DocStateItem[] = [
 ];
 
 const listSample = (children: ReactNode) => (
-  <div className="h-48 w-full max-w-[381px]">
+  <div className="h-28 w-full max-w-[381px]">
     <ChatMessageList aria-label="Mensajes con Ana Pérez" className="h-full">
       {children}
     </ChatMessageList>
   </div>
+);
+
+const breakpointPreview = listSample(
+  <>
+    {messageItem({ direction: 'incoming' })}
+    {messageItem({ direction: 'outgoing', author: 'Hugo García', avatar: avatar('Men_4') })}
+  </>
 );
 
 export const doc: ComponentDocContent = {
@@ -92,12 +99,11 @@ export const doc: ComponentDocContent = {
           marks: [
             { n: 1, selector: '[data-figma-part="Avatar"]', side: 'left' },
             { n: 2, selector: '[data-figma-part="Frame 1984080546"]', side: 'top' },
-            { n: 3, selector: '[data-figma-part="Status"]', side: 'left' },
-            { n: 4, selector: '[data-figma-part="Hora"]', index: -1, side: 'right' },
+            { n: 3, selector: '[data-figma-part="Status"]', side: 'right' },
+            { n: 4, selector: '[data-figma-part="Hora"]', index: -1, side: 'bottom' },
           ],
           dimensions: [
             { kind: 'padding', selector: '[data-figma-part="Frame 1984080546"]', side: 'left' },
-            { kind: 'gap', from: '[data-figma-part="Status"]', to: '[data-figma-part="Hora"]', axis: 'y' },
           ],
         }],
         guidelines: [
@@ -114,7 +120,7 @@ export const doc: ComponentDocContent = {
             { n: 1, selector: '[data-figma-part="Frame 1984080546"]', side: 'top' },
             { n: 2, selector: '[data-figma-part="Status"]', side: 'left' },
             { n: 3, selector: '[data-figma-part="Hora"]', side: 'right' },
-            { n: 4, selector: '[data-figma-part="Avatar"]', side: 'right' },
+            { n: 4, selector: '[data-figma-part="Avatar"]', side: 'top' },
           ],
         }],
         guidelines: [
@@ -126,15 +132,15 @@ export const doc: ComponentDocContent = {
       }, {
         canvases: [
           { label: 'Audio entrante', preview: audioMessage(), marks: [
-            { n: 1, selector: '[data-figma-part="Avatar"]', side: 'left' },
-            { n: 2, selector: '[data-figma-part="Frame 1984080545"]', side: 'top' },
-            { n: 3, selector: '[data-figma-part="Onda de audio"]', side: 'top' },
-            { n: 4, selector: '[data-figma-part="Hora"]', index: -1, side: 'right' },
+            { n: 1, selector: '[data-figma-part="Frame 1984080545"]', side: 'top' },
+            { n: 2, selector: '[data-figma-part="Reproductor"]', side: 'top' },
+            { n: 3, selector: '[data-figma-part="Hora"]', index: -1, side: 'bottom' },
+            { n: 4, selector: '[data-figma-part="Avatar"]', side: 'left' },
           ] },
           { label: 'Audio saliente', preview: audioMessage({ direction: 'outgoing', author: 'Hugo García', avatar: avatar('Men_4') }), marks: [
             { n: 1, selector: '[data-figma-part="Frame 1984080545"]', side: 'top' },
-            { n: 2, selector: '[data-figma-part="Onda de audio"]', side: 'top' },
-            { n: 3, selector: '[data-figma-part="Hora"]', index: -1, side: 'left' },
+            { n: 2, selector: '[data-figma-part="Reproductor"]', side: 'top' },
+            { n: 3, selector: '[data-figma-part="Hora"]', index: -1, side: 'bottom' },
             { n: 4, selector: '[data-figma-part="Avatar"]', side: 'right' },
           ] },
         ],
@@ -148,7 +154,7 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Estados',
-      description: 'ChatMessage no es interactivo: sus cuatro variantes de aspecto corresponden a dirección y tipo de contenido del set de Figma.',
+      description: 'ChatMessage no es interactivo: tiene 4 estados de aspecto, uno por variante del set de Figma. Todos son de la misma pieza y cambian con la dirección (entrante o saliente) y el tipo de contenido (texto o audio).',
       blocks: [{ type: 'states', items: states }],
     },
     {
@@ -202,7 +208,8 @@ export const doc: ComponentDocContent = {
         <><strong>Búsqueda y configuración:</strong> encuentra el set «Conversacion (Atom)» en Assets. Sus propiedades combinan dirección y contenido.</>,
         <><strong>Property 1:</strong> Default es incoming/text; Variant2, outgoing/text; Variant4, outgoing/audio; Variant5, incoming/audio.</>,
         <><strong>Diferencias:</strong> Figma no contiene el autor ni la hora accesible. El código añade ambos, oculta el avatar a lectores de pantalla y usa una lista de mensajes con anuncios y desplazamiento en <code>ChatMessageList</code>.</>,
-        <><strong>Tokens responsive:</strong> el código usa <code>space/general/6xl</code> para el margen del lado opuesto al avatar. Los tokens actuales resuelven 40 px en Mobile y 48 px en Tablet y Desktop; el comentario de variantes indica 56 px para escritorio.</>,
+        <><strong>Hora y duración:</strong> en el texto, «hora» es la marca de tiempo del mensaje. La capa «Hora» del reproductor de audio en Figma es la duración del audio.</>,
+        <><strong>Tokens responsive:</strong> el código usa <code>space/general/6xl</code> para el margen del lado opuesto al avatar. Resuelve 40 px en Mobile y 56 px desde 48 rem (Tablet y Desktop).</>,
       ] }],
     },
   ],
@@ -229,9 +236,9 @@ export const doc: ComponentDocContent = {
       title: 'Aplicaciones de breakpoints',
       description: 'Cada vista se dibuja con los valores responsive de su breakpoint. Tablet usa los mismos tokens que Desktop.',
       blocks: [{ type: 'breakpoints',
-        desktop: { columns: [{ title: 'Conversación', bullets: [<>El margen opuesto al avatar usa <code>space/general/6xl</code>: 48 px en Desktop.</>, <>La fila mantiene 8 px entre mensajes y entre avatar y burbuja.</>], preview: listSample(<>{messageItem({ direction: 'incoming' })}{messageItem({ direction: 'outgoing', author: 'Hugo García', avatar: avatar('Men_4') })}</>) }] },
-        mobile: { bullets: [<><strong>Margen lateral:</strong> <code>space/general/6xl</code> resuelve 40 px en Mobile.</>, <>La burbuja conserva el radio de 16 px y el espacio de 8 px entre avatar y contenido.</>, <>El audio sigue ocupando el espacio libre de la fila.</>], preview: listSample(audioItem()) },
-        tablet: { bullets: [<><strong>Sin cambios:</strong> usa los mismos tokens que Desktop.</>, <>El margen opuesto al avatar es 48 px.</>, <>La fila conserva el gap de 8 px.</>], preview: listSample(messageItem({ direction: 'outgoing', author: 'Hugo García', avatar: avatar('Men_4') })) },
+        desktop: { columns: [{ title: 'Conversación', bullets: [<>El margen opuesto al avatar usa <code>space/general/6xl</code>: 56 px en Desktop.</>, <>La fila mantiene 8 px entre mensajes y entre avatar y burbuja.</>], preview: breakpointPreview }] },
+        mobile: { bullets: [<><strong>Margen lateral:</strong> <code>space/general/6xl</code> resuelve 40 px en Mobile, 16 px menos que en Desktop.</>, <>La burbuja conserva el radio de 16 px y el espacio de 8 px entre avatar y contenido.</>], preview: breakpointPreview },
+        tablet: { bullets: [<><strong>Sin cambios:</strong> usa los mismos tokens que Desktop.</>, <>El margen opuesto al avatar es 56 px.</>, <>La fila conserva el gap de 8 px.</>], preview: breakpointPreview },
       }],
     },
     {

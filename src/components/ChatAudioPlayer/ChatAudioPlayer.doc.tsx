@@ -8,28 +8,37 @@ import { ChatAudioPlayer } from './ChatAudioPlayer';
  * El componente no tiene set propio de Figma; sus partes se toman del marco Reproductor.
  */
 
-const player = (props: Partial<ComponentProps<typeof ChatAudioPlayer>> = {}) => (
-  <ChatAudioPlayer duration={74} {...props} />
+const player = (props: Partial<ComponentProps<typeof ChatAudioPlayer>> = {}, width = 360) => (
+  <div className="w-full" style={{ maxWidth: width }}>
+    <ChatAudioPlayer duration={74} {...props} />
+  </div>
+);
+
+/** Reproductor en un ancho dado (px), para mostrar la onda en un espacio justo. */
+const playerWidth = (width: number) => (
+  <div className="w-full" style={{ maxWidth: width }}>
+    <ChatAudioPlayer duration={74} defaultCurrentTime={37} />
+  </div>
 );
 
 const states: DocStateItem[] = [
   {
     label: 'En pausa',
     tone: 'neutral',
-    description: 'El botón anuncia «Reproducir audio» y la onda muestra la posición actual. La búsqueda queda deshabilitada si la duración no es mayor que cero.',
-    samples: [player()],
+    description: <>El botón anuncia «Reproducir audio» y las barras encendidas muestran la posición actual. La onda es un control <code>range</code> nativo: mueve la posición con teclado, clic o arrastre y expone el tiempo con <code>aria-valuetext</code>.</>,
+    samples: [player({ defaultCurrentTime: 37 })],
   },
   {
     label: 'Reproduciendo',
     tone: 'accent',
     description: <>El botón anuncia «Pausar audio». Las barras encendidas representan el avance; con <code>src</code>, el elemento de audio interno reproduce el archivo.</>,
-    samples: [player({ defaultPlaying: true })],
+    samples: [player({ defaultPlaying: true, defaultCurrentTime: 37 })],
   },
   {
-    label: 'Posición intermedia',
-    tone: 'accent',
-    description: 'El control nativo `range` permite mover la posición con teclado, clic o arrastre y expone el tiempo con `aria-valuetext`.',
-    samples: [player({ defaultCurrentTime: 37 })],
+    label: 'Sin duración',
+    tone: 'neutral',
+    description: 'Si la duración no es mayor que cero, la búsqueda queda deshabilitada y la onda no responde a la posición.',
+    samples: [player({ duration: 0 })],
   },
 ];
 
@@ -43,7 +52,7 @@ export const doc: ComponentDocContent = {
   definition: [
     {
       title: 'Anatomía',
-      description: 'El reproductor reúne un botón, una onda de barras y la duración; las posiciones del botón y la hora dependen del contexto.',
+      description: 'El reproductor reúne un botón, una onda de barras y la duración; las posiciones del botón y de la duración dependen del contexto.',
       blocks: [{
         type: 'anatomy',
         groups: [{
@@ -71,19 +80,19 @@ export const doc: ComponentDocContent = {
           guidelines: [
             <><strong>Botón:</strong> botón de solo ícono <code>Button</code> en tamaño xs (32 px), con variante <code>secondary</code> por defecto o <code>primary</code>. Su nombre accesible cambia entre reproducir y pausar.</>,
             <><strong>Onda de audio:</strong> ocupa el espacio disponible, mide 26 px de alto y contiene barras de 3 px con separación de 3 px. Las barras reproducidas usan <code>background-acent-tertiary</code>; las demás, <code>background-general-gray-fifth</code>.</>,
-            <><strong>Hora:</strong> muestra la duración como <code>m:ss</code> (o <code>h:mm:ss</code> desde una hora), en tipografía de 12 px. Puede ir antes o después de la onda.</>,
+            <><strong>Duración:</strong> muestra la duración como <code>m:ss</code> (o <code>h:mm:ss</code> desde una hora), en tipografía de 12 px. Puede ir antes o después de la onda.</>,
           ],
         }],
       }],
     },
     {
       title: 'Estados',
-      description: <>ChatAudioPlayer presenta tres situaciones documentadas: pausa, reproducción y posición intermedia. El componente no expone una prop para forzar estados visuales de hover o foco.</>,
+      description: <>ChatAudioPlayer tiene 3 estados: en pausa, reproduciendo y sin duración. La posición de las barras encendidas cambia dentro de los dos primeros. El componente no expone una prop para forzar estados visuales de hover o foco.</>,
       blocks: [{ type: 'states', items: states }],
     },
     {
       title: 'Tokens y modos',
-      description: 'Tokens de color y tipografía usados por la onda y la duración. El botón hereda los tokens de `Button`.',
+      description: <>Tokens de color y tipografía usados por la onda y la duración. El botón hereda los tokens de <code>Button</code>. Dentro de un mensaje de chat, la duración hereda el color del texto de la burbuja.</>,
       titleInside: true,
       blocks: [{ type: 'tokens', groups: [{
         title: 'Onda y duración',
@@ -102,7 +111,7 @@ export const doc: ComponentDocContent = {
       titleInside: true,
       blocks: [{ type: 'figma', bullets: [
         <><strong>Ubicación:</strong> no hay un set propio. El marco «Reproductor» aparece en Conversacion (Atom), Audio (Atom) y en la pantalla Chat; el código lo reutilizan <code>ChatMessage</code> y <code>ChatComposer</code>.</>,
-        <><strong>Composición:</strong> el botón, la onda y la hora corresponden a las capas «Button», «Onda de audio» y «Hora». El código permite cambiar la posición con <code>buttonPosition</code> y <code>timePosition</code>.</>,
+        <><strong>Composición:</strong> el botón, la onda y la duración corresponden a las capas «Button», «Onda de audio» y «Hora» (en Figma, «Hora» es la duración del audio). El código permite cambiar la posición con <code>buttonPosition</code> y <code>timePosition</code>.</>,
         <><strong>Variantes:</strong> <code>buttonVariant=&quot;primary&quot;</code> corresponde al botón relleno del composer móvil; <code>secondary</code> es el valor por defecto. Las variantes de posición se definen en código.</>,
         <><strong>Diferencias:</strong> Figma muestra el marco estático; el código añade reproducción, búsqueda por teclado, foco visible y etiquetas accesibles. No se encontró una spec con propiedades responsive del reproductor.</>,
       ] }],
@@ -120,8 +129,8 @@ export const doc: ComponentDocContent = {
           <><strong>Estado externo:</strong> usa <code>playing</code> y <code>currentTime</code> con sus callbacks si la reproducción la controla otra parte de la aplicación.</>,
         ],
         avoid: [
-          <><strong>Audio sin duración:</strong> no uses el reproductor si no puedes proporcionar <code>duration</code>. (Alternativa: <code>ChatMessage</code> sin control de audio).</>,
-          <><strong>Reproductor de música completo:</strong> evita esta pieza si necesitas volumen, listas o selección de pistas. (Alternativa: un reproductor específico para esa experiencia).</>,
+          <><strong>Audio sin duración:</strong> no uses el reproductor si no puedes proporcionar <code>duration</code>. (Alternativa: <code>FileCard</code>, que presenta el archivo sin duración).</>,
+          <><strong>Reproductor de música completo:</strong> evita esta pieza si necesitas volumen, listas o selección de pistas. CAOS no tiene un componente para esa experiencia.</>,
           <><strong>Solo mostrar un archivo:</strong> no uses el reproductor si la acción es abrir o descargar el archivo. (Alternativa: <code>FileCard</code>).</>,
         ],
       }],
@@ -131,7 +140,7 @@ export const doc: ComponentDocContent = {
       description: 'Cada vista se dibuja con los valores responsive de su breakpoint. Tablet usa los mismos tokens que Desktop.',
       blocks: [{ type: 'breakpoints',
         desktop: { columns: [{ title: 'Composer', bullets: [<><strong>Sin cambios:</strong> mide lo mismo en Desktop, Tablet y Mobile.</>, <>La variante de botón por defecto es <code>secondary</code>.</>], preview: samePlayer() }] },
-        mobile: { bullets: [<><strong>Sin cambios:</strong> mide lo mismo en Desktop, Tablet y Mobile.</>, <>El composer móvil puede usar botón <code>primary</code>.</>, <>La onda ocupa el ancho disponible y reduce sus barras al espacio medido.</>], preview: player({ buttonVariant: 'primary', defaultCurrentTime: 20 }) },
+        mobile: { bullets: [<><strong>Sin cambios:</strong> mide lo mismo en Desktop, Tablet y Mobile.</>, <>El botón mantiene el tamaño xs de 32 px.</>, <>La onda ocupa el ancho disponible y reduce sus barras al espacio medido.</>], preview: samePlayer() },
         tablet: { bullets: [<><strong>Sin cambios:</strong> mide lo mismo en Desktop, Tablet y Mobile.</>, <>El botón mantiene el tamaño xs de 32 px.</>, <>La onda ocupa el ancho disponible y reduce sus barras al espacio medido.</>], preview: samePlayer() },
       }],
     },
@@ -143,8 +152,8 @@ export const doc: ComponentDocContent = {
         { kind: 'dont', framed: true, title: 'Duración no disponible', description: 'No presentes una onda buscable cuando no conoces la duración real.', preview: player({ duration: 0 }) },
         { kind: 'do', framed: true, title: 'Etiquetas descriptivas', description: 'Mantén nombres que expliquen reproducir, pausar y buscar para la tecnología de asistencia.', preview: player({ playLabel: 'Reproducir nota de voz', pauseLabel: 'Pausar nota de voz', seekLabel: 'Posición de la nota de voz' }) },
         { kind: 'dont', framed: true, title: 'Etiquetas genéricas', description: 'No reemplaces los nombres accesibles por etiquetas sin contexto.', preview: player({ playLabel: 'Botón', pauseLabel: 'Botón', seekLabel: 'Control' }) },
-        { kind: 'do', framed: true, title: 'Indica la fuente', description: <>Pasa <code>src</code> cuando el reproductor deba gestionar el audio y mantener la posición sincronizada.</>, preview: player({ src: '/audios/nota.mp3' }) },
-        { kind: 'dont', framed: true, title: 'Fuente no conectada', description: <>No esperes reproducción de audio si omites <code>src</code>; sin fuente, el componente solo presenta estado.</>, preview: player() },
+        { kind: 'do', framed: true, title: 'Ancho suficiente', description: 'Dale el ancho de la burbuja o del composer para que la onda muestre la posición con claridad.', preview: playerWidth(360) },
+        { kind: 'dont', framed: true, title: 'Ancho demasiado corto', description: 'No lo encajes en un espacio de pocos píxeles: la onda se reduce a unas pocas barras y la posición deja de leerse.', preview: playerWidth(140) },
       ] }],
     },
   ],

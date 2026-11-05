@@ -10,46 +10,56 @@ import { ChatDetailsGrid, ChatDetailsHeader, ChatDetailsLink, ChatDetailsPanel, 
 /*
  * Contenido de la página de documentación de ChatDetailsPanel (plantilla v2). Manda el código
  * (`ChatDetailsPanel.types.ts`, `ChatDetailsPanel.variants.ts`, `ChatDetailsPanel.tsx`), luego `ChatDetailsPanel.docs.json`.
+ * Cada muestra lleva su propio nombre de panel y de región: varias `aside` o regiones con el mismo nombre en una pestaña
+ * son landmarks repetidos (axe `landmark-unique`).
  */
+
+// Figma: 14894:12557 (component set Laterales (Atom))
+
+type PanelProps = Partial<ComponentProps<typeof ChatDetailsPanel>>;
+type PanelChildren = ReactNode | ((state: { collapsed: boolean }) => ReactNode);
 
 const photoAvatar = (size: 'md' | 'sm' = 'md') => (
   <Avatar variant="photo" size={size} src={PHOTO_SRC.Woman_1} alt="" badge={size === 'md'} badgeState="success" badgeLabel="En línea" />
 );
 
-const profileContent = () => (
+/** Vista de perfil. `sample` distingue el nombre de la región de fotografías en cada muestra. */
+const profileContent = (sample: string) => (
   <>
-    <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={3} />
+    <ChatDetailsProfile data-slot="profile" avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={3} />
     <ul className="m-0 list-none p-0">
       <ChatDetailsLink icon="folder">Documentos</ChatDetailsLink>
       <ChatDetailsLink icon="gallery">Fotografías</ChatDetailsLink>
     </ul>
-    <ChatDetailsGrid aria-label="Fotografías recientes">
+    <ChatDetailsGrid aria-label={`Fotografías recientes (${sample})`}>
       <FileCard type="thumbnail" title="Notas de reunión" selection="checkbox" className="size-auto aspect-square w-full" />
       <FileCard type="thumbnail" title="Pizarra del equipo" selection="checkbox" className="size-auto aspect-square w-full" />
     </ChatDetailsGrid>
   </>
 );
 
-const panel = (children: ReactNode | ((state: { collapsed: boolean }) => ReactNode), props: Partial<ComponentProps<typeof ChatDetailsPanel>> = {}) => (
-  <ChatDetailsPanel aria-label="Detalles de la conversación" collapsible className="h-[560px]" {...props}>
+/** Contenido del riel: avatar y accesos compactos a cada sección. */
+const railContent = () => (
+  <>
+    {photoAvatar('sm')}
+    <div className="flex flex-col gap-ds-space-general-2xl">
+      <ChatDetailsLink compact icon="folder">Documentos</ChatDetailsLink>
+      <ChatDetailsLink compact icon="gallery">Fotografías</ChatDetailsLink>
+    </div>
+  </>
+);
+
+/** Panel plegable de muestra. `sample` va en su nombre accesible para que no se repita en la pestaña. */
+const panel = (sample: string, children: PanelChildren, props: PanelProps = {}) => (
+  <ChatDetailsPanel aria-label={`Detalles de la conversación (${sample})`} collapsible className="h-[560px]" {...props}>
     {children}
   </ChatDetailsPanel>
 );
 
-const profilePanel = () => panel(profileContent());
+const profilePanel = (sample: string) => panel(sample, profileContent(sample));
 
-const railPanel = () => panel(
-  ({ collapsed }) => collapsed ? (
-    <>
-      {photoAvatar('sm')}
-      <div className="flex flex-col gap-ds-space-general-2xl">
-        <ChatDetailsLink compact icon="folder">Documentos</ChatDetailsLink>
-        <ChatDetailsLink compact icon="gallery">Fotografías</ChatDetailsLink>
-      </div>
-    </>
-  ) : profileContent(),
-  { defaultCollapsed: true }
-);
+const railPanel = (sample: string, props: PanelProps = {}) =>
+  panel(sample, ({ collapsed }) => (collapsed ? railContent() : profileContent(sample)), { defaultCollapsed: true, ...props });
 
 const fileActions = () => (
   <>
@@ -58,39 +68,64 @@ const fileActions = () => (
   </>
 );
 
-const filesPanel = () => panel(
-  <>
-    <ChatDetailsHeader onBack={() => {}} actions={fileActions()} />
-    <ChatDetailsGrid aria-label="Documentos">
-      <FileCard type="icon" title="Notas de reunión" description="Actualizado hoy" selection="checkbox" />
-      <FileCard type="icon" title="Plan de trabajo" description="Actualizado ayer" selection="checkbox" />
-    </ChatDetailsGrid>
-  </>,
-  { collapsible: false }
+/** Vista de documentos. Sin `back`, la cabecera no dibuja el botón Anterior. */
+const filesPanel = (sample: string, { back = true, className }: { back?: boolean; className?: string } = {}) =>
+  panel(
+    sample,
+    <>
+      <ChatDetailsHeader onBack={back ? () => {} : undefined} actions={fileActions()} />
+      <ChatDetailsGrid aria-label={`Documentos (${sample})`}>
+        <FileCard type="icon" title="Notas de reunión" description="Actualizado hoy" selection="checkbox" />
+        <FileCard type="icon" title="Plan de trabajo" description="Actualizado ayer" selection="checkbox" />
+      </ChatDetailsGrid>
+    </>,
+    { collapsible: false, ...(className && { className }) },
+  );
+
+/*
+ * Muestras de Do and Dont’s: el panel (fondo On Canva) sobre la superficie de la pantalla (`background/container/surface`),
+ * como en la app. Sin ella se funde con la pantalla del marco de teléfono, que usa el mismo fondo On Canva.
+ */
+const onScreen = (node: ReactNode) => (
+  <div className="flex w-full justify-end rounded-ds-radius-general-lg bg-ds-background-container-surface p-ds-space-general-md">{node}</div>
+);
+
+/*
+ * Perfil suelto de la regla de encabezados. Es una ilustración (`inert`): el h6 del caso malo saltaría niveles en la
+ * propia página de documentación, y el lector de pantalla no debe recorrer la muestra.
+ */
+const profileSample = (headingLevel: 3 | 6) => (
+  <div inert className="flex w-full justify-center">
+    <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={headingLevel} />
+  </div>
 );
 
 const states: DocStateItem[] = [
   {
     label: 'Expanded',
     tone: 'neutral',
-    description: 'Panel de 320 px para mostrar la vista activa. El contenido puede ser un nodo o una función que recibe el estado de plegado.',
-    samples: [profilePanel()],
+    description: 'Panel de 320 px con la vista activa. El contenido puede ser un nodo o una función que recibe el estado de plegado.',
+    samples: [profilePanel('estado expandido')],
   },
   {
     label: 'Collapsed',
     tone: 'accent',
-    description: <>Riel de 80 px activado con <code>collapsed</code>. El botón expone <code>aria-expanded=&quot;false&quot;</code> y las vistas pueden sustituir el contenido por controles compactos.</>,
-    samples: [railPanel()],
+    description: (
+      <>
+        Riel de 80 px. El botón expone <code>aria-expanded=&quot;false&quot;</code>; la función de <code>children</code> cambia el contenido por
+        accesos compactos.
+      </>
+    ),
+    samples: [railPanel('estado plegado')],
   },
 ];
-
-const tokenPreview = () => profilePanel();
 
 export const doc: ComponentDocContent = {
   name: 'ChatDetailsPanel',
   icon: 'info-circle',
   classification: 'composicion',
-  summary: 'ChatDetailsPanel es la composición lateral que reúne la información de una conversación y sus vistas de perfil, documentos o fotografías. Aporta estructura, nombre accesible y plegado; sus subcomponentes organizan el contenido y la navegación interna.',
+  summary:
+    'ChatDetailsPanel es la composición lateral que reúne la información de una conversación y sus vistas de perfil, documentos o fotografías. Aporta estructura, nombre accesible y plegado; sus subcomponentes organizan el contenido y la navegación interna.',
   definition: [
     {
       title: 'Anatomía',
@@ -98,13 +133,13 @@ export const doc: ComponentDocContent = {
       blocks: [{ type: 'anatomy', groups: [{
         canvases: [{
           label: 'Perfil y fotografías',
-          preview: profilePanel(),
+          preview: profilePanel('anatomía del perfil'),
           width: 320,
           marks: [
             { n: 1, selector: 'aside', side: 'left' },
-            { n: 2, selector: '[data-figma-part="Info"]', side: 'top' },
+            { n: 2, selector: '[data-slot="profile"]', side: 'left' },
             { n: 3, selector: '[data-figma-part="Heading"]', side: 'right' },
-            { n: 4, selector: '[data-figma-part="Filename"]', side: 'right' },
+            { n: 4, selector: 'ul > li', index: 0, side: 'right' },
             { n: 5, selector: '[role="region"]', side: 'bottom' },
           ],
           dimensions: [
@@ -122,11 +157,11 @@ export const doc: ComponentDocContent = {
       }, {
         canvases: [{
           label: 'Vista de documentos',
-          preview: filesPanel(),
+          preview: filesPanel('anatomía de documentos'),
           width: 320,
           marks: [
             { n: 1, selector: '[data-figma-part="Button"]', side: 'top' },
-            { n: 2, selector: 'button[aria-label="Eliminar seleccionados"]', side: 'right' },
+            { n: 2, selector: 'div:has(> button[aria-label="Eliminar seleccionados"])', side: 'top' },
             { n: 3, selector: '[role="region"]', side: 'bottom' },
           ],
         }],
@@ -139,7 +174,12 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Estados',
-      description: 'ChatDetailsPanel tiene dos estados de anchura: Expanded y Collapsed. El estado plegado requiere <code>collapsible</code> para mostrar el botón de control.',
+      description: (
+        <>
+          ChatDetailsPanel tiene 2 estados de ancho, los dos del panel: Expanded y Collapsed. Se pliega con <code>collapsed</code> o{' '}
+          <code>defaultCollapsed</code>; <code>collapsible</code> solo agrega el botón que alterna entre los dos.
+        </>
+      ),
       blocks: [{ type: 'states', items: states }],
     },
     {
@@ -148,9 +188,10 @@ export const doc: ComponentDocContent = {
       titleInside: true,
       blocks: [{ type: 'tokens', groups: [{
         title: 'Panel de perfil',
-        preview: tokenPreview(),
+        preview: profilePanel('tokens'),
         entries: [
           { part: 'Fondo', color: 'background-container-default-on-canva' },
+          { part: 'Sombra (en oscuro es transparente)', color: 'effect-shadow-on-canva-md' },
           { part: 'Nombre', color: 'text-neutral-heading', text: 'typography-heading-size-md' },
           { part: 'Descripción', color: 'text-neutral-body', text: 'typography-body-size-md' },
         ],
@@ -175,14 +216,14 @@ export const doc: ComponentDocContent = {
       blocks: [{ type: 'usage',
         use: [
           <><strong>Detalles de una conversación:</strong> usa el panel como región complementaria con un <code>aria-label</code> descriptivo.</>,
-          <><strong>Navegar entre vistas:</strong> combina <code>ChatDetailsLink</code> y <code>ChatDetailsHeader</code>; quien compone las vistas gestiona el cambio y el retorno del foco.</>,
+          <><strong>Navegar entre vistas:</strong> combina <code>ChatDetailsLink</code> y <code>ChatDetailsHeader</code>. Quien compone las vistas mueve el foco: al abrir una vista, a <code>backRef</code>; al volver, a la fila que la abrió.</>,
           <><strong>Galerías o documentos:</strong> muestra elementos en <code>ChatDetailsGrid</code>, con un nombre accesible para cada región desplazable.</>,
           <><strong>Diseño plegable:</strong> habilita <code>collapsible</code> y usa la función de <code>children</code> para adaptar el contenido al riel.</>,
         ],
         avoid: [
-          <><strong>Contenido principal de la página:</strong> no uses el panel como contenedor principal. (Alternativa: la región principal de la pantalla).</>,
-          <><strong>Panel sin nombre:</strong> no omitas <code>aria-label</code> en el <code>aside</code> ni en <code>ChatDetailsGrid</code>. (Alternativa: añade un nombre que describa el contenido).</>,
-          <><strong>Cambiar vista sin gestionar foco:</strong> al desmontar el control activado, el foco puede volver al documento. (Alternativa: enfócalo en <code>ChatDetailsHeader.backRef</code> y restáuralo en la fila que abrió la vista).</>,
+          <><strong>Mensajes de la conversación:</strong> no pongas la conversación dentro del panel; el panel la complementa. (Alternativa: <code>ChatMessageList</code> con <code>ChatComposer</code>).</>,
+          <><strong>Navegación principal:</strong> no uses el panel como menú lateral de la aplicación. (Alternativa: <code>SideBar</code>).</>,
+          <><strong>Perfil fuera de un chat:</strong> no uses el panel para mostrar una ficha de persona en otra pantalla. (Alternativa: <code>ProfileCard</code>).</>,
         ],
       }],
     },
@@ -190,21 +231,32 @@ export const doc: ComponentDocContent = {
       title: 'Aplicaciones de breakpoints',
       description: 'Cada vista se dibuja con los valores responsive de su breakpoint. Tablet usa los mismos tokens que Desktop.',
       blocks: [{ type: 'breakpoints',
-        desktop: { columns: [{ title: 'Panel expandido', bullets: [<>El ancho es 320 px.</>, <>El riel plegado mide 80 px.</>], preview: profilePanel() }] },
-        mobile: { bullets: [<>El código mantiene el ancho expandido de 320 px.</>, <>El riel plegado mide 80 px y conserva los botones compactos.</>, <>TODO: confirmar con diseño la ubicación del panel y el comportamiento de su contenido en Mobile.</>], preview: profilePanel() },
-        tablet: { bullets: [<>El panel mantiene los anchos fijos de 320 px y 80 px.</>, <>No hay props ni tokens de breakpoint en el componente.</>, <>Ajusta el contenedor padre para ubicar el panel junto al contenido.</>], preview: profilePanel() },
+        desktop: { columns: [{ title: 'Panel expandido', bullets: [
+          <><strong>Sin cambios:</strong> mide lo mismo en Desktop, Tablet y Mobile.</>,
+          <><strong>Anchos fijos:</strong> 320 px expandido y 80 px plegado.</>,
+        ], preview: profilePanel('Desktop') }] },
+        mobile: { bullets: [
+          <><strong>Sin cambios:</strong> mide lo mismo en Desktop, Tablet y Mobile.</>,
+          <><strong>Anchos fijos:</strong> 320 px expandido y 80 px plegado, con los accesos compactos en el riel.</>,
+          <><strong>Ubicación:</strong> el componente no tiene props ni tokens de breakpoint; el contenedor padre decide dónde va.</>,
+        ], preview: profilePanel('Mobile') },
+        tablet: { bullets: [
+          <><strong>Sin cambios:</strong> mide lo mismo en Desktop, Tablet y Mobile.</>,
+          <><strong>Anchos fijos:</strong> 320 px expandido y 80 px plegado.</>,
+          <><strong>Alto:</strong> el panel no fija su alto; dáselo con <code>className</code> o con el contenedor padre.</>,
+        ], preview: profilePanel('Tablet') },
       }],
     },
     {
       title: 'Do and Dont’s',
       description: 'Criterios para componer el panel y sus vistas accesibles.',
       blocks: [{ type: 'practices', items: [
-        { kind: 'do', framed: true, title: 'Adapta el riel', description: <>Usa la función de <code>children</code> para mostrar accesos compactos al plegar el panel.</>, preview: railPanel() },
-        { kind: 'dont', framed: true, title: 'Contenido comprimido', description: 'No mantengas el perfil y la cuadrícula completos dentro del riel estrecho.', preview: panel(profileContent(), { defaultCollapsed: true }) },
-        { kind: 'do', framed: true, title: 'Nombra la región', description: 'Da a cada región desplazable un nombre que identifique su contenido.', preview: filesPanel() },
-        { kind: 'dont', framed: true, title: 'Región sin contexto', description: 'No reutilices un nombre genérico para las vistas de documentos y fotografías.', preview: panel(<><ChatDetailsHeader onBack={() => {}} /><ChatDetailsGrid aria-label="Contenido"><FileCard type="icon" title="Notas de reunión" /></ChatDetailsGrid></>, { collapsible: false }) },
-        { kind: 'do', framed: true, title: 'Nivel de título correcto', description: <>Ajusta <code>headingLevel</code> para mantener el orden de encabezados de la página.</>, preview: <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={3} /> },
-        { kind: 'dont', framed: true, title: 'Nivel de título profundo', description: 'No elijas un nivel de encabezado solo por su tamaño visual.', preview: <ChatDetailsProfile avatar={photoAvatar()} name="Ana Pérez" description="Disponible para conversar" headingLevel={6} /> },
+        { kind: 'do', framed: true, title: 'Adapta el riel', description: <>Usa la función de <code>children</code> para mostrar accesos compactos al plegar el panel.</>, preview: onScreen(railPanel('riel adaptado', { className: 'h-80' })) },
+        { kind: 'dont', framed: true, title: 'Riel vacío', description: 'No dejes el riel solo con el botón de plegar: la persona pierde los accesos.', preview: onScreen(panel('riel vacío', ({ collapsed }) => (collapsed ? null : profileContent('riel vacío')), { defaultCollapsed: true, className: 'h-80' })) },
+        { kind: 'do', framed: true, title: 'Ofrece volver', description: <>Pasa <code>onBack</code> a <code>ChatDetailsHeader</code> en cada vista de archivos.</>, preview: onScreen(filesPanel('vista con Anterior', { className: 'h-80' })) },
+        { kind: 'dont', framed: true, title: 'Vista sin salida', description: 'No abras una vista de archivos sin el botón Anterior: la persona no puede volver al perfil.', preview: onScreen(filesPanel('vista sin Anterior', { back: false, className: 'h-80' })) },
+        { kind: 'do', framed: true, title: 'Nivel de título correcto', description: <>Ajusta <code>headingLevel</code> al orden de la página; el nombre se ve igual en cualquier nivel.</>, preview: profileSample(3) },
+        { kind: 'dont', framed: true, title: 'Nivel de título que salta', description: 'No saltes niveles: se ve igual, pero el lector de pantalla anuncia una jerarquía falsa.', preview: profileSample(6) },
       ] }],
     },
   ],

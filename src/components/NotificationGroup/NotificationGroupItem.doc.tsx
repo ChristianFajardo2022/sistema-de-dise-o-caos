@@ -20,7 +20,7 @@ const item = (props: Partial<ComponentProps<typeof NotificationGroupItem>> = {})
 const states: DocStateItem[] = [
   {
     label: 'Default · Unread',
-    tone: 'success',
+    tone: 'neutral',
     description: 'La fila muestra el punto de no leída y la descripción en peso semibold.',
     samples: [item({ unread: true })],
   },
@@ -60,17 +60,17 @@ export const doc: ComponentDocContent = {
           marks: [
             { n: 1, selector: 'li', side: 'left' },
             { n: 2, selector: '[data-figma-part="Content"]', side: 'top' },
-            { n: 3, selector: '[data-figma-part="Time"]', side: 'left' },
-            { n: 4, selector: '[data-figma-part="Badge"]', side: 'left' },
-            { n: 5, selector: '[data-figma-part="Lorem ipsum dolor sit amet."]', side: 'bottom' },
+            { n: 3, selector: '[data-figma-part="Hace 22m"]', side: 'right' },
+            { n: 4, selector: '[data-figma-part="Badge"]', side: 'top' },
+            { n: 5, selector: '[data-figma-part^="Lorem ipsum"]', side: 'bottom' },
           ],
           dimensions: [
             { kind: 'height', selector: '[data-figma-part="Content"]' },
-            { kind: 'gap', from: '[data-figma-part="Time"]', to: '[data-figma-part="Lorem ipsum dolor sit amet."]', axis: 'y' },
+            { kind: 'gap', from: '[data-figma-part="Time"]', to: '[data-figma-part^="Lorem ipsum"]', axis: 'y' },
           ],
         }],
         guidelines: [
-          <><strong>Fila:</strong> es un <code>li</code> de 316 px de ancho en la referencia. Lleva radio de 16 px y trazos superior e inferior de 0.5 px.</>,
+          <><strong>Fila:</strong> es un <code>li</code> de 316 px de ancho en la referencia. Lleva radio de 16 px y trazos superior e inferior de 0,5 px.</>,
           <><strong>Contenido:</strong> usa padding vertical de 8 px, padding derecho de 12 px y no añade padding izquierdo.</>,
           <><strong>Hora:</strong> aparece arriba con tipografía regular de 12 px/16 px.</>,
           <><strong>Estado de lectura:</strong> <code>unread</code> añade un punto Success con nombre accesible «No leída» junto a la hora.</>,
@@ -83,7 +83,7 @@ export const doc: ComponentDocContent = {
           marks: [
             { n: 1, selector: 'a[data-notification-control]', side: 'left' },
             { n: 2, selector: '[data-figma-part="Time"]', side: 'top' },
-            { n: 3, selector: '[data-figma-part="Lorem ipsum dolor sit amet."]', side: 'bottom' },
+            { n: 3, selector: '[data-figma-part^="Lorem ipsum"]', side: 'bottom' },
           ],
         }],
         guidelines: [
@@ -95,12 +95,12 @@ export const doc: ComponentDocContent = {
     },
     {
       title: 'Estados',
-      description: 'NotificationGroupItem no es interactiva por defecto. Sus variantes de aspecto corresponden a Type Default o Eliminate y State Unread o Read.',
+      description: 'NotificationGroupItem tiene 4 estados del set Dropdown group notification (Atom) de Figma: Type Default o Eliminate, cada uno en State Unread o Read. No es interactiva por defecto.',
       blocks: [{ type: 'states', items: states }],
     },
     {
       title: 'Tokens y modos',
-      description: 'Tokens de la descripción, la hora y los trazos de la fila. El contenido usa texto blanco en ambos modos.',
+      description: 'Tokens de la descripción, la hora y los trazos de la fila. El token de texto neutro cambia con el modo: no es un color fijo.',
       titleInside: true,
       blocks: [{ type: 'tokens', groups: [
         {
@@ -110,6 +110,8 @@ export const doc: ComponentDocContent = {
             { part: 'Trazo superior e inferior', color: 'border-general-default-on-card' },
             { part: 'Hora', color: 'text-neutral-white', text: 'primitives-typography-size-sm' },
             { part: 'Descripción', color: 'text-neutral-white', text: 'primitives-typography-size-md' },
+            { part: 'Peso de la descripción', text: 'primitives-typography-weight-semibold' },
+            { part: 'Punto de no leída', color: 'background-semantic-success-tertiary' },
           ],
         },
         {
@@ -119,6 +121,7 @@ export const doc: ComponentDocContent = {
             { part: 'Trazo superior e inferior', color: 'border-general-default-on-card' },
             { part: 'Hora', color: 'text-neutral-white', text: 'primitives-typography-size-sm' },
             { part: 'Descripción', color: 'text-neutral-white', text: 'primitives-typography-size-md' },
+            { part: 'Peso de la descripción', text: 'primitives-typography-weight-regular' },
           ],
         },
       ] }],
@@ -148,9 +151,9 @@ export const doc: ComponentDocContent = {
           <><strong>Eliminar una fila:</strong> pasa <code>onDelete</code> cuando la notificación individual se pueda eliminar.</>,
         ],
         avoid: [
-          <><strong>Fila fuera de una lista:</strong> el componente renderiza <code>li</code>. (Alternativa: úsalo dentro de <code>NotificationGroup</code> o de un <code>ul</code>).</>,
-          <><strong>Control sin propósito:</strong> no añadas <code>href</code> u <code>onClick</code> si la fila no abre ni cambia nada. (Alternativa: deja la descripción como texto informativo).</>,
-          <><strong>Estado contradictorio:</strong> no marques como leída una notificación que sigue pendiente de revisión. (Alternativa: activa <code>unread</code>).</>,
+          <><strong>Fila fuera de una lista:</strong> el componente renderiza <code>li</code>. (Alternativa: <code>NotificationGroup</code>, que organiza las filas en una lista).</>,
+          <><strong>Notificación aislada:</strong> no uses la fila para una notificación que no pertenece a un grupo. (Alternativa: <code>NotificationItem</code> o <code>NotificationCard</code>).</>,
+          <><strong>Estado contradictorio:</strong> no marques como leída una notificación que sigue pendiente de revisión; activa <code>unread</code>.</>,
         ],
       }],
     },
@@ -159,7 +162,7 @@ export const doc: ComponentDocContent = {
       description: 'Cada vista se dibuja con los valores responsive de su breakpoint. Tablet usa los mismos tokens que Desktop.',
       blocks: [{ type: 'breakpoints',
         desktop: { columns: [{ title: 'Fila del grupo', bullets: [<>La referencia mide 316 px de ancho.</>, <>El contenido usa padding vertical de 8 px y derecho de 12 px.</>], preview: item({ unread: true }) }] },
-        mobile: { bullets: [<><strong>Sin cambios:</strong> conserva el mismo padding en Desktop, Tablet y Mobile.</>, <>La fila ocupa el ancho que le da el grupo.</>, <>El control mantiene el área clicable extendida sobre la fila.</>], preview: item({ unread: true, href: '#ajustes' }) },
+        mobile: { bullets: [<><strong>Sin cambios:</strong> conserva el mismo padding en Desktop, Tablet y Mobile.</>, <>La fila ocupa el ancho que le da el grupo.</>, <>Si la fila tiene control, mantiene el área clicable extendida sobre ella.</>], preview: item({ unread: true }) },
         tablet: { bullets: [<><strong>Sin cambios:</strong> conserva el mismo padding en Desktop, Tablet y Mobile.</>, <>La fila ocupa el ancho que le da el grupo.</>, <>El punto de no leída queda junto a la hora.</>], preview: item({ unread: true }) },
       }],
     },
@@ -167,12 +170,12 @@ export const doc: ComponentDocContent = {
       title: 'Do and Dont’s',
       description: 'Criterios para comunicar el estado y la acción de cada fila.',
       blocks: [{ type: 'practices', items: [
-        { kind: 'do', framed: true, title: 'Marca como no leída', description: <>Activa <code>unread</code> mientras la notificación esté pendiente de revisar.</>, preview: item({ unread: true }) },
-        { kind: 'dont', framed: true, title: 'Estado leído incorrecto', description: 'No muestres como leída una notificación que todavía requiere atención.', preview: item({ unread: false }) },
-        { kind: 'do', framed: true, title: 'Enlace con destino', description: <>Pasa <code>href</code> cuando la fila navegue a otra ubicación.</>, preview: item({ href: '#ajustes' }) },
-        { kind: 'dont', framed: true, title: 'Enlace sin destino', description: 'No simules un enlace si la fila no tiene un destino real.', preview: item() },
-        { kind: 'do', framed: true, title: 'Elimina la fila', description: <>Pasa <code>onDelete</code> si la persona puede quitar esta notificación.</>, preview: item({ onDelete: () => {}, defaultRevealed: true }) },
-        { kind: 'dont', framed: true, title: 'Acción innecesaria', description: 'No muestres eliminar si la fila debe permanecer en el grupo.', preview: item() },
+        { kind: 'do', framed: true, title: 'Marca como no leída', description: <>Activa <code>unread</code> mientras la notificación esté pendiente: el punto y el peso semibold la destacan.</>, preview: item({ unread: true, description: 'Tienes una invitación pendiente de responder.' }) },
+        { kind: 'dont', framed: true, title: 'Estado leído incorrecto', description: 'No muestres como leída una notificación pendiente: el mensaje pide respuesta y la fila parece resuelta.', preview: item({ unread: false, description: 'Tienes una invitación pendiente de responder.' }) },
+        { kind: 'do', framed: true, title: 'Descripción breve', description: 'Resume la notificación en una frase corta para que la fila se lea de un vistazo.', preview: item({ unread: true, description: 'Se guardaron los ajustes.' }) },
+        { kind: 'dont', framed: true, title: 'Descripción extensa', description: 'No escribas párrafos en la fila: crece sin límite y empuja el resto del grupo.', preview: item({ unread: true, description: 'Se actualizó la imagen de perfil, se guardaron los ajustes de privacidad y se añadió una nota de reunión con todos los detalles del cambio.' }) },
+        { kind: 'do', framed: true, title: 'Elimina la fila', description: <>Pasa <code>onDelete</code> si la persona puede quitar esta notificación.</>, preview: item({ onDelete: () => {}, defaultRevealed: true, description: 'Se actualizó la imagen de perfil.' }) },
+        { kind: 'dont', framed: true, title: 'Acción innecesaria', description: 'No muestres eliminar si la fila debe permanecer: el mensaje exige una acción antes de descartarlo.', preview: item({ unread: true, onDelete: () => {}, defaultRevealed: true, description: 'Debes aceptar los términos para continuar.' }) },
       ] }],
     },
   ],

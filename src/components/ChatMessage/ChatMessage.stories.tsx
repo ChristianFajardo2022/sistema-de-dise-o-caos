@@ -45,12 +45,12 @@ const meta = {
     direction: 'incoming',
     type: 'text',
     author: 'Ana Pérez',
-    time: '20:14',
+    time: '8:14 p.m.',
     children: '¿Puedes revisar las notas de la reunión?',
   },
   decorators: [
     (Story) => (
-      <div className="w-full max-w-[618px]">
+      <div className="w-full max-w-[618px] rounded-ds-radius-general-xl bg-ds-background-container-default-on-canva p-ds-space-general-lg">
         <Story />
       </div>
     ),
@@ -62,14 +62,14 @@ type Story = StoryObj<typeof meta>;
 
 const avatar = (photo: PhotoName) => <Avatar variant="photo" size="sm" src={PHOTO_SRC[photo]} alt="" />;
 
-/** Playground. Un `ChatMessage` es un `<li>`: aquí va dentro de un `<ul>`. */
+/** Playground. Un `ChatMessage` es un `<li>`: aquí va dentro de un `<ol>`. */
 export const Interactive: Story = {
   render: ({ children, ...args }) => (
-    <ul className="m-0 list-none p-0">
+    <ol className="m-0 list-none p-0">
       <ChatMessage {...args} avatar={avatar(args.direction === 'outgoing' ? 'Men_4' : 'Woman_1')}>
         {args.type === 'audio' ? <ChatAudioPlayer duration={74} timePosition="start" buttonPosition="end" /> : children}
       </ChatMessage>
-    </ul>
+    </ol>
   ),
 };
 
@@ -83,11 +83,11 @@ interface Item {
 }
 
 const SEED: Item[] = [
-  { id: 1, direction: 'incoming', author: 'Ana Pérez', time: '09:12', text: 'Hola, ¿puedes revisar las notas?' },
-  { id: 2, direction: 'outgoing', author: 'Tú', time: '09:13', text: 'Ya revisé el documento.' },
-  { id: 3, direction: 'incoming', author: 'Ana Pérez', time: '09:14', text: '¿Puedes compartir la fecha de la reunión?' },
-  { id: 4, direction: 'outgoing', author: 'Tú', time: '09:15', text: 'Te confirmo antes de la reunión.' },
-  { id: 5, direction: 'outgoing', author: 'Tú', time: '09:16', audio: 42 },
+  { id: 1, direction: 'incoming', author: 'Ana Pérez', time: '9:12 a.m.', text: 'Hola, ¿puedes revisar las notas?' },
+  { id: 2, direction: 'outgoing', author: 'Tú', time: '9:13 a.m.', text: 'Ya revisé el documento.' },
+  { id: 3, direction: 'incoming', author: 'Ana Pérez', time: '9:14 a.m.', text: '¿Puedes compartir la fecha de la reunión?' },
+  { id: 4, direction: 'outgoing', author: 'Tú', time: '9:15 a.m.', text: 'Te confirmo antes de la reunión.' },
+  { id: 5, direction: 'outgoing', author: 'Tú', time: '9:16 a.m.', audio: 42 },
 ];
 
 /** Mensajes que llegan solos en la demo, uno cada 4 s. */
@@ -107,7 +107,7 @@ function ConversationDemo() {
       if (sent >= INCOMING.length) clearInterval(timer);
       setItems((list) => [
         ...list,
-        { id: list.length + 1, direction: 'incoming', author: 'Ana Pérez', time: `09:${20 + sent}`, text },
+        { id: list.length + 1, direction: 'incoming', author: 'Ana Pérez', time: `9:${20 + sent} a.m.`, text },
       ]);
     }, 4000);
     return () => clearInterval(timer);
@@ -146,7 +146,7 @@ export const FigmaMatrix: Story = {
   decorators: [(Story) => <Story />],
   render: () => (
     <div className="bg-ds-background-general-black p-6">
-      <ul className="m-0 flex w-[381px] list-none flex-col gap-6 p-0">
+      <ol className="m-0 flex w-[381px] list-none flex-col gap-6 p-0">
         {FIGMA.map((v) => (
           <ChatMessage
             key={v.name}
@@ -154,13 +154,13 @@ export const FigmaMatrix: Story = {
             direction={v.direction}
             type={v.type}
             author={v.direction === 'incoming' ? 'Ana Pérez' : 'Hugo García'}
-            time="20:14"
+            time="8:14 p.m."
             avatar={avatar(v.photo)}
           >
             {v.type === 'audio' ? <ChatAudioPlayer duration={1214} defaultCurrentTime={(1214 * 10) / 179} timePosition="start" buttonPosition="end" /> : '¿Puedes revisar las notas de la reunión?'}
           </ChatMessage>
         ))}
-      </ul>
+      </ol>
     </div>
   ),
 };
@@ -171,10 +171,10 @@ export const AccessibilityTest: Story = {
   render: () => (
     <div className="flex h-[300px] flex-col">
       <ChatMessageList aria-label="Mensajes con Ana Pérez" className="flex-1">
-        <ChatMessage author="Ana Pérez" time="09:12" avatar={avatar('Woman_1')}>
+        <ChatMessage author="Ana Pérez" time="9:12 a.m." avatar={avatar('Woman_1')}>
           Hola
         </ChatMessage>
-        <ChatMessage direction="outgoing" type="audio" author="Tú" time="09:13" avatar={avatar('Men_4')}>
+        <ChatMessage direction="outgoing" type="audio" author="Tú" time="9:13 a.m." avatar={avatar('Men_4')}>
           <ChatAudioPlayer duration={20} timePosition="start" buttonPosition="end" />
         </ChatMessage>
       </ChatMessageList>
@@ -186,8 +186,8 @@ export const AccessibilityTest: Story = {
     await expect(log).toHaveAttribute('aria-live', 'polite');
     const items = within(log).getAllByRole('listitem');
     await expect(items).toHaveLength(2);
-    await expect(items[0]).toHaveTextContent(/^Ana Pérez: Hola, 09:12$/);
-    await expect(items[0].querySelector('time')).toHaveTextContent('09:12');
+    await expect(items[0]).toHaveTextContent(/^Ana Pérez: Hola, 9:12 a.m.$/);
+    await expect(items[0].querySelector('time')).toHaveTextContent('9:12 a.m.');
     const play = canvas.getByRole('button', { name: 'Reproducir audio' });
     await userEvent.click(play);
     await expect(canvas.getByRole('button', { name: 'Pausar audio' })).toHaveFocus();

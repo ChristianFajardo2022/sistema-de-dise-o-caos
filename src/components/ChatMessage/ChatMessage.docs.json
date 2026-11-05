@@ -4,19 +4,54 @@
   "description": "Mensaje de una conversación del component set Conversacion (Atom) de Figma. Property 1: Default = incoming/text, Variant2 = outgoing/text, Variant4 = outgoing/audio y Variant5 = incoming/audio. La fila lleva avatar de 32 y una burbuja: los mensajes entrantes se alinean a la izquierda y los salientes a la derecha. type=\"audio\" estira la burbuja para ChatAudioPlayer. ChatMessage es un li y va dentro de ChatMessageList, que usa role=\"log\", aria-live=\"polite\" y una lista ordenada. La lista anuncia mensajes nuevos sin interrumpir y baja al final si ya estaba abajo. El autor se lee antes del contenido aunque no se dibuja; la hora se muestra dentro de time. El avatar es decorativo.",
   "category": "Data Display",
   "props": {
-    "direction": { "type": "'incoming' | 'outgoing'", "default": "'incoming'", "description": "Property 1 de Figma: Default y Variant5 = incoming; Variant2 y Variant4 = outgoing." },
-    "type": { "type": "'text' | 'audio'", "default": "'text'", "description": "Variant4 y Variant5 usan audio; la burbuja ocupa el ancho libre." },
-    "children": { "type": "ReactNode", "required": true, "description": "Texto del mensaje o un ChatAudioPlayer." },
-    "author": { "type": "string", "required": true, "description": "Autor, solo para lectores de pantalla." },
-    "time": { "type": "string", "required": false, "description": "Hora visible (en un elemento time)." },
-    "dateTime": { "type": "string", "required": false, "description": "Valor ISO 8601 del elemento time." },
-    "avatar": { "type": "ReactNode", "required": false, "description": "Avatar photo sm (32), decorativo." },
-    "className": { "type": "string", "required": false, "description": "Clases del li raíz." }
+    "direction": {
+      "type": "'incoming' | 'outgoing'",
+      "default": "'incoming'",
+      "description": "Property 1 de Figma: Default y Variant5 = incoming; Variant2 y Variant4 = outgoing."
+    },
+    "type": {
+      "type": "'text' | 'audio'",
+      "default": "'text'",
+      "description": "Variant4 y Variant5 usan audio; la burbuja ocupa el ancho libre."
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": true,
+      "description": "Texto del mensaje o un ChatAudioPlayer."
+    },
+    "author": {
+      "type": "string",
+      "required": true,
+      "description": "Autor, solo para lectores de pantalla."
+    },
+    "time": {
+      "type": "string",
+      "required": false,
+      "description": "Hora visible (en un elemento time)."
+    },
+    "dateTime": {
+      "type": "string",
+      "required": false,
+      "description": "Valor ISO 8601 del elemento time."
+    },
+    "avatar": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Avatar photo sm (32), decorativo."
+    },
+    "className": {
+      "type": "string",
+      "required": false,
+      "description": "Clases del li raíz."
+    }
   },
   "subcomponents": {
     "ChatMessageList": "aria-label, stickToBottom, scrollToBottomKey, maxHeight"
   },
   "examples": [
-    { "title": "Conversación", "code": "<ChatMessageList aria-label=\"Mensajes con Ana Pérez\" className=\"h-96\">\n  <ChatMessage author=\"Ana Pérez\" time=\"09:12\" avatar={<Avatar variant=\"photo\" size=\"sm\" src={foto} alt=\"\" />}>Hola, ¿puedes revisar las notas?</ChatMessage>\n  <ChatMessage direction=\"outgoing\" type=\"audio\" author=\"Tú\" time=\"09:13\" avatar={…}>\n    <ChatAudioPlayer duration={42} src={url} />\n  </ChatMessage>\n</ChatMessageList>" }
+    {
+      "title": "Conversación",
+      "code": "<ChatMessageList aria-label=\"Mensajes con Ana Pérez\" className=\"h-96\">\n  <ChatMessage author=\"Ana Pérez\" time=\"9:12 a.m.\" dateTime=\"2026-11-04T09:12:00\" avatar={<Avatar variant=\"initials\" size=\"sm\" name=\"Ana Pérez\" />}>\n    Hola, ¿puedes revisar las notas?\n  </ChatMessage>\n  <ChatMessage direction=\"outgoing\" type=\"audio\" author=\"Hugo García\" time=\"9:13 a.m.\" dateTime=\"2026-11-04T09:13:00\" avatar={<Avatar variant=\"initials\" size=\"sm\" name=\"Hugo García\" />}>\n    <ChatAudioPlayer duration={42} />\n  </ChatMessage>\n</ChatMessageList>"
+    }
   ]
 }

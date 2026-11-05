@@ -13,13 +13,27 @@ import { componentDocsParameters } from '../../docs/storybook';
 import { doc } from './ChatComposer.doc';
 import docsJson from './ChatComposer.docs.json';
 
+/**
+ * Código de Personalizar: el lienzo muestra Grabar porque la historia pasa `onRecord`. Las funciones no entran en el
+ * código generado, así que se escribe `onRecord` aquí para que al copiarlo siga el micrófono.
+ */
+function composerCode(args: Record<string, unknown>): string {
+  const lines = ['  onRecord={() => {}}'];
+  for (const [name, value] of Object.entries(args)) {
+    if (value === undefined || typeof value === 'function' || value === false) continue;
+    if (value === true) lines.push(`  ${name}`);
+    else lines.push(`  ${name}={${JSON.stringify(value)}}`);
+  }
+  return `<ChatComposer\n${lines.join('\n')}\n/>`;
+}
+
 const meta = {
   title: 'Data Display/ChatComposer',
   component: ChatComposer,
   parameters: {
     layout: 'padded',
     docs: componentDocsParameters(doc, docsJson),
-    docsLive: { exclude: ['value', 'defaultValue', 'textareaProps', 'attachments', 'audio'] },
+    docsLive: { exclude: ['value', 'defaultValue', 'textareaProps', 'attachments', 'audio'], code: composerCode },
   },
   tags: ['autodocs'],
   argTypes: {
