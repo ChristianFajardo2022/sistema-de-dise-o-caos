@@ -39,13 +39,13 @@ export const proposito =
 
 /** Ruta rápida: qué necesitas → en qué pestaña está */
 export const rutaRapida: { necesidad: string; pestana: string; seccion: string }[] = [
-  { necesidad: 'Entender la voz en un minuto', pestana: 'Voz', seccion: 'Voz en 30 segundos' },
-  { necesidad: 'Revisar un texto antes de publicarlo', pestana: 'Voz', seccion: 'Checklist antes de publicar' },
-  { necesidad: 'Elegir el tono para un mensaje', pestana: 'Tono', seccion: 'Mapa de tonos por situación' },
-  { necesidad: 'Nombrar un botón, un titular o un campo', pestana: 'Cómo escribimos', seccion: 'Estructura sin relleno, Botones y Campos' },
-  { necesidad: 'Resolver dudas de forma (mayúsculas, dinero, fechas, límites)', pestana: 'Mecánica', seccion: 'Mecánica de escritura' },
-  { necesidad: 'Escribir un error, un estado vacío, un correo o un SMS', pestana: 'Patrones', seccion: 'Patrones por componente' },
-  { necesidad: 'Confirmar cómo se llama algo en el producto', pestana: 'Glosario', seccion: 'Glosario' },
+  { necesidad: 'Entender la voz en un minuto', pestana: 'Definición', seccion: 'Voz en 30 segundos' },
+  { necesidad: 'Revisar un texto antes de publicarlo', pestana: 'Definición', seccion: 'Checklist antes de publicar' },
+  { necesidad: 'Elegir el tono para un mensaje', pestana: 'Definición', seccion: 'Mapa de tonos por situación' },
+  { necesidad: 'Nombrar un botón, un titular o un campo', pestana: 'Aplicación', seccion: 'Estructura sin relleno, Botones y Campos' },
+  { necesidad: 'Resolver dudas de forma (mayúsculas, dinero, fechas, límites)', pestana: 'Aplicación', seccion: 'Mecánica de escritura' },
+  { necesidad: 'Escribir un error, un estado vacío, un correo o un SMS', pestana: 'Aplicación', seccion: 'Patrones por componente' },
+  { necesidad: 'Confirmar cómo se llama algo en el producto', pestana: 'Definición', seccion: 'Glosario' },
 ];
 
 /* ------------------------------------------------------------------ Voz */
@@ -119,13 +119,13 @@ export const atributos: Atributo[] = [
 
 /** Checklist antes de publicar: pregunta → pestaña donde está el detalle */
 export const checklist: { pregunta: string; dondeVer: string }[] = [
-  { pregunta: '¿La acción se entiende en menos de un segundo?', dondeVer: 'Voz · Atributos' },
-  { pregunta: '¿Suena a una persona? (tú, primera persona, voz activa)', dondeVer: 'Cómo escribimos' },
-  { pregunta: '¿El titular y el subtítulo dicen cosas distintas, y cada palabra aporta?', dondeVer: 'Cómo escribimos · Estructura sin relleno' },
-  { pregunta: '¿Los botones y los campos usan palabras del usuario y términos del glosario?', dondeVer: 'Cómo escribimos · Botones, Campos · Glosario' },
-  { pregunta: '¿El tono corresponde al momento: dinero, error, espera o logro?', dondeVer: 'Tono' },
-  { pregunta: '¿Es neutro en género, accesible y respeta la mecánica (moneda, fechas, límites)?', dondeVer: 'Cómo escribimos · Lenguaje neutro · Mecánica' },
-  { pregunta: '¿Sobra algo? Si al quitarlo el significado no cambia, se quita.', dondeVer: 'Cómo escribimos · Estructura sin relleno' },
+  { pregunta: '¿La acción se entiende en menos de un segundo?', dondeVer: 'Definición · Atributos de la voz' },
+  { pregunta: '¿Suena a una persona? (tú, primera persona, voz activa)', dondeVer: 'Aplicación · Persona y trato' },
+  { pregunta: '¿El titular y el subtítulo dicen cosas distintas, y cada palabra aporta?', dondeVer: 'Aplicación · Estructura sin relleno' },
+  { pregunta: '¿Los botones y los campos usan palabras del usuario y términos del glosario?', dondeVer: 'Aplicación · Botones y Campos; Definición · Glosario' },
+  { pregunta: '¿El tono corresponde al momento: dinero, error, espera o logro?', dondeVer: 'Definición · Mapa de tonos por situación' },
+  { pregunta: '¿Es neutro en género, accesible y respeta la mecánica (moneda, fechas, límites)?', dondeVer: 'Aplicación · Lenguaje neutro y Mecánica de escritura; Accesibilidad' },
+  { pregunta: '¿Sobra algo? Si al quitarlo el significado no cambia, se quita.', dondeVer: 'Aplicación · Estructura sin relleno' },
 ];
 
 export const vozDescripcion =
