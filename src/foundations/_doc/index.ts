@@ -19,5 +19,6 @@ export { ScrollRegion } from './ScrollRegion';
 export { contrast, luminance, onColor } from './color';
 export * from './tokensCss';
 export { FoundationDoc } from './FoundationDoc';
+export { ListaVinetas } from './ListaVinetas';
 export { DocCodePanel, DocDataTable, DocExamplePanel, DocNoteCard, DocSimpleCard, DocTextCardView, DocTextCards, FoundationBlockView } from './FoundationBlocks';
 export type * from './foundationDoc.types';
