@@ -3,7 +3,9 @@ import type { FocusEvent, KeyboardEvent, ReactNode } from 'react';
 import { Icon } from '../../components/Icon';
 import { ICON_SIZES, defaultIconVariant } from '../../components/Icon/Icon.types';
 import type { IconName, IconSize, IconVariant } from '../../components/Icon/Icon.types';
+import { Chip, ChipGroup } from '../../components/Chip';
 import { Input } from '../../components/Input';
+import { Select } from '../../components/Select';
 import { caosIconCategories, caosIcons } from '../../icons/caos/registry.generated';
 import { cn } from '../../utils/cn';
 import { DocHeading } from '../_doc';
@@ -13,6 +15,9 @@ const DEFAULT_SIZE: IconSize = 24;
 
 /** "Support- Like- Question" → "Support, Like, Question" (los nombres de categoría vienen de Figma) */
 const categoryLabel = (c: string) => c.replace(/-\s*/g, ', ');
+
+/** Categoría apta para un id (sin espacios: `aria-labelledby` separa por espacios). */
+const slug = (c: string) => c.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 interface Entry {
   name: IconName;
@@ -98,7 +103,11 @@ const IconCell = memo(function IconCell({
   );
 });
 
-function Segmented<T extends string | number>({
+/**
+ * Opciones de una sola elección con los Chip de CAOS (`ChipGroup` de selección única: `radiogroup`, una parada de Tab y
+ * flechas). La leyenda visible nombra el grupo.
+ */
+function Opciones<T extends string | number>({
   legend,
   value,
   options,
@@ -111,31 +120,29 @@ function Segmented<T extends string | number>({
   options: { value: T; label: string }[];
   onChange: (v: T) => void;
 }) {
+  const legendId = useId();
   return (
-    <fieldset className={cn('m-0 flex min-w-0 flex-col gap-ds-space-general-md border-0 p-0', className)}>
-      <legend className="mb-ds-space-general-md p-0 text-ds-primitives-typography-size-md font-medium text-ds-text-neutral-heading">
+    <div className={cn('flex min-w-0 flex-col gap-ds-space-general-md', className)}>
+      <span id={legendId} className="text-ds-primitives-typography-size-md font-ds-primitives-typography-weight-semibold text-ds-text-neutral-heading">
         {legend}
-      </legend>
-      <div className="flex flex-wrap gap-ds-space-general-md">
+      </span>
+      <ChipGroup
+        aria-labelledby={legendId}
+        selectionMode="single"
+        value={[String(value)]}
+        onValueChange={(v) => {
+          const next = options.find((o) => String(o.value) === v[0]);
+          if (next) onChange(next.value);
+        }}
+        className="flex flex-wrap gap-ds-space-general-md"
+      >
         {options.map((o) => (
-          <button
-            key={o.value}
-            type="button"
-            aria-pressed={o.value === value}
-            onClick={() => onChange(o.value)}
-            className={cn(
-              'min-h-10 min-w-10 cursor-pointer rounded-full border px-ds-space-general-xl text-ds-primitives-typography-size-md',
-              o.value === value
-                ? 'border-ds-text-neutral-heading bg-ds-text-neutral-heading text-ds-background-container-surface'
-                : 'border-ds-border-general-default-on-card bg-transparent text-ds-text-neutral-heading hover:bg-ds-background-container-hover-on-canva',
-              focusRing,
-            )}
-          >
+          <Chip key={o.value} value={String(o.value)} icon={false}>
             {o.label}
-          </button>
+          </Chip>
         ))}
-      </div>
-    </fieldset>
+      </ChipGroup>
+    </div>
   );
 }
 
@@ -149,7 +156,7 @@ interface CatalogoIconosProps {
  * Activar un ícono copia su código `<Icon name="…" />` y lo anuncia con aria-live.
  */
 export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): ReactNode {
-  const selectId = useId();
+  const groupId = useId();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState(ALL);
   const [variant, setVariant] = useState<IconVariant>('line');
@@ -253,28 +260,17 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <div className="flex flex-col gap-ds-space-general-md">
-          <label htmlFor={selectId} className="text-ds-primitives-typography-size-md font-medium text-ds-text-neutral-heading">
-            Categoría
-          </label>
-          <select
-            id={selectId}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={cn(
-              'min-h-10 w-full cursor-pointer rounded-ds-radius-general-xl border border-ds-border-general-default-on-card bg-ds-background-container-surface px-ds-space-general-xl text-ds-primitives-typography-size-md text-ds-text-neutral-heading',
-              focusRing,
-            )}
-          >
-            <option value={ALL}>Todas ({ENTRIES.length})</option>
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {categoryLabel(c)} ({ENTRIES.filter((e) => e.category === c).length})
-              </option>
-            ))}
-          </select>
-        </div>
-        <Segmented
+        <Select
+          label="Categoría"
+          fullWidth
+          value={category}
+          onValueChange={setCategory}
+          options={[
+            { value: ALL, label: `Todas (${ENTRIES.length})` },
+            ...CATEGORIES.map((c) => ({ value: c, label: `${categoryLabel(c)} (${ENTRIES.filter((e) => e.category === c).length})` })),
+          ]}
+        />
+        <Opciones
           legend="Variante"
           value={variant}
           onChange={setVariant}
@@ -283,7 +279,7 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
             { value: 'fill', label: 'Relleno' },
           ]}
         />
-        <Segmented
+        <Opciones
           className="tablet:col-span-2"
           legend="Tamaño de vista previa (px)"
           value={size}
@@ -313,16 +309,16 @@ export function CatalogoIconos({ fullscreen = false }: CatalogoIconosProps): Rea
       ) : (
         <div ref={gridRef} onFocus={onGridFocus} onKeyDown={onGridKeyDown} className="flex flex-col gap-ds-space-general-4xl">
           {groups.map((g) => (
-          <section key={g.category} aria-labelledby={`${selectId}-${g.category}`} className="flex flex-col gap-ds-space-general-2xl">
+          <section key={g.category} aria-labelledby={`${groupId}-${slug(g.category)}`} className="flex flex-col gap-ds-space-general-2xl">
             <DocHeading
-              id={`${selectId}-${g.category}`}
+              id={`${groupId}-${slug(g.category)}`}
               level={fullscreen ? 'h2' : 'h3'}
               size="sm"
               className="border-b border-ds-border-general-default-on-card pb-ds-space-general-lg"
             >
               {categoryLabel(g.category)} <span className="font-normal text-ds-text-neutral-gray">· {g.items.length}</span>
             </DocHeading>
-            <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-ds-space-general-lg p-0">
+            <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-ds-space-general-lg p-0">
               {g.items.map((e) => (
                 <IconCell key={e.name} name={e.name} size={size} variant={variant} tabStop={e.name === tabStopIcon} onCopy={onCopy} />
               ))}
