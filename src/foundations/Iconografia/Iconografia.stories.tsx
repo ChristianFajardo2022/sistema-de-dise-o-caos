@@ -12,7 +12,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Pestaña Definición: estilo y tamaño, casos de uso, valores, color, variables y el catálogo de íconos. */
+/** Pestaña Definición: estilo y tamaño, casos de uso, valores, color, variables y el acceso al catálogo de íconos. */
 export const Definicion: Story = { name: 'Definición', args: { initialTab: 'definicion' } };
 
 /** Pestaña Aplicación: accionable frente a informativo, el ícono por breakpoint y Do and Dont’s. */
@@ -28,6 +28,15 @@ export const Desarrollo: Story = { name: 'Desarrollo', args: { initialTab: 'desa
 export const CatalogoPantallaCompleta: Story = {
   name: 'Catálogo a pantalla completa',
   render: () => <CatalogoIconos fullscreen />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // El buscador filtra
+    const buscar = canvas.getByRole('searchbox', { name: /Buscar ícono/ });
+    await userEvent.type(buscar, 'calendar');
+    await expect(await canvas.findByRole('button', { name: 'calendar, copiar código' })).toBeInTheDocument();
+    await expect(canvas.queryByRole('button', { name: 'search, copiar código' })).not.toBeInTheDocument();
+    await userEvent.clear(buscar);
+  },
 };
 
 const H2 = {
@@ -56,7 +65,7 @@ const H2 = {
   Desarrollo: ['Aplicar en Figma', 'Consumo técnico', 'Agregar un ícono a la biblioteca', 'Auditoría, supuestos y pendientes'],
 };
 
-/** Test de la página: h1, las cuatro pestañas (clic y flechas), los h2 de cada una y el buscador del catálogo. Oculto en el menú. */
+/** Test de la página: h1, las cuatro pestañas (clic y flechas), los h2 de cada una y el enlace al catálogo. Oculto en el menú. */
 export const DocPageTest: Story = {
   tags: ['!dev'],
   args: { initialTab: 'definicion' },
@@ -72,12 +81,11 @@ export const DocPageTest: Story = {
     await expect(canvas.getByRole('table', { name: 'Tamaños de Icon y su variante por defecto' })).toBeInTheDocument();
     await expect(canvas.getByRole('table', { name: 'Tokens de dimensión y de espacio de ícono por breakpoint' })).toBeInTheDocument();
     await expect(canvas.getByRole('table', { name: 'Colores de ícono semánticos por modo' })).toBeInTheDocument();
-    // Catálogo: el buscador filtra
-    const buscar = canvas.getByRole('searchbox', { name: /Buscar ícono/ });
-    await userEvent.type(buscar, 'calendar');
-    await expect(await canvas.findByRole('button', { name: 'calendar, copiar código' })).toBeInTheDocument();
-    await expect(canvas.queryByRole('button', { name: 'search, copiar código' })).not.toBeInTheDocument();
-    await userEvent.clear(buscar);
+    // Catálogo: enlace a su propia historia
+    await expect(canvas.getByRole('link', { name: 'Abrir el catálogo de íconos' })).toHaveAttribute(
+      'href',
+      './?path=/story/fundamentos-de-diseño-iconografía--catalogo-pantalla-completa',
+    );
     await userEvent.click(tabs[1]);
     await expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
     await expect(h2()).toEqual(H2['Aplicación']);

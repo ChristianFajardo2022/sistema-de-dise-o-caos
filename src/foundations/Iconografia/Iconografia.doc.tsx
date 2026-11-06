@@ -2,7 +2,8 @@ import type { DocInline, DocPractice } from '../../docs/types';
 import type { FoundationBlock, FoundationDocContent } from '../_doc/foundationDoc.types';
 import { ListaVinetas } from '../_doc/ListaVinetas';
 import { THEMES, THEME_LABELS, ratioText } from '../Colores/colorData';
-import { CatalogoIconos } from './Catalogo';
+import { ButtonLink } from '../../components/ButtonLink';
+
 import {
   ComposicionAnotada,
   ComposicionPorBreakpoint,
@@ -57,6 +58,9 @@ import {
   utilidad,
   utilidadColor,
 } from './iconografiaData';
+
+/** Historia "Catálogo a pantalla completa" (Iconografia.stories.tsx), con la misma forma de enlace que el menú lateral */
+const CATALOGO_HREF = './?path=/story/fundamentos-de-diseño-iconografía--catalogo-pantalla-completa';
 
 /*
  * Contenido de la página Iconografía (plantilla v2 de fundamentos, como Tipografía, Colores, Retículas, Contenedores y
@@ -560,8 +564,18 @@ export const doc: FoundationDocContent = {
     },
     {
       title: 'Catálogo',
-      description: `Los ${TOTAL_ICONOS} íconos de la biblioteca. Busca por nombre o por categoría, cambia la vista previa y activa un ícono para copiar su código.`,
-      blocks: [{ type: 'custom', content: <CatalogoIconos /> }],
+      description: `Los ${TOTAL_ICONOS} íconos de la biblioteca tienen su propia página: busca por nombre o por categoría, cambia la vista previa y activa un ícono para copiar su código.`,
+      blocks: [
+        {
+          type: 'custom',
+          content: (
+            // El catálogo completo alarga demasiado esta pestaña: vive en su propia historia, abierta en el marco de Storybook
+            <ButtonLink href={CATALOGO_HREF} target="_top" iconRight={false}>
+              Abrir el catálogo de íconos
+            </ButtonLink>
+          ),
+        },
+      ],
     },
   ],
   application: [
