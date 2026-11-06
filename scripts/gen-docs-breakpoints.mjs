@@ -25,7 +25,8 @@ for (const line of css.split('\n')) {
     mediaDepth = depth;
   }
   const decl = line.match(/^\s*(--(?:color-)?ds-responsive-[\w-]+):\s*(.+?);\s*$/);
-  if (decl) {
+  // `@theme inline` redeclara algunas como `var(<sí misma>)`: no es un valor y pisaría el de Mobile
+  if (decl && decl[2] !== `var(${decl[1]})`) {
     const target = media === 'tablet' ? tablet : media === 'desktop' ? desktop : base;
     target[decl[1]] = decl[2];
   }

@@ -5,9 +5,9 @@ export type DocBreakpointName = 'mobile' | 'tablet' | 'desktop';
 
 export const BREAKPOINT_VARS: Record<DocBreakpointName, Record<string, string>> = {
   "mobile": {
-    "--color-ds-responsive-effect-shadow-on-canva-md": "var(--color-ds-responsive-effect-shadow-on-canva-md)",
-    "--color-ds-responsive-effect-shadow-on-canva-sm": "var(--color-ds-responsive-effect-shadow-on-canva-sm)",
-    "--color-ds-responsive-effect-shadow-on-card": "var(--color-ds-responsive-effect-shadow-on-card)",
+    "--color-ds-responsive-effect-shadow-on-canva-md": "var(--color-ds-background-effect-shadow-shadow-on-canva-md-mobile)",
+    "--color-ds-responsive-effect-shadow-on-canva-sm": "var(--color-ds-background-effect-shadow-shadow-on-canva-sm-mobile)",
+    "--color-ds-responsive-effect-shadow-on-card": "var(--color-ds-background-effect-shadow-shadow-on-card-mobile)",
     "--ds-responsive-column-default": "4",
     "--ds-responsive-dimention-avatar-lg": "var(--ds-primitives-dimention-4xl)",
     "--ds-responsive-dimention-avatar-md": "var(--ds-primitives-dimention-3xl)",
