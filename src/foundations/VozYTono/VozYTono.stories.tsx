@@ -11,7 +11,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Pestaña Definición: voz, atributos, audiencias, tono y glosario. */
+/** Pestaña Definición: voz, atributos, audiencias, tono, glosario y fundamentos de UX Writing. */
 export const Definicion: Story = { name: 'Definición', args: { initialTab: 'definicion' } };
 
 /** Pestaña Aplicación: cómo escribimos, mecánica de escritura y patrones por componente con muestras vivas. */
@@ -20,7 +20,7 @@ export const Aplicacion: Story = { name: 'Aplicación', args: { initialTab: 'apl
 /** Pestaña Accesibilidad: lenguaje claro, enlaces, etiquetas, errores y textos para lectores de pantalla. */
 export const Accesibilidad: Story = { name: 'Accesibilidad', args: { initialTab: 'accesibilidad' } };
 
-/** Pestaña Desarrollo: revisión de textos de un componente nuevo, fundamentos de UX Writing y consumo técnico. */
+/** Pestaña Desarrollo: la voz en las props de texto, del mensaje técnico al texto para la persona, formatos con Intl, textos de ejemplo y revisión de un componente nuevo. */
 export const Desarrollo: Story = { name: 'Desarrollo', args: { initialTab: 'desarrollo' } };
 
 const H2 = {
@@ -38,6 +38,7 @@ const H2 = {
     'Mapa de tonos por situación',
     'Cómo elegir el tono en 4 preguntas',
     'Glosario',
+    'Fundamentos de UX Writing',
   ],
   Aplicación: [
     'Persona y trato',
@@ -60,7 +61,13 @@ const H2 = {
     'Cómo lo lee un lector de pantalla',
     'Textos alternativos y aria-label',
   ],
-  Desarrollo: ['Revisión de textos de un componente nuevo', 'Cómo se usa al crear un componente', 'Fundamentos de UX Writing', 'Consumo técnico'],
+  Desarrollo: [
+    'La voz en el código',
+    'Del mensaje técnico al texto para la persona',
+    'Formatos en el código',
+    'Textos de ejemplo en historias y documentación',
+    'Revisión de textos de un componente nuevo',
+  ],
 };
 
 /** Test de la página: h1, las cuatro pestañas (clic y flechas) y los h2 de cada una. Oculto en el menú. */
@@ -92,6 +99,8 @@ export const DocPageTest: Story = {
     await userEvent.keyboard('{ArrowRight}');
     await expect(tabs[3]).toHaveAttribute('aria-selected', 'true');
     await expect(h2()).toEqual(H2['Desarrollo']);
+    await expect(canvas.getByRole('table', { name: 'Del mensaje técnico al texto que lee la persona' })).toBeInTheDocument();
+    await expect(canvas.getByRole('table', { name: 'Formatos de la guía y salida de Intl con es-CO' })).toBeInTheDocument();
     await expect(canvas.getByRole('table', { name: 'Revisión de textos de un componente nuevo' })).toBeInTheDocument();
     await expect(canvas.getAllByRole('button', { name: /^Copiar código/ })).toHaveLength(2);
   },

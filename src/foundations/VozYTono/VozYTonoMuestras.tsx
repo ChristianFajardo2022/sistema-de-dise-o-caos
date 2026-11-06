@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Alert } from '../../components/Alert';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
+import { Icon } from '../../components/Icon';
 import { Input } from '../../components/Input';
 import { AlertModalPanel } from '../../components/Modal';
 import { Tag } from '../../components/Tag';
@@ -241,4 +242,27 @@ export function MuestraPatron({ patron }: { patron: Patron }): ReactNode {
     );
   }
   return null;
+}
+
+/** Toast de éxito con título y, si hay, mensaje. */
+export function MuestraToast({ titulo, descripcion }: { titulo: string; descripcion?: string }) {
+  return (
+    <Ilustracion className="flex w-full justify-center p-ds-space-general-4xl">
+      <Toast type="success" title={titulo} description={descripcion} />
+    </Ilustracion>
+  );
+}
+
+/** Botón de solo ícono con su `aria-label` escrito debajo (el texto que lee un lector de pantalla). */
+export function MuestraAriaLabel({ etiqueta }: { etiqueta: string }) {
+  return (
+    <Ilustracion className="flex w-full flex-col items-center gap-ds-space-general-lg p-ds-space-general-4xl">
+      <Button iconOnly variant="secondary" aria-label={etiqueta}>
+        <Icon name="close-circle" aria-hidden="true" />
+      </Button>
+      <span className={cn(primary, 'text-ds-primitives-typography-size-md text-ds-text-neutral-gray')}>
+        aria-label: <code>{etiqueta}</code>
+      </span>
+    </Ilustracion>
+  );
 }

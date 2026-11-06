@@ -6,12 +6,14 @@ import {
   EnCaos,
   EtiquetaCelebracion,
   ListaCitas,
+  MuestraAriaLabel,
   MuestraBoton,
   MuestraBotones,
   MuestraCampo,
   MuestraCampoConAyuda,
   MuestraErrorCampo,
   MuestraPatron,
+  MuestraToast,
   PreguntaChecklist,
   PreguntasTono,
   SuenaAsi,
@@ -120,21 +122,45 @@ const lineas = (...items: DocInline[]): DocInline => (
 
 // ───────────────────────── código de ejemplo ─────────────────────────
 
-const CODIGO_CONSUMO = [
-  "import { Input } from '../../components/Input';",
-  "import { patrones } from './vozYTono.content';",
+const CODIGO_FORMATOS = [
+  "const pesos = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });",
+  "const porcentaje = new Intl.NumberFormat('es-CO', { style: 'percent', maximumFractionDigits: 0 });",
+  "const diaMes = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'long' });",
+  "const diaMesAnio = new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });",
+  "const numerica = new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });",
+  "const hora12 = new Intl.DateTimeFormat('es-CO', { hour: 'numeric', minute: '2-digit', hour12: true });",
   '',
-  "// La fórmula y el ejemplo salen de la guía: no se copian a mano",
-  "const campo = patrones.find((p) => p.componente === 'Error en un campo');",
+  '// $ pegado al valor: no se usa style: \'currency\' porque pone un espacio duro después del $',
+  'export const dinero = (valor: number) => `$${pesos.format(valor)}`;',
   '',
-  '<Input label="Celular" state="error" errorText={campo?.ejemplo} />',
+  '// El año solo si cambia',
+  'export const fecha = (date: Date, hoy = new Date()) =>',
+  '  (date.getFullYear() === hoy.getFullYear() ? diaMes : diaMesAnio).format(date);',
+  '',
+  'export const fechaNumerica = (date: Date) => numerica.format(date);',
+  '',
+  '// a.m. y p.m. sin el espacio interno que pone Intl ("p. m.")',
+  'export const hora = (date: Date) =>',
+  '  hora12',
+  '    .formatToParts(date)',
+  "    .map((p) => (p.type === 'dayPeriod' ? p.value.replace(/\\s/g, '').toLowerCase() : p.value))",
+  "    .join('');",
+  '',
+  'export const porcentajeDe = (fraccion: number) => porcentaje.format(fraccion);',
 ].join('\n');
 
-const CODIGO_REVISION = [
-  "import { revisionComponente } from './vozYTono.content';",
+const CODIGO_PROPS = [
+  '<Button>Crear envío</Button>',
   '',
-  '// Una fila por punto de revisión: { punto, regla }',
-  'revisionComponente.map(({ punto, regla }) => `${punto}: ${regla}`);',
+  '<Input label="Celular" state="error" errorText="El número de celular debe tener 10 dígitos." />',
+  '',
+  '<Input label="Celular" placeholder="310 123 4567" />',
+  '',
+  '<Toast type="success" title="Contacto creado." />',
+  '',
+  '<Button iconOnly aria-label="Cerrar">',
+  '  <Icon name="close-circle" aria-hidden="true" />',
+  '</Button>',
 ].join('\n');
 
 const CODIGO_TEXTOS_ACCESIBLES = [
@@ -338,6 +364,21 @@ export const doc: FoundationDocContent = {
           rows: g.terminos.map((t) => [t.concepto, t.definicion, t.ejemplo, t.evitar]),
         },
       ]),
+    },
+    {
+      title: 'Fundamentos de UX Writing',
+      description: anexo.intro,
+      blocks: [
+        subTitle('Objetivos'),
+        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.objetivos.map((o) => <><strong>{o.titulo}.</strong> {o.texto}</>)} /> }] },
+        subTitle('Cuándo usar las heurísticas'),
+        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.cuandoUsar} /> }] },
+        subTitle('Heurísticas de UX Writing'),
+        { type: 'text', content: anexo.heuristicasIntro },
+        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.heuristicas.map((h) => <><strong>{h.titulo}.</strong> {h.texto}</>)} /> }] },
+        subTitle('Cómo son los buenos contenidos'),
+        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.contenidos.map((c) => <><strong>{c.titulo}.</strong> {c.texto}</>)} /> }] },
+      ],
     },
   ],
   application: [
@@ -665,6 +706,172 @@ export const doc: FoundationDocContent = {
   ],
   development: [
     {
+      title: 'La voz en el código',
+      description: 'La voz también se escribe en el código: en las props de texto que muestra la interfaz y en las que solo lee un lector de pantalla. Cada texto sigue la guía.',
+      blocks: [
+        subTitle('Botón'),
+        {
+          type: 'practices',
+          items: [
+            practice('do', 'Botón que nombra la acción', <>Infinitivo y la acción concreta: <code>{'<Button>Crear envío</Button>'}</code>.</>, <MuestraBotones bueno />),
+            practice('dont', 'Botón genérico', <>Una etiqueta que no dice qué pasa: <code>{'<Button>OK</Button>'}</code>.</>, <MuestraBoton texto="OK" />),
+          ],
+        },
+        subTitle('Texto de error de un campo'),
+        {
+          type: 'practices',
+          items: [
+            practice(
+              'do',
+              'errorText que dice qué se necesita',
+              <><code>errorText</code> dice qué se necesita, sin culpar y sin códigos.</>,
+              <MuestraErrorCampo etiqueta="Celular" valor="310 123 45" error={patron('Error en un campo')?.ejemplo ?? ''} />,
+            ),
+            practice('dont', 'errorText que no explica', <><code>errorText=&quot;Dato inválido&quot;</code> no dice qué dato ni cómo corregirlo.</>, <MuestraErrorCampo etiqueta="Celular" valor="310 123 45" error="Dato inválido" />),
+          ],
+        },
+        subTitle('Placeholder'),
+        {
+          type: 'practices',
+          items: [
+            practice('do', 'placeholder con un ejemplo real', <><code>placeholder=&quot;310 123 4567&quot;</code>: un ejemplo real, en el formato esperado.</>, <MuestraCampo etiqueta="Celular" placeholder="310 123 4567" />),
+            practice('dont', 'placeholder que da una instrucción', <><code>placeholder=&quot;Ingresa el número&quot;</code>: da una instrucción y desaparece al escribir.</>, <MuestraCampo etiqueta="Celular" placeholder="Ingresa el número" />),
+          ],
+        },
+        subTitle('Título y mensaje de un Toast'),
+        {
+          type: 'practices',
+          items: [
+            practice(
+              'do',
+              'Toast con el resultado en pocas palabras',
+              <><code>title=&quot;Contacto creado.&quot;</code>: el resultado, sin adornos.</>,
+              <MuestraToast titulo={patron('Éxito (toast)')?.ejemplo ?? ''} />,
+            ),
+            practice(
+              'dont',
+              'Toast con relleno',
+              <>Exclamación, «éxito» y una frase larga que no aporta: se quita lo que no cambia el significado.</>,
+              <MuestraToast titulo="¡Éxito!" descripcion="La operación se completó correctamente." />,
+            ),
+          ],
+        },
+        subTitle('aria-label de un botón de solo ícono'),
+        {
+          type: 'practices',
+          items: [
+            practice('do', 'aria-label que dice la función', <><code>aria-label=&quot;Cerrar&quot;</code>: la función, en la misma voz.</>, <MuestraAriaLabel etiqueta="Cerrar" />),
+            practice('dont', 'aria-label que repite el rol', <><code>aria-label=&quot;Botón para cerrar la ventana&quot;</code>: el lector ya dice «botón».</>, <MuestraAriaLabel etiqueta="Botón para cerrar la ventana" />),
+          ],
+        },
+        { type: 'code', sample: { label: 'Props de texto con la voz de la guía', code: CODIGO_PROPS } },
+      ],
+    },
+    {
+      title: 'Del mensaje técnico al texto para la persona',
+      description: 'El sistema devuelve códigos y mensajes para quien programa. La persona lee qué pasó y qué sigue, sin culpar, sin códigos y sin jerga. Se aplican las fórmulas de «Patrones por componente».',
+      blocks: [
+        {
+          type: 'table',
+          caption: 'Del mensaje técnico al texto que lee la persona',
+          minWidth: 900,
+          columns: [
+            { header: 'Lo que devuelve el sistema', width: 300 },
+            { header: 'Lo que lee la persona', width: 360 },
+            { header: 'Fórmula de la guía', width: 300 },
+          ],
+          rows: [
+            [<code key="a">422 phone: must match ^\d{'{10}'}$</code>, patron('Error en un campo')?.ejemplo ?? '', patron('Error en un campo')?.formula ?? ''],
+            [<code key="b">401 Unauthorized: token expired</code>, 'Tu sesión terminó. Inicia sesión de nuevo para continuar.', 'Qué pasó + qué sigue'],
+            [<code key="c">TypeError: Failed to fetch</code>, 'No pudimos conectarnos. Revisa tu conexión e inténtalo de nuevo.', 'Qué pasó + qué sigue'],
+            [<code key="d">504 Gateway Timeout</code>, 'Estamos tardando más de lo normal. Puedes intentarlo de nuevo en unos minutos.', 'Responsabilidad + cuándo reintentar'],
+            [<code key="e">500 Internal Server Error</code>, patron('Error del sistema')?.ejemplo ?? '', patron('Error del sistema')?.formula ?? ''],
+            [<code key="f">403 Forbidden: missing scope</code>, 'No tienes permisos para gestionar esta guía.', 'Qué pasó (sin culpar)'],
+          ],
+        },
+        {
+          type: 'note',
+          tone: 'neutral',
+          title: 'Criterio propio',
+          content:
+            'La guía trae tal cual el error de un campo (422), el error del sistema (500) y el permiso denegado (403, en «Lenguaje neutro»). Los textos de sesión vencida, sin conexión y tiempo de espera son criterio propio con las mismas fórmulas: revísalos con el equipo de UX Writing.',
+        },
+        {
+          type: 'practices',
+          items: [
+            practice('do', 'Mensaje para la persona', 'Dice qué pasó y qué sigue, con las palabras de la persona.', <EjemploEnMarco>No pudimos conectarnos. Revisa tu conexión e inténtalo de nuevo.</EjemploEnMarco>),
+            practice('dont', 'Mensaje técnico sin traducir', 'Muestra el error del sistema tal cual: la persona no sabe qué hacer.', <EjemploEnMarco>TypeError: Failed to fetch</EjemploEnMarco>),
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Formatos en el código',
+      description: 'Los formatos de «Mecánica de escritura» se producen con Intl, no a mano. Intl no da el formato exacto de la guía en dos casos (dinero y hora) y necesita un ajuste.',
+      blocks: [
+        {
+          type: 'table',
+          caption: 'Formatos de la guía y salida de Intl con es-CO',
+          minWidth: 900,
+          columns: [
+            { header: 'Formato', width: 140 },
+            { header: 'Intl sin ajustar', width: 300 },
+            { header: 'Salida real', width: 160 },
+            { header: 'Ajuste', width: 300 },
+          ],
+          rows: [
+            ['Dinero: $12.340', <code key="1">NumberFormat(&apos;es-CO&apos;, {'{ style: \'currency\', currency: \'COP\', maximumFractionDigits: 0 }'})</code>, '$ 12.340 (con un espacio duro después del $)', 'Anteponer «$» a NumberFormat sin style: «currency»: $12.340'],
+            ['Fecha: 26 de octubre', <code key="2">DateTimeFormat(&apos;es-CO&apos;, {'{ day: \'numeric\', month: \'long\' }'})</code>, '26 de octubre', 'Ninguno. Con year: «numeric» sale 26 de octubre de 2026 (el año solo si cambia).'],
+            ['Fecha numérica: 26/10/2026', <code key="3">DateTimeFormat(&apos;es-CO&apos;, {'{ day: \'2-digit\', month: \'2-digit\', year: \'numeric\' }'})</code>, '26/10/2026', 'Ninguno.'],
+            ['Hora: 5:00 p.m.', <code key="4">DateTimeFormat(&apos;es-CO&apos;, {'{ hour: \'numeric\', minute: \'2-digit\', hour12: true }'})</code>, '5:00 p. m. (con un espacio dentro de «p. m.»)', 'Quitar los espacios de dayPeriod con formatToParts: 5:00 p.m.'],
+            ['Porcentaje: 15%', <code key="5">NumberFormat(&apos;es-CO&apos;, {'{ style: \'percent\' }'})</code>, '15%', 'Ninguno. Con maximumFractionDigits: 0 no salen decimales.'],
+          ],
+        },
+        { type: 'code', sample: { label: 'Formateadores con el ajuste (comprobados en Node 22 y en Chromium)', code: CODIGO_FORMATOS } },
+        {
+          type: 'note',
+          tone: 'neutral',
+          title: 'Salida comprobada',
+          content: (
+            <>
+              <code>dinero(12340)</code> da «$12.340»; <code>dinero(1234567)</code>, «$1.234.567»; <code>fecha()</code> de un 26 de octubre, «26 de octubre» (y «26 de octubre de 2026» si el año cambia); <code>fechaNumerica()</code>, «26/10/2026»; <code>hora()</code> de las 17:00, «5:00 p.m.», y de las 9:12, «9:12 a.m.»; <code>porcentajeDe(0.15)</code>, «15%». El resultado depende de los datos de idioma del motor (ICU): vuelve a comprobarlo si cambias de versión.
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      title: 'Textos de ejemplo en historias y documentación',
+      description: 'Los textos de ejemplo de una historia o de una documentación siguen la misma voz: datos realistas del glosario, nunca relleno.',
+      blocks: [
+        {
+          type: 'table',
+          caption: 'Textos de ejemplo: qué evitar y qué usar',
+          minWidth: 720,
+          columns: [
+            { header: 'Situación', width: 220 },
+            { header: 'Evita', width: 340 },
+            { header: 'Usa', width: 400 },
+          ],
+          rows: [
+            ['Texto de un botón', 'Texto, Botón, Test', 'Crear envío'],
+            ['Nombre de una persona', 'Usuario de prueba, Test Test', 'Laura Gómez'],
+            ['Contenido de un campo', 'Lorem ipsum dolor sit amet', 'Dos camisetas y una gorra'],
+            ['Celular', '1234567890, 000 000 0000', '310 123 4567'],
+            ['Dirección', 'Calle falsa 123', 'Cl. 72 # 10-34'],
+            ['Mensaje de éxito', 'Éxito, Test OK', 'Contacto creado.'],
+            ['Estado vacío', 'No hay datos.', 'Aún no tienes envíos. Cuando crees uno, lo verás aquí.'],
+          ],
+        },
+        {
+          type: 'note',
+          tone: 'neutral',
+          title: 'Criterio propio',
+          content: 'La guía pide que los textos de ejemplo sigan la misma guía y usen los patrones por componente como base. Esta tabla baja ese punto a casos concretos; los datos de la columna «Usa» salen del glosario y de los patrones de la guía.',
+        },
+      ],
+    },
+    {
       title: 'Revisión de textos de un componente nuevo',
       description: 'Cada componente nuevo del sistema, con sus historias y su documentación, pasa esta revisión de textos antes de cerrarse.',
       blocks: [
@@ -674,101 +881,6 @@ export const doc: FoundationDocContent = {
           minWidth: 720,
           columns: [{ header: 'Punto a revisar', width: 260 }, { header: 'Regla', width: 700 }],
           rows: revisionComponente.map((r) => [r.punto, r.regla]),
-        },
-      ],
-    },
-    {
-      title: 'Cómo se usa al crear un componente',
-      description: 'La lista se aplica a todo texto que el componente muestra o que lo documenta.',
-      blocks: [
-        {
-          type: 'cards',
-          items: [
-            {
-              title: 'Pasos de la revisión',
-              steps: [
-                { title: 'Reúne los textos', content: 'Etiquetas, placeholders, ayudas, errores, botones, textos para lectores de pantalla y los ejemplos de las historias y de la documentación.' },
-                { title: 'Recorre la tabla', content: 'Compara cada texto con el punto que le corresponde y corrige lo que no cumple. Si falta un término, búscalo en el glosario.' },
-                { title: 'Aplica el tono', content: 'Elige el tono según el momento con el mapa de tonos. Un error, un pago o un retraso no llevan humor ni exclamaciones.' },
-                { title: 'Cierra el componente', content: 'El componente se da por terminado cuando todos sus textos pasan la revisión.' },
-              ],
-            },
-          ],
-        },
-        { type: 'code', sample: { label: 'Leer la lista de revisión desde el código', code: CODIGO_REVISION } },
-      ],
-    },
-    {
-      title: 'Fundamentos de UX Writing',
-      description: anexo.intro,
-      blocks: [
-        subTitle('Objetivos'),
-        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.objetivos.map((o) => <><strong>{o.titulo}.</strong> {o.texto}</>)} /> }] },
-        subTitle('Cuándo usar las heurísticas'),
-        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.cuandoUsar} /> }] },
-        subTitle('Heurísticas de UX Writing'),
-        { type: 'text', content: anexo.heuristicasIntro },
-        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.heuristicas.map((h) => <><strong>{h.titulo}.</strong> {h.texto}</>)} /> }] },
-        subTitle('Cómo son los buenos contenidos'),
-        { type: 'cards', items: [{ preview: <ListaVinetas items={anexo.contenidos.map((c) => <><strong>{c.titulo}.</strong> {c.texto}</>)} /> }] },
-      ],
-    },
-    {
-      title: 'Consumo técnico',
-      description: (
-        <>
-          El texto de esta página no está escrito en la página: vive en <code>vozYTono.content.ts</code> y la página lo reparte en las cuatro pestañas.
-        </>
-      ),
-      blocks: [
-        {
-          type: 'note',
-          tone: 'accent',
-          title: 'Una sola fuente',
-          content: (
-            <>
-              <code>src/foundations/VozYTono/vozYTono.content.ts</code> es la fuente única de la guía. Si la guía cambia, se edita ahí y la página se actualiza sola. No copies sus frases a una historia o a una documentación: impórtalas.
-            </>
-          ),
-        },
-        {
-          type: 'table',
-          caption: 'Exports de vozYTono.content.ts y la pestaña donde se muestran',
-          minWidth: 800,
-          columns: [
-            { header: 'Exports', width: 420 },
-            { header: 'Contenido', width: 300 },
-            { header: 'Pestaña', width: 200 },
-          ],
-          rows: [
-            [<code key="1">ficha</code>, 'Versión, responsable, a quién aplica y cómo proponer cambios', 'Definición'],
-            [<code key="2">proposito</code>, 'Propósito de la guía', 'Definición'],
-            [<code key="3">rutaRapida</code>, 'Qué necesitas y en qué pestaña y sección está', 'Definición'],
-            [<code key="4">vozEn30, atributos, checklist</code>, 'Voz en 30 segundos, atributos y checklist', 'Definición'],
-            [<code key="5">vozDescripcion, adn, audiencias</code>, 'La voz de la marca y sus audiencias', 'Definición'],
-            [<code key="6">tonoIntro, tonoEnFlujo, humorRegla, mapaDeTonos, elegirTono</code>, 'Tono', 'Definición'],
-            [<code key="7">glosarioIntro, glosario</code>, 'Términos aprobados', 'Definición'],
-            [<code key="8">terminosBaseIntro</code>, 'Introducción a los términos base. No se muestra en la página.', 'Ninguna'],
-            [<code key="9">comoEscribimosIntro, persona, estilo, estructuraSinRelleno, botones, campos, placeholders, lenguajeNeutro</code>, 'Cómo escribimos', 'Aplicación'],
-            [<code key="10">mecanica, limites, abreviaturas</code>, 'Mecánica de escritura', 'Aplicación'],
-            [<code key="11">patronesIntro, patrones</code>, 'Fórmulas por componente y muestras', 'Aplicación'],
-            [<code key="12">accesibilidad</code>, 'Accesibilidad aplicada', 'Accesibilidad'],
-            [<code key="13">revisionComponente, anexo</code>, 'Revisión de un componente nuevo y fundamentos de UX Writing', 'Desarrollo'],
-          ],
-        },
-        { type: 'code', sample: { label: 'Usar un patrón de la guía en un componente', code: CODIGO_CONSUMO } },
-        {
-          type: 'cards',
-          items: [
-            {
-              title: 'Cambiar el texto de la guía',
-              steps: [
-                { title: 'Edita el archivo', content: <>Cambia el texto en <code>vozYTono.content.ts</code> y deja la estructura de la página como está.</> },
-                { title: 'Actualiza las referencias', content: <>Si renombras una sección, ajusta <code>rutaRapida</code> y la columna «Dónde ver el detalle» de <code>checklist</code>, que nombran la pestaña y la sección.</> },
-                { title: 'Verifica', content: 'Revisa que ninguna otra parte del repo dependa del export que cambiaste y que la página siga completa a 390 px.' },
-              ],
-            },
-          ],
         },
       ],
     },
